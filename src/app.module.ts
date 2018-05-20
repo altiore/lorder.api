@@ -1,16 +1,18 @@
 import { APP_GUARD } from '@nestjs/core';
 import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { RolesGuard } from './@common/guards/roles.guard';
+
 // import { LoggerMiddleware } from './@common/middlewares/logger.middleware';
 
 @Module({
-  imports: [UsersModule],
-  controllers: [AppController],
-  providers: [AppService, {
+  imports: [
+    UsersModule,
+    TypeOrmModule.forRoot(),
+  ],
+  providers: [{
     provide: APP_GUARD,
     useClass: RolesGuard,
   }],

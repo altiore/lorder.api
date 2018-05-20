@@ -1,4 +1,4 @@
-import { Get, Controller, Post, Body, Param } from '@nestjs/common';
+import { Get, Controller, Post, Body, Param, ParseIntPipe } from '@nestjs/common';
 
 import { Roles } from '../@common/decorators/roles.decorator';
 import { UsersService } from './users.service';
@@ -15,12 +15,12 @@ export class UsersController {
 
   @Get(':id')
   @Roles('owner', 'admin')
-  findOne(@Param('id') id: number): string {
+  findOne(@Param('id', ParseIntPipe) id: number): string {
     return typeof id;
   }
 
   @Post()
   create(@Body() data: CreateUserDto) {
-
+    console.log('body', data);
   }
 }
