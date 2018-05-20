@@ -5,6 +5,7 @@
   "username": "altiore_contrib",
   "password": "!ap4L&BQnfbH",
   "database": "altiore_contrib",
+  "timezone": "Z",
   "entities": ["src/**/**.entity{.ts,.js}"],
   "synchronize": false,
   "migrations": ["migrations/*.ts"],

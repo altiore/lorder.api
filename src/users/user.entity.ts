@@ -6,11 +6,17 @@ export class User {
   id: number;
 
   @Column()
-  name: string;
-
-  @Column()
   identifier: string;
 
-  @Column('int')
+  @Column({type: 'int', default: 1})
   status: number;
+
+  @Column('int')
+  paymentMethod: number;
+
+  @Column('datetime')
+  createdAt: Date;
+
+  @Column('datetime')
+  updatedAt: Date;
 }

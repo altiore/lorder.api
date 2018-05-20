@@ -1,9 +1,10 @@
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_FILTER } from '@nestjs/core';
 import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UsersModule } from './users/users.module';
 import { RolesGuard } from './@common/guards/roles.guard';
+import { AllExceptionsFilter } from './@common/filters/all-exceptions.filter';
 
 // import { LoggerMiddleware } from './@common/middlewares/logger.middleware';
 
@@ -12,10 +13,16 @@ import { RolesGuard } from './@common/guards/roles.guard';
     UsersModule,
     TypeOrmModule.forRoot(),
   ],
-  providers: [{
-    provide: APP_GUARD,
-    useClass: RolesGuard,
-  }],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

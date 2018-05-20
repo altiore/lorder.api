@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-const tableName = 'users';
+const tableName = 'user';
 
 export class createUserTable1526826461540 implements MigrationInterface {
 
@@ -11,7 +11,10 @@ export class createUserTable1526826461540 implements MigrationInterface {
         {
           name: 'id',
           type: 'int',
+          isNullable: false,
+          isGenerated: true,
           isPrimary: true,
+          generationStrategy: 'increment',
         },
         {
           name: 'identifier',
@@ -22,16 +25,19 @@ export class createUserTable1526826461540 implements MigrationInterface {
           type: 'int',
         },
         {
-          name: 'payment_method',
+          name: 'paymentMethod',
           type: 'int',
+          isNullable: true,
         },
         {
-          name: 'created_at',
-          type: 'timestamp',
+          name: 'createdAt',
+          type: 'datetime',
+          default: 'NOW()',
         },
         {
-          name: 'created_at',
-          type: 'timestamp',
+          name: 'updatedAt',
+          type: 'datetime',
+          default: 'NOW()',
         },
       ],
     }));
