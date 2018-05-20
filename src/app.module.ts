@@ -2,7 +2,7 @@ import { APP_GUARD, APP_FILTER } from '@nestjs/core';
 import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { UsersModule } from './users/users.module';
+import { UserModule } from './user/user.module';
 import { RolesGuard } from './@common/guards/roles.guard';
 import { AllExceptionsFilter } from './@common/filters/all-exceptions.filter';
 
@@ -10,7 +10,7 @@ import { AllExceptionsFilter } from './@common/filters/all-exceptions.filter';
 
 @Module({
   imports: [
-    UsersModule,
+    UserModule,
     TypeOrmModule.forRoot(),
   ],
   providers: [
