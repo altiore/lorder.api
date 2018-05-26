@@ -1,22 +1,40 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import * as moment from 'moment';
+import { ApiModelProperty } from '@nestjs/swagger';
 
 @Entity()
 export class User {
+  @ApiModelProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ApiModelProperty()
   @Column()
   identifier: string;
 
-  @Column({type: 'int', default: 1})
+  @ApiModelProperty()
+  @Column('int')
   status: number;
 
-  @Column('int')
+  @ApiModelProperty()
+  @Column({ type: 'int', nullable: true })
   paymentMethod: number;
 
-  @Column('datetime')
-  createdAt: Date;
+  @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
+  @CreateDateColumn({
+    transformer: {
+      to: d => d ? d.toDate() : undefined,
+      from: d => moment(d),
+    },
+  })
+  createdAt: moment.Moment;
 
-  @Column('datetime')
-  updatedAt: Date;
+  @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
+  @UpdateDateColumn({
+    transformer: {
+      to: d => d ? d.toDate() : undefined,
+      from: d => moment(d),
+    },
+  })
+  updatedAt: moment.Moment;
 }

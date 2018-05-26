@@ -1,21 +1,32 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { TestingModule } from '@nestjs/testing';
+
+import { MyTest } from '../testHelper/MyTest';
+
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { User } from './user.entity';
 
-describe('UsersController', () => {
+describe('UsersController', async () => {
   let app: TestingModule;
 
   beforeAll(async () => {
-    app = await Test.createTestingModule({
+    app = await MyTest.create([User], {
       controllers: [UserController],
       providers: [UserService],
-    }).compile();
+    }, [
+      {identifier: 'test1', status: 1, paymentMethod: 1, createdAt: new Date(), updateAt: new Date()},
+      {identifier: 'test2', status: 1, paymentMethod: 1, createdAt: new Date(), updateAt: new Date()},
+    ]);
   });
 
-  describe('root', () => {
-    it('should return "Hello Users!"', () => {
+  // afterAll(() => {
+  //   console.log('after all');
+  // })
+
+  describe('findOne', async () => {
+    it('should return "Hello Users!"', async () => {
       const userController = app.get<UserController>(UserController);
-      expect(userController.root()).toBe('Hello Users!');
+      expect(await userController.findOne(1)).toMatchObject({id: 1});
     });
   });
 });

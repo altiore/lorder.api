@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/create.user.dto';
+import { ValidationException } from '../@common/exceptions/validation.exception';
+import moment = require('moment');
 
 @Injectable()
 export class UserService {
@@ -18,6 +20,10 @@ export class UserService {
 
   public async findOne(id: number): Promise<User> {
     return await this.userRepository.findOneOrFail(id);
+  }
+
+  public async findOneByIdentifier(identifier: string): Promise<User> {
+    return await this.userRepository.findOneOrFail({ identifier });
   }
 
   public async create(createUserDto: CreateUserDto): Promise<User> {

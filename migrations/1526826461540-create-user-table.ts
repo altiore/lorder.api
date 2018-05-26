@@ -19,10 +19,12 @@ export class createUserTable1526826461540 implements MigrationInterface {
         {
           name: 'identifier',
           type: 'varchar',
+          isNullable: false,
         },
         {
           name: 'status',
           type: 'int',
+          isNullable: false,
         },
         {
           name: 'paymentMethod',
@@ -32,12 +34,14 @@ export class createUserTable1526826461540 implements MigrationInterface {
         {
           name: 'createdAt',
           type: 'datetime',
-          default: 'NOW()',
+          precision: 6,
+          isNullable: false,
         },
         {
           name: 'updatedAt',
           type: 'datetime',
-          default: 'NOW()',
+          precision: 6,
+          isNullable: false,
         },
       ],
     }));
