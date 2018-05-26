@@ -1,10 +1,10 @@
 import { TestingModule } from '@nestjs/testing';
 
-import { MyTest } from '../testHelper/MyTest';
+import { MyTest } from '../@common/testHelper/MyTest';
 
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { User } from './user.entity';
+import { User } from '../@entities/user';
 
 describe('UsersController', async () => {
   let app: TestingModule;

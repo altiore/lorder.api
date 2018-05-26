@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthModule } from './auth/auth.module';
+import { ProjectModule } from './project/project.module';
 import { UserModule } from './user/user.module';
 import { RolesGuard } from './@common/guards/roles.guard';
 import { AllExceptionsFilter } from './@common/filters/all-exceptions.filter';
@@ -12,6 +13,7 @@ import { AllExceptionsFilter } from './@common/filters/all-exceptions.filter';
     AuthModule,
     TypeOrmModule.forRoot(),
     UserModule,
+    ProjectModule,
   ],
   providers: [
     {
@@ -24,11 +26,4 @@ import { AllExceptionsFilter } from './@common/filters/all-exceptions.filter';
     },
   ],
 })
-export class AppModule {
-  // configure(consumer: MiddlewareConsumer) {
-  //   // consumer
-  //   //   .apply(LoggerMiddleware)
-  //   //   .with('testValue')
-  //   //   .forRoutes('/users');
-  // }
-}
+export class AppModule {}

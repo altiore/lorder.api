@@ -2,48 +2,37 @@ import { Get, Controller, Post, Body, Param, ParseIntPipe, UseGuards } from '@ne
 import { ApiBearerAuth, ApiUseTags, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import * as jwt from 'jsonwebtoken';
-import { pick } from 'lodash';
 
+import { User } from '../@entities/user';
+import { Project, ProjectDto } from '../@entities/project';
 import { Roles } from '../@common/decorators/roles.decorator';
 import { UserJWT } from '../@common/decorators/user-jwt.decorator';
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create.user.dto';
-import { User } from './user.entity';
-import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import { ProjectService } from './project.service';
 
 @ApiBearerAuth()
-@ApiUseTags('users')
 @UseGuards(AuthGuard('jwt'))
-@Controller('users')
-export class UserController {
-  constructor(private readonly usersService: UserService) {}
-
-  @Get('self')
-  @ApiResponse({ status: 200, type: User })
-  public async self(@UserJWT() user: User): Promise<any> {
-    const payload: JwtPayload = pick(user, ['identifier']);
-    // const payload: JwtPayload = { identifier: 'user@email.com' };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 3600 });
-    return { user, token };
-  }
+@ApiUseTags('projects')
+@Controller('projects')
+export class ProjectController {
+  constructor(private readonly projectService: ProjectService) {}
 
   @Get()
-  @ApiResponse({ status: 200, type: User, isArray: true })
+  @ApiResponse({ status: 200, type: Project, isArray: true })
   public async all(@UserJWT() user: User): Promise<any> {
-    return this.usersService.findAll();
+    return this.projectService.findAll(user);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   @Roles('owner', 'admin')
-  @ApiResponse({ status: 200, type: User })
-  public async findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
-    return await this.usersService.findOne(id);
+  @ApiResponse({ status: 200, type: Project })
+  public async one(@Param('id', ParseIntPipe) id: number): Promise<Project> {
+    return await this.projectService.findOne(id);
   }
 
   @Post()
-  @ApiResponse({ status: 201, description: 'The User has been successfully created.', type: User })
-  public async create(@Body() data: CreateUserDto): Promise<User> {
-    return await this.usersService.create(data);
+  @ApiResponse({ status: 201, description: 'The Project has been successfully created.', type: Project })
+  public async create(@Body() data: ProjectDto): Promise<Project> {
+    return await this.projectService.create(data);
   }
 }

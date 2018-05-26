@@ -1,32 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 
-import { ProjectEntity } from './project.entity';
-import { CreateUserDto } from './dto/create.user.dto';
+import { Project, ProjectRepository, ProjectDto } from '../@entities/project';
+import { User } from '../@entities/user';
 
 @Injectable()
 export class ProjectService {
   constructor(
-    @InjectRepository(ProjectEntity)
-    private readonly userRepository: Repository<ProjectEntity>,
+    @InjectRepository(ProjectRepository)
+    private readonly projectRepo: ProjectRepository,
   ) {}
 
-  public findAll(): Promise<ProjectEntity[]> {
-    return this.userRepository.find();
+  public findAll(user: User): Promise<Project[]> {
+    // TODO: return only Project, which belongs to user
+    return this.projectRepo.find();
   }
 
-  public async findOne(id: number): Promise<ProjectEntity> {
-    return await this.userRepository.findOneOrFail(id);
+  public async findOne(id: number): Promise<Project> {
+    return await this.projectRepo.findOneOrFail(id);
   }
 
-  public async findOneByIdentifier(identifier: string): Promise<ProjectEntity> {
-    return await this.userRepository.findOne({ identifier });
-  }
-
-  public async create(createUserDto: CreateUserDto): Promise<ProjectEntity> {
-    const user = this.userRepository.create(createUserDto);
-    user.status = 1;
-    return await this.userRepository.save(user);
+  public async create(data: ProjectDto): Promise<Project> {
+    const project = this.projectRepo.create(data);
+    return await this.projectRepo.save(project);
   }
 }
