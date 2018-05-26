@@ -12,7 +12,7 @@ export class User {
   id: number;
 
   @ApiModelProperty()
-  @Column()
+  @Column({ unique: true })
   identifier: string;
 
   @ApiModelProperty()

@@ -8,6 +8,6 @@ export class Role {
   id: number;
 
   @ApiModelProperty()
-  @Column()
+  @Column({ unique: true })
   name: string;
 }
