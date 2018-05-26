@@ -5,14 +5,14 @@ import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly usersService: UserService) {}
+  constructor(private readonly userService: UserService) {}
 
   async createToken() {
     const user: JwtPayload = { identifier: 'user@email.com' };
-    return jwt.sign(user, 'secretKey', { expiresIn: 3600 });
+    return jwt.sign(user, process.env.JWT_SECRET, { expiresIn: 3600 });
   }
 
   async validateUser(payload: JwtPayload): Promise<any> {
-    return await this.usersService.findOneByIdentifier(payload.identifier);
+    return await this.userService.findOneByIdentifier(payload.identifier);
   }
 }

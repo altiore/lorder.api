@@ -4,20 +4,16 @@ import { ApiModelProperty } from '@nestjs/swagger';
 import { CreateUpdate } from '../@common/columns/create-update';
 
 @Entity()
-export class User extends CreateUpdate {
+export class Project extends CreateUpdate {
   @ApiModelProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
   @ApiModelProperty()
   @Column()
-  identifier: string;
+  title: string;
 
   @ApiModelProperty()
-  @Column('int')
-  status: number;
-
-  @ApiModelProperty()
-  @Column({ type: 'int', nullable: true })
-  paymentMethod: number;
+  @Column('int', { nullable: true })
+  monthlyBudget: number;
 }

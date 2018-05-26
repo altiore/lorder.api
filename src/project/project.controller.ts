@@ -29,7 +29,7 @@ export class UserController {
 
   @Get()
   @ApiResponse({ status: 200, type: User, isArray: true })
-  public async all(): Promise<any> {
+  public async all(@UserJWT() user: User): Promise<any> {
     return this.usersService.findAll();
   }
 
