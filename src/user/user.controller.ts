@@ -1,4 +1,4 @@
-import { Get, Controller, Post, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Get, Controller, Post, Put, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiUseTags, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import * as jwt from 'jsonwebtoken';
@@ -7,7 +7,7 @@ import * as jwt from 'jsonwebtoken';
 import { Roles } from '../@common/decorators/roles.decorator';
 import { UserJWT } from '../@common/decorators/user-jwt.decorator';
 import { UserService } from './user.service';
-import { User, CreateUserDto } from '../@entities/user';
+import { User, CreateUserDto, UpdateUserDto } from '../@entities/user';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 
 @ApiBearerAuth()
@@ -21,14 +21,14 @@ export class UserController {
   @ApiResponse({ status: 200, type: User })
   public async self(@UserJWT() user: User): Promise<any> {
     // const payload: JwtPayload = pick(user, ['identifier']);
-    const payload: JwtPayload = { identifier: 'user@email.com' };
+    const payload: JwtPayload = { identifier: 'razvan' };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 3600 });
     return { user, token };
   }
 
   @Get()
   @ApiResponse({ status: 200, type: User, isArray: true })
-  public async all(): Promise<any> {
+  public all(): Promise<any> {
     return this.usersService.findAll();
   }
 
@@ -36,13 +36,19 @@ export class UserController {
   @Get(':id')
   @Roles('owner', 'admin')
   @ApiResponse({ status: 200, type: User })
-  public async findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
-    return await this.usersService.findOne(id);
+  public findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
+    return this.usersService.findOne(id);
   }
 
   @Post()
   @ApiResponse({ status: 201, description: 'The User has been successfully created.', type: User })
-  public async create(@Body() data: CreateUserDto): Promise<User> {
-    return await this.usersService.create(data);
+  public create(@Body() data: CreateUserDto): Promise<User> {
+    return this.usersService.create(data);
+  }
+
+  @Put()
+  @ApiResponse({ status: 200, description: 'The User has been successfully updated.', type: User })
+  public update(@UserJWT() user: User, @Body() data: UpdateUserDto): Promise<User> {
+    return this.usersService.update(user, data);
   }
 }

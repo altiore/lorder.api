@@ -1,11 +1,23 @@
 import { EntityRepository, Repository } from 'typeorm';
+
 import { User } from './user.entity';
+import { CreateUserDto, UpdateUserDto } from './dto';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
 
-  findByIdentifier(identifier: string) {
-    return this.findOne({ identifier });
+  public findByIdentifier(identifier: string): Promise<User> {
+    return this.findOneOrFail({ identifier });
   }
 
+  public createEntity(data: CreateUserDto): Promise<User> {
+    const user = this.create(data);
+    user.status = 1;
+    return this.save(user);
+  }
+
+  public updateEntity(user: User, data: UpdateUserDto): Promise<User> {
+    this.merge(user, data);
+    return this.save(user);
+  }
 }

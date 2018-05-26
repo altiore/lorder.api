@@ -16,6 +16,20 @@ export class User {
   identifier: string;
 
   @ApiModelProperty()
+  @Column({ unique: true, nullable: true, length: 254, transformer: {
+    to: d => d ? d.toLowerCase() : undefined,
+    from: d => d,
+  }})
+  email: string;
+
+  @ApiModelProperty()
+  @Column({ unique: true, nullable: true, length: 13, transformer: {
+    to: d => d ? d.replace(/[\D]/gi, '') : undefined,
+    from: d => d,
+  }})
+  tel: string;
+
+  @ApiModelProperty()
   @Column('int')
   status: number;
 
