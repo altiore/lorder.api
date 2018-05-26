@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn, ManyToMany, JoinTable } from 'typeorm';
 import { ApiModelProperty } from '@nestjs/swagger';
-import * as moment from 'moment';
+import { Moment } from 'moment';
 
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { Role } from '../role';
@@ -39,11 +39,11 @@ export class User {
 
   @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
   @CreateDateColumn(momentDateTransformer)
-  createdAt: moment.Moment;
+  createdAt: Moment;
 
   @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
   @UpdateDateColumn(momentDateTransformer)
-  updatedAt: moment.Moment;
+  updatedAt: Moment;
 
   @ManyToMany(type => Role)
   @JoinTable({ name: 'user_roles' })

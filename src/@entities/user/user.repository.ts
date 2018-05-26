@@ -20,4 +20,5 @@ export class UserRepository extends Repository<User> {
     this.merge(user, data);
     return this.save(user);
   }
+
 }
