@@ -32,7 +32,7 @@ export class UserController {
     return this.usersService.findAll();
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   @Roles('owner', 'admin')
   @ApiResponse({ status: 200, type: User })
