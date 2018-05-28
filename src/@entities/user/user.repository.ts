@@ -10,9 +10,10 @@ export class UserRepository extends Repository<User> {
     return this.findOneOrFail({ identifier });
   }
 
-  public createEntity(data: CreateUserDto): Promise<User> {
+  public createEntity<T>(data: T | CreateUserDto): Promise<User> {
     const user = this.create(data);
     user.status = 1;
+    user.identifier = user.identifier || user.email;
     return this.save(user);
   }
 

@@ -9,10 +9,11 @@ import { UserJWT } from '../@common/decorators/user-jwt.decorator';
 import { UserService } from './user.service';
 import { User, CreateUserDto, UpdateUserDto } from '../@entities/user';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import { InviteDto } from '../@entities/user/dto';
 
 @ApiBearerAuth()
-@ApiUseTags('users')
 @UseGuards(AuthGuard('jwt'))
+@ApiUseTags('users')
 @Controller('users')
 export class UserController {
   constructor(private readonly usersService: UserService) {}
@@ -50,5 +51,11 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'The User has been successfully updated.', type: User })
   public update(@UserJWT() user: User, @Body() data: UpdateUserDto): Promise<User> {
     return this.usersService.update(user, data);
+  }
+
+  @Post('invite')
+  @ApiResponse({ status: 201, description: 'The Invite has been successfully sent.', type: User })
+  public invite(@Body() data: InviteDto): Promise<User> {
+    return this.usersService.invite(data);
   }
 }
