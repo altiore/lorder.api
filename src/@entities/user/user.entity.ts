@@ -45,7 +45,7 @@ export class User {
   @UpdateDateColumn(momentDateTransformer)
   updatedAt: Moment;
 
-  @ManyToMany(type => Role, role => role.users, { eager: true })
+  @ManyToMany(type => Role, role => role.users, { eager: true, cascade: ['insert'] })
   @JoinTable({ name: 'user_roles' })
   roles: Role[];
 }
