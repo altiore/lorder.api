@@ -18,7 +18,7 @@ export class ProjectController {
 
   @Get()
   @ApiResponse({ status: 200, type: Project, isArray: true })
-  public async all(@UserJWT() user: User): Promise<any> {
+  public all(@UserJWT() user: User): Promise<any> {
     return this.projectService.findAll(user);
   }
 
@@ -26,13 +26,13 @@ export class ProjectController {
   @Get(':id')
   @Roles('owner', 'admin')
   @ApiResponse({ status: 200, type: Project })
-  public async one(@Param('id', ParseIntPipe) id: number): Promise<Project> {
-    return await this.projectService.findOne(id);
+  public one(@Param('id', ParseIntPipe) id: number): Promise<Project> {
+    return this.projectService.findOne(id);
   }
 
   @Post()
   @ApiResponse({ status: 201, description: 'The Project has been successfully created.', type: Project })
-  public async create(@Body() data: ProjectDto): Promise<Project> {
-    return await this.projectService.create(data);
+  public create(@Body() data: ProjectDto): Promise<Project> {
+    return this.projectService.create(data);
   }
 }
