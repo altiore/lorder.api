@@ -5,7 +5,6 @@ import { CreateUserDto, UpdateUserDto } from './dto';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
-
   public findByIdentifier(identifier: string): Promise<User> {
     return this.findOneOrFail({ identifier });
   }
@@ -21,5 +20,4 @@ export class UserRepository extends Repository<User> {
     this.merge(user, data);
     return this.save(user);
   }
-
 }

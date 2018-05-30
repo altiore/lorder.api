@@ -1,4 +1,12 @@
-import { Get, Controller, Post, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import {
+  Get,
+  Controller,
+  Post,
+  Body,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiUseTags, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import * as jwt from 'jsonwebtoken';
@@ -26,12 +34,19 @@ export class ProjectController {
   @Get(':id')
   @Roles('owner', 'admin')
   @ApiResponse({ status: 200, type: Project })
-  public one(@Param('id', ParseIntPipe) id: number): Promise<Project> {
+  public one(
+    @Param('id', ParseIntPipe)
+    id: number,
+  ): Promise<Project> {
     return this.projectService.findOne(id);
   }
 
   @Post()
-  @ApiResponse({ status: 201, description: 'The Project has been successfully created.', type: Project })
+  @ApiResponse({
+    status: 201,
+    description: 'The Project has been successfully created.',
+    type: Project,
+  })
   public create(@Body() data: ProjectDto): Promise<Project> {
     return this.projectService.create(data);
   }

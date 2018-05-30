@@ -2,7 +2,6 @@ import { TypeormTestHelper } from '../../@common/test-helper/typeorm.test.helper
 import { UserRepository } from './user.repository';
 
 describe('The UserRepository', () => {
-
   let tth: TypeormTestHelper;
   let userRepository: UserRepository;
 

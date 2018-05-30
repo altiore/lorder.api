@@ -1,4 +1,13 @@
-import { Get, Controller, Post, Put, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import {
+  Get,
+  Controller,
+  Post,
+  Put,
+  Body,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiUseTags, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import * as jwt from 'jsonwebtoken';
@@ -23,7 +32,9 @@ export class UserController {
   public async self(@UserJWT() user: User): Promise<any> {
     // const payload: JwtPayload = pick(user, ['identifier']);
     const payload: JwtPayload = { identifier: 'razvan' };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 3600 });
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: 3600,
+    });
     return { user, token };
   }
 
@@ -37,24 +48,42 @@ export class UserController {
   @Get(':id')
   @Roles('owner', 'admin')
   @ApiResponse({ status: 200, type: User })
-  public findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
+  public findOne(
+    @Param('id', ParseIntPipe)
+    id: number,
+  ): Promise<User> {
     return this.usersService.findOne(id);
   }
 
   @Post()
-  @ApiResponse({ status: 201, description: 'The User has been successfully created.', type: User })
+  @ApiResponse({
+    status: 201,
+    description: 'The User has been successfully created.',
+    type: User,
+  })
   public create(@Body() data: CreateUserDto): Promise<User> {
     return this.usersService.create(data);
   }
 
   @Put()
-  @ApiResponse({ status: 200, description: 'The User has been successfully updated.', type: User })
-  public update(@UserJWT() user: User, @Body() data: UpdateUserDto): Promise<User> {
+  @ApiResponse({
+    status: 200,
+    description: 'The User has been successfully updated.',
+    type: User,
+  })
+  public update(
+    @UserJWT() user: User,
+    @Body() data: UpdateUserDto,
+  ): Promise<User> {
     return this.usersService.update(user, data);
   }
 
   @Post('invite')
-  @ApiResponse({ status: 201, description: 'The Invite has been successfully sent.', type: User })
+  @ApiResponse({
+    status: 201,
+    description: 'The Invite has been successfully sent.',
+    type: User,
+  })
   public invite(@Body() data: InviteDto): Promise<User> {
     return this.usersService.invite(data);
   }
