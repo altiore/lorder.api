@@ -21,7 +21,7 @@ import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import { InviteDto } from '../@entities/user/dto';
 
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
+// @UseGuards(AuthGuard('jwt'))
 @ApiUseTags('users')
 @Controller('users')
 export class UserController {

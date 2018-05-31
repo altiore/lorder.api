@@ -5,9 +5,10 @@ import { MailModule } from '../mail/mail.module';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { UserRepository } from '../@entities/user';
+import { RoleRepository } from '../@entities/role';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserRepository]), MailModule],
+  imports: [TypeOrmModule.forFeature([UserRepository, RoleRepository]), MailModule],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService],
