@@ -22,6 +22,4 @@ definitions:
       image: mysql:5.7
       environment:
         MYSQL_DATABASE: 'pipelines'
-        MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
-        MYSQL_USER: 'test_user'
-        MYSQL_PASSWORD: 'test_user_password'
+        MYSQL_ROOT_PASSWORD: 'let_me_in'
