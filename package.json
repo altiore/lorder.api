@@ -18,7 +18,9 @@
     "mjml": "mjml src/mail/@mails/mjml/*.mjml -o mails/",
     "migration:create": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:generate --name new",
     "migration:up": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:run",
-    "migration:down": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:revert"
+    "migration:down": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:revert",
+    "migration:test:up": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm --config .env.test migration:run",
+    "migration:test:down": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm --config .env.test migration:revert"
   },
   "dependencies": {
     "@nestjs/common": "^5.0.0-beta.6",

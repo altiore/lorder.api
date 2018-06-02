@@ -6,12 +6,6 @@ export class TypeormTestHelper {
   private repo;
 
   private runMigrations() {
-    if (!process.env.TYPEORM_DATABASE) {
-      require('dotenv').config();
-    }
-    process.env.TYPEORM_DATABASE = process.env.TEST_TYPEORM_DATABASE;
-    process.env.TYPEORM_USERNAME = process.env.TEST_TYPEORM_USERNAME;
-    process.env.TYPEORM_PASSWORD = process.env.TEST_TYPEORM_PASSWORD;
     function runCommand(command, callback) {
       const child = exec(command, (err, stdout, stderr) => {
         if (err != null) {
@@ -29,13 +23,13 @@ export class TypeormTestHelper {
         console.log('child errd with: ' + err);
       });
       child.stdout.on('data', d => {
-        // console.log(d);
+        console.log(d);
       });
     }
 
     return new Promise((resove, reject) => {
       runCommand(
-        `${__dirname}/../../../node_modules/.bin/ts-node ${__dirname}/../../../node_modules/.bin/typeorm migration:run`,
+        `${process.cwd()}/node_modules/.bin/ts-node ${process.cwd()}/node_modules/.bin/typeorm migration:run`,
         (err, stdout) => {
           if (err) {
             reject(err);
@@ -48,14 +42,31 @@ export class TypeormTestHelper {
   }
 
   public async create<T>(repo): Promise<T> {
-    // 1. run migrations
-    await this.runMigrations();
+    // 1. set variables
+    if (!process.env.TYPEORM_DATABASE) {
+      require('dotenv').config();
+    }
+    process.env.TYPEORM_DATABASE = process.env.TEST_TYPEORM_DATABASE;
+    process.env.TYPEORM_USERNAME = process.env.TEST_TYPEORM_USERNAME;
+    process.env.TYPEORM_PASSWORD = process.env.TEST_TYPEORM_PASSWORD;
+
+    // 2. run migrations
+    // await this.runMigrations();
+
+    // 3. create connection
     this.connection = await createConnection();
+
+    // 4. create repositories
     return (this.repo = this.connection.getCustomRepository(repo));
+
+    // 5. load fixtures
   }
 
   public async cancel() {
+    // 1. remove fixtures
     await this.repo.delete({});
+
+    // 2. close connection
     await this.connection.close();
   }
 }
