@@ -55,7 +55,7 @@ export class TypeormTestHelper {
 
   public async create<T>(repo): Promise<T> {
     // 1. run migrations
-    await this.runMigrations();
+    // await this.runMigrations();
     this.connection = await createConnection();
     return (this.repo = this.connection.getCustomRepository(repo));
   }

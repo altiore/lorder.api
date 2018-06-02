@@ -13,6 +13,7 @@ pipelines:
             - node
           script:
             - yarn install
+            - yarn migration:up
             - yarn test
 
 definitions:
