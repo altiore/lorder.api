@@ -1,7 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiModelProperty } from '@nestjs/swagger';
-
-import { User } from '../user';
 
 @Entity()
 export class Role {
@@ -12,7 +10,4 @@ export class Role {
   @ApiModelProperty()
   @Column({ unique: true })
   name: string;
-
-  @ManyToMany(type => User, user => user.roles)
-  users: User[];
 }

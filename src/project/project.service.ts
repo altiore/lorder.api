@@ -12,16 +12,14 @@ export class ProjectService {
   ) {}
 
   public findAll(user: User): Promise<Project[]> {
-    // TODO: return only Project, which belongs to user
-    return this.projectRepo.find();
+    return this.projectRepo.findAllByOwner(user);
   }
 
-  public async findOne(id: number): Promise<Project> {
-    return await this.projectRepo.findOneOrFail(id);
+  public findOne(id: number, user: User): Promise<Project> {
+    return this.projectRepo.findOneByOwner(id, user);
   }
 
-  public async create(data: ProjectDto): Promise<Project> {
-    const project = this.projectRepo.create(data);
-    return await this.projectRepo.save(project);
+  public create(data: ProjectDto, user: User): Promise<Project> {
+    return this.projectRepo.createByUser(data, user);
   }
 }

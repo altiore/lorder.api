@@ -1,9 +1,10 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 import { ApiModelProperty } from '@nestjs/swagger';
 import { Moment } from 'moment';
 
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
-import { Role } from '../role';
+import { Role } from '../role/role.entity';
+import { Project } from '../project/project.entity';
 
 @Entity()
 export class User {
@@ -45,7 +46,12 @@ export class User {
   @UpdateDateColumn(momentDateTransformer)
   updatedAt: Moment;
 
-  @ManyToMany(type => Role, role => role.users, { eager: true, cascade: ['insert'] })
+  @ApiModelProperty({ type: Role, isArray: true })
+  @ManyToMany(type => Role, undefined, { eager: true, cascade: ['insert'] })
   @JoinTable({ name: 'user_roles' })
   roles: Role[];
+
+  @ApiModelProperty({ type: Project, isArray: true })
+  @OneToMany(type => Project, project => project.owner)
+  projects: Project[];
 }
