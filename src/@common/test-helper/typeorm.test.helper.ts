@@ -13,12 +13,6 @@ export class TypeormTestHelper {
     process.env.TYPEORM_USERNAME = process.env.TEST_TYPEORM_USERNAME;
     process.env.TYPEORM_PASSWORD = process.env.TEST_TYPEORM_PASSWORD;
     function runCommand(command, callback) {
-      console.log('env variables 2', {
-        nodeenv: process.env.NODE_ENV,
-        database: process.env.TYPEORM_DATABASE,
-        username: process.env.TYPEORM_USERNAME,
-        password: process.env.TYPEORM_PASSWORD,
-      });
       const child = exec(command, (err, stdout, stderr) => {
         if (err != null) {
           return callback(err, null);
@@ -55,7 +49,7 @@ export class TypeormTestHelper {
 
   public async create<T>(repo): Promise<T> {
     // 1. run migrations
-    // await this.runMigrations();
+    await this.runMigrations();
     this.connection = await createConnection();
     return (this.repo = this.connection.getCustomRepository(repo));
   }
