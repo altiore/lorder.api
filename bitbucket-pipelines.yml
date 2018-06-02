@@ -14,3 +14,13 @@ pipelines:
           script:
             - yarn install
             - yarn test
+
+definitions:
+  services:
+    mysql:
+      image: mysql:5.7
+      environment:
+        MYSQL_DATABASE: 'pipelines'
+        MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+        MYSQL_USER: 'test_user'
+        MYSQL_PASSWORD: 'test_user_password'

@@ -6,7 +6,12 @@ export class TypeormTestHelper {
   private repo;
 
   private runMigrations() {
-    process.env.TYPEORM_DATABASE = 'altiore_contrib_test';
+    if (!process.env.TYPEORM_DATABASE) {
+      require('dotenv').config();
+    }
+    process.env.TYPEORM_DATABASE = process.env.TEST_TYPEORM_DATABASE;
+    process.env.TYPEORM_USERNAME = process.env.TEST_TYPEORM_USERNAME;
+    process.env.TYPEORM_PASSWORD = process.env.TEST_TYPEORM_PASSWORD;
     function runCommand(command, callback) {
       const child = exec(command, (err, stdout, stderr) => {
         if (err != null) {
