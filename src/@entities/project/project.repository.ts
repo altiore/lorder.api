@@ -9,16 +9,14 @@ export class ProjectRepository extends Repository<Project> {
 
   findAllByOwner(owner: User): Promise<Project[]> {
     return this.find({
-      // select: ['id', 'title', 'monthlyBudget'],
       where: { owner },
       relations: ['owner'],
       loadRelationIds: true,
-      // loadEagerRelations: false,
     });
   }
 
   findOneByOwner(id: number, owner: User): Promise<Project> {
-    return this.findOneOrFail({id, owner });
+    return this.findOneOrFail({ where: {id, owner }, relations: ['owner']});
   }
 
   createByUser(data: ProjectDto, creator: User): Promise<Project> {
