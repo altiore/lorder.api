@@ -8,12 +8,7 @@ import { UserModule } from './user/user.module';
 import { AllExceptionsFilter } from './@common/filters/all-exceptions.filter';
 
 @Module({
-  imports: [
-    AuthModule,
-    TypeOrmModule.forRoot(),
-    UserModule,
-    ProjectModule,
-  ],
+  imports: [AuthModule, TypeOrmModule.forRoot(), UserModule, ProjectModule],
   providers: [
     {
       provide: APP_FILTER,

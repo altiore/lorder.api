@@ -1,15 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { User, UserRepository, CreateUserDto, InviteDto } from '../@entities/user';
+import {
+  User,
+  UserRepository,
+  CreateUserDto,
+  InviteDto,
+} from '../@entities/user';
 import { UpdateUserDto } from '../@entities/user/dto';
 import { MailService } from '../mail/mail.service';
+import { RoleRepository } from '../@entities/role';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(UserRepository)
-    private readonly userRepo: UserRepository,
+    @InjectRepository(UserRepository) private readonly userRepo: UserRepository,
+    @InjectRepository(RoleRepository) private readonly roleRepo: RoleRepository,
     private readonly mailService: MailService,
   ) {}
 
@@ -34,7 +40,8 @@ export class UserService {
   }
 
   public async invite(invite: InviteDto): Promise<User> {
-    const user = await this.userRepo.createEntity<InviteDto>(invite);
+    const userRole = await this.roleRepo.findUserRole();
+    const user = await this.userRepo.createEntity<InviteDto>(invite, [userRole]);
     const response = await this.mailService.sendInvite(user);
     // console.log(response);
     return user;

@@ -8,36 +8,37 @@ export class TypeormTestHelper {
   private runMigrations() {
     process.env.TYPEORM_DATABASE = 'altiore_contrib_test';
     function runCommand(command, callback) {
-
       const child = exec(command, (err, stdout, stderr) => {
         if (err != null) {
           return callback(err, null);
-        } else if (typeof(stderr) !== 'string') {
+        } else if (typeof stderr !== 'string') {
           return callback(new Error(stderr), null);
         } else {
           return callback(null, stdout);
         }
       });
-      child.on('close', (code) => {
+      child.on('close', code => {
         console.log('child ended with: ' + code);
       });
-      child.on('error', (err) => {
+      child.on('error', err => {
         console.log('child errd with: ' + err);
       });
-      child.stdout.on('data', (d) => {
+      child.stdout.on('data', d => {
         // console.log(d);
       });
-
     }
 
     return new Promise((resove, reject) => {
-      runCommand(`${__dirname}/../../../node_modules/.bin/ts-node ${__dirname}/../../../node_modules/.bin/typeorm migration:run`, (err, stdout) => {
-        if (err) {
-          reject(err);
-        } else {
-          resove(stdout);
-        }
-      });
+      runCommand(
+        `${__dirname}/../../../node_modules/.bin/ts-node ${__dirname}/../../../node_modules/.bin/typeorm migration:run`,
+        (err, stdout) => {
+          if (err) {
+            reject(err);
+          } else {
+            resove(stdout);
+          }
+        },
+      );
     });
   }
 
@@ -45,7 +46,7 @@ export class TypeormTestHelper {
     // 1. run migrations
     await this.runMigrations();
     this.connection = await createConnection();
-    return this.repo = this.connection.getCustomRepository(repo);
+    return (this.repo = this.connection.getCustomRepository(repo));
   }
 
   public async cancel() {

@@ -29,7 +29,10 @@ export class MailService {
    * Put variables to template: @see https://github.com/janl/mustache.js
    */
   private putParamsToTemplate(template: 'invite', params: object): string {
-    return Mustache.render(readFileSync(resolve(process.env.MAILS_PATH, `${template}.html`), 'utf8'), params);
+    return Mustache.render(
+      readFileSync(resolve(process.env.MAILS_PATH, `${template}.html`), 'utf8'),
+      params,
+    );
   }
 
   public sendInvite(user: User): Promise<[ClientResponse, {}]> {
