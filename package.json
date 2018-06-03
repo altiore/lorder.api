@@ -9,10 +9,12 @@
     "node": "8.9.0"
   },
   "scripts": {
+    "prestart": "yarn migration:up && rm -rf dist && tsc",
     "format": "prettier --write \"**/*.ts\"",
-    "start": "ts-node -r tsconfig-paths/register src/main.ts",
+    "start": "node dist/main.js",
+    "start:old": "ts-node -r tsconfig-paths/register src/main.ts",
     "start:dev": "nodemon",
-    "prestart:prod": "rm -rf dist && tsc",
+    "prestart:prod": "yarn migration:up && rm -rf dist && tsc",
     "start:prod": "node dist/main.js",
     "start:hmr": "node dist/server",
     "test": "jest",
