@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "calculate-contribution-for-users-in-project",
   "author": "razvanlomov@gmail.com",
-  "license": "BSD",
+  "license": "UNLICENSED",
   "main": "dist/main.js",
   "engines": {
     "node": "8.9.0"
@@ -69,7 +69,7 @@
     "supertest": "^3.0.0",
     "ts-jest": "^21.2.4",
     "ts-loader": "^4.1.0",
-    "ts-node": "^4.1.0",
+    "ts-node": "^6.1.0",
     "tsconfig-paths": "^3.1.1",
     "tslint": "5.3.2",
     "webpack": "^4.2.0",
