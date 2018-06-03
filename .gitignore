@@ -1,7 +1,23 @@
 .idea
 coverage
+
+# Node build artifacts
 node_modules
+npm-debug.log
+yarn-error.log
+
 dist
+!/dist/app.json
+!/dist/.env
+!/dist/.gitignore
+!/dist/Procfile
+
+# Local development
 .env
 .env.test.env
-yarn-error.log
+*.dev
+.DS_Store
+
+# Docker
+Dockerfile
+docker-compose.yml
