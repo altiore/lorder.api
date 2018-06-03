@@ -33,13 +33,13 @@ export class createUserTable1526826461540 implements MigrationInterface {
           },
           {
             name: 'createdAt',
-            type: 'datetime',
+            type: 'timestamp',
             precision: 6,
             isNullable: false,
           },
           {
             name: 'updatedAt',
-            type: 'datetime',
+            type: 'timestamp',
             precision: 6,
             isNullable: false,
           },
