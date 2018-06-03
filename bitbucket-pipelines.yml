@@ -15,13 +15,15 @@ pipelines:
             - yarn install
             - yarn migration:up
             - yarn test
+            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git HEAD
           services:
-            - mysql
+            - postgres
 
 definitions:
   services:
-    mysql:
-      image: mysql:5.7
+    postgres:
+      image: postgres
       environment:
-        MYSQL_DATABASE: 'pipelines'
-        MYSQL_ROOT_PASSWORD: 'let_me_in'
+        POSTGRES_DB: 'pipelines'
+        POSTGRES_USER: 'test_user'
+        POSTGRES_PASSWORD: 'test_user_password'
