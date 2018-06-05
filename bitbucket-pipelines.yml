@@ -6,18 +6,32 @@
 image: node:8.9.0
 
 pipelines:
+  default:
+    - step:
+        name: Migrations and test (look at postinstall script)
+        caches:
+          - node
+        script:
+          - yarn install
+          - yarn test
+        services:
+          - postgres
   branches:
     master:
       - step:
+          name: Tests one more time before deploy
           caches:
             - node
           script:
             - yarn install
-            - yarn migration:up
             - yarn test
-            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git HEAD
           services:
             - postgres
+      - step:
+          name: Deploy to altiore-staging
+          deployment: staging
+          script:
+            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git HEAD
 
 definitions:
   services:

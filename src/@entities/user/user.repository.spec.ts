@@ -24,10 +24,11 @@ describe('The UserRepository', () => {
 
   it('updateEntity email', async () => {
     const user = await userRepository.findByIdentifier('test');
+    const newEmail = 'testnew2@mail.com';
     expect((await userRepository.updateEntity(user, {
-      email: 'test@mail.com',
-    })).email).toBe('test@mail.com');
-    expect((await userRepository.find({where: { email: 'test@mail.com' }})).length).toBe(1);
+      email: newEmail,
+    })).email).toBe(newEmail);
+    expect((await userRepository.find({where: { email: newEmail }})).length).toBe(1);
   });
 
   it('updateEntity tel', async () => {

@@ -1,45 +1,48 @@
-import { exec } from 'child_process';
-import { createConnection, Connection, Repository } from 'typeorm';
+// import { exec } from 'child_process';
+import { createConnection, Connection } from 'typeorm';
+
+import { User, UserRepository } from '../../@entities/user';
+import { RoleRepository } from '../../@entities/role';
 
 export class TypeormTestHelper {
   private connection: Connection;
   private repos;
 
-  private runMigrations() {
-    function runCommand(command, callback) {
-      const child = exec(command, (err, stdout, stderr) => {
-        if (err != null) {
-          return callback(err, null);
-        } else if (typeof stderr !== 'string') {
-          return callback(new Error(stderr), null);
-        } else {
-          return callback(null, stdout);
-        }
-      });
-      child.on('close', code => {
-        console.log('child ended with: ' + code);
-      });
-      child.on('error', err => {
-        console.log('child errd with: ' + err);
-      });
-      child.stdout.on('data', d => {
-        console.log(d);
-      });
-    }
-
-    return new Promise((resove, reject) => {
-      runCommand(
-        `${process.cwd()}/node_modules/.bin/ts-node ${process.cwd()}/node_modules/.bin/typeorm migration:run`,
-        (err, stdout) => {
-          if (err) {
-            reject(err);
-          } else {
-            resove(stdout);
-          }
-        },
-      );
-    });
-  }
+  // private runMigrations() {
+  //   function runCommand(command, callback) {
+  //     const child = exec(command, (err, stdout, stderr) => {
+  //       if (err != null) {
+  //         return callback(err, null);
+  //       } else if (typeof stderr !== 'string') {
+  //         return callback(new Error(stderr), null);
+  //       } else {
+  //         return callback(null, stdout);
+  //       }
+  //     });
+  //     child.on('close', code => {
+  //       console.log('child ended with: ' + code);
+  //     });
+  //     child.on('error', err => {
+  //       console.log('child errd with: ' + err);
+  //     });
+  //     child.stdout.on('data', d => {
+  //       console.log(d);
+  //     });
+  //   }
+  //
+  //   return new Promise((resove, reject) => {
+  //     runCommand(
+  //       `${process.cwd()}/node_modules/.bin/ts-node ${process.cwd()}/node_modules/.bin/typeorm migration:run`,
+  //       (err, stdout) => {
+  //         if (err) {
+  //           reject(err);
+  //         } else {
+  //           resove(stdout);
+  //         }
+  //       },
+  //     );
+  //   });
+  // }
 
   public async beforeAll(...args): Promise<any> {
     // 1. set variables
@@ -71,7 +74,7 @@ export class TypeormTestHelper {
     await this.connection.close();
   }
 
-  public async createUser(userRepo: Repository<any>, roleRepo: Repository<any>): Promise<any> {
+  public async createUser(userRepo: UserRepository, roleRepo: RoleRepository): Promise<User> {
     let userRole = await roleRepo.findOne({ where: { name: 'user' } });
     if (!userRole) {
       const newRole = await roleRepo.create({name: 'user'});
@@ -83,7 +86,7 @@ export class TypeormTestHelper {
       status: 10,
       paymentMethod: 1,
     });
-    user.role = userRole;
+    user.roles = [userRole];
     return await userRepo.save(user);
   }
 }
