@@ -24,6 +24,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(PORT, () => console.log(`Listening on ${SCHEMA}://${HOST}:${PORT}`));
+  await app.listen(PORT, () => console.log(`Listening on ${SCHEMA}://${HOST}:${PORT}/api/`));
 }
 bootstrap();

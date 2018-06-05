@@ -22,12 +22,13 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "webpack": "webpack --config webpack.config.js",
     "mjml": "mjml src/mail/@mails/mjml/*.mjml -o mails/",
-    "migration:create": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:generate --name new",
+    "migration:generate": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:generate --name generated",
+    "migration:create": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:create --name new",
     "migration:up": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:run",
     "migration:down": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:revert",
     "migration:test:up": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm --config .env.test migration:run",
     "migration:test:down": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm --config .env.test migration:revert",
-    "precommit": "lint-staged"
+    "precommit": "yarn test && lint-staged"
   },
   "dependencies": {
     "@nestjs/common": "^5.0.0-beta.6",

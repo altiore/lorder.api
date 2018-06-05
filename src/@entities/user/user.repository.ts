@@ -7,7 +7,7 @@ import { Role } from '../role';
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
   public findByIdentifier(identifier: string): Promise<User> {
-    return this.findOneOrFail({ identifier });
+    return this.findOneOrFail({ where: { identifier } });
   }
 
   public createEntity<T>(data: T | CreateUserDto, roles: Role[] = []): Promise<User> {

@@ -1,9 +1,9 @@
 import { exec } from 'child_process';
-import { createConnection, Connection } from 'typeorm';
+import { createConnection, Connection, Repository } from 'typeorm';
 
 export class TypeormTestHelper {
   private connection: Connection;
-  private repo;
+  private repos;
 
   private runMigrations() {
     function runCommand(command, callback) {
@@ -41,7 +41,7 @@ export class TypeormTestHelper {
     });
   }
 
-  public async create<T>(repo): Promise<T> {
+  public async beforeAll(...args): Promise<any> {
     // 1. set variables
     if (!process.env.TYPEORM_DATABASE) {
       require('dotenv').config();
@@ -57,16 +57,33 @@ export class TypeormTestHelper {
     this.connection = await createConnection();
 
     // 4. create repositories
-    return (this.repo = this.connection.getCustomRepository(repo));
+    this.repos = args ? args.map(repo => this.connection.getCustomRepository(repo)) : [];
+    return this.repos;
 
     // 5. load fixtures
   }
 
-  public async cancel() {
+  public async afterAll() {
     // 1. remove fixtures
-    await this.repo.delete({});
+    await Promise.all(this.repos.map(async (repo) => await repo.delete({})));
 
     // 2. close connection
     await this.connection.close();
+  }
+
+  public async createUser(userRepo: Repository<any>, roleRepo: Repository<any>): Promise<any> {
+    let userRole = await roleRepo.findOne({ where: { name: 'user' } });
+    if (!userRole) {
+      const newRole = await roleRepo.create({name: 'user'});
+      userRole = await roleRepo.save(newRole);
+    }
+    const user = await userRepo.create({
+      identifier: 'test@mail.com',
+      email: 'test@mail.com',
+      status: 10,
+      paymentMethod: 1,
+    });
+    user.role = userRole;
+    return await userRepo.save(user);
   }
 }

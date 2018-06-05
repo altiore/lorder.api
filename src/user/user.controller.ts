@@ -22,7 +22,7 @@ export class UserController {
   @ApiResponse({ status: 200, type: User })
   public async self(@UserJWT() user: User): Promise<any> {
     // const payload: JwtPayload = pick(user, ['identifier']);
-    const payload: JwtPayload = { identifier: 'razvan' };
+    const payload: JwtPayload = { identifier: 'razvanlomov@gmail.com' };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 3600 });
     return { user, token };
   }

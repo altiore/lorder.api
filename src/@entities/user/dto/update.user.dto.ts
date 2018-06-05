@@ -13,12 +13,12 @@ export class UpdateUserDto {
   @IsString()
   @IsNotEmpty()
   @IsOptional()
-  public readonly email: string;
+  public readonly email?: string;
 
   @ApiModelPropertyOptional()
   @Length(12, 24)
   @IsString()
   @IsNotEmpty()
   @IsOptional()
-  public readonly tel: string;
+  public readonly tel?: string;
 }
