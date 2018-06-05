@@ -1,8 +1,9 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
 import { ApiModelProperty } from '@nestjs/swagger';
 import * as moment from 'moment';
 
 import { User } from '../user/user.entity';
+import { Phase } from '../project-phase/phase.entity';
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 
 @Entity()
@@ -38,4 +39,8 @@ export class Project {
   @ApiModelProperty({ type: User })
   @ManyToOne(type => User, user => user.projects, { nullable: false })
   owner: User;
+
+  @ApiModelProperty({ type: Phase, isArray: true })
+  @OneToMany(type => Phase, phase => phase.project)
+  phases: Phase[];
 }
