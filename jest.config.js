@@ -16,6 +16,7 @@ module.exports = {
     '!**/*.d.{ts,tsx}',
     '!**/node_modules/**',
     '!**/vendor/**',
+    '!**/@migrations/**',
   ],
   coverageDirectory: './coverage/',
   coverageReporters: [
