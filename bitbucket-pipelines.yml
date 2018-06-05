@@ -13,7 +13,7 @@ pipelines:
           - node
         script:
           - yarn install
-          - yarn test
+          - yarn test:cov
         services:
           - postgres
   branches:
@@ -24,7 +24,7 @@ pipelines:
             - node
           script:
             - yarn install
-            - yarn test
+            - yarn test:cov
           services:
             - postgres
       - step:
