@@ -10,11 +10,8 @@
   },
   "scripts": {
     "postinstall": "yarn build && yarn migration:up",
-    "prestart": "rm -rf dist && tsc && yarn migration:up",
     "start": "node dist/main.js",
-    "build": "rimraf dist && tsc",
-    "format": "prettier --write \"**/*.ts\"",
-    "start:old": "ts-node -r tsconfig-paths/register src/main.ts",
+    "build": "rm -rf dist && tsc",
     "start:dev": "cross-env NODE_ENV=development nodemon",
     "start:hmr": "node dist/server",
     "test": "jest --maxWorkers=1",
