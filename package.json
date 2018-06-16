@@ -21,14 +21,14 @@
     "test:cov": "jest --coverage --maxWorkers=1 && codecov --token=d80eff89-9fdc-4a57-a585-70b6cbcf1abc",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "webpack": "webpack --config webpack.config.js",
-    "mjml": "mjml src/mail/@mails/mjml/*.mjml -o mails/",
+    "prepare:mails": "mjml src/mail/mjml/*.mjml -o mails/",
     "migration:generate": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:generate --name generated",
     "migration:create": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:create --name new",
     "migration:up": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:run",
     "migration:down": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:revert",
     "migration:test:up": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm --config .env.test migration:run",
     "migration:test:down": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm --config .env.test migration:revert",
-    "precommit": "yarn test && lint-staged"
+    "precommit": "yarn test && rimraf mails/* && yarn prepare:mails && lint-staged"
   },
   "dependencies": {
     "@nestjs/common": "^5.0.0-beta.6",

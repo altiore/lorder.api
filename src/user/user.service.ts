@@ -12,7 +12,6 @@ import { UpdateUserDto } from '../@entities/user/dto';
 import { MailService } from '../mail/mail.service';
 import { RoleRepository } from '../@entities/role';
 import { ValidationException } from '../@common/exceptions/validation.exception';
-import { async } from 'rxjs/internal/scheduler/async';
 
 @Injectable()
 export class UserService {
@@ -30,8 +29,12 @@ export class UserService {
     return this.userRepo.findOneOrFail(id);
   }
 
-  public findOneByIdentifier(username: string, withPassword: boolean = false): Promise<User> {
-    return this.userRepo.findByIdentifier(username, withPassword);
+  public findOneByUsername(username: string, withPassword: boolean = false): Promise<User> {
+    return this.userRepo.findByUsername(username, withPassword);
+  }
+
+  public findUserByEmail(email: string): Promise<User> {
+    return this.userRepo.findOneByEmail(email);
   }
 
   public create(createUserDto: CreateUserDto): Promise<User> {
@@ -39,7 +42,7 @@ export class UserService {
   }
 
   public async login(loginUserDto: LoginUserDto): Promise<User> {
-    const user = await this.findOneByIdentifier(loginUserDto.username, true);
+    const user = await this.findOneByUsername(loginUserDto.username, true);
     if (!user) {
       throw new NotFoundException(`User with username ${loginUserDto.username} does not found`);
     }

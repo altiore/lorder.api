@@ -18,12 +18,12 @@ describe('The UserRepository', () => {
     expect(result.status).toEqual(1);
   });
 
-  it('findByIdentifier', async () => {
-    expect((await userRepository.findByIdentifier('test')).status).toBe(1);
+  it('findByUsername', async () => {
+    expect((await userRepository.findByUsername('test')).status).toBe(1);
   });
 
   it('updateEntity email', async () => {
-    const user = await userRepository.findByIdentifier('test');
+    const user = await userRepository.findByUsername('test');
     const newEmail = 'testnew2@mail.com';
     expect((await userRepository.updateEntity(user, {
       email: newEmail,
@@ -32,7 +32,7 @@ describe('The UserRepository', () => {
   });
 
   it('updateEntity tel', async () => {
-    const user = await userRepository.findByIdentifier('test');
+    const user = await userRepository.findByUsername('test');
     expect((await userRepository.updateEntity(user, {
       tel: '7777777777',
     })).tel).toBe('7777777777');
