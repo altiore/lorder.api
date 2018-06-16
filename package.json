@@ -28,7 +28,7 @@
     "migration:down": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:revert",
     "migration:test:up": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm --config .env.test migration:run",
     "migration:test:down": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm --config .env.test migration:revert",
-    "precommit": "yarn test && rimraf mails/* && yarn prepare:mails && lint-staged"
+    "precommit": "yarn test && rimraf mails/* && yarn prepare:mails && git add . && lint-staged"
   },
   "dependencies": {
     "@nestjs/common": "^5.0.0-beta.6",
