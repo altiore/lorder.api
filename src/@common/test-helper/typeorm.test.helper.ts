@@ -68,7 +68,7 @@ export class TypeormTestHelper {
 
   public async afterAll() {
     // 1. remove fixtures
-    await Promise.all(this.repos.map(async (repo) => await repo.delete({})));
+    await Promise.all(this.repos.map(async repo => await repo.delete({})));
 
     // 2. close connection
     await this.connection.close();
@@ -77,7 +77,7 @@ export class TypeormTestHelper {
   public async createUser(userRepo: UserRepository, roleRepo: RoleRepository): Promise<User> {
     let userRole = await roleRepo.findOne({ where: { name: 'user' } });
     if (!userRole) {
-      const newRole = await roleRepo.create({name: 'user'});
+      const newRole = await roleRepo.create({ name: 'user' });
       userRole = await roleRepo.save(newRole);
     }
     const user = await userRepo.create({

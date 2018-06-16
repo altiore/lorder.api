@@ -12,14 +12,16 @@ import { User, UpdateUserDto } from '../@entities/user';
 @ApiUseTags('me')
 @Controller('me')
 export class MeController {
-  constructor(
-    private readonly meService: MeService,
-  ) {}
+  constructor(private readonly meService: MeService) {}
 
   @Patch()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('user')
-  @ApiResponse({ status: 200, description: 'The User has been successfully updated.', type: User })
+  @ApiResponse({
+    status: 200,
+    description: 'The User has been successfully updated.',
+    type: User,
+  })
   public update(@UserJWT() user: User, @Body() data: UpdateUserDto): Promise<User> {
     return this.meService.update(user, data);
   }

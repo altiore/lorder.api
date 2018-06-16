@@ -56,10 +56,7 @@ export class MailService {
    * Put variables to template: @see https://github.com/janl/mustache.js
    */
   private putParamsToTemplate(template: IMailTemplate, params: object): string {
-    return Mustache.render(
-      readFileSync(resolve(process.cwd() + '/mails/', `${template}.html`), 'utf8'),
-      params,
-    );
+    return Mustache.render(readFileSync(resolve(process.cwd() + '/mails/', `${template}.html`), 'utf8'), params);
   }
 
   /**
@@ -79,7 +76,7 @@ export class MailService {
    * @see https://sendgrid.com/docs/API_Reference/Web_API_v3/index.html
    */
   private async sendWithSendGrid(msg: MessageDto): Promise<MailAcceptedDto> {
-    const [res] = await sgMail.send(msg) as [ClientResponse, {}];
+    const [res] = (await sgMail.send(msg)) as [ClientResponse, {}];
     return {
       statusCode: res.statusCode,
       statusMessage: res.statusMessage,

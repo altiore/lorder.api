@@ -7,16 +7,18 @@ import { Role } from '../role';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
-
   public findOneByEmail(email: string, withPassword: boolean = false): Promise<User> {
     if (withPassword) {
-      return this.findOne({ where: { email }, select: ['email', 'status', 'password'] });
+      return this.findOne({
+        where: { email },
+        select: ['email', 'status', 'password'],
+      });
     }
     return this.findOne({ where: { email } });
   }
 
   public async findOneByResetLink(resetLink: string): Promise<User> {
-    const user = await this.findOneOrFail({ where: { resetLink }});
+    const user = await this.findOneOrFail({ where: { resetLink } });
     user.status = 10;
     user.resetLink = null;
     return await this.save(user);
@@ -29,7 +31,9 @@ export class UserRepository extends Repository<User> {
       user.roles = roles;
     }
     if (!user.password) {
-      user.password = createHash('md5').update('123456789').digest('hex');
+      user.password = createHash('md5')
+        .update('123456789')
+        .digest('hex');
     }
     return this.save(user);
   }

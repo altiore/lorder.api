@@ -6,13 +6,20 @@ import { User } from '../user/user.entity';
 
 @EntityRepository(Project)
 export class ProjectRepository extends Repository<Project> {
-
   public findAllByOwner(owner: User): Promise<Project[]> {
-    return this.find({ where: { owner }, relations: ['owner'], loadRelationIds: true });
+    return this.find({
+      where: { owner },
+      relations: ['owner'],
+      loadRelationIds: true,
+    });
   }
 
   public findOneByOwner(id: number, owner: User): Promise<Project> {
-    return this.findOneOrFail({ where: { id, owner }, relations: ['owner'], loadRelationIds: true });
+    return this.findOneOrFail({
+      where: { id, owner },
+      relations: ['owner'],
+      loadRelationIds: true,
+    });
   }
 
   public createByUser(data: ProjectDto, creator: User): Promise<Project> {
@@ -22,5 +29,4 @@ export class ProjectRepository extends Repository<Project> {
     project.owner = creator;
     return this.save(project);
   }
-
 }

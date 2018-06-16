@@ -40,7 +40,10 @@ describe('The ProjectRepository', () => {
   });
 
   it('findOneByOwner should throw error due to wrong owner', async () => {
-    const wrongUser = await userRepository.createEntity({email: 'wrong@mail.com', resetLink: 'test'});
+    const wrongUser = await userRepository.createEntity({
+      email: 'wrong@mail.com',
+      resetLink: 'test',
+    });
     const project = await projectRepo.createByUser({ title: 'testProject2', monthlyBudget: 10000 }, wrongUser);
     await expect(projectRepo.findOneByOwner(project.id, user)).rejects.toBeInstanceOf(Error);
   });

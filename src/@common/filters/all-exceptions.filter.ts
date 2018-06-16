@@ -1,9 +1,4 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpStatus,
-} from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus } from '@nestjs/common';
 import { parseDetail } from '../helpers/parseDetailFromTypeormException';
 
 @Catch()
@@ -47,7 +42,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
           } else {
             response.status(status).json({
               statusCode: status,
-              message: exception && exception.message || exception.toString ? exception.toString() : 'NO',
+              message: (exception && exception.message) || exception.toString ? exception.toString() : 'NO',
             });
           }
 

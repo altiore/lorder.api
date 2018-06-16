@@ -27,13 +27,21 @@ export class ProjectController {
   @Get(':id')
   @Roles('user')
   @ApiResponse({ status: 200, type: Project })
-  public one(@UserJWT() user: User, @Param('id', ParseIntPipe) id: number): Promise<Project> {
+  public one(
+    @UserJWT() user: User,
+    @Param('id', ParseIntPipe)
+    id: number,
+  ): Promise<Project> {
     return this.projectService.findOne(id, user);
   }
 
   @Post()
   @Roles('user')
-  @ApiResponse({ status: 201, description: 'The Project has been successfully created.', type: Project })
+  @ApiResponse({
+    status: 201,
+    description: 'The Project has been successfully created.',
+    type: Project,
+  })
   public create(@UserJWT() user: User, @Body() data: ProjectDto): Promise<Project> {
     return this.projectService.create(data, user);
   }

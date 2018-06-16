@@ -1,10 +1,4 @@
-import {
-  IsNotEmpty,
-  IsString,
-  MinLength,
-  MaxLength,
-  IsNumber,
-} from 'class-validator';
+import { IsNotEmpty, IsString, MinLength, MaxLength, IsNumber } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
 
 export class PhaseDto {

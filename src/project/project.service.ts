@@ -6,10 +6,7 @@ import { User } from '../@entities/user';
 
 @Injectable()
 export class ProjectService {
-  constructor(
-    @InjectRepository(ProjectRepository)
-    private readonly projectRepo: ProjectRepository,
-  ) {}
+  constructor(@InjectRepository(ProjectRepository) private readonly projectRepo: ProjectRepository) {}
 
   public findAll(user: User): Promise<Project[]> {
     return this.projectRepo.findAllByOwner(user);

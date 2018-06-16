@@ -1,4 +1,13 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn, ManyToMany, JoinTable, OneToMany } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+  ManyToMany,
+  JoinTable,
+  OneToMany,
+} from 'typeorm';
 import { ApiModelProperty } from '@nestjs/swagger';
 import { Moment } from 'moment';
 
@@ -13,17 +22,27 @@ export class User {
   id: number;
 
   @ApiModelProperty()
-  @Column({ unique: true, nullable: true, length: 254, transformer: {
-    to: d => d ? d.toLowerCase() : undefined,
-    from: d => d,
-  }})
+  @Column({
+    unique: true,
+    nullable: true,
+    length: 254,
+    transformer: {
+      to: d => (d ? d.toLowerCase() : undefined),
+      from: d => d,
+    },
+  })
   email: string;
 
   @ApiModelProperty()
-  @Column({ unique: true, nullable: true, length: 13, transformer: {
-    to: d => d ? d.replace(/[\D]/gi, '') : undefined,
-    from: d => d,
-  }})
+  @Column({
+    unique: true,
+    nullable: true,
+    length: 13,
+    transformer: {
+      to: d => (d ? d.replace(/[\D]/gi, '') : undefined),
+      from: d => d,
+    },
+  })
   tel: string;
 
   @ApiModelProperty()

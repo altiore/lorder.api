@@ -25,14 +25,21 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
   @ApiResponse({ status: 200, type: User })
-  public findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
+  public findOne(
+    @Param('id', ParseIntPipe)
+    id: number,
+  ): Promise<User> {
     return this.usersService.findOne(id);
   }
 
   @Post()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
-  @ApiResponse({ status: 201, description: 'The User has been successfully created.', type: User })
+  @ApiResponse({
+    status: 201,
+    description: 'The User has been successfully created.',
+    type: User,
+  })
   public create(@Body() data: CreateUserDto): Promise<User> {
     return this.usersService.create(data);
   }
@@ -40,7 +47,11 @@ export class UserController {
   @Post('invite')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
-  @ApiResponse({ status: 201, description: 'The Invite has been successfully sent.', type: User })
+  @ApiResponse({
+    status: 201,
+    description: 'The Invite has been successfully sent.',
+    type: User,
+  })
   public invite(@Body() data: CreateUserDto): Promise<User> {
     return this.usersService.invite(data);
   }

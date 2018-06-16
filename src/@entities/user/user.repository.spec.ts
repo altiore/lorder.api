@@ -14,7 +14,10 @@ describe('The UserRepository', () => {
   });
 
   it('createEntity', async () => {
-    const result = await userRepository.createEntity({ email: 'test', resetLink: 'test' });
+    const result = await userRepository.createEntity({
+      email: 'test',
+      resetLink: 'test',
+    });
     expect(result.status).toEqual(1);
   });
 
@@ -24,18 +27,22 @@ describe('The UserRepository', () => {
 
   it('updateEntity tel', async () => {
     const user = await userRepository.findOneByEmail('test');
-    expect((await userRepository.updateEntity(user, {
-      tel: '7777777777',
-    })).tel).toBe('7777777777');
-    expect((await userRepository.find({where: { tel: '7777777777' }})).length).toBe(1);
+    expect(
+      (await userRepository.updateEntity(user, {
+        tel: '7777777777',
+      })).tel,
+    ).toBe('7777777777');
+    expect((await userRepository.find({ where: { tel: '7777777777' } })).length).toBe(1);
   });
 
   it('updateEntity email', async () => {
     const user = await userRepository.findOneByEmail('test');
     const newEmail = 'testnew2@mail.com';
-    expect((await userRepository.updateEntity(user, {
-      email: newEmail,
-    })).email).toBe(newEmail);
-    expect((await userRepository.find({where: { email: newEmail }})).length).toBe(1);
+    expect(
+      (await userRepository.updateEntity(user, {
+        email: newEmail,
+      })).email,
+    ).toBe(newEmail);
+    expect((await userRepository.find({ where: { email: newEmail } })).length).toBe(1);
   });
 });

@@ -2,12 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createHash } from 'crypto';
 
-import {
-  User,
-  UserRepository,
-  CreateUserDto,
-  LoginUserDto,
-} from '../@entities/user';
+import { User, UserRepository, CreateUserDto, LoginUserDto } from '../@entities/user';
 import { UpdateUserDto } from '../@entities/user/dto';
 import { MailService } from '../mail/mail.service';
 import { RoleRepository } from '../@entities/role';
@@ -69,6 +64,10 @@ export class UserService {
   }
 
   private validatePassword(user: User, password: string) {
-    return createHash('md5').update(password).digest('hex') === user.password;
+    return (
+      createHash('md5')
+        .update(password)
+        .digest('hex') === user.password
+    );
   }
 }

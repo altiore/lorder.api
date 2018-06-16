@@ -48,5 +48,4 @@ export class AuthService {
   public async validateUser(payload: JwtPayload): Promise<User> {
     return await this.userService.findUserByEmail(payload.email);
   }
-
 }
