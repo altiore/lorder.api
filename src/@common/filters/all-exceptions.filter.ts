@@ -26,22 +26,31 @@ export class AllExceptionsFilter implements ExceptionFilter {
           break;
         }
         case 'QueryFailedError': {
-          const parsedDetail = parseDetail(exception.detail);
-          const status = HttpStatus.UNPROCESSABLE_ENTITY;
-          response.status(status).json({
-            statusCode: status,
-            message: parsedDetail[3] === 'already exists' ? 'Validation Error' : exception.detail,
-            errors: [
-              {
-                value: parsedDetail[2],
-                property: parsedDetail[1],
-                children: [],
-                constraints: {
-                  isUnique: parsedDetail[3],
+          let parsedDetail;
+          if (exception.detail) {
+            const status = HttpStatus.UNPROCESSABLE_ENTITY;
+            parsedDetail = parseDetail(exception.detail);
+            response.status(status).json({
+              statusCode: status,
+              message: parsedDetail[3] === 'already exists' ? 'Validation Error' : exception.detail,
+              errors: [
+                {
+                  value: parsedDetail[2],
+                  property: parsedDetail[1],
+                  children: [],
+                  constraints: {
+                    isUnique: parsedDetail[3],
+                  },
                 },
-              },
-            ],
-          });
+              ],
+            });
+          } else {
+            response.status(status).json({
+              statusCode: status,
+              message: exception && exception.message || exception.toString ? exception.toString() : 'NO',
+            });
+          }
+
           break;
         }
         default: {
