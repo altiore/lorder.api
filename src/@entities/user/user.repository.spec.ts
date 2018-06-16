@@ -14,7 +14,7 @@ describe('The UserRepository', () => {
   });
 
   it('createEntity', async () => {
-    const result = await userRepository.createEntity({ identifier: 'test' });
+    const result = await userRepository.createEntity({ username: 'test' });
     expect(result.status).toEqual(1);
   });
 

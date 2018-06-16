@@ -3,9 +3,10 @@ import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 
 export class CreateUserDto {
   @ApiModelProperty()
+  @IsEmail()
   @IsString()
   @IsNotEmpty()
-  public readonly identifier: string;
+  public readonly username: string;
 
   @ApiModelPropertyOptional()
   @IsEmail()

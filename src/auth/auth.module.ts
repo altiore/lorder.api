@@ -7,5 +7,6 @@ import { UserModule } from '../user/user.module';
 @Module({
   imports: [UserModule],
   providers: [AuthService, JwtStrategy],
+  exports: [AuthService],
 })
 export class AuthModule {}

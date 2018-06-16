@@ -14,7 +14,7 @@ export class User {
 
   @ApiModelProperty()
   @Column({ unique: true })
-  identifier: string;
+  username: string;
 
   @ApiModelProperty()
   @Column({ unique: true, nullable: true, length: 254, transformer: {
@@ -37,6 +37,9 @@ export class User {
   @ApiModelProperty()
   @Column({ type: 'int', nullable: true })
   paymentMethod: number;
+
+  @Column({ nullable: true, select: false })
+  password: string;
 
   @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
   @CreateDateColumn(momentDateTransformer)

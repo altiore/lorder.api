@@ -1,8 +1,6 @@
-import { Get, Controller, Post, Put, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Get, Controller, Patch, Post, Put, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiUseTags, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import * as jwt from 'jsonwebtoken';
-// import { pick } from 'lodash';
 
 import { RolesGuard } from '../@common/guards/roles.guard';
 import { Roles } from '../@common/decorators/roles.decorator';
@@ -10,21 +8,23 @@ import { UserJWT } from '../@common/decorators/user-jwt.decorator';
 import { UserService } from './user.service';
 import { User, CreateUserDto, UpdateUserDto } from '../@entities/user';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
-import { InviteDto } from '../@entities/user/dto';
+import { InviteDto, LoginUserDto } from '../@entities/user/dto';
+import { AuthService } from '../auth/auth.service';
 
 @ApiBearerAuth()
 @ApiUseTags('users')
 @Controller('users')
 export class UserController {
-  constructor(private readonly usersService: UserService) {}
+  constructor(
+    private readonly usersService: UserService,
+    private readonly authService: AuthService,
+  ) {}
 
-  @Get('self')
+  @Patch('login')
   @ApiResponse({ status: 200, type: User })
-  public async self(@UserJWT() user: User): Promise<any> {
-    // const payload: JwtPayload = pick(user, ['identifier']);
-    const payload: JwtPayload = { identifier: 'razvanlomov@gmail.com' };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 3600 });
-    return { user, token };
+  public async login(@Body() data: LoginUserDto): Promise<string> {
+    const user = await this.usersService.login(data);
+    return this.authService.createToken({ username: user.username });
   }
 
   @Get()

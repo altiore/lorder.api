@@ -9,12 +9,11 @@ import { User } from '../@entities/user';
 export class AuthService {
   constructor(private readonly userService: UserService) {}
 
-  async createToken() {
-    const user: JwtPayload = { identifier: 'user@email.com' };
-    return jwt.sign(user, process.env.JWT_SECRET, { expiresIn: 3600 });
+  public createToken(userInfo: JwtPayload) {
+    return jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: 3600 });
   }
 
   public async validateUser(payload: JwtPayload): Promise<User> {
-    return await this.userService.findOneByIdentifier(payload.identifier);;
+    return await this.userService.findOneByIdentifier(payload.username);
   }
 }
