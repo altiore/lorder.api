@@ -15,18 +15,18 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     if (exception.getResponse && exception.getStatus) {
       response.status(exception.getStatus()).json(exception.getResponse());
-    } else if (exception.message && exception.name && exception.detail) {
-      const parsedDetail = parseDetail(exception.detail);
+    } else if (exception.message && exception.name) {
       switch (exception.name) {
         case 'EntityNotFound': {
           const status = HttpStatus.NOT_FOUND;
           response.status(status).json({
             statusCode: status,
-            message: exception.message,
+            message: process.env.NODE_ENV === 'development' ? exception.message : 'Requested Entity not found',
           });
           break;
         }
         case 'QueryFailedError': {
+          const parsedDetail = parseDetail(exception.detail);
           const status = HttpStatus.UNPROCESSABLE_ENTITY;
           response.status(status).json({
             statusCode: status,
@@ -54,7 +54,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
         }
       }
     } else {
-      console.error(exception);
+      if (process.env.NODE_ENV === 'development') {
+        console.error(exception);
+      }
       response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal Server Error',

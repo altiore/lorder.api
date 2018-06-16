@@ -7,21 +7,24 @@ import { Role } from '../role';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
-  public findByUsername(username: string, withPassword: boolean = false): Promise<User> {
+
+  public findOneByEmail(email: string, withPassword: boolean = false): Promise<User> {
     if (withPassword) {
-      return this.findOneOrFail({ where: { username }, select: ['username', 'email', 'status', 'password'] });
+      return this.findOne({ where: { email }, select: ['email', 'status', 'password'] });
     }
-    return this.findOneOrFail({ where: { username } });
+    return this.findOne({ where: { email } });
   }
 
-  public findOneByEmail(email: string): Promise<User> {
-    return this.findOneOrFail({ where: { email } });
+  public async findOneByResetLink(resetLink: string): Promise<User> {
+    const user = await this.findOneOrFail({ where: { resetLink }});
+    user.status = 10;
+    user.resetLink = null;
+    return await this.save(user);
   }
 
-  public createEntity<T>(data: T | CreateUserDto, roles: Role[] = []): Promise<User> {
+  public createEntity(data: CreateUserDto, roles: Role[] = []): Promise<User> {
     const user = this.create(data);
     user.status = 1;
-    user.email = user.email || user.username;
     if (roles.length) {
       user.roles = roles;
     }

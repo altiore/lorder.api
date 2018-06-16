@@ -6,7 +6,7 @@ export class LoginUserDto {
   @IsEmail()
   @IsString()
   @IsNotEmpty()
-  public readonly username: string;
+  public readonly email: string;
 
   @ApiModelProperty()
   @IsString()

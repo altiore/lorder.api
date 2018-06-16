@@ -5,10 +5,12 @@ import { JwtStrategy } from './jwt.strategy';
 import { MailModule } from '../mail/mail.module';
 import { UserModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserRepository } from '../@entities/user';
 
 @Module({
   controllers: [AuthController],
-  imports: [MailModule, UserModule],
+  imports: [MailModule, UserModule, TypeOrmModule.forFeature([UserRepository])],
   providers: [AuthService, JwtStrategy],
 })
 export class AuthModule {}

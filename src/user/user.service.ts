@@ -6,7 +6,7 @@ import {
   User,
   UserRepository,
   CreateUserDto,
-  InviteDto, LoginUserDto,
+  LoginUserDto,
 } from '../@entities/user';
 import { UpdateUserDto } from '../@entities/user/dto';
 import { MailService } from '../mail/mail.service';
@@ -29,12 +29,8 @@ export class UserService {
     return this.userRepo.findOneOrFail(id);
   }
 
-  public findOneByUsername(username: string, withPassword: boolean = false): Promise<User> {
-    return this.userRepo.findByUsername(username, withPassword);
-  }
-
-  public findUserByEmail(email: string): Promise<User> {
-    return this.userRepo.findOneByEmail(email);
+  public findUserByEmail(email: string, withPassword: boolean = false): Promise<User> {
+    return this.userRepo.findOneByEmail(email, withPassword);
   }
 
   public create(createUserDto: CreateUserDto): Promise<User> {
@@ -42,9 +38,9 @@ export class UserService {
   }
 
   public async login(loginUserDto: LoginUserDto): Promise<User> {
-    const user = await this.findOneByUsername(loginUserDto.username, true);
+    const user = await this.findUserByEmail(loginUserDto.email, true);
     if (!user) {
-      throw new NotFoundException(`User with username ${loginUserDto.username} does not found`);
+      throw new NotFoundException(`User with email ${loginUserDto.email} does not found`);
     }
     if (!this.validatePassword(user, loginUserDto.password)) {
       throw new ValidationException([
@@ -64,9 +60,9 @@ export class UserService {
     return this.userRepo.updateEntity(user, data);
   }
 
-  public async invite(invite: InviteDto): Promise<User> {
+  public async invite(invite: CreateUserDto): Promise<User> {
     const userRole = await this.roleRepo.findUserRole();
-    const user = await this.userRepo.createEntity<InviteDto>(invite, [userRole]);
+    const user = await this.userRepo.createEntity(invite, [userRole]);
     const response = await this.mailService.sendInvite(user);
     // console.log(response);
     return user;

@@ -1,21 +1,17 @@
-import { Get, Controller, Post, Put, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Get, Controller, Post, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiUseTags, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
 import { RolesGuard } from '../@common/guards/roles.guard';
 import { Roles } from '../@common/decorators/roles.decorator';
-// import { UserJWT } from '../@common/decorators/user-jwt.decorator';
 import { UserService } from './user.service';
 import { User, CreateUserDto } from '../@entities/user';
-import { InviteDto } from '../@entities/user/dto';
 
 @ApiBearerAuth()
 @ApiUseTags('users')
 @Controller('users')
 export class UserController {
-  constructor(
-    private readonly usersService: UserService,
-  ) {}
+  constructor(private readonly usersService: UserService) {}
 
   @Get()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -45,7 +41,7 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
   @ApiResponse({ status: 201, description: 'The Invite has been successfully sent.', type: User })
-  public invite(@Body() data: InviteDto): Promise<User> {
+  public invite(@Body() data: CreateUserDto): Promise<User> {
     return this.usersService.invite(data);
   }
 }

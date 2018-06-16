@@ -1,17 +1,17 @@
 import { IsString, IsNotEmpty, IsEmail, IsOptional } from 'class-validator';
-import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiModelProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
   @ApiModelProperty()
   @IsEmail()
   @IsString()
   @IsNotEmpty()
-  public readonly username: string;
+  @IsOptional()
+  public readonly email: string;
 
-  @ApiModelPropertyOptional()
+  @ApiModelProperty()
   @IsEmail()
   @IsString()
   @IsNotEmpty()
-  @IsOptional()
-  public readonly email?: string;
+  public readonly resetLink: string;
 }

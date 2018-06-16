@@ -13,7 +13,7 @@
     "format": "prettier --write \"**/*.ts\"",
     "start": "node dist/main.js",
     "start:old": "ts-node -r tsconfig-paths/register src/main.ts",
-    "start:dev": "nodemon",
+    "start:dev": "cross-env NODE_ENV=development nodemon",
     "prestart:prod:old": "yarn migration:up && rm -rf dist && tsc",
     "start:prod": "node dist/main.js",
     "start:hmr": "node dist/server",

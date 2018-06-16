@@ -1,30 +1,34 @@
-import { Body, Controller, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Query, Post, Req, HttpCode } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
-// import { AuthGuard } from '@nestjs/passport';
+import { Request, Response } from 'express';
 
-// import { RolesGuard } from '../@common/guards/roles.guard';
-// import { Roles } from '../@common/decorators/roles.decorator';
 import { User } from '../@entities/user';
 import { EmailDto, LoginUserDto } from '../@entities/user/dto';
 import { AuthService } from './auth.service';
+import { MailAcceptedDto } from '../mail/dto';
 
 @ApiBearerAuth()
 @ApiUseTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('magic')
-  @ApiResponse({ status: 200, type: User })
-  public async magic(@Body() data: EmailDto): Promise<string> {
-    return this.authService.sendMagicLink(data);
+  @HttpCode(202)
+  @ApiResponse({ status: 202, type: MailAcceptedDto })
+  public magic(@Body() data: EmailDto, @Req() req: Request): Promise<MailAcceptedDto> {
+    return this.authService.sendMagicLink(data, req.protocol + '://' + req.get('host'));
+  }
+
+  @Get('activate')
+  @ApiResponse({ status: 200, description: 'Возвращает Bearer ключ' })
+  public activate(@Query('identifier') identifier: string): Promise<string> {
+    return this.authService.activate(identifier);
   }
 
   @Patch('login')
   @ApiResponse({ status: 200, type: User })
-  public async login(@Body() data: LoginUserDto): Promise<string> {
+  public login(@Body() data: LoginUserDto): Promise<string> {
     return this.authService.login(data);
   }
 }

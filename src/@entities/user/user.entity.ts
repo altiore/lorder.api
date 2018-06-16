@@ -13,10 +13,6 @@ export class User {
   id: number;
 
   @ApiModelProperty()
-  @Column({ unique: true })
-  username: string;
-
-  @ApiModelProperty()
   @Column({ unique: true, nullable: true, length: 254, transformer: {
     to: d => d ? d.toLowerCase() : undefined,
     from: d => d,
@@ -40,6 +36,9 @@ export class User {
 
   @Column({ nullable: true, select: false })
   password: string;
+
+  @Column({ nullable: true, select: false })
+  resetLink: string;
 
   @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
   @CreateDateColumn(momentDateTransformer)

@@ -81,7 +81,6 @@ export class TypeormTestHelper {
       userRole = await roleRepo.save(newRole);
     }
     const user = await userRepo.create({
-      username: 'test@mail.com',
       email: 'test@mail.com',
       status: 10,
       paymentMethod: 1,
