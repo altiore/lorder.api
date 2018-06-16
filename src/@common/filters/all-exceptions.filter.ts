@@ -59,7 +59,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       }
     } else {
       if (process.env.NODE_ENV === 'development') {
-        console.error(exception);
+        console.error(exception + '1');
       }
       response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
