@@ -9,7 +9,8 @@ const HOST = process.env.HOST || process.env.HOSTNAME || 'localhost';
 const SCHEMA = process.env.NODE_ENV === 'production' ? 'https' : 'http';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // TODO: enable only several domains
+  const app = await NestFactory.create(AppModule, { cors: true });
   app.useGlobalPipes(new ValidationPipe());
   app.setGlobalPrefix('v1');
 
