@@ -8,9 +8,20 @@ const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || process.env.HOSTNAME || 'localhost';
 const SCHEMA = process.env.NODE_ENV === 'production' ? 'https' : 'http';
 
+const corsOptions = {
+  origin: ['http://localhost:8181'],
+  // methods: '',
+  // allowedHeaders: '',
+  // exposedHeaders: '',
+  // credentials: '',
+  // maxAge: '',
+  // preflightContinue: '',
+  // optionsSuccessStatus: '',
+};
+
 async function bootstrap() {
   // TODO: enable only several domains
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule, { cors: corsOptions });
   app.useGlobalPipes(new ValidationPipe());
   app.setGlobalPrefix('v1');
 
@@ -27,4 +38,5 @@ async function bootstrap() {
 
   await app.listen(PORT, () => console.log(`Listening on ${SCHEMA}://${HOST}:${PORT}/api/`));
 }
+
 bootstrap();
