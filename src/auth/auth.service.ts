@@ -3,7 +3,8 @@ import { Injectable } from '@nestjs/common';
 
 import { UserService } from '../user/user.service';
 import { MailService } from '../mail/mail.service';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { JwtPayload } from './interfaces';
+import { TokenResponseDto } from './dto';
 import { EmailDto, LoginUserDto, User, UserRepository } from '../@entities/user';
 import { MailAcceptedDto } from '../mail/dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,7 +19,7 @@ export class AuthService {
 
   public async sendMagicLink({ email }: EmailDto, hostWithProtocol: string): Promise<MailAcceptedDto> {
     let user = await this.userService.findUserByEmail(email);
-    const resetLink = this.createToken({ email });
+    const { token: resetLink } = this.createToken({ email });
     if (!user) {
       user = await this.userService.create({ email, resetLink });
     } else {
@@ -30,19 +31,19 @@ export class AuthService {
   /**
    * Возвращает JWT ключ
    */
-  public async activate(resetLink: string): Promise<string> {
+  public async activate(resetLink: string): Promise<TokenResponseDto> {
     const user = await this.userRepo.findOneByResetLink(resetLink);
     jwt.verify(resetLink, process.env.JWT_SECRET);
     return this.createToken({ email: user.email });
   }
 
-  public async login(data: LoginUserDto): Promise<string> {
+  public async login(data: LoginUserDto): Promise<TokenResponseDto> {
     const user = await this.userService.login(data);
     return this.createToken({ email: user.email });
   }
 
-  public createToken(userInfo: JwtPayload) {
-    return jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: 3600 });
+  public createToken(userInfo: JwtPayload): TokenResponseDto {
+    return { token: jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: 3600 }) };
   }
 
   public async validateUser(payload: JwtPayload): Promise<User> {

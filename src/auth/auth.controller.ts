@@ -5,6 +5,7 @@ import { User } from '../@entities/user';
 import { EmailDto, LoginUserDto } from '../@entities/user/dto';
 import { AuthService } from './auth.service';
 import { MailAcceptedDto } from '../mail/dto';
+import { TokenResponseDto } from './dto';
 
 @ApiBearerAuth()
 @ApiUseTags('auth')
@@ -20,14 +21,14 @@ export class AuthController {
   }
 
   @Get('activate')
-  @ApiResponse({ status: 200, description: 'Возвращает Bearer ключ' })
-  public activate(@Query('identifier') identifier: string): Promise<string> {
+  @ApiResponse({ status: 200, description: 'Возвращает Bearer ключ', type: TokenResponseDto })
+  public activate(@Query('identifier') identifier: string): Promise<TokenResponseDto> {
     return this.authService.activate(identifier);
   }
 
   @Patch('login')
   @ApiResponse({ status: 200, type: User })
-  public login(@Body() data: LoginUserDto): Promise<string> {
+  public login(@Body() data: LoginUserDto): Promise<TokenResponseDto> {
     return this.authService.login(data);
   }
 }
