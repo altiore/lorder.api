@@ -14,11 +14,14 @@ describe('The UserRepository', () => {
   });
 
   it('createEntity', async () => {
-    const result = await userRepository.createEntity({
-      email: 'test',
-      resetLink: 'test',
-    });
-    expect(result.status).toEqual(1);
+    const { user, password } = await userRepository.createWithRoles(
+      {
+        email: 'test',
+        resetLink: 'test',
+      },
+      [],
+    );
+    expect(user.status).toEqual(1);
   });
 
   it('findByUsername', async () => {

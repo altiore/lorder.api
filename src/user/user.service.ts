@@ -28,46 +28,34 @@ export class UserService {
     return this.userRepo.findOneByEmail(email, withPassword);
   }
 
-  public create(createUserDto: CreateUserDto): Promise<User> {
-    return this.userRepo.createEntity(createUserDto);
+  public findActiveUserByEmail(email: string) {
+    return this.userRepo.findOneActiveByEmail(email);
   }
 
   public async login(loginUserDto: LoginUserDto): Promise<User> {
-    const user = await this.findUserByEmail(loginUserDto.email, true);
+    const user = this.userRepo.validatePassword(loginUserDto);
     if (!user) {
-      throw new NotFoundException(`User with email ${loginUserDto.email} does not found`);
+      throw new NotFoundException(`Пользователь с email-адресом ${loginUserDto.email} не был найден`);
     }
-    if (!this.validatePassword(user, loginUserDto.password)) {
-      throw new ValidationException([
-        {
-          property: 'password',
-          children: [],
-          constraints: {
-            isInvalid: 'Password is invalid',
-          },
-        },
-      ]);
-    }
-    return user;
+    return user as Promise<User>;
   }
 
   public update(user: User, data: UpdateUserDto): Promise<User> {
     return this.userRepo.updateEntity(user, data);
   }
 
+  public activateByResetLink(resetLink: string) {
+    return this.userRepo.activateByResetLink(resetLink);
+  }
+
   public async invite(invite: CreateUserDto): Promise<User> {
-    const userRole = await this.roleRepo.findUserRole();
-    const user = await this.userRepo.createEntity(invite, [userRole]);
-    const response = await this.mailService.sendInvite(user);
-    // console.log(response);
+    const { user } = await this.createUser(invite);
+    await this.mailService.sendInvite(user);
     return user;
   }
 
-  private validatePassword(user: User, password: string) {
-    return (
-      createHash('md5')
-        .update(password)
-        .digest('hex') === user.password
-    );
+  public async createUser(data: CreateUserDto) {
+    const userRole = await this.roleRepo.findUserRole();
+    return this.userRepo.createWithRoles(data, [userRole]);
   }
 }

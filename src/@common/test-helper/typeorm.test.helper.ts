@@ -8,42 +8,6 @@ export class TypeormTestHelper {
   private connection: Connection;
   private repos;
 
-  // private runMigrations() {
-  //   function runCommand(command, callback) {
-  //     const child = exec(command, (err, stdout, stderr) => {
-  //       if (err != null) {
-  //         return callback(err, null);
-  //       } else if (typeof stderr !== 'string') {
-  //         return callback(new Error(stderr), null);
-  //       } else {
-  //         return callback(null, stdout);
-  //       }
-  //     });
-  //     child.on('close', code => {
-  //       console.log('child ended with: ' + code);
-  //     });
-  //     child.on('error', err => {
-  //       console.log('child errd with: ' + err);
-  //     });
-  //     child.stdout.on('data', d => {
-  //       console.log(d);
-  //     });
-  //   }
-  //
-  //   return new Promise((resove, reject) => {
-  //     runCommand(
-  //       `${process.cwd()}/node_modules/.bin/ts-node ${process.cwd()}/node_modules/.bin/typeorm migration:run`,
-  //       (err, stdout) => {
-  //         if (err) {
-  //           reject(err);
-  //         } else {
-  //           resove(stdout);
-  //         }
-  //       },
-  //     );
-  //   });
-  // }
-
   public async beforeAll(...args): Promise<any> {
     // 1. set variables
     if (!process.env.TYPEORM_DATABASE) {
@@ -53,17 +17,14 @@ export class TypeormTestHelper {
     process.env.TYPEORM_USERNAME = process.env.TEST_TYPEORM_USERNAME;
     process.env.TYPEORM_PASSWORD = process.env.TEST_TYPEORM_PASSWORD;
 
-    // 2. run migrations
-    // await this.runMigrations();
-
-    // 3. create connection
+    // 2. create connection
     this.connection = await createConnection();
 
-    // 4. create repositories
+    // 3. create repositories
     this.repos = args ? args.map(repo => this.connection.getCustomRepository(repo)) : [];
     return this.repos;
 
-    // 5. load fixtures
+    // 4. load fixtures
   }
 
   public async afterAll() {

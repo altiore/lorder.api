@@ -32,18 +32,6 @@ export class UserController {
     return this.usersService.findOne(id);
   }
 
-  @Post()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('admin')
-  @ApiResponse({
-    status: 201,
-    description: 'The User has been successfully created.',
-    type: User,
-  })
-  public create(@Body() data: CreateUserDto): Promise<User> {
-    return this.usersService.create(data);
-  }
-
   @Post('invite')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
