@@ -9,7 +9,7 @@ const HOST = process.env.HOST || process.env.HOSTNAME || 'localhost';
 const SCHEMA = process.env.NODE_ENV === 'production' ? 'https' : 'http';
 
 const corsOptions = {
-  origin: ['http://localhost:8181'],
+  origin: ['http://localhost:8181', 'https://altioreui.herokuapp.com'],
   // methods: '',
   // allowedHeaders: '',
   // exposedHeaders: '',
