@@ -1,8 +1,6 @@
 {
   "defaultSeverity": "error",
-  "extends": [
-    "tslint:recommended"
-  ],
+  "extends": ["tslint:recommended", "tslint-config-prettier"],
   "jsRules": {
     "no-unused-expression": true
   },
@@ -21,7 +19,7 @@
     ],
     "max-line-length": [
       true,
-      150
+      120
     ],
     "member-ordering": [
       false

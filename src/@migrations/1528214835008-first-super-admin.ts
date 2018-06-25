@@ -11,7 +11,9 @@ export class firstSuperAdmin1528214835008 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {
-    await queryRunner.query(`DELETE FROM "user";`);
     await queryRunner.query(`DELETE FROM "role";`);
+    const [{ id: superAdminId }] = await queryRunner.query(`SELECT id FROM "user" WHERE email='${superAdminEmail}';`);
+    await queryRunner.query(`DELETE FROM "project" WHERE "ownerId"='${superAdminId}';`);
+    await queryRunner.query(`DELETE FROM "user" WHERE email='${superAdminEmail}';`);
   }
 }

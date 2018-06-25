@@ -15,13 +15,13 @@ export class new1528031925559 implements MigrationInterface {
       `CREATE TABLE "user_roles" ("userId" integer NOT NULL, "roleId" integer NOT NULL, CONSTRAINT "PK_88481b0c4ed9ada47e9fdd67475" PRIMARY KEY ("userId", "roleId"))`,
     );
     await queryRunner.query(
-      `ALTER TABLE "project" ADD CONSTRAINT "FK_cfb02dac45e9dec5b82f960b3e3" FOREIGN KEY ("creatorId") REFERENCES "user"("id")`,
+      `ALTER TABLE "project" ADD CONSTRAINT "FK_cfb02dac45e9dec5b82f960b3e3" FOREIGN KEY ("creatorId") REFERENCES "user"("id") ON DELETE SET NULL`,
     );
     await queryRunner.query(
-      `ALTER TABLE "project" ADD CONSTRAINT "FK_69f6206a176b5f48c9db7367eea" FOREIGN KEY ("updatorId") REFERENCES "user"("id")`,
+      `ALTER TABLE "project" ADD CONSTRAINT "FK_69f6206a176b5f48c9db7367eea" FOREIGN KEY ("updatorId") REFERENCES "user"("id") ON DELETE SET NULL`,
     );
     await queryRunner.query(
-      `ALTER TABLE "project" ADD CONSTRAINT "FK_9884b2ee80eb70b7db4f12e8aed" FOREIGN KEY ("ownerId") REFERENCES "user"("id")`,
+      `ALTER TABLE "project" ADD CONSTRAINT "FK_9884b2ee80eb70b7db4f12e8aed" FOREIGN KEY ("ownerId") REFERENCES "user"("id") ON DELETE CASCADE`,
     );
     await queryRunner.query(
       `ALTER TABLE "user_roles" ADD CONSTRAINT "FK_472b25323af01488f1f66a06b67" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE`,

@@ -37,11 +37,11 @@ export class Project {
   updatedAt: moment.Moment;
 
   @ApiModelProperty({ type: User })
-  @ManyToOne(type => User, undefined, { nullable: false })
+  @ManyToOne(type => User)
   creator: User;
 
   @ApiModelProperty({ type: User })
-  @ManyToOne(type => User, undefined, { nullable: false })
+  @ManyToOne(type => User)
   updator: User;
 
   @ApiModelProperty({ type: User })

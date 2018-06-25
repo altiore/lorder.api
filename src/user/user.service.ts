@@ -1,12 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { createHash } from 'crypto';
 
 import { User, UserRepository, CreateUserDto, LoginUserDto } from '../@entities/user';
 import { UpdateUserDto } from '../@entities/user/dto';
 import { MailService } from '../mail/mail.service';
 import { RoleRepository } from '../@entities/role';
-import { ValidationException } from '../@common/exceptions/validation.exception';
 
 @Injectable()
 export class UserService {
@@ -57,5 +55,10 @@ export class UserService {
   public async createUser(data: CreateUserDto) {
     const userRole = await this.roleRepo.findUserRole();
     return this.userRepo.createWithRoles(data, [userRole]);
+  }
+
+  public async remove(id: number): Promise<void> {
+    await this.userRepo.delete(id);
+    return;
   }
 }

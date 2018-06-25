@@ -1,4 +1,4 @@
-import { Get, Controller, Post, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Get, Controller, Post, Delete, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiUseTags, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -10,19 +10,19 @@ import { User, CreateUserDto } from '../@entities/user';
 @ApiBearerAuth()
 @ApiUseTags('users')
 @Controller('users')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class UserController {
   constructor(private readonly usersService: UserService) {}
 
   @Get()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('super-admin')
   @ApiResponse({ status: 200, type: User, isArray: true })
   public all(): Promise<any> {
+    // TODO: pagination
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
   @ApiResponse({ status: 200, type: User })
   public findOne(
@@ -32,8 +32,17 @@ export class UserController {
     return this.usersService.findOne(id);
   }
 
+  @Delete(':id')
+  @Roles('super-admin')
+  @ApiResponse({ status: 200 })
+  public remove(
+    @Param('id', ParseIntPipe)
+    id: number,
+  ) {
+    return this.usersService.remove(id);
+  }
+
   @Post('invite')
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
   @ApiResponse({
     status: 201,
