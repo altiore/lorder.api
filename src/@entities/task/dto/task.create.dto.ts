@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString, MinLength, MaxLength, IsNumber } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
 
-export class PhaseDto {
+export class TaskCreateDto {
   @ApiModelProperty()
   @MaxLength(40)
   @MinLength(3)
@@ -11,5 +11,5 @@ export class PhaseDto {
 
   @ApiModelProperty()
   @IsNumber()
-  projectId: number;
+  monthlyBudget: number;
 }

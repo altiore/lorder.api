@@ -10,9 +10,9 @@ import {
 import { ApiModelProperty } from '@nestjs/swagger';
 import * as moment from 'moment';
 
-import { User } from '../user/user.entity';
-import { Phase } from '../project-phase/phase.entity';
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
+import { User } from '../user/user.entity';
+import { Task } from '../task/task.entity';
 
 @Entity()
 export class Project {
@@ -48,7 +48,7 @@ export class Project {
   @ManyToOne(type => User, user => user.projects, { nullable: false })
   owner: User;
 
-  @ApiModelProperty({ type: Phase, isArray: true })
-  @OneToMany(type => Phase, phase => phase.project)
-  phases: Phase[];
+  @ApiModelProperty({ type: Task, isArray: true })
+  @OneToMany(type => Task, task => task.project)
+  tasks: Task[];
 }

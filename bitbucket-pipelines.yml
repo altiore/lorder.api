@@ -13,6 +13,7 @@ pipelines:
           - node
         script:
           - yarn install
+          - yarn pretest
           - yarn test:cov
         services:
           - postgres
@@ -24,6 +25,7 @@ pipelines:
             - node
           script:
             - yarn install
+            - yarn pretest
             - yarn test:cov
           services:
             - postgres

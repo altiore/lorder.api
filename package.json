@@ -14,6 +14,7 @@
     "build": "rm -rf dist && tsc",
     "start:dev": "cross-env NODE_ENV=development nodemon",
     "start:hmr": "node dist/server",
+    "pretest": "node scripts/refresh.js && yarn migration:test:up",
     "test": "jest --maxWorkers=1",
     "test:cov": "jest --coverage --maxWorkers=1 && codecov --token=d80eff89-9fdc-4a57-a585-70b6cbcf1abc",
     "test:e2e": "jest --config ./test/jest-e2e.json",
