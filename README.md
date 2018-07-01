@@ -2,37 +2,10 @@
 
 ## Description
 
-calculate-contribution-for-users-in-project
+Calculate Contribution For Users In Project
 
-## Installation
+## Содержание документации:
 
-```bash
-$ npm install
-```
-
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
+#### [Installation](https://bitbucket.org/altiore/altiore_contrib/wiki/Installation)
+#### [Style Guide](https://bitbucket.org/altiore/altiore_contrib/wiki/Style%20Guide)
+#### [Git Flow](https://bitbucket.org/altiore/altiore_contrib/wiki/Git%20Flow)
