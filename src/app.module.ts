@@ -7,10 +7,11 @@ import { AuthModule } from './auth/auth.module';
 import { MeModule } from './me/me.module';
 import { ProjectModule } from './project/project.module';
 import { TaskModule } from './task/task.module';
+import { TaskTypeModule } from './tasktype/tasktype.module';
 import { UserModule } from './user/user.module';
 
 @Module({
-  imports: [AuthModule, MeModule, ProjectModule, TaskModule, TypeOrmModule.forRoot(), UserModule],
+  imports: [AuthModule, MeModule, ProjectModule, TaskModule, TaskTypeModule, TypeOrmModule.forRoot(), UserModule],
   providers: [
     {
       provide: APP_FILTER,

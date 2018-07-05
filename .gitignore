@@ -21,3 +21,4 @@ dist
 # Docker
 Dockerfile
 docker-compose.yml
+/nbproject/
