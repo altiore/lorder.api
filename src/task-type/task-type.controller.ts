@@ -8,7 +8,7 @@ import { User } from '../@entities/user';
 import { TaskType, TaskTypeCreateDto } from '../@entities/task-type';
 import { Roles } from '../@common/decorators/roles.decorator';
 import { UserJWT } from '../@common/decorators/user-jwt.decorator';
-import { TaskTypeService } from './tasktype.service';
+import { TaskTypeService } from './task-type.service';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -34,21 +34,27 @@ export class TaskTypeController {
     return this.tasktypeService.create(taskTypeCreateDto);
   }
 
-  @Patch()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Patch(':id')
   @Roles('user')
   @ApiResponse({
     status: 200,
-    description: 'The task type has been successfully updated.',
+    type: TaskType,
   })
-  public update(@UserJWT() user: User) {
-    return this.tasktypeService.update();
+  public update(
+    @Param('id', ParseIntPipe)
+    id: number,
+    @Body() taskTypeCreateDto: TaskTypeCreateDto,
+  ) {
+    return this.tasktypeService.update(id, taskTypeCreateDto);
   }
 
-  @Delete()
+  @Delete(':id')
   @Roles('user')
   @ApiResponse({ status: 200 })
-  public remove() {
-    return this.tasktypeService.delete();
+  public remove(
+    @Param('id', ParseIntPipe)
+    id: number,
+  ) {
+    return this.tasktypeService.remove(id);
   }
 }

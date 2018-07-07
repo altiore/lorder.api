@@ -7,7 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { MeModule } from './me/me.module';
 import { ProjectModule } from './project/project.module';
 import { TaskModule } from './task/task.module';
-import { TaskTypeModule } from './tasktype/tasktype.module';
+import { TaskTypeModule } from './task-type/task-type.module';
 import { UserModule } from './user/user.module';
 
 @Module({

@@ -13,4 +13,10 @@ export class TaskTypeRepository extends Repository<TaskType> {
   public findAll(): Promise<TaskType[]> {
     return this.find();
   }
+
+  public async updateById(id: number, data: TaskTypeCreateDto): Promise<TaskType> {
+    let entity = await this.findOneOrFail(id);
+    entity = this.merge(entity, data);
+    return this.save(entity);
+  }
 }

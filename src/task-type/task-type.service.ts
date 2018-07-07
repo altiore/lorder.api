@@ -15,11 +15,18 @@ export class TaskTypeService {
     return this.taskTypeRepo.createTaskType(tasktypeCreateDto);
   }
 
-  public update() {
-    return ['updated'];
+  public update(id: number, taskTypeCreateDto: TaskTypeCreateDto): Promise<TaskType> {
+    return this.taskTypeRepo.updateById(id, taskTypeCreateDto);
   }
 
+  /**
   public delete() {
     return ['deleted'];
+  }
+*/
+
+  public async remove(id: number): Promise<void> {
+    await this.taskTypeRepo.delete(id);
+    return;
   }
 }
