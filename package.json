@@ -18,7 +18,7 @@
     "pretest:cov": "node scripts/refresh.js && yarn migration:test:up",
     "test": "jest --maxWorkers=1 --detectOpenHandles",
     "test:cov": "jest --coverage --maxWorkers=1 --detectOpenHandles && codecov --token=d80eff89-9fdc-4a57-a585-70b6cbcf1abc",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:e2e": "jest --config jest.config.e2e.js --maxWorkers=1 --detectOpenHandles",
     "webpack": "webpack --config webpack.config.js",
     "prepare:mails": "mjml src/mail/mjml/*.mjml -o mails/",
     "migration:generate": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:generate --name generated",
@@ -55,7 +55,7 @@
     "reflect-metadata": "0.1.12",
     "rxjs": "6.2.1",
     "typeorm": "0.2.7",
-    "typescript": "2.9.2"
+    "typescript": "2.6.2"
   },
   "devDependencies": {
     "@types/express": "4.16.0",
@@ -86,19 +86,6 @@
   "repository": {
     "type": "git",
     "url": "https://git.heroku.com/altiore.git"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".spec.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "coverageDirectory": "../coverage"
   },
   "lint-staged": {
     "**/*.ts": [

@@ -1,8 +1,8 @@
 // import { exec } from 'child_process';
 import { createConnection, Connection } from 'typeorm';
 
-import { User, UserRepository } from '../../@entities/user';
-import { RoleRepository } from '../../@entities/role';
+import { User, UserRepository } from '../../@orm/user';
+import { RoleRepository } from '../../@orm/role';
 
 export class TypeormTestHelper {
   private connection: Connection;

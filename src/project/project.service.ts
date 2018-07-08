@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Project, ProjectRepository, ProjectDto } from '../@entities/project';
-import { User } from '../@entities/user';
+import { Project, ProjectRepository, ProjectDto } from '../@orm/project';
+import { User } from '../@orm/user';
 
 @Injectable()
 export class ProjectService {

@@ -4,7 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 
 import { RolesGuard } from '../@common/guards/roles.guard';
 import { Roles } from '../@common/decorators/roles.decorator';
-import { Task, TaskCreateDto } from '../@entities/task';
+import { Task, TaskCreateDto } from '../@orm/task';
 import { TaskService } from './task.service';
 
 @ApiBearerAuth()

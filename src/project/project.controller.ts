@@ -4,8 +4,8 @@ import { AuthGuard } from '@nestjs/passport';
 import * as jwt from 'jsonwebtoken';
 
 import { RolesGuard } from '../@common/guards/roles.guard';
-import { User } from '../@entities/user';
-import { Project, ProjectDto } from '../@entities/project';
+import { User } from '../@orm/user';
+import { Project, ProjectDto } from '../@orm/project';
 import { Roles } from '../@common/decorators/roles.decorator';
 import { UserJWT } from '../@common/decorators/user-jwt.decorator';
 import { ProjectService } from './project.service';

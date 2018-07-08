@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Patch, Query, Post, HttpCode, Headers } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 
-import { User } from '../@entities/user';
-import { EmailDto, LoginUserDto } from '../@entities/user/dto';
+import { User } from '../@orm/user';
+import { EmailDto, LoginUserDto } from '../@orm/user/dto';
 import { AuthService } from './auth.service';
 import { MailAcceptedDto } from '../mail/dto';
 import { TokenResponseDto } from './dto';

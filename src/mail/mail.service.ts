@@ -6,7 +6,7 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
 import { MailAcceptedDto, MessageDto } from './dto';
-import { User } from '../@entities/user';
+import { User } from '../@orm/user';
 
 export type IMailTemplate = 'invite' | 'magic';
 

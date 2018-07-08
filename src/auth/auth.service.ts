@@ -5,7 +5,7 @@ import { UserService } from '../user/user.service';
 import { MailService } from '../mail/mail.service';
 import { JwtPayload } from './interfaces';
 import { TokenResponseDto } from './dto';
-import { EmailDto, LoginUserDto, User } from '../@entities/user';
+import { EmailDto, LoginUserDto, User } from '../@orm/user';
 import { MailAcceptedDto } from '../mail/dto';
 
 @Injectable()

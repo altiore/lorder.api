@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { User, UserRepository, CreateUserDto, LoginUserDto } from '../@entities/user';
-import { UpdateUserDto } from '../@entities/user/dto';
+import { User, UserRepository, CreateUserDto, LoginUserDto } from '../@orm/user';
+import { UpdateUserDto } from '../@orm/user/dto';
 import { MailService } from '../mail/mail.service';
-import { RoleRepository } from '../@entities/role';
+import { RoleRepository } from '../@orm/role';
 
 @Injectable()
 export class UserService {

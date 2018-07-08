@@ -22,9 +22,7 @@ describe('The ProjectRepository', () => {
 
   it('createEntity', async () => {
     const result = await projectRepo.createByUser({ title: 'testProject', monthlyBudget: 1000 }, user);
-    expect(result.createdAt).not.toBeUndefined();
-    expect(result.createdAt).not.toBeNull();
-    expect(result.createdAt).not.toBe('');
+    expect(result.createdAt).toBeTruthy();
     expect(result.title).toBe('testProject');
     expect(result.monthlyBudget).toBe(1000);
   });
@@ -32,9 +30,7 @@ describe('The ProjectRepository', () => {
   it('findOneByOwner', async () => {
     const project = await projectRepo.createByUser({ title: 'testProject2', monthlyBudget: 10000 }, user);
     const result = await projectRepo.findOneByOwner(project.id, user);
-    expect(result.createdAt).not.toBeUndefined();
-    expect(result.createdAt).not.toBeNull();
-    expect(result.createdAt).not.toBe('');
+    expect(result.createdAt).toBeTruthy();
     expect(result.title).toBe('testProject2');
     expect(result.monthlyBudget).toBe(10000);
   });

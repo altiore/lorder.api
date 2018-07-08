@@ -5,7 +5,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../@common/guards/roles.guard';
 import { Roles } from '../@common/decorators/roles.decorator';
 import { UserService } from './user.service';
-import { User, CreateUserDto } from '../@entities/user';
+import { User, CreateUserDto } from '../@orm/user';
 
 @ApiBearerAuth()
 @ApiUseTags('users')

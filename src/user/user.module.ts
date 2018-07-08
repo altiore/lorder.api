@@ -4,8 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MailModule } from '../mail/mail.module';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { UserRepository } from '../@entities/user';
-import { RoleRepository } from '../@entities/role';
+import { UserRepository } from '../@orm/user';
+import { RoleRepository } from '../@orm/role';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UserRepository, RoleRepository]), MailModule],

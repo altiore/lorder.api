@@ -6,7 +6,7 @@ import { MailModule } from '../mail/mail.module';
 import { UserModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserRepository } from '../@entities/user';
+import { UserRepository } from '../@orm/user';
 
 @Module({
   controllers: [AuthController],
