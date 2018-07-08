@@ -9,6 +9,7 @@ pipelines:
   default:
     - step:
         name: Migrations and test (look at postinstall script)
+        deployment: test
         caches:
           - node
         script:
