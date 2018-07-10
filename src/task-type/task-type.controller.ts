@@ -5,7 +5,7 @@ import * as jwt from 'jsonwebtoken';
 
 import { RolesGuard } from '../@common/guards/roles.guard';
 import { User } from '../@entities/user';
-import { TaskType, TaskTypeCreateDto } from '../@entities/task-type';
+import { TaskType, TaskTypeCreateDto } from '../@orm/task-type';
 import { Roles } from '../@common/decorators/roles.decorator';
 import { UserJWT } from '../@common/decorators/user-jwt.decorator';
 import { TaskTypeService } from './task-type.service';
@@ -18,14 +18,14 @@ export class TaskTypeController {
   constructor(private readonly tasktypeService: TaskTypeService) {}
 
   @Get()
-  @Roles('user')
+  @Roles('super-admin')
   @ApiResponse({ status: 200, type: TaskType, isArray: true })
   public all() {
     return this.tasktypeService.findAll();
   }
 
   @Post()
-  @Roles('user')
+  @Roles('super-admin')
   @ApiResponse({
     status: 201,
     type: TaskType,
@@ -35,7 +35,7 @@ export class TaskTypeController {
   }
 
   @Patch(':id')
-  @Roles('user')
+  @Roles('super-admin')
   @ApiResponse({
     status: 200,
     type: TaskType,
@@ -49,7 +49,7 @@ export class TaskTypeController {
   }
 
   @Delete(':id')
-  @Roles('user')
+  @Roles('super-admin')
   @ApiResponse({ status: 200 })
   public remove(
     @Param('id', ParseIntPipe)
