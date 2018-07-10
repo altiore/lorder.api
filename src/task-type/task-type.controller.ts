@@ -4,10 +4,8 @@ import { AuthGuard } from '@nestjs/passport';
 import * as jwt from 'jsonwebtoken';
 
 import { RolesGuard } from '../@common/guards/roles.guard';
-import { User } from '../@entities/user';
 import { TaskType, TaskTypeCreateDto } from '../@orm/task-type';
 import { Roles } from '../@common/decorators/roles.decorator';
-import { UserJWT } from '../@common/decorators/user-jwt.decorator';
 import { TaskTypeService } from './task-type.service';
 
 @ApiBearerAuth()
