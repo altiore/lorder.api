@@ -1,4 +1,4 @@
-import { TypeormTestHelper } from '../../@common/test-helper/typeorm.test.helper';
+import { TypeormTestHelper } from '../typeorm.test.helper';
 import { UserRepository } from './user.repository';
 
 const tth = new TypeormTestHelper();
@@ -36,16 +36,5 @@ describe('The UserRepository', () => {
       })).tel,
     ).toBe('7777777777');
     expect((await userRepository.find({ where: { tel: '7777777777' } })).length).toBe(1);
-  });
-
-  it('updateEntity email', async () => {
-    const user = await userRepository.findOneByEmail('test');
-    const newEmail = 'testnew2@mail.com';
-    expect(
-      (await userRepository.updateEntity(user, {
-        email: newEmail,
-      })).email,
-    ).toBe(newEmail);
-    expect((await userRepository.find({ where: { email: newEmail } })).length).toBe(1);
   });
 });

@@ -1,30 +1,22 @@
-// import { exec } from 'child_process';
 import { createConnection, Connection } from 'typeorm';
 
-import { User, UserRepository } from '../../@orm/user';
-import { RoleRepository } from '../../@orm/role';
+import { User, UserRepository } from './user';
+import { RoleRepository } from './role';
+const config = require('../../ormconfig');
 
 export class TypeormTestHelper {
   private connection: Connection;
   private repos;
 
   public async beforeAll(...args): Promise<any> {
-    // 1. set variables
-    if (!process.env.TYPEORM_DATABASE) {
-      require('dotenv').config();
-    }
-    process.env.TYPEORM_DATABASE = process.env.TEST_TYPEORM_DATABASE;
-    process.env.TYPEORM_USERNAME = process.env.TEST_TYPEORM_USERNAME;
-    process.env.TYPEORM_PASSWORD = process.env.TEST_TYPEORM_PASSWORD;
+    // 1. create connection
+    this.connection = await createConnection(config);
 
-    // 2. create connection
-    this.connection = await createConnection();
-
-    // 3. create repositories
+    // 2. create repositories
     this.repos = args ? args.map(repo => this.connection.getCustomRepository(repo)) : [];
     return this.repos;
 
-    // 4. load fixtures
+    // 3. load fixtures
   }
 
   public async afterAll() {

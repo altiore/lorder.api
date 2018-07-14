@@ -1,4 +1,4 @@
-import { TypeormTestHelper } from '../../@common/test-helper/typeorm.test.helper';
+import { TypeormTestHelper } from '../typeorm.test.helper';
 import { UserRepository } from '../user/user.repository';
 import { User } from '../user/user.entity';
 import { RoleRepository } from '../role/role.repository';
