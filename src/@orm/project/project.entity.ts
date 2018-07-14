@@ -1,11 +1,11 @@
 import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-    ManyToOne,
-    OneToMany, ManyToMany, JoinTable,
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { ApiModelProperty } from '@nestjs/swagger';
 import * as moment from 'moment';
@@ -13,9 +13,8 @@ import * as moment from 'moment';
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { User } from '../user/user.entity';
 import { Task } from '../task/task.entity';
-import {Role} from '../role/role.entity';
-import {TaskType} from '../task-type';
-import {ProjectTaskType} from '../project-task-type/project-task-type.entity';
+import { TaskType } from '../task-type/task-type.entity';
+import { ProjectTaskType } from '../project-task-type/project-task-type.entity';
 
 @Entity()
 export class Project {
@@ -55,8 +54,8 @@ export class Project {
   @OneToMany(type => Task, task => task.project)
   tasks: Task[];
 
-    @ApiModelProperty({ type: TaskType, isArray: true })
-    @OneToMany(type => ProjectTaskType, projectTaskType => projectTaskType.tasktype)
-    projectTaskTypes: ProjectTaskType[];
+  @ApiModelProperty({ type: TaskType, isArray: true })
+  @OneToMany(type => ProjectTaskType, projectTaskType => projectTaskType.taskType)
+  projectTaskTypes: ProjectTaskType[];
 
 }
