@@ -10,8 +10,8 @@ import { TaskTypeService } from './task-type.service';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard)
-@ApiUseTags('tasktype')
-@Controller('tasktype')
+@ApiUseTags('task-type')
+@Controller('task-type')
 export class TaskTypeController {
   constructor(private readonly tasktypeService: TaskTypeService) {}
 

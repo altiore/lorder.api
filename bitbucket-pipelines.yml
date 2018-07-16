@@ -18,7 +18,7 @@ pipelines:
         services:
           - postgres
   branches:
-    master:
+    staging:
       - step:
           name: Tests one more time before deploy
           caches:
@@ -33,6 +33,17 @@ pipelines:
           deployment: staging
           script:
             - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git HEAD
+    master:
+      - step:
+          name: Tests one more time before deploy
+          deployment: production
+          caches:
+            - node
+          script:
+            - yarn install
+            - yarn test:remote
+          services:
+            - postgres
 
 definitions:
   services:
