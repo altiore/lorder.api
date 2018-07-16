@@ -3,22 +3,42 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from './@common/pipes/validation.pipe';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 
 declare const module: any;
 
+const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || process.env.HOSTNAME || 'localhost';
+const SCHEMA = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+
+const corsOptions = {
+  origin: [
+    'http://localhost:8181', // local
+    'https://staging-altiore.herokuapp.com', // staging server
+    'http://altiore.loc', // static local server (server from build folder)
+  ],
+} as CorsOptions;
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: corsOptions });
   app.useGlobalPipes(new ValidationPipe());
+  app.setGlobalPrefix('v1');
 
   const options = new DocumentBuilder()
     .setTitle('Altiore')
     .setDescription('Altiore API documentation')
     .setVersion('1.0')
     .addBearerAuth('Authorization', 'header')
+    .setSchemes(SCHEMA)
+    .setBasePath('v1')
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
 
+  await app.listen(
+    PORT,
+    () => process.env.NODE_ENV !== 'production' && console.log(`Listening on ${SCHEMA}://${HOST}:${PORT}/api/`),
+  );
   if (module.hot) {
     module.hot.accept();
     module.hot.dispose(() => app.close());

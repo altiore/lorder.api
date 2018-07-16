@@ -9,7 +9,7 @@ export class ProjectTaskType {
   @ManyToOne(type => Project, project => project.projectTaskTypes, { primary: true })
   project: Project;
 
-  @ManyToOne(type => TaskType, tasktype => tasktype.projectTaskTypes, { primary: true })
+  @ManyToOne(type => TaskType, taskType => taskType.projectTaskTypes, { primary: true })
   taskType: TaskType;
 
   @Column()

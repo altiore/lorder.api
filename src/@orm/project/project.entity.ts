@@ -55,7 +55,7 @@ export class Project {
   tasks: Task[];
 
   @ApiModelProperty({ type: TaskType, isArray: true })
-  @OneToMany(type => ProjectTaskType, projectTaskType => projectTaskType.taskType)
+  @OneToMany(type => ProjectTaskType, projectTaskType => projectTaskType.project)
   projectTaskTypes: ProjectTaskType[];
 
 }

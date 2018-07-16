@@ -3,6 +3,7 @@ import { EntityRepository, Repository } from 'typeorm';
 import { Project } from './project.entity';
 import { ProjectDto } from './dto';
 import { User } from '../user/user.entity';
+import { ProjectTaskType } from '../project-task-type';
 
 @EntityRepository(Project)
 export class ProjectRepository extends Repository<Project> {
@@ -27,6 +28,11 @@ export class ProjectRepository extends Repository<Project> {
     project.creator = creator;
     project.updator = creator;
     project.owner = creator;
+    return this.save(project);
+  }
+
+  public replaceTaskTypes(project: Project, projectTaskTypes: ProjectTaskType[]) {
+    project.projectTaskTypes = projectTaskTypes;
     return this.save(project);
   }
 }

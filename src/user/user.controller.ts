@@ -8,7 +8,7 @@ import { UserService } from './user.service';
 import { User, CreateUserDto } from '../@orm/user';
 
 @ApiBearerAuth()
-@ApiUseTags('users')
+@ApiUseTags('users (super-admin)')
 @Controller('users')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class UserController {
@@ -23,7 +23,7 @@ export class UserController {
   }
 
   @Get(':id')
-  @Roles('admin')
+  @Roles('super-admin')
   @ApiResponse({ status: 200, type: User })
   public findOne(
     @Param('id', ParseIntPipe)
@@ -43,7 +43,7 @@ export class UserController {
   }
 
   @Post('invite')
-  @Roles('admin')
+  @Roles('super-admin')
   @ApiResponse({
     status: 201,
     description: 'The Invite has been successfully sent.',
