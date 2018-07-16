@@ -9,6 +9,7 @@
     "node": "8.11.3"
   },
   "scripts": {
+    "first:install": "bin/install.sh",
     "postinstall": "yarn build && yarn migration:up",
     "start": "node dist/main.js",
     "build": "rm -rf dist && tsc",

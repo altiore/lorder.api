@@ -1,18 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { In } from 'typeorm';
 
 import { Project, ProjectRepository, ProjectDto } from '../@orm/project';
 import { ProjectTaskTypeRepository } from '../@orm/project-task-type';
 import { TaskTypeRepository } from '../@orm/task-type';
 import { User } from '../@orm/user';
-import { TaskTypeDto } from './dto/task-type.dto';
+import { TaskTypesDto } from './dto/task-types.dto';
 
 @Injectable()
 export class ProjectService {
   constructor(
     @InjectRepository(ProjectRepository) private readonly projectRepo: ProjectRepository,
-    @InjectRepository(ProjectRepository) private readonly taskTypeRepo: TaskTypeRepository,
-    @InjectRepository(ProjectRepository) private readonly projectTaskTypeRepo: ProjectTaskTypeRepository,
+    @InjectRepository(TaskTypeRepository) private readonly taskTypeRepo: TaskTypeRepository,
+    @InjectRepository(ProjectTaskTypeRepository) private readonly projectTaskTypeRepo: ProjectTaskTypeRepository,
   ) {}
 
   public findAll(user: User): Promise<Project[]> {
@@ -27,9 +28,21 @@ export class ProjectService {
     return this.projectRepo.createByUser(data, user);
   }
 
-  public async update(project: Project, taskTypesIds: TaskTypeDto[]): Promise<Project> {
+  public async update(project: Project, taskTypesIds: number[]): Promise<any> {
     const taskTypes = await this.taskTypeRepo.findByIds(taskTypesIds);
-    const projectTaskTypes = this.projectTaskTypeRepo.cre
-    return this.projectRepo.replaceTaskTypes(project, taskTypes);
+    if (taskTypes.length !== taskTypesIds.length) {
+      throw new NotAcceptableException(
+        'Недопустимый id taskType был передан.' +
+          ' Пожалуйста, убедитесь, что все сущности были созданы предварительно',
+      );
+    }
+    // const projectTaskTypes = this.projectTaskTypeRepo.createMultipleByProjectAndTaskTypes(project, taskTypes);
+    try {
+      return await this.projectTaskTypeRepo.createMultiple(project, taskTypes);
+    } catch (e) {
+      console.log(e);
+      return 'error';
+    }
+    // return this.projectRepo.replaceTaskTypes(project, projectTaskTypes);
   }
 }

@@ -9,7 +9,7 @@ import { Project, ProjectDto } from '../@orm/project';
 import { Roles } from '../@common/decorators/roles.decorator';
 import { UserJWT } from '../@common/decorators/user-jwt.decorator';
 import { ProjectService } from './project.service';
-import { TaskTypeDto } from './dto/task-type.dto';
+import { TaskTypesDto } from './dto/task-types.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -55,11 +55,12 @@ export class ProjectController {
     type: Project,
   })
   public async update(
-    @Body() taskTypes: TaskTypeDto[],
+    @Body() dto: TaskTypesDto,
     @UserJWT() user: User,
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<Project> {
+    @Param('id', ParseIntPipe)
+    id: number,
+  ): Promise<any> {
     const project = await this.projectService.findOne(id, user);
-    return this.projectService.update(project, taskTypes);
+    return this.projectService.update(project, dto.taskTypes);
   }
 }

@@ -1,4 +1,4 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository, Repository, In } from 'typeorm';
 
 import { ProjectTaskType } from './project-task-type.entity';
 import { Project } from '../project';
@@ -6,13 +6,20 @@ import { TaskType } from '../task-type';
 
 @EntityRepository(ProjectTaskType)
 export class ProjectTaskTypeRepository extends Repository<ProjectTaskType> {
-  public createMultipleByProjectAndTaskTypes(project: Project, taskTypes: TaskType[]) {
-    return this.createQueryBuilder()
+  public async createMultiple(project: Project, taskTypes: TaskType[]): Promise<any> {
+    await this.delete({ project });
+    const entities = taskTypes.map((taskType, order) =>
+      this.create({
+        project,
+        taskType,
+        order,
+      }),
+    );
+    await this.createQueryBuilder()
       .insert()
-      .values(taskTypes.map(taskType => ({
-        projectId: project.id,
-        projectId: project.id,
-      })))
+      .into(ProjectTaskType)
+      .values(entities)
       .execute();
+    return entities;
   }
 }
