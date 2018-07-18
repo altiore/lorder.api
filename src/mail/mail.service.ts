@@ -6,8 +6,11 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
 import { MailAcceptedDto, MessageDto } from './dto';
-import { User } from '../@orm/user';
 
+/**
+ * каждое письмо соответсвует одноименному файлу в папке mjml
+ * Например `invite` соответствует файлу mjml/invite.mjml
+ */
 export type IMailTemplate = 'invite' | 'magic';
 
 @Injectable()
@@ -18,16 +21,30 @@ export class MailService {
 
   public static readonly ADMIN_EMAIL = 'razzwan@altiore.org';
 
-  public sendInvite(user: User): Promise<MailAcceptedDto> {
+  public sendInvite({
+    email,
+    inviter,
+    link,
+    member = 'Приятель',
+    project,
+  }: {
+    email: string;
+    inviter?: string;
+    link: string;
+    member?: string;
+    project: string;
+  }): Promise<MailAcceptedDto> {
     const output = this.putParamsToTemplate(MailService.INVITE_TEMPLATE, {
-      LINK: 'https://google.com/test/link',
-      LINK_NAME: 'Button Name',
+      LINK: link,
+      MEMBER: member,
+      INVITER: inviter || 'Администратор',
+      PROJECT: project,
     });
 
     return this.send({
       from: MailService.ADMIN_EMAIL,
-      to: user.email,
-      subject: 'Приглашение Altiore',
+      to: email,
+      subject: `Приглашение в проект ${project} (Altiore)`,
       html: output,
     });
   }

@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { User, UserRepository, CreateUserDto, LoginUserDto } from '../@orm/user';
 import { UpdateUserDto } from '../@orm/user/dto';
-import { MailService } from '../mail/mail.service';
 import { RoleRepository } from '../@orm/role';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class UserService {
@@ -46,19 +46,17 @@ export class UserService {
     return this.userRepo.activateByResetLink(resetLink);
   }
 
-  public async invite(invite: CreateUserDto): Promise<User> {
-    const { user } = await this.createUser(invite);
-    await this.mailService.sendInvite(user);
-    return user;
-  }
-
   public async createUser(data: CreateUserDto) {
     const userRole = await this.roleRepo.findUserRole();
-    return this.userRepo.createWithRoles(data, [userRole]);
+    return await this.userRepo.createWithRoles(data, [userRole]);
   }
 
   public async remove(id: number): Promise<void> {
     await this.userRepo.delete(id);
     return;
+  }
+
+  public async exists(email): Promise<boolean> {
+    return !!(await this.userRepo.findOne({ where: { email }, select: ['id'] }));
   }
 }

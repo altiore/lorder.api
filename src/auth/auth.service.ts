@@ -14,8 +14,7 @@ export class AuthService {
 
   public async sendMagicLink({ email }: EmailDto, hostWithProtocol: string): Promise<MailAcceptedDto> {
     let user = await this.userService.findUserByEmail(email);
-    const { token: resetLink } = this.createToken({ email });
-    const link = `${hostWithProtocol}/start/${resetLink}`;
+    const { link, resetLink } = this.createActivationLink(email, hostWithProtocol);
     if (!user) {
       const res = await this.userService.createUser({ email, resetLink });
       user = res.user;
@@ -41,6 +40,11 @@ export class AuthService {
    */
   public async validateUser(payload: JwtPayload): Promise<User> {
     return await this.userService.findActiveUserByEmail(payload.email);
+  }
+
+  public createActivationLink(email, hostWithProtocol): { resetLink: string; link: string } {
+    const { token: resetLink } = this.createToken({ email });
+    return { resetLink, link: `${hostWithProtocol}/start/${resetLink}` };
   }
 
   /**

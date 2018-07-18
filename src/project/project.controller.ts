@@ -1,10 +1,10 @@
-import { Get, Controller, Post, Body, Param, ParseIntPipe, UseGuards, Put } from '@nestjs/common';
+import { Get, Controller, Post, Body, Param, ParseIntPipe, UseGuards, Put, Headers } from '@nestjs/common';
 import { ApiBearerAuth, ApiUseTags, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import * as jwt from 'jsonwebtoken';
 
 import { RolesGuard } from '../@common/guards/roles.guard';
-import { User } from '../@orm/user';
+import { EmailDto, User } from '../@orm/user';
 import { Project, ProjectDto } from '../@orm/project';
 import { Roles } from '../@common/decorators/roles.decorator';
 import { UserJWT } from '../@common/decorators/user-jwt.decorator';
@@ -62,5 +62,24 @@ export class ProjectController {
   ): Promise<any> {
     const project = await this.projectService.findOne(id, user);
     return this.projectService.update(project, dto.taskTypes);
+  }
+
+  @ApiUseTags('projects -> users')
+  @Post(':id/users')
+  @Roles('admin')
+  @ApiResponse({
+    status: 201,
+    description: 'The Invite has been successfully sent.',
+    type: User,
+  })
+  public async invite(
+    @Body() data: EmailDto,
+    @Headers('origin') origin: string,
+    @Param('id', ParseIntPipe)
+    id: number,
+    @UserJWT() user: User,
+  ): Promise<User> {
+    const project = await this.projectService.findOne(id, user);
+    return this.projectService.invite(project, data, origin);
   }
 }

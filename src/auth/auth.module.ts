@@ -12,5 +12,6 @@ import { UserRepository } from '../@orm/user';
   controllers: [AuthController],
   imports: [MailModule, UserModule, TypeOrmModule.forFeature([UserRepository])],
   providers: [AuthService, JwtStrategy],
+  exports: [AuthService],
 })
 export class AuthModule {}

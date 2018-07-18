@@ -52,6 +52,7 @@ export class UserRepository extends Repository<User> {
     }
     await this.save(user);
     delete user.password;
+    delete user.resetLink;
     return { user, password };
   }
 
