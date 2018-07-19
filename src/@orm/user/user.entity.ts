@@ -14,6 +14,7 @@ import { Moment } from 'moment';
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { Role } from '../role/role.entity';
 import { Project } from '../project/project.entity';
+import { UserProjects } from '../user-projects/user-projects.entity';
 
 @Entity()
 export class User {
@@ -75,4 +76,8 @@ export class User {
   @ApiModelProperty({ type: Project, isArray: true })
   @OneToMany(type => Project, project => project.owner)
   projects: Project[];
+
+  @ApiModelProperty({ type: UserProjects, isArray: true })
+  @OneToMany(type => UserProjects, userProjects => userProjects.memberId)
+  userProjects: UserProjects[];
 }

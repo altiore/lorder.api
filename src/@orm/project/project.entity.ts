@@ -15,6 +15,7 @@ import { User } from '../user/user.entity';
 import { Task } from '../task/task.entity';
 import { TaskType } from '../task-type/task-type.entity';
 import { ProjectTaskType } from '../project-task-type/project-task-type.entity';
+import { UserProjects } from '../user-projects/user-projects.entity';
 
 @Entity()
 export class Project {
@@ -57,5 +58,9 @@ export class Project {
   @ApiModelProperty({ type: TaskType, isArray: true })
   @OneToMany(type => ProjectTaskType, projectTaskType => projectTaskType.project)
   projectTaskTypes: ProjectTaskType[];
+
+  @ApiModelProperty({ type: UserProjects, isArray: true })
+  @OneToMany(type => UserProjects, userProjects => userProjects.projectId)
+  userProjects: UserProjects[];
 
 }
