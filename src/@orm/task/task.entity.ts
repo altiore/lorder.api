@@ -1,7 +1,8 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent } from 'typeorm';
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 
 import { Project } from '../project/project.entity';
+import { UserTask } from '../user-task/user-task.entity';
 
 @Entity()
 @Tree('closure-table')
@@ -31,4 +32,8 @@ export class Task {
   @ApiModelPropertyOptional()
   @Column()
   value: number;
+
+  @ApiModelProperty({ type: UserTask, isArray: true })
+  @OneToMany(type => UserTask, userTask => userTask.task)
+  userTasks: UserTask[];
 }

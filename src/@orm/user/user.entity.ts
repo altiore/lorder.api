@@ -15,6 +15,7 @@ import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { Role } from '../role/role.entity';
 import { Project } from '../project/project.entity';
 import { UserProject } from '../user-project/user-project.entity';
+import { UserTask } from '../user-task/user-task.entity';
 
 @Entity()
 export class User {
@@ -84,4 +85,8 @@ export class User {
   @ApiModelProperty({ type: UserProject, isArray: true })
   @OneToMany(type => UserProject, userProject => userProject.member)
   invitedMembers: UserProject[];
+
+  @ApiModelProperty({ type: UserTask, isArray: true })
+  @OneToMany(type => UserTask, userTask => userTask.user)
+  tasks: UserTask[];
 }

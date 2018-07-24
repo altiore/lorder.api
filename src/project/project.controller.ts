@@ -13,7 +13,6 @@ import { TaskTypesDto } from './dto/task-types.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard)
-@ApiUseTags('projects')
 @Controller('projects')
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
@@ -21,6 +20,7 @@ export class ProjectController {
   @Get()
   @Roles('user')
   @ApiResponse({ status: 200, type: Project, isArray: true })
+  @ApiUseTags('projects')
   public async all(@UserJWT() user: User): Promise<Project[]> {
     return this.projectService.findAll(user);
   }
@@ -28,6 +28,7 @@ export class ProjectController {
   @Get(':id')
   @Roles('user')
   @ApiResponse({ status: 200, type: Project })
+  @ApiUseTags('projects')
   public one(
     @UserJWT() user: User,
     @Param('id', ParseIntPipe)
@@ -43,6 +44,7 @@ export class ProjectController {
     description: 'The Project has been successfully created.',
     type: Project,
   })
+  @ApiUseTags('projects')
   public create(@UserJWT() user: User, @Body() data: ProjectDto): Promise<Project> {
     return this.projectService.create(data, user);
   }
@@ -54,6 +56,7 @@ export class ProjectController {
     description: 'Project task types has been successfully added.',
     type: Project,
   })
+  @ApiUseTags('projects')
   public async update(
     @Body() dto: TaskTypesDto,
     @UserJWT() user: User,
@@ -64,7 +67,6 @@ export class ProjectController {
     return this.projectService.update(project, dto.taskTypes);
   }
 
-  @ApiUseTags('projects -> users')
   @Post(':id/users')
   @Roles('admin')
   @ApiResponse({
@@ -72,6 +74,7 @@ export class ProjectController {
     description: 'The Invite has been successfully sent.',
     type: User,
   })
+  @ApiUseTags('projects -> users')
   public async invite(
     @Body() data: EmailDto,
     @Headers('origin') origin: string,
