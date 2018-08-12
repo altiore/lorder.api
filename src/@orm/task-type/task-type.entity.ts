@@ -14,6 +14,10 @@ export class TaskType {
   @Column({ nullable: false })
   title: string;
 
+  @ApiModelProperty()
+  @Column({ default: false, nullable: false })
+  isPublic: boolean;
+
   @ApiModelProperty({ type: Project, isArray: true })
   @OneToMany(type => ProjectTaskType, projectTaskType => projectTaskType.taskType)
   projectTaskTypes: ProjectTaskType[];
