@@ -27,8 +27,7 @@
     "migration:up": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:run",
     "migration:down": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:revert",
     "migration:test:up": "cross-env TYPEORM_DATABASE=altiore_contrib_test ./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:run",
-    "migration:test:down": "cross-env TYPEORM_DATABASE=altiore_contrib_test ./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:revert",
-    "precommit": "yarn test && rimraf mails/* && yarn prepare:mails && git add . && lint-staged"
+    "migration:test:down": "cross-env TYPEORM_DATABASE=altiore_contrib_test ./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:revert"
   },
   "dependencies": {
     "@nestjs/common": "5.0.1",
@@ -66,12 +65,12 @@
     "@types/supertest": "2.0.4",
     "codecov": "3.0.2",
     "dotenv": "6.0.0",
-    "husky": "0.14.3",
+    "husky": "^1.0.0-rc.13",
     "jest": "23.2.0",
-    "lint-staged": "7.2.0",
+    "lint-staged": "7.2.2",
     "mjml": "4.1.0",
     "nodemon": "1.17.5",
-    "prettier": "1.13.4",
+    "prettier": "1.14.2",
     "rimraf": "2.6.2",
     "supertest": "3.1.0",
     "ts-jest": "23.0.0",
@@ -88,13 +87,19 @@
     "type": "git",
     "url": "https://git.heroku.com/altiore.git"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "lint-staged": {
-    "**/*.ts": [
-      "prettier --write --print-width 120 --single-quote --parser typescript",
+    "*.{js,jsx,json,css,md}": [
+      "prettier --write --print-width 120 --trailing-comma es5",
       "git add"
     ],
-    "./src/**/*.{js,json,md}": [
-      "prettier --write --print-width 120 --single-quote",
+    "*.{ts,tsx}": [
+      "tslint --fix -t verbose",
+      "prettier --write --print-width 120 --single-quote --parser typescript --trailing-comma es5",
       "git add"
     ]
   }
