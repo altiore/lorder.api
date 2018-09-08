@@ -12,6 +12,7 @@ pipelines:
           - yarn test:remote
         services:
           - postgres
+          - redis
   branches:
     staging:
       - step:
@@ -23,6 +24,7 @@ pipelines:
             - yarn test:remote
           services:
             - postgres
+            - redis
       - step:
           name: Deploy to altiore-staging
           deployment: staging
@@ -39,6 +41,7 @@ pipelines:
             - yarn test:remote
           services:
             - postgres
+            - redis
 
 definitions:
   services:
@@ -48,3 +51,5 @@ definitions:
         POSTGRES_DB: 'pipelines'
         POSTGRES_USER: 'test_user'
         POSTGRES_PASSWORD: 'test_user_password'
+    redis:
+      image: redis
