@@ -22,4 +22,19 @@ export class ProjectTaskTypeRepository extends Repository<ProjectTaskType> {
       .execute();
     return entities;
   }
+
+  public async addToProject(project: Project, taskType: TaskType): Promise<ProjectTaskType> {
+    const order = await this.count({ where: { project } });
+    const entity = this.create({
+      order,
+      project,
+      taskType,
+    });
+    return await this.save(entity);
+  }
+
+  public async removeFromProject(project: Project, taskType: TaskType): Promise<any> {
+    const entities = await this.find({ where: { project }, order: { order: 'ASC' } });
+    return this.createMultiple(project, entities.map(el => el.taskType).filter(el => el.id !== taskType.id));
+  }
 }

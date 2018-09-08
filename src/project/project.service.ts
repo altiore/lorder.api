@@ -1,5 +1,6 @@
 import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DeleteResult } from 'typeorm';
 
 import { Project, ProjectDto, ProjectRepository } from '../@orm/project';
 import { ProjectTaskTypeRepository } from '../@orm/project-task-type';
@@ -20,23 +21,36 @@ export class ProjectService {
     private readonly mailService: MailService
   ) {}
 
-  public findAll(user: User): Promise<Project[]> {
+  public findAll(user: User): Promise<Partial<Project>[]> {
     return this.projectRepo.findAllByOwner(user);
   }
 
   public async findOne(id: number, user: User): Promise<Project> {
     try {
-      return await this.projectRepo.findOneByOwner(id, user);
+      return (await this.projectRepo.findOneByOwner(id, user)) as Project;
     } catch (e) {
-      throw new NotFoundException(
-        'Вы пытаетесь пригласить пользователя в проект, который не существует,' +
-          ' или вы не являетесь его администратором'
-      );
+      throw new NotFoundException('Проект не найден');
     }
   }
 
   public create(data: ProjectDto, user: User): Promise<Project> {
     return this.projectRepo.createByUser(data, user);
+  }
+
+  public async addTaskType(project: Project, taskTypeId: number): Promise<any> {
+    const taskType = await this.taskTypeRepo.findOne(taskTypeId);
+    if (!taskType) {
+      throw new NotFoundException('Тип задачи не был найден');
+    }
+    return this.projectTaskTypeRepo.addToProject(project, taskType);
+  }
+
+  public async removeFromProject(project: Project, taskTypeId: number): Promise<DeleteResult> {
+    const taskType = await this.taskTypeRepo.findOne(taskTypeId);
+    if (!taskType) {
+      throw new NotFoundException('Тип задачи не был найден');
+    }
+    return this.projectTaskTypeRepo.removeFromProject(project, taskType);
   }
 
   public async update(project: Project, taskTypesIds: number[]): Promise<any> {

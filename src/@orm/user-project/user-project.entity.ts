@@ -7,7 +7,7 @@ import { User } from '../user/user.entity';
 @Entity()
 export class UserProject {
   @ApiModelProperty({ type: User })
-  @ManyToOne(type => User, user => user.memberProjects, { primary: true })
+  @ManyToOne(type => User, user => user.memberProjects, { primary: true, eager: true })
   member: User;
 
   @ApiModelProperty({ type: Project })

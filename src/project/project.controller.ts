@@ -7,8 +7,7 @@ import { Roles } from '../@common/decorators/roles.decorator';
 import { UserJWT } from '../@common/decorators/user-jwt.decorator';
 import { RolesGuard } from '../@common/guards/roles.guard';
 import { Project, ProjectDto } from '../@orm/project';
-import { EmailDto, User } from '../@orm/user';
-import { TaskTypesDto } from './dto/task-types.dto';
+import { User } from '../@orm/user';
 import { ProjectService } from './project.service';
 
 @ApiBearerAuth()
@@ -21,7 +20,7 @@ export class ProjectController {
   @Roles('user')
   @ApiResponse({ status: 200, type: Project, isArray: true })
   @ApiUseTags('projects')
-  public async all(@UserJWT() user: User): Promise<Project[]> {
+  public async all(@UserJWT() user: User): Promise<Partial<Project>[]> {
     return this.projectService.findAll(user);
   }
 
@@ -29,7 +28,7 @@ export class ProjectController {
   @Roles('user')
   @ApiResponse({ status: 200, type: Project })
   @ApiUseTags('projects')
-  public one(@UserJWT() user: User, @Param('id', ParseIntPipe) id: number): Promise<Project> {
+  public one(@UserJWT() user: User, @Param('id', ParseIntPipe) id: number): Promise<Partial<Project>> {
     return this.projectService.findOne(id, user);
   }
 
@@ -43,23 +42,6 @@ export class ProjectController {
   @ApiUseTags('projects')
   public create(@UserJWT() user: User, @Body() data: ProjectDto): Promise<Project> {
     return this.projectService.create(data, user);
-  }
-
-  @Put(':id/task-types')
-  @Roles('user')
-  @ApiResponse({
-    description: 'Project task types has been successfully added.',
-    status: 200,
-    type: Project,
-  })
-  @ApiUseTags('projects')
-  public async update(
-    @Body() dto: TaskTypesDto,
-    @UserJWT() user: User,
-    @Param('id', ParseIntPipe) id: number
-  ): Promise<any> {
-    const project = await this.projectService.findOne(id, user);
-    return this.projectService.update(project, dto.taskTypes);
   }
 
   // @Post(':id/users')

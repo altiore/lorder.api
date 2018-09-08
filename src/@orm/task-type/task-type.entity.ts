@@ -1,8 +1,8 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiModelProperty } from '@nestjs/swagger';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-import { Project } from '../project/project.entity';
 import { ProjectTaskType } from '../project-task-type/project-task-type.entity';
+import { Project } from '../project/project.entity';
 
 @Entity()
 export class TaskType {
@@ -18,7 +18,6 @@ export class TaskType {
   @Column({ default: false, nullable: false })
   isPublic: boolean;
 
-  @ApiModelProperty({ type: Project, isArray: true })
   @OneToMany(type => ProjectTaskType, projectTaskType => projectTaskType.taskType)
   projectTaskTypes: ProjectTaskType[];
 }

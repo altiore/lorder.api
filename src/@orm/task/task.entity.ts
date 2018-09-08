@@ -1,5 +1,5 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent } from 'typeorm';
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent } from 'typeorm';
 
 import { Project } from '../project/project.entity';
 import { UserTask } from '../user-task/user-task.entity';
@@ -16,10 +16,12 @@ export class Task {
   project: Project;
 
   // ApiModel does not work here due to circular dependency
-  @TreeParent() parent?: Task;
+  @TreeParent()
+  parent?: Task;
 
   // ApiModel does not work here due to circular dependency
-  @TreeChildren() children?: Task[];
+  @TreeChildren()
+  children?: Task[];
 
   @ApiModelProperty()
   @Column({ nullable: false })
@@ -34,6 +36,6 @@ export class Task {
   value: number;
 
   @ApiModelProperty({ type: UserTask, isArray: true })
-  @OneToMany(type => UserTask, userTask => userTask.task)
+  @OneToMany(type => UserTask, userTask => userTask.task, { eager: false })
   userTasks: UserTask[];
 }

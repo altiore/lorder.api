@@ -1,21 +1,21 @@
+import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { Moment } from 'moment';
 import {
   Column,
   CreateDateColumn,
   Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
   ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { ApiModelProperty } from '@nestjs/swagger';
-import { Moment } from 'moment';
 
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
-import { User } from '../user/user.entity';
-import { Task } from '../task/task.entity';
-import { TaskType } from '../task-type/task-type.entity';
 import { ProjectTaskType } from '../project-task-type/project-task-type.entity';
+import { TaskType } from '../task-type/task-type.entity';
+import { Task } from '../task/task.entity';
 import { UserProject } from '../user-project/user-project.entity';
+import { User } from '../user/user.entity';
 
 @Entity()
 export class Project {
@@ -55,11 +55,26 @@ export class Project {
   @OneToMany(type => Task, task => task.project)
   tasks: Task[];
 
-  @ApiModelProperty({ type: TaskType, isArray: true })
   @OneToMany(type => ProjectTaskType, projectTaskType => projectTaskType.project)
   projectTaskTypes: ProjectTaskType[];
 
-  @ApiModelProperty({ type: UserProject, isArray: true })
+  @ApiModelPropertyOptional({ type: TaskType, isArray: true })
+  get taskTypes() {
+    return this.projectTaskTypes &&
+      this.projectTaskTypes.length &&
+      this.projectTaskTypes[0] &&
+      this.projectTaskTypes[0].taskType
+      ? this.projectTaskTypes.sort((a, b) => a.order - b.order).map(ptt => ptt.taskType)
+      : [];
+  }
+
   @OneToMany(type => UserProject, userProject => userProject.project)
   projectMembers: UserProject[];
+
+  @ApiModelPropertyOptional({ type: User, isArray: true })
+  get members() {
+    return this.projectMembers && this.projectMembers.length && this.projectMembers[0] && this.projectMembers[0].member
+      ? this.projectMembers.map(ptt => ptt.member)
+      : [];
+  }
 }

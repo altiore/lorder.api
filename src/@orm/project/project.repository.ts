@@ -1,26 +1,27 @@
+import { omit } from 'lodash';
 import { EntityRepository, Repository } from 'typeorm';
 
-import { ProjectTaskType } from '../project-task-type/project-task-type.entity';
 import { User } from '../user/user.entity';
 import { ProjectDto } from './dto';
 import { Project } from './project.entity';
 
 @EntityRepository(Project)
 export class ProjectRepository extends Repository<Project> {
-  public findAllByOwner(owner: User): Promise<Project[]> {
-    return this.find({
+  public async findAllByOwner(owner: User): Promise<Partial<Project>[]> {
+    const entities = await this.find({
       loadRelationIds: true,
       relations: ['owner'],
       where: { owner },
     });
+    return entities.map(this.preparePublic);
   }
 
-  public findOneByOwner(id: number, owner: User): Promise<Project> {
-    return this.findOneOrFail({
-      loadRelationIds: true,
-      relations: ['owner'],
+  public async findOneByOwner(id: number, owner: User): Promise<Partial<Project>> {
+    const entity = await this.findOneOrFail({
+      relations: ['owner', 'tasks', 'projectTaskTypes', 'projectMembers'],
       where: { id, owner },
     });
+    return this.prepare(entity);
   }
 
   public createByUser(data: ProjectDto, creator: User): Promise<Project> {
@@ -31,8 +32,15 @@ export class ProjectRepository extends Repository<Project> {
     return this.save(project);
   }
 
-  public replaceTaskTypes(project: Project, projectTaskTypes: ProjectTaskType[]) {
-    project.projectTaskTypes = projectTaskTypes;
-    return this.save(project);
+  public preparePublic(project: Project): Partial<Project> {
+    return omit<Project>(project, ['projectTaskTypes', 'projectMembers', 'tasks', 'creator', 'updator']);
+  }
+
+  public prepare(project: Project): Partial<Partial<Project>> {
+    return {
+      ...omit<Project>(project, ['projectTaskTypes', 'projectMembers']),
+      members: project.members,
+      taskTypes: project.taskTypes,
+    };
   }
 }
