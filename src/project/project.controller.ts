@@ -41,9 +41,9 @@ export class ProjectController {
   }
 
   @ApiResponse({ description: 'Проект успешно удален', status: 201, type: Project })
-  @Delete()
+  @Delete(':id')
   @Roles('user')
-  public delete(@UserJWT() user: User, @Body() data: IdDto): Promise<DeleteResult> {
-    return this.projectService.remove(data, user);
+  public delete(@UserJWT() user: User, @Param('id', ParseIntPipe) id: number): Promise<DeleteResult> {
+    return this.projectService.remove(id, user);
   }
 }

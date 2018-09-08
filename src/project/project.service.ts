@@ -36,7 +36,7 @@ export class ProjectService {
     return this.projectRepo.createByUser(data, user);
   }
 
-  public remove({ id }: IdDto, user: User): Promise<DeleteResult> {
+  public remove(id: number, user: User): Promise<DeleteResult> {
     return this.projectRepo.delete({ id, owner: user });
   }
 
