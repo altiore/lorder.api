@@ -2,10 +2,11 @@ import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/c
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult } from 'typeorm';
 
+import { IdDto } from '../@common/dto';
 import { Project, ProjectDto, ProjectRepository } from '../@orm/project';
 import { ProjectTaskTypeRepository } from '../@orm/project-task-type';
 import { TaskTypeRepository } from '../@orm/task-type';
-import { EmailDto, IdDto, User } from '../@orm/user';
+import { EmailDto, User } from '../@orm/user';
 import { UserProjectRepository } from '../@orm/user-project';
 import { AuthService } from '../auth/auth.service';
 
@@ -33,6 +34,10 @@ export class ProjectService {
 
   public create(data: ProjectDto, user: User): Promise<Project> {
     return this.projectRepo.createByUser(data, user);
+  }
+
+  public remove({ id }: IdDto, user: User): Promise<DeleteResult> {
+    return this.projectRepo.delete({ id, owner: user });
   }
 
   public async addTaskType(project: Project, taskTypeId: number): Promise<any> {
