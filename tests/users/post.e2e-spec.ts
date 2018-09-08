@@ -1,9 +1,10 @@
-import * as request from 'supertest';
-import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import * as request from 'supertest';
 import { getConnection } from 'typeorm';
 
 import { AppModule } from '../../src/app.module';
+import { RedisService } from '../../src/redis/redis.service';
 
 const BASE_URL = '/users';
 
@@ -20,6 +21,7 @@ describe(`POST ${BASE_URL} (e2e)`, () => {
   });
 
   afterAll(async () => {
+    app.get(RedisService).closeConnection();
     const connection = getConnection();
     await connection.close();
   });
@@ -29,9 +31,9 @@ describe(`POST ${BASE_URL} (e2e)`, () => {
       .post(BASE_URL)
       .expect(404)
       .expect({
-        statusCode: 404,
         error: 'Not Found',
         message: 'Cannot POST /users',
+        statusCode: 404,
       });
   });
 });

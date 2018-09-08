@@ -18,7 +18,7 @@
     "pretest": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && yarn migration:test:up",
     "test": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest --maxWorkers=1 --detectOpenHandles",
     "pretest:remote": "echo  \"Please, do NOT run LOCALLY!\" && node bin/refresh.js && yarn migration:up",
-    "test:remote": "echo -e \"Please, do NOT run LOCALLY!\" && jest --coverage --maxWorkers=1 --detectOpenHandles && codecov --token=d80eff89-9fdc-4a57-a585-70b6cbcf1abc",
+    "test:remote": "echo -e \"Please, do NOT run LOCALLY!\" && jest --coverage --maxWorkers=1 --forceExit && codecov --token=d80eff89-9fdc-4a57-a585-70b6cbcf1abc",
     "test:e2e": "jest --config jest.config.e2e.js --maxWorkers=1 --detectOpenHandles",
     "webpack": "webpack --config webpack.config.js",
     "prepare:mails": "mjml src/mail/mjml/*.mjml -o mails/",

@@ -52,4 +52,8 @@ export class RedisService {
       });
     });
   }
+
+  closeConnection() {
+    this.redis.quit();
+  }
 }

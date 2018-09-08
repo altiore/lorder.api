@@ -1,10 +1,11 @@
-import * as request from 'supertest';
-import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import { getConnection } from 'typeorm';
+import { Test } from '@nestjs/testing';
 import * as jwt from 'jsonwebtoken';
+import * as request from 'supertest';
+import { getConnection } from 'typeorm';
 
 import { AppModule } from '../../src/app.module';
+import { RedisService } from '../../src/redis/redis.service';
 
 const BASE_URL = '/users';
 
@@ -21,6 +22,7 @@ describe(`GET ${BASE_URL} (e2e)`, () => {
   });
 
   afterAll(async () => {
+    app.get(RedisService).closeConnection();
     const connection = getConnection();
     await connection.close();
   });
@@ -30,8 +32,8 @@ describe(`GET ${BASE_URL} (e2e)`, () => {
       .get(BASE_URL)
       .expect(401)
       .expect({
-        statusCode: 401,
         error: 'Unauthorized',
+        statusCode: 401,
       });
   });
 
@@ -40,13 +42,13 @@ describe(`GET ${BASE_URL} (e2e)`, () => {
       .post(BASE_URL)
       .set(
         'Authorization',
-        `Bearer ${jwt.sign({ email: 'razvanlomov@gmail.com' }, process.env.JWT_SECRET, { expiresIn: 3600 })}`,
+        `Bearer ${jwt.sign({ email: 'razvanlomov@gmail.com' }, process.env.JWT_SECRET, { expiresIn: 3600 })}`
       )
       .expect(404)
       .expect({
-        statusCode: 404,
         error: 'Not Found',
         message: 'Cannot POST /users',
+        statusCode: 404,
       });
   });
 });
