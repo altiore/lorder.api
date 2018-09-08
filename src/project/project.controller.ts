@@ -6,7 +6,6 @@ import { DeleteResult } from 'typeorm';
 
 import { Roles } from '../@common/decorators/roles.decorator';
 import { UserJWT } from '../@common/decorators/user-jwt.decorator';
-import { IdDto } from '../@common/dto';
 import { RolesGuard } from '../@common/guards/roles.guard';
 import { Project, ProjectDto } from '../@orm/project';
 import { User } from '../@orm/user';
