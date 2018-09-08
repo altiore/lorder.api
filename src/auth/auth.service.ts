@@ -6,37 +6,48 @@ import { DeepPartial } from 'typeorm';
 
 import { ValidationException } from '../@common/exceptions/validation.exception';
 import { EmailDto, LoginUserDto, User, UserRepository } from '../@orm/user';
+import { UserProjectRepository } from '../@orm/user-project';
 import { MailAcceptedDto } from '../mail/dto';
 import { MailService } from '../mail/mail.service';
 import { RedisService } from '../redis/redis.service';
 import { UserService } from '../user/user.service';
-import { TokenResponseDto } from './dto';
+import { ActivateDto, TokenResponseDto } from './dto';
 import { JwtPayload } from './interfaces';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserRepository) private readonly userRepo: UserRepository,
+    @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository,
     private readonly mailService: MailService,
     private readonly redisService: RedisService,
     private readonly userService: UserService
   ) {}
 
-  public async sendMagicLink(data: EmailDto, hostWithProtocol: string): Promise<MailAcceptedDto> {
+  public async sendMagicLink(
+    data: EmailDto,
+    hostWithProtocol: string,
+    query?: string,
+    returnUser: boolean = false
+  ): Promise<User | MailAcceptedDto> {
     const email = data.email;
     let user = await this.userService.findUserByEmail(email);
-    const link = await this.createMagicLink(data, hostWithProtocol);
+    const link = await this.createMagicLink(data, hostWithProtocol, query);
     if (!user) {
       const res = await this.userService.createUser({ email });
       user = res.user;
     }
-    return await this.mailService.sendMagicLink(user.email, link);
+    const sendMagicLinkResult = await this.mailService.sendMagicLink(user.email, link);
+    if (returnUser) {
+      return user;
+    }
+    return sendMagicLinkResult;
   }
 
-  public async activate(oneTimeToken: string): Promise<TokenResponseDto> {
+  public async activate(activateDto: ActivateDto): Promise<TokenResponseDto> {
     let userData;
     try {
-      userData = await this.redisService.findUserDataByOneTimeToken(oneTimeToken);
+      userData = await this.redisService.findUserDataByOneTimeToken(activateDto.oneTimeToken);
     } catch (e) {
       throw new NotFoundException(
         'Истек срок действия одноразовой ссылки.' + ' Пожалуйста, запросите новую ссылку для восстановления'
@@ -58,6 +69,9 @@ export class AuthService {
       dataForUpdate.password = userData.password;
     }
     await this.userService.unsafeUpdate(user, dataForUpdate);
+    if (activateDto.project) {
+      await this.userProjectRepo.activateInProject(user, activateDto.project);
+    }
     return this.createBearerKey({ email: user.email });
   }
 
@@ -89,9 +103,9 @@ export class AuthService {
     return await this.userService.findActiveUserByEmail(payload.email);
   }
 
-  public async createMagicLink(userData: LoginUserDto | EmailDto, host: string): Promise<string> {
+  private async createMagicLink(userData: LoginUserDto | EmailDto, host: string, query: string = ''): Promise<string> {
     const resetLinkToken = await this.redisService.createOneTimeToken(userData);
-    return `${host}/start/${resetLinkToken}`;
+    return `${host}/start/${resetLinkToken}${query ? `?${query}` : ''}`;
   }
 
   private findException(user: User, data: LoginUserDto): HttpException {

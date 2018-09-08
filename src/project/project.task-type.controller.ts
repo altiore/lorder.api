@@ -14,6 +14,7 @@ import { TaskTypeDto, TaskTypesDto } from './dto';
 import { ProjectService } from './project.service';
 
 @ApiBearerAuth()
+@ApiUseTags('projects -> task-types')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('projects/:id/task-types')
 export class ProjectTaskTypeController {
@@ -24,7 +25,6 @@ export class ProjectTaskTypeController {
     status: 200,
     type: ProjectTaskType,
   })
-  @ApiUseTags('projects/task-types')
   @Post()
   @Roles('user')
   public async addTaskTypeToProject(
@@ -41,7 +41,6 @@ export class ProjectTaskTypeController {
     status: 200,
     type: Project,
   })
-  @ApiUseTags('projects/task-types')
   @Put()
   @Roles('user')
   public async update(
@@ -58,7 +57,6 @@ export class ProjectTaskTypeController {
     status: 200,
     type: DeleteResult,
   })
-  @ApiUseTags('projects/task-types')
   @Delete()
   @Roles('user')
   public async removeFromProject(

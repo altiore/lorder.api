@@ -43,23 +43,4 @@ export class ProjectController {
   public create(@UserJWT() user: User, @Body() data: ProjectDto): Promise<Project> {
     return this.projectService.create(data, user);
   }
-
-  // @Post(':id/users')
-  // @Roles('admin')
-  // @ApiResponse({
-  //   status: 201,
-  //   description: 'The Invite has been successfully sent.',
-  //   type: User,
-  // })
-  // @ApiUseTags('projects -> users')
-  // public async invite(
-  //   @Body() data: EmailDto,
-  //   @Headers('origin') origin: string,
-  //   @Param('id', ParseIntPipe)
-  //   id: number,
-  //   @UserJWT() user: User,
-  // ): Promise<User> {
-  //   const project = await this.projectService.findOne(id, user);
-  //   return this.projectService.invite(project, data, origin);
-  // }
 }

@@ -1,11 +1,11 @@
-import { Body, Controller, Get, Headers, HttpCode, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Headers, HttpCode, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 
 import { User } from '../@orm/user';
 import { EmailDto, LoginUserDto } from '../@orm/user/dto';
 import { MailAcceptedDto } from '../mail/dto';
 import { AuthService } from './auth.service';
-import { TokenResponseDto } from './dto';
+import { ActivateDto, TokenResponseDto } from './dto';
 
 @ApiBearerAuth()
 @ApiUseTags('auth (guest)')
@@ -16,14 +16,14 @@ export class AuthController {
   @ApiResponse({ status: 202, type: MailAcceptedDto })
   @HttpCode(202)
   @Post('magic')
-  public magic(@Body() data: EmailDto, @Headers('origin') origin: string): Promise<MailAcceptedDto> {
-    return this.authService.sendMagicLink(data, origin);
+  public async magic(@Body() data: EmailDto, @Headers('origin') origin: string): Promise<MailAcceptedDto> {
+    return (await this.authService.sendMagicLink(data, origin)) as MailAcceptedDto;
   }
 
   @ApiResponse({ status: 200, description: 'Возвращает Bearer ключ', type: TokenResponseDto })
   @Get('activate')
-  public activate(@Query('oneTimeToken') oneTimeToken: string): Promise<TokenResponseDto> {
-    return this.authService.activate(oneTimeToken);
+  public activate(@Query() activateDto: ActivateDto): Promise<TokenResponseDto> {
+    return this.authService.activate(activateDto);
   }
 
   @ApiResponse({ status: 200, type: MailAcceptedDto })
