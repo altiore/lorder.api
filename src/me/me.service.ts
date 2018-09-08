@@ -9,6 +9,6 @@ export class MeService {
   constructor(private readonly userService: UserService) {}
 
   public update(user: User, data: UpdateUserDto): Promise<User> {
-    return this.userService.update(user, data);
+    return this.userService.updateUser(user, data);
   }
 }

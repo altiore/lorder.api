@@ -1,8 +1,8 @@
-import { EntityRepository, Repository, In } from 'typeorm';
+import { EntityRepository, In, Repository } from 'typeorm';
 
+import { Project } from '../project/project.entity';
+import { TaskType } from '../task-type/task-type.entity';
 import { ProjectTaskType } from './project-task-type.entity';
-import { Project } from '../project';
-import { TaskType } from '../task-type';
 
 @EntityRepository(ProjectTaskType)
 export class ProjectTaskTypeRepository extends Repository<ProjectTaskType> {
@@ -10,10 +10,10 @@ export class ProjectTaskTypeRepository extends Repository<ProjectTaskType> {
     await this.delete({ project });
     const entities = taskTypes.map((taskType, order) =>
       this.create({
+        order,
         project,
         taskType,
-        order,
-      }),
+      })
     );
     await this.createQueryBuilder()
       .insert()

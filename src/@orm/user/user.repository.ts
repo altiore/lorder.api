@@ -1,10 +1,8 @@
-import { EntityRepository, Repository } from 'typeorm';
 import { createHash } from 'crypto';
-const generator = require('generate-password');
+import { DeepPartial, EntityRepository, Repository } from 'typeorm';
 
-import { User } from './user.entity';
-import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dto';
 import { Role } from '../role/role.entity';
+import { User } from './user.entity';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
@@ -14,8 +12,8 @@ export class UserRepository extends Repository<User> {
   public findOneByEmail(email: string, withPassword: boolean = false): Promise<User> {
     if (withPassword) {
       return this.findOne({
-        where: { email },
         select: ['email', 'status', 'password'],
+        where: { email },
       });
     }
     return this.findOne({ where: { email } });
@@ -28,49 +26,35 @@ export class UserRepository extends Repository<User> {
     return this.findOneOrFail({ where: { email, status: 10 } });
   }
 
-  public async activateByResetLink(resetLink: string): Promise<User> {
-    const user = await this.findOneOrFail({ where: { resetLink } });
-    user.status = 10;
-    user.resetLink = null;
-    return await this.save(user);
-  }
-
-  public updateEntity(user: User, data: UpdateUserDto): Promise<User> {
+  public updateOne(user: User, data: DeepPartial<User>): Promise<User> {
     this.merge(user, data);
     return this.save(user);
   }
 
-  public async createWithRoles(data: CreateUserDto, roles: Role[]): Promise<{ user: User; password?: string }> {
+  public async createWithRoles(data: DeepPartial<User>, roles: Role[]): Promise<{ user: User; password?: string }> {
     const user = this.create(data);
     // создаваемый пользователь всегда неактивен
     user.status = 1;
     user.roles = roles;
     let password;
-    if (!user.password) {
-      password = this.generatePassword();
-      user.password = this.hashPassword(password);
+    if (user.password) {
+      password = this.hashPassword(user.password);
+      user.password = password;
     }
     await this.save(user);
     delete user.password;
-    delete user.resetLink;
     return { user, password };
   }
 
-  public async validatePassword({ email, password }: LoginUserDto): Promise<User | false> {
-    const user = await this.findOneByEmail(email, true);
-    const isValid = this.hashPassword(password) === user.password;
-    delete user.password;
-    return isValid && user;
+  public isPasswordValid(user: User, password: string): boolean {
+    return this.hashPassword(password) === user.password;
   }
 
-  private generatePassword() {
-    return generator.generate({
-      length: 12,
-      numbers: true,
-    });
+  public isStatusActive(user: User): boolean {
+    return user.status === 10;
   }
 
-  private hashPassword(password) {
+  public hashPassword(password) {
     return createHash('md5')
       .update(password)
       .digest('hex');

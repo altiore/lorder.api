@@ -14,8 +14,6 @@
     "curly": false,
     "interface-name": [false],
     "array-type": [false],
-    "no-empty-interface": false,
-    "no-empty": false,
     "arrow-parens": false,
     "max-classes-per-file": [false],
     "variable-name": [false],

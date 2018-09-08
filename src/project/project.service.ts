@@ -1,7 +1,7 @@
 import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Project, ProjectRepository, ProjectDto } from '../@orm/project';
+import { Project, ProjectDto, ProjectRepository } from '../@orm/project';
 import { ProjectTaskTypeRepository } from '../@orm/project-task-type';
 import { TaskTypeRepository } from '../@orm/task-type';
 import { EmailDto, User } from '../@orm/user';
@@ -17,7 +17,7 @@ export class ProjectService {
     @InjectRepository(ProjectTaskTypeRepository) private readonly projectTaskTypeRepo: ProjectTaskTypeRepository,
     private readonly authService: AuthService,
     private readonly userService: UserService,
-    private readonly mailService: MailService,
+    private readonly mailService: MailService
   ) {}
 
   public findAll(user: User): Promise<Project[]> {
@@ -30,7 +30,7 @@ export class ProjectService {
     } catch (e) {
       throw new NotFoundException(
         'Вы пытаетесь пригласить пользователя в проект, который не существует,' +
-          ' или вы не являетесь его администратором',
+          ' или вы не являетесь его администратором'
       );
     }
   }
@@ -43,34 +43,33 @@ export class ProjectService {
     const taskTypes = await this.taskTypeRepo.findByIds(taskTypesIds);
     if (taskTypes.length !== taskTypesIds.length) {
       throw new NotAcceptableException(
-        'Недопустимый id taskType был передан.' +
-          ' Пожалуйста, убедитесь, что все сущности были созданы предварительно',
+        'Недопустимый id taskType был передан.' + ' Пожалуйста, убедитесь, что все сущности были созданы предварительно'
       );
     }
     // const projectTaskTypes = this.projectTaskTypeRepo.createMultipleByProjectAndTaskTypes(project, taskTypes);
     try {
       return await this.projectTaskTypeRepo.createMultiple(project, taskTypes);
     } catch (e) {
-      console.log(e);
+      // console.log(e);
       return 'error';
     }
     // return this.projectRepo.replaceTaskTypes(project, projectTaskTypes);
   }
 
-  public async invite(project: Project, invite: EmailDto, hostWithProtocol: string): Promise<User> {
-    const { link, resetLink } = await this.authService.createActivationLink(invite.email, hostWithProtocol);
-    if (await this.userService.exists(invite.email)) {
-      throw new NotAcceptableException('Такой пользователь уже есть в системе!');
-    }
-    const { user } = await this.userService.createUser({
-      email: invite.email,
-      resetLink,
-    });
-    await this.mailService.sendInvite({
-      email: invite.email,
-      link,
-      project: project.title,
-    });
-    return user;
-  }
+  // public async invite(project: Project, invite: EmailDto, hostWithProtocol: string): Promise<User> {
+  //   const { link, resetLink } = await this.authService.sendMagicLink(invite.email, hostWithProtocol);
+  //   if (await this.userService.exists(invite.email)) {
+  //     throw new NotAcceptableException('Такой пользователь уже есть в системе!');
+  //   }
+  //   const { user } = await this.userService.createUser({
+  //     email: invite.email,
+  //     resetLink,
+  //   });
+  //   await this.mailService.sendInvite({
+  //     email: invite.email,
+  //     link,
+  //     project: project.title,
+  //   });
+  //   return user;
+  // }
 }

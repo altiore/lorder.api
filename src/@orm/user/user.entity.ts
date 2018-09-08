@@ -1,19 +1,19 @@
+import { ApiModelProperty } from '@nestjs/swagger';
+import { Moment } from 'moment';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  ManyToMany,
-  JoinTable,
-  OneToMany,
 } from 'typeorm';
-import { ApiModelProperty } from '@nestjs/swagger';
-import { Moment } from 'moment';
 
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
-import { Role } from '../role/role.entity';
 import { Project } from '../project/project.entity';
+import { Role } from '../role/role.entity';
 import { UserProject } from '../user-project/user-project.entity';
 import { UserTask } from '../user-task/user-task.entity';
 
@@ -25,25 +25,25 @@ export class User {
 
   @ApiModelProperty()
   @Column({
-    unique: true,
-    nullable: true,
     length: 254,
+    nullable: true,
     transformer: {
-      to: d => (d ? d.toLowerCase() : undefined),
       from: d => d,
+      to: d => (d ? d.toLowerCase() : undefined),
     },
+    unique: true,
   })
   email: string;
 
   @ApiModelProperty()
   @Column({
-    unique: true,
-    nullable: true,
     length: 13,
+    nullable: true,
     transformer: {
-      to: d => (d ? d.replace(/[\D]/gi, '') : undefined),
       from: d => d,
+      to: d => (d ? d.replace(/[\D]/gi, '') : undefined),
     },
+    unique: true,
   })
   tel: string;
 
@@ -58,9 +58,6 @@ export class User {
   @Column({ nullable: true, select: false })
   password: string;
 
-  @Column({ nullable: true, select: false })
-  resetLink: string;
-
   @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
   @CreateDateColumn(momentDateTransformer)
   createdAt: Moment;
@@ -70,7 +67,7 @@ export class User {
   updatedAt: Moment;
 
   @ApiModelProperty({ type: Role, isArray: true })
-  @ManyToMany(type => Role, undefined, { eager: true, cascade: ['insert'] })
+  @ManyToMany(() => Role, undefined, { eager: true, cascade: ['insert'] })
   @JoinTable({ name: 'user_roles' })
   roles: Role[];
 

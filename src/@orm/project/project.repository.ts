@@ -1,25 +1,25 @@
 import { EntityRepository, Repository } from 'typeorm';
 
-import { Project } from './project.entity';
-import { ProjectDto } from './dto';
+import { ProjectTaskType } from '../project-task-type/project-task-type.entity';
 import { User } from '../user/user.entity';
-import { ProjectTaskType } from '../project-task-type';
+import { ProjectDto } from './dto';
+import { Project } from './project.entity';
 
 @EntityRepository(Project)
 export class ProjectRepository extends Repository<Project> {
   public findAllByOwner(owner: User): Promise<Project[]> {
     return this.find({
-      where: { owner },
-      relations: ['owner'],
       loadRelationIds: true,
+      relations: ['owner'],
+      where: { owner },
     });
   }
 
   public findOneByOwner(id: number, owner: User): Promise<Project> {
     return this.findOneOrFail({
-      where: { id, owner },
-      relations: ['owner'],
       loadRelationIds: true,
+      relations: ['owner'],
+      where: { id, owner },
     });
   }
 

@@ -1,17 +1,18 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AuthService } from './auth.service';
-import { JwtStrategy } from './jwt.strategy';
+import { UserRepository } from '../@orm/user';
 import { MailModule } from '../mail/mail.module';
+import { RedisModule } from '../redis/redis.module';
 import { UserModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserRepository } from '../@orm/user';
+import { AuthService } from './auth.service';
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   controllers: [AuthController],
-  imports: [MailModule, UserModule, TypeOrmModule.forFeature([UserRepository])],
-  providers: [AuthService, JwtStrategy],
   exports: [AuthService],
+  imports: [MailModule, RedisModule, UserModule, TypeOrmModule.forFeature([UserRepository])],
+  providers: [AuthService, JwtStrategy],
 })
 export class AuthModule {}

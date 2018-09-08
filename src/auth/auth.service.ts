@@ -1,38 +1,85 @@
+import { HttpException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ValidationError } from 'class-validator';
 import * as jwt from 'jsonwebtoken';
-import { Injectable } from '@nestjs/common';
+import { DeepPartial } from 'typeorm';
 
-import { UserService } from '../user/user.service';
-import { MailService } from '../mail/mail.service';
-import { JwtPayload } from './interfaces';
-import { TokenResponseDto } from './dto';
-import { EmailDto, LoginUserDto, User } from '../@orm/user';
+import { ValidationException } from '../@common/exceptions/validation.exception';
+import { EmailDto, LoginUserDto, User, UserRepository } from '../@orm/user';
 import { MailAcceptedDto } from '../mail/dto';
+import { MailService } from '../mail/mail.service';
+import { RedisService } from '../redis/redis.service';
+import { UserService } from '../user/user.service';
+import { TokenResponseDto } from './dto';
+import { JwtPayload } from './interfaces';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService, private readonly mailService: MailService) {}
+  constructor(
+    @InjectRepository(UserRepository) private readonly userRepo: UserRepository,
+    private readonly mailService: MailService,
+    private readonly redisService: RedisService,
+    private readonly userService: UserService
+  ) {}
 
-  public async sendMagicLink({ email }: EmailDto, hostWithProtocol: string): Promise<MailAcceptedDto> {
+  public async sendMagicLink(data: EmailDto, hostWithProtocol: string): Promise<MailAcceptedDto> {
+    const email = data.email;
     let user = await this.userService.findUserByEmail(email);
-    const { link, resetLink } = this.createActivationLink(email, hostWithProtocol);
+    const link = await this.createMagicLink(data, hostWithProtocol);
     if (!user) {
-      const res = await this.userService.createUser({ email, resetLink });
+      const res = await this.userService.createUser({ email });
       user = res.user;
-    } else {
-      await this.userService.update(user, { resetLink });
     }
     return await this.mailService.sendMagicLink(user.email, link);
   }
 
-  public async activate(resetLink: string): Promise<TokenResponseDto> {
-    const user = await this.userService.activateByResetLink(resetLink);
-    jwt.verify(resetLink, process.env.JWT_SECRET);
-    return this.createToken({ email: user.email });
+  public async activate(oneTimeToken: string): Promise<TokenResponseDto> {
+    let userData;
+    try {
+      userData = await this.redisService.findUserDataByOneTimeToken(oneTimeToken);
+    } catch (e) {
+      throw new NotFoundException(
+        'Истек срок действия одноразовой ссылки.' + ' Пожалуйста, запросите новую ссылку для восстановления'
+      );
+    }
+    if (!userData || !userData.email) {
+      throw new NotFoundException(
+        'Истек срок действия одноразовой ссылки.' + ' Пожалуйста, запросите новую ссылку для восстановления'
+      );
+    }
+    const user = await this.userService.findUserByEmail(userData.email);
+    if (!user) {
+      throw new NotFoundException('Пользователь был удален из системы. Пожалуйста повторите вход');
+    }
+    const dataForUpdate = {
+      status: 10,
+    } as DeepPartial<User>;
+    if (userData.password) {
+      dataForUpdate.password = userData.password;
+    }
+    await this.userService.unsafeUpdate(user, dataForUpdate);
+    return this.createBearerKey({ email: user.email });
   }
 
-  public async login(data: LoginUserDto): Promise<TokenResponseDto> {
-    const user = await this.userService.login(data);
-    return this.createToken({ email: user.email });
+  public async login(data: LoginUserDto, hostWithProtocol: string): Promise<TokenResponseDto> {
+    const user = await this.userService.findUserByEmail(data.email, true);
+    const exception = this.findException(user, data);
+    if (exception) {
+      if (!user) {
+        await this.userService.createUser({ email: data.email });
+      }
+      const link = await this.createMagicLink(
+        {
+          email: data.email,
+          password: this.userRepo.hashPassword(data.password),
+        },
+        hostWithProtocol
+      );
+      await this.mailService.sendMagicLink(data.email, link);
+      throw exception;
+    }
+
+    return this.createBearerKey({ email: user.email });
   }
 
   /**
@@ -42,15 +89,59 @@ export class AuthService {
     return await this.userService.findActiveUserByEmail(payload.email);
   }
 
-  public createActivationLink(email, hostWithProtocol): { resetLink: string; link: string } {
-    const { token: resetLink } = this.createToken({ email });
-    return { resetLink, link: `${hostWithProtocol}/start/${resetLink}` };
+  public async createMagicLink(userData: LoginUserDto | EmailDto, host: string): Promise<string> {
+    const resetLinkToken = await this.redisService.createOneTimeToken(userData);
+    return `${host}/start/${resetLinkToken}`;
+  }
+
+  private findException(user: User, data: LoginUserDto): HttpException {
+    if (!user) {
+      return new ValidationException(
+        [
+          Object.assign(new ValidationError(), {
+            constraints: {
+              isNotFound: 'Email не был найден',
+            },
+            property: 'email',
+            value: data.email,
+          }),
+        ],
+        'Поьзователь не был найдет. Мы успешно создали нового пользователя и отправили ссылку для активации'
+      );
+    }
+    if (!user.password) {
+      return new NotAcceptableException(
+        'Пароль пользователя никогда ранее не был задан.' +
+          ' Мы отправили ссылку для активации нового пароля. Пожалуйста, проверьте почту'
+      );
+    }
+    if (!this.userRepo.isStatusActive(user)) {
+      return new NotAcceptableException(
+        'Email пользовтаеля еще не подтвержден.' +
+          ' Мы отправили ссылку для активации пользователя. Пожалуйста, проверьте почту'
+      );
+    }
+    if (!this.userRepo.isPasswordValid(user, data.password)) {
+      return new ValidationException(
+        [
+          Object.assign(new ValidationError(), {
+            constraints: {
+              isNotFound: 'Пароль неверен',
+            },
+            property: 'password',
+            value: data.email,
+          }),
+        ],
+        'Мы выслали вам ссылку для восстановления пароля. Пожалуйста, проверьте почту, чтоб зайти'
+      );
+    }
+    return null;
   }
 
   /**
    * Используется при создании ключа валидации
    */
-  private createToken(userInfo: JwtPayload): TokenResponseDto {
-    return { token: jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: 3600 }) };
+  private createBearerKey(userInfo: JwtPayload): TokenResponseDto {
+    return { bearerKey: jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: 3600 }) };
   }
 }
