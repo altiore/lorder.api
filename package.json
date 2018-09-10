@@ -6,20 +6,18 @@
   "license": "UNLICENSED",
   "main": "dist/main.js",
   "engines": {
-    "node": "8.11.3"
+    "node": ">=8.11.3"
   },
   "scripts": {
+    "start": "cross-env NODE_ENV=development nodemon",
+    "start:hmr": "node dist/server",
     "first:install": "bin/install.sh",
     "postinstall": "yarn build && yarn migration:up",
-    "start": "node dist/main.js",
     "build": "rm -rf dist && tsc",
-    "start:dev": "cross-env NODE_ENV=development nodemon",
-    "start:hmr": "node dist/server",
     "pretest": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && yarn migration:test:up",
-    "test": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest --maxWorkers=1 --detectOpenHandles",
+    "test": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest -i -b --detectOpenHandles",
     "pretest:remote": "echo  \"Please, do NOT run LOCALLY!\" && node bin/refresh.js && yarn migration:up",
-    "test:remote": "echo -e \"Please, do NOT run LOCALLY!\" && jest --coverage --maxWorkers=1 --forceExit && codecov --token=d80eff89-9fdc-4a57-a585-70b6cbcf1abc",
-    "test:e2e": "jest --config jest.config.e2e.js --maxWorkers=1 --detectOpenHandles",
+    "test:remote": "echo -e \"Please, do NOT run LOCALLY!\" && jest --coverage -i && codecov --token=d80eff89-9fdc-4a57-a585-70b6cbcf1abc",
     "webpack": "webpack --config webpack.config.js",
     "prepare:mails": "mjml src/mail/mjml/*.mjml -o mails/",
     "migration:generate": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:generate --name generated",
