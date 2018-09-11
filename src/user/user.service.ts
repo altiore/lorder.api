@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial } from 'typeorm';
 
 import { RoleRepository } from '../@orm/role';
 import { UpdateUserDto, User, UserRepository } from '../@orm/user';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
@@ -26,6 +27,15 @@ export class UserService {
 
   public findActiveUserByEmail(email: string) {
     return this.userRepo.findOneByEmail(email);
+  }
+
+  public async updateUserById(userId: number, data: UserDto): Promise<User> {
+    const user = await this.userRepo.findOne(userId);
+    if (!user) {
+      throw new NotFoundException(`Пользователь с id: ${userId} не найден`);
+    }
+    user.roles = await this.roleRepo.findRolesByName(data.role);
+    return await this.userRepo.save(user);
   }
 
   public updateUser(user: User, data: UpdateUserDto): Promise<User> {

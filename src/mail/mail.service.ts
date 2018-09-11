@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import * as sgMail from '@sendgrid/mail';
 import { ClientResponse } from '@sendgrid/client/src/response';
-import * as Mustache from 'mustache';
+import * as sgMail from '@sendgrid/mail';
 import { readFileSync } from 'fs';
+import * as Mustache from 'mustache';
 import { resolve } from 'path';
 
 import { MailAcceptedDto, MessageDto } from './dto';
@@ -15,11 +15,14 @@ export type IMailTemplate = 'invite' | 'magic';
 
 @Injectable()
 export class MailService {
+  public static readonly ADMIN_EMAIL = 'razzwan@altiore.org';
+
+  private static readonly INVITE_TEMPLATE = 'invite';
+  private static readonly MAGIC_LINK = 'magic';
+
   constructor() {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   }
-
-  public static readonly ADMIN_EMAIL = 'razzwan@altiore.org';
 
   public sendInvite({
     email,
@@ -35,17 +38,17 @@ export class MailService {
     project: string;
   }): Promise<MailAcceptedDto> {
     const output = this.putParamsToTemplate(MailService.INVITE_TEMPLATE, {
+      INVITER: inviter || 'Администратор',
       LINK: link,
       MEMBER: member,
-      INVITER: inviter || 'Администратор',
       PROJECT: project,
     });
 
     return this.send({
       from: MailService.ADMIN_EMAIL,
-      to: email,
-      subject: `Приглашение в проект ${project} (Altiore)`,
       html: output,
+      subject: `Приглашение в проект ${project} (Altiore)`,
+      to: email,
     });
   }
 
@@ -58,14 +61,11 @@ export class MailService {
     // const [res] = await this.send({
     return this.send({
       from: MailService.ADMIN_EMAIL,
-      to: email,
-      subject: 'Магическая ссылка Altiore',
       html: output,
+      subject: 'Магическая ссылка Altiore',
+      to: email,
     });
   }
-
-  private static readonly INVITE_TEMPLATE = 'invite';
-  private static readonly MAGIC_LINK = 'magic';
 
   /**
    * Render template: @see https://mjml.io/
