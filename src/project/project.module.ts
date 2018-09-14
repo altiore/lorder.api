@@ -6,10 +6,12 @@ import { ProjectTaskTypeRepository } from '../@orm/project-task-type';
 import { TaskTypeRepository } from '../@orm/task-type';
 import { UserProjectRepository } from '../@orm/user-project';
 import { AuthModule } from '../auth/auth.module';
+import { ProjectMemberController } from './member/project.member.controller';
+import { ProjectMemberService } from './member/project.member.service';
 import { ProjectController } from './project.controller';
-import { ProjectMemberController } from './project.member.controller';
 import { ProjectService } from './project.service';
-import { ProjectTaskTypeController } from './project.task-type.controller';
+import { ProjectTaskTypeController } from './task-type/project.task-type.controller';
+import { ProjectTaskTypeService } from './task-type/project.task-type.service';
 
 @Module({
   controllers: [ProjectController, ProjectMemberController, ProjectTaskTypeController],
@@ -18,6 +20,6 @@ import { ProjectTaskTypeController } from './project.task-type.controller';
     AuthModule,
     TypeOrmModule.forFeature([ProjectRepository, ProjectTaskTypeRepository, TaskTypeRepository, UserProjectRepository]),
   ],
-  providers: [ProjectService],
+  providers: [ProjectService, ProjectMemberService, ProjectTaskTypeService],
 })
 export class ProjectModule {}

@@ -3,19 +3,23 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 import * as jwt from 'jsonwebtoken';
 
-import { Roles } from '../@common/decorators/roles.decorator';
-import { UserJWT } from '../@common/decorators/user-jwt.decorator';
-import { IdDto } from '../@common/dto';
-import { RolesGuard } from '../@common/guards/roles.guard';
-import { EmailDto, User } from '../@orm/user';
-import { ProjectService } from './project.service';
+import { Roles } from '../../@common/decorators/roles.decorator';
+import { UserJWT } from '../../@common/decorators/user-jwt.decorator';
+import { IdDto } from '../../@common/dto';
+import { RolesGuard } from '../../@common/guards/roles.guard';
+import { EmailDto, User } from '../../@orm/user';
+import { ProjectService } from '../project.service';
+import { ProjectMemberService } from './project.member.service';
 
 @ApiBearerAuth()
 @ApiUseTags('projects -> members')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('projects/:projectId/members')
 export class ProjectMemberController {
-  constructor(private readonly projectService: ProjectService) {}
+  constructor(
+    private readonly projectService: ProjectService,
+    private readonly projectMemberService: ProjectMemberService
+  ) {}
 
   @Post()
   @Roles('admin')
@@ -31,7 +35,7 @@ export class ProjectMemberController {
     @UserJWT() user: User
   ): Promise<User> {
     const project = await this.projectService.findOne(projectId, user);
-    return this.projectService.invite(project, data, origin, user);
+    return this.projectMemberService.invite(project, data, origin, user);
   }
 
   @ApiResponse({ status: 200, type: Boolean })
@@ -43,6 +47,6 @@ export class ProjectMemberController {
     @UserJWT() user: User
   ): Promise<boolean> {
     const project = await this.projectService.findOne(projectId, user);
-    return this.projectService.removeMemberFromProject(data, project);
+    return this.projectMemberService.removeMemberFromProject(data, project);
   }
 }
