@@ -4,6 +4,7 @@ import { EntityRepository, Repository } from 'typeorm';
 import { User } from '../user/user.entity';
 import { ProjectDto } from './dto';
 import { Project } from './project.entity';
+import {FindManyOptions} from 'typeorm/find-options/FindManyOptions';
 
 @EntityRepository(Project)
 export class ProjectRepository extends Repository<Project> {
@@ -43,4 +44,14 @@ export class ProjectRepository extends Repository<Project> {
       taskTypes: project.taskTypes,
     };
   }
+
+    public async findCountFrom(from: number, count: number): Promise<Partial<Project>[]>
+    {
+        const entities = await this.find({
+            order: {'id': 'ASC'},
+            skip: from,
+            take: count,
+        });
+        return entities.map(this.preparePublic);
+    }
 }

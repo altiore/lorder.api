@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query, UseGuards} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 import * as jwt from 'jsonwebtoken';
@@ -10,6 +10,9 @@ import { RolesGuard } from '../@common/guards/roles.guard';
 import { Project, ProjectDto } from '../@orm/project';
 import { User } from '../@orm/user';
 import { ProjectService } from './project.service';
+import {Task} from '../@orm/task';
+import {ActivateDto} from '../auth/dto';
+import {ProjectsDto} from './dto/projects.dto';
 
 @ApiBearerAuth()
 @ApiUseTags('projects')
@@ -21,8 +24,9 @@ export class ProjectController {
   @ApiResponse({ status: 200, type: Project, isArray: true })
   @Get()
   @Roles('user')
-  public async all(@UserJWT() user: User): Promise<Partial<Project>[]> {
-    return this.projectService.findAll(user);
+  public async all(@UserJWT() user: User, @Query() projectsDto: ProjectsDto ): Promise<Partial<Project>[]> {
+    // return this.projectService.findAll(user);
+      return this.projectService.findCount(projectsDto);
   }
 
   @ApiResponse({ status: 200, type: Project })
@@ -45,4 +49,5 @@ export class ProjectController {
   public delete(@UserJWT() user: User, @Param('id', ParseIntPipe) id: number): Promise<DeleteResult> {
     return this.projectService.remove(id, user);
   }
+
 }
