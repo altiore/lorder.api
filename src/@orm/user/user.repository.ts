@@ -9,14 +9,20 @@ export class UserRepository extends Repository<User> {
   /**
    * Испльзуется при входе по паролю
    */
-  public findOneByEmail(email: string, withPassword: boolean = false): Promise<User> {
+  public async findOneByEmail(email: string, withPassword: boolean = false): Promise<User> {
     if (withPassword) {
-      return this.findOne({
-        select: ['email', 'status', 'password'],
-        where: { email },
-      });
+      try {
+        return await this.findOne({
+          loadEagerRelations: false,
+          relations: ['roles'],
+          select: ['email', 'status', 'password'],
+          where: { email },
+        });
+      } catch (e) {
+        throw e;
+      }
     }
-    return this.findOne({ where: { email } });
+    return await this.findOne({ where: { email } });
   }
 
   /**

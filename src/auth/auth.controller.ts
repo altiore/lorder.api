@@ -5,7 +5,7 @@ import { User } from '../@orm/user';
 import { EmailDto, LoginUserDto } from '../@orm/user/dto';
 import { MailAcceptedDto } from '../mail/dto';
 import { AuthService } from './auth.service';
-import { ActivateDto, TokenResponseDto } from './dto';
+import { ActivateDto, IdentityDto } from './dto';
 
 @ApiBearerAuth()
 @ApiUseTags('auth (guest)')
@@ -20,9 +20,9 @@ export class AuthController {
     return (await this.authService.sendMagicLink(data, origin)) as MailAcceptedDto;
   }
 
-  @ApiResponse({ status: 200, description: 'Возвращает Bearer ключ', type: TokenResponseDto })
+  @ApiResponse({ status: 200, description: 'Возвращает Bearer ключ', type: IdentityDto })
   @Get('activate')
-  public activate(@Query() activateDto: ActivateDto): Promise<TokenResponseDto> {
+  public activate(@Query() activateDto: ActivateDto): Promise<IdentityDto> {
     return this.authService.activate(activateDto);
   }
 
@@ -32,7 +32,7 @@ export class AuthController {
   public async login(
     @Body() data: LoginUserDto,
     @Headers('origin') origin: string
-  ): Promise<TokenResponseDto | MailAcceptedDto> {
+  ): Promise<IdentityDto | MailAcceptedDto> {
     return this.authService.login(data, origin);
   }
 }

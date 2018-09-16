@@ -26,7 +26,7 @@ export class UserService {
   }
 
   public findActiveUserByEmail(email: string) {
-    return this.userRepo.findOneByEmail(email);
+    return this.userRepo.findOneActiveByEmail(email);
   }
 
   public async updateUserById(userId: number, data: UserDto): Promise<User> {

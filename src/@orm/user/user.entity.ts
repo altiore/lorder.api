@@ -13,7 +13,7 @@ import {
 
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { Project } from '../project/project.entity';
-import { Role } from '../role/role.entity';
+import { Role, ROLES } from '../role/role.entity';
 import { UserProject } from '../user-project/user-project.entity';
 import { UserTask } from '../user-task/user-task.entity';
 
@@ -86,4 +86,8 @@ export class User {
   @ApiModelProperty({ type: UserTask, isArray: true })
   @OneToMany(type => UserTask, userTask => userTask.user)
   tasks: UserTask[];
+
+  get role() {
+    return { 1: ROLES.USER, 2: ROLES.ADMIN, 3: ROLES.SUPER_ADMIN }[this.roles.length];
+  }
 }

@@ -11,7 +11,7 @@ import { MailAcceptedDto } from '../mail/dto';
 import { MailService } from '../mail/mail.service';
 import { RedisService } from '../redis/redis.service';
 import { UserService } from '../user/user.service';
-import { ActivateDto, TokenResponseDto } from './dto';
+import { ActivateDto, IdentityDto } from './dto';
 import { JwtPayload } from './interfaces';
 
 @Injectable()
@@ -44,7 +44,7 @@ export class AuthService {
     return sendMagicLinkResult;
   }
 
-  public async activate(activateDto: ActivateDto): Promise<TokenResponseDto> {
+  public async activate(activateDto: ActivateDto): Promise<IdentityDto> {
     let userData;
     try {
       userData = await this.redisService.findUserDataByOneTimeToken(activateDto.oneTimeToken);
@@ -72,10 +72,13 @@ export class AuthService {
     if (activateDto.project) {
       await this.userProjectRepo.activateInProject(user, activateDto.project);
     }
-    return this.createBearerKey({ email: user.email });
+    return {
+      bearerKey: this.createBearerKey({ email: user.email }),
+      role: user.role,
+    };
   }
 
-  public async login(data: LoginUserDto, hostWithProtocol: string): Promise<TokenResponseDto> {
+  public async login(data: LoginUserDto, hostWithProtocol: string): Promise<IdentityDto> {
     const user = await this.userService.findUserByEmail(data.email, true);
     const exception = this.findException(user, data);
     if (exception) {
@@ -93,7 +96,10 @@ export class AuthService {
       throw exception;
     }
 
-    return this.createBearerKey({ email: user.email });
+    return {
+      bearerKey: this.createBearerKey({ email: user.email }),
+      role: user.role,
+    };
   }
 
   /**
@@ -155,7 +161,7 @@ export class AuthService {
   /**
    * Используется при создании ключа валидации
    */
-  private createBearerKey(userInfo: JwtPayload): TokenResponseDto {
-    return { bearerKey: jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: 3600 }) };
+  private createBearerKey(userInfo: JwtPayload, expiresIn: number = 3600): string {
+    return jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn });
   }
 }
