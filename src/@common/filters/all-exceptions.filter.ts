@@ -1,4 +1,5 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from '@nestjs/common';
+
 import { parseDetail } from '../helpers/parseDetailFromTypeormException';
 
 @Catch()
@@ -15,8 +16,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
         case 'EntityNotFound': {
           const status = HttpStatus.NOT_FOUND;
           response.status(status).json({
-            statusCode: status,
             message: process.env.NODE_ENV === 'development' ? exception.message : 'Requested Entity not found',
+            statusCode: status,
           });
           break;
         }
@@ -25,24 +26,31 @@ export class AllExceptionsFilter implements ExceptionFilter {
           if (exception.detail) {
             const status = HttpStatus.UNPROCESSABLE_ENTITY;
             parsedDetail = parseDetail(exception.detail);
+            if (!parsedDetail) {
+              response.status(status).json({
+                message: exception.detail,
+                statusCode: status,
+              });
+              break;
+            }
             response.status(status).json({
-              statusCode: status,
-              message: parsedDetail[3] === 'already exists' ? 'Validation Error' : exception.detail,
               errors: [
                 {
-                  value: parsedDetail[2],
-                  property: parsedDetail[1],
                   children: [],
                   constraints: {
                     isUnique: parsedDetail[3],
                   },
+                  property: parsedDetail[1],
+                  value: parsedDetail[2],
                 },
               ],
+              message: parsedDetail[3] === 'already exists' ? 'Validation Error' : exception.detail,
+              statusCode: status,
             });
           } else {
             response.status(status).json({
-              statusCode: status,
               message: (exception && exception.message) || exception.toString ? exception.toString() : 'NO',
+              statusCode: status,
             });
           }
 
@@ -51,19 +59,21 @@ export class AllExceptionsFilter implements ExceptionFilter {
         default: {
           const status = HttpStatus.NOT_ACCEPTABLE;
           response.status(status).json({
-            statusCode: status,
             message: exception.message,
+            statusCode: status,
           });
           break;
         }
       }
     } else {
       if (process.env.NODE_ENV === 'development') {
+        /* tslint:disable */
         console.error(exception + '1');
+        /* tslint:enable */
       }
       response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal Server Error',
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }

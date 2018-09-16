@@ -53,7 +53,15 @@ export class RedisService {
     });
   }
 
-  closeConnection() {
-    this.redis.quit();
+  closeConnection(): Promise<void> {
+    return new Promise((ok, reject) => {
+      this.redis.quit(err => {
+        if (err) {
+          reject();
+        } else {
+          ok();
+        }
+      });
+    });
   }
 }

@@ -19,7 +19,8 @@
     "variable-name": [false],
     "one-line": [false],
     "one-variable-per-declaration": [false],
-    "no-var-requires": false
+    "no-var-requires": false,
+    "only-arrow-functions": false
   },
   "rulesDirectory": []
 }

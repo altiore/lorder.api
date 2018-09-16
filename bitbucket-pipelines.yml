@@ -8,8 +8,8 @@ pipelines:
         caches:
           - node
         script:
-          - yarn install
-          - yarn test:remote
+          - npm i
+          - npm run test:remote
         services:
           - postgres
           - redis
@@ -20,8 +20,8 @@ pipelines:
           caches:
             - node
           script:
-            - yarn install
-            - yarn test:remote
+            - npm i
+            - npm run test:remote
           services:
             - postgres
             - redis
@@ -37,8 +37,8 @@ pipelines:
           caches:
             - node
           script:
-            - yarn install
-            - yarn test:remote
+            - npm i
+            - npm test:remote
           services:
             - postgres
             - redis
