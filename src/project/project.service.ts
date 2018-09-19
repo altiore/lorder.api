@@ -1,21 +1,16 @@
-import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult } from 'typeorm';
 
-import { IdDto } from '../@common/dto';
 import { Project, ProjectDto, ProjectRepository } from '../@orm/project';
-import { ProjectTaskTypeRepository } from '../@orm/project-task-type';
-import { TaskTypeRepository } from '../@orm/task-type';
-import { EmailDto, User } from '../@orm/user';
-import { UserProjectRepository } from '../@orm/user-project';
-import { AuthService } from '../auth/auth.service';
-import { PagesDto } from './dto/pages.dto';
+import { User } from '../@orm/user';
+import { ProjectPaginationDto } from './dto';
 
 @Injectable()
 export class ProjectService {
   constructor(@InjectRepository(ProjectRepository) private readonly projectRepo: ProjectRepository) {}
 
-  public findAll(user: User): Promise<Partial<Project>[]> {
+  public findAllByUser(user: User): Promise<Partial<Project>[]> {
     return this.projectRepo.findAllByOwner(user);
   }
 
@@ -35,9 +30,9 @@ export class ProjectService {
     return this.projectRepo.delete({ id, owner: user });
   }
 
-  public async findCount(pagesDto: PagesDto): Promise<Partial<Project>[]> {
+  public async findWithPagination(pagesDto: ProjectPaginationDto): Promise<Partial<Project>[]> {
     try {
-      return this.projectRepo.findCountFrom(pagesDto.skeep, pagesDto.count, pagesDto.orderBy, pagesDto.order);
+      return this.projectRepo.findWithPagination(pagesDto);
     } catch (e) {
       throw new NotFoundException('Проекты не найдены');
     }

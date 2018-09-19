@@ -4,7 +4,7 @@ import { DeepPartial } from 'typeorm';
 
 import { RoleRepository } from '../@orm/role';
 import { UpdateUserDto, User, UserRepository } from '../@orm/user';
-import { UserDto } from './dto/user.dto';
+import { UserDto, UserPaginationDto } from './dto';
 
 @Injectable()
 export class UserService {
@@ -13,8 +13,12 @@ export class UserService {
     @InjectRepository(RoleRepository) private readonly roleRepo: RoleRepository
   ) {}
 
-  public findAll(): Promise<User[]> {
-    return this.userRepo.find();
+  public findAll(pagesDto: UserPaginationDto): Promise<User[]> {
+    try {
+      return this.userRepo.findWithPagination(pagesDto);
+    } catch (e) {
+      throw new NotFoundException('Пользователи не найдены');
+    }
   }
 
   public findOne(id: number): Promise<User> {

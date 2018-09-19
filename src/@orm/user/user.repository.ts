@@ -1,6 +1,7 @@
 import { createHash } from 'crypto';
 import { DeepPartial, EntityRepository, Repository } from 'typeorm';
 
+import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Role } from '../role/role.entity';
 import { User } from './user.entity';
 
@@ -58,6 +59,19 @@ export class UserRepository extends Repository<User> {
 
   public isStatusActive(user: User): boolean {
     return user.status === 10;
+  }
+
+  public findWithPagination({
+    count = 20,
+    skip = 0,
+    orderBy = 'createdAt',
+    order = 'desc',
+  }: PaginationDto<User>): Promise<User[]> {
+    return this.find({
+      order: { [orderBy]: order.toUpperCase() },
+      skip,
+      take: count,
+    });
   }
 
   public hashPassword(password) {

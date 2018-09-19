@@ -1,7 +1,7 @@
 import { ApiModelPropertyOptional } from '@nestjs/swagger';
-import { IsNumber, IsNumberString, IsOptional, IsString } from 'class-validator';
+import { IsIn, IsNumberString, IsOptional, IsString } from 'class-validator';
 
-export class PagesDto {
+export class PaginationDto<Entity> {
   @ApiModelPropertyOptional()
   @IsNumberString()
   @IsOptional()
@@ -10,15 +10,16 @@ export class PagesDto {
   @ApiModelPropertyOptional()
   @IsNumberString()
   @IsOptional()
-  public readonly skeep?: number;
+  public readonly skip?: number;
 
   @ApiModelPropertyOptional()
   @IsString()
   @IsOptional()
-  public readonly orderBy?: string;
+  public readonly orderBy?: keyof Entity;
 
   @ApiModelPropertyOptional()
   @IsString()
   @IsOptional()
-  public readonly order?: string;
+  @IsIn(['asc', 'desc'])
+  public readonly order?: 'asc' | 'desc';
 }

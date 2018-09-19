@@ -7,7 +7,7 @@ import {
   Param,
   ParseIntPipe,
   Patch,
-  Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -17,7 +17,7 @@ import { Roles } from '../@common/decorators/roles.decorator';
 import { UserJWT } from '../@common/decorators/user-jwt.decorator';
 import { RolesGuard } from '../@common/guards/roles.guard';
 import { User } from '../@orm/user';
-import { UserDto } from './dto/user.dto';
+import { UserDto, UserPaginationDto } from './dto';
 import { UserService } from './user.service';
 
 @ApiBearerAuth()
@@ -30,8 +30,8 @@ export class UserController {
   @ApiResponse({ status: 200, type: User, isArray: true })
   @Get()
   @Roles('super-admin')
-  public all(): Promise<any> {
-    return this.usersService.findAll();
+  public all(@Query() pagesDto: UserPaginationDto): Promise<User[]> {
+    return this.usersService.findAll(pagesDto);
   }
 
   @ApiResponse({ status: 200, type: User })

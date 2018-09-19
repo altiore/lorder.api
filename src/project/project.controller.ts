@@ -8,10 +8,8 @@ import { Roles } from '../@common/decorators/roles.decorator';
 import { UserJWT } from '../@common/decorators/user-jwt.decorator';
 import { RolesGuard } from '../@common/guards/roles.guard';
 import { Project, ProjectDto } from '../@orm/project';
-import { Task } from '../@orm/task';
 import { User } from '../@orm/user';
-import { ActivateDto } from '../auth/dto';
-import { PagesDto } from './dto/pages.dto';
+import { ProjectPaginationDto } from './dto';
 import { ProjectService } from './project.service';
 
 @ApiBearerAuth()
@@ -24,9 +22,8 @@ export class ProjectController {
   @ApiResponse({ status: 200, type: Project, isArray: true })
   @Get()
   @Roles('user')
-  public async all(@UserJWT() user: User, @Query() pagesDto: PagesDto): Promise<Partial<Project>[]> {
-    // return this.projectService.findAll(user);
-    return this.projectService.findCount(pagesDto);
+  public async all(@UserJWT() user: User, @Query() pagesDto: ProjectPaginationDto): Promise<Partial<Project>[]> {
+    return this.projectService.findWithPagination(pagesDto);
   }
 
   @ApiResponse({ status: 200, type: Project })

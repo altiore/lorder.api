@@ -2,6 +2,7 @@ import { omit } from 'lodash';
 import { EntityRepository, Repository } from 'typeorm';
 
 import { FindManyOptions } from 'typeorm/find-options/FindManyOptions';
+import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { User } from '../user/user.entity';
 import { ProjectDto } from './dto';
 import { Project } from './project.entity';
@@ -45,16 +46,15 @@ export class ProjectRepository extends Repository<Project> {
     };
   }
 
-  public async findCountFrom(
-    from?: number,
-    count?: number,
-    orderBy?: string,
-    order?: string
-  ): Promise<Partial<Project>[]> {
-    const orderParam = orderBy && order ? { [orderBy]: order } : {};
+  public async findWithPagination({
+    skip = 0,
+    count = 20,
+    orderBy = 'createdAt',
+    order = 'desc',
+  }: PaginationDto<Project>): Promise<Partial<Project>[]> {
     const entities = await this.find({
-      order: orderParam,
-      skip: from,
+      order: { [orderBy]: order.toUpperCase() },
+      skip,
       take: count,
     });
     return entities.map(this.preparePublic);
