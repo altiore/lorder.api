@@ -1,10 +1,10 @@
 import { omit } from 'lodash';
 import { EntityRepository, Repository } from 'typeorm';
 
+import { FindManyOptions } from 'typeorm/find-options/FindManyOptions';
 import { User } from '../user/user.entity';
 import { ProjectDto } from './dto';
 import { Project } from './project.entity';
-import {FindManyOptions} from 'typeorm/find-options/FindManyOptions';
 
 @EntityRepository(Project)
 export class ProjectRepository extends Repository<Project> {
@@ -45,13 +45,18 @@ export class ProjectRepository extends Repository<Project> {
     };
   }
 
-    public async findCountFrom(from: number, count: number): Promise<Partial<Project>[]>
-    {
-        const entities = await this.find({
-            order: {'id': 'ASC'},
-            skip: from,
-            take: count,
-        });
-        return entities.map(this.preparePublic);
-    }
+  public async findCountFrom(
+    from?: number,
+    count?: number,
+    orderBy?: string,
+    order?: string
+  ): Promise<Partial<Project>[]> {
+    const orderParam = orderBy && order ? { [orderBy]: order } : {};
+    const entities = await this.find({
+      order: orderParam,
+      skip: from,
+      take: count,
+    });
+    return entities.map(this.preparePublic);
+  }
 }

@@ -37,7 +37,7 @@ export class ProjectService {
 
   public async findCount(pagesDto: PagesDto): Promise<Partial<Project>[]> {
     try {
-      return this.projectRepo.findCountFrom(pagesDto.skeep, pagesDto.count);
+      return this.projectRepo.findCountFrom(pagesDto.skeep, pagesDto.count, pagesDto.orderBy, pagesDto.order);
     } catch (e) {
       throw new NotFoundException('Проекты не найдены');
     }
