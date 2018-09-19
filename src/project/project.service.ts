@@ -3,13 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult } from 'typeorm';
 
 import { IdDto } from '../@common/dto';
-import {Project, ProjectDto, ProjectRepository} from '../@orm/project';
-import {ProjectsDto} from './dto/projects.dto';
+import { Project, ProjectDto, ProjectRepository } from '../@orm/project';
 import { ProjectTaskTypeRepository } from '../@orm/project-task-type';
 import { TaskTypeRepository } from '../@orm/task-type';
 import { EmailDto, User } from '../@orm/user';
 import { UserProjectRepository } from '../@orm/user-project';
 import { AuthService } from '../auth/auth.service';
+import { PagesDto } from './dto/pages.dto';
 
 @Injectable()
 export class ProjectService {
@@ -35,11 +35,11 @@ export class ProjectService {
     return this.projectRepo.delete({ id, owner: user });
   }
 
-    public async findCount(projectsDto: ProjectsDto): Promise<Partial<Project>[]> {
-        try {
-            return this.projectRepo.findCountFrom(projectsDto.fromNumber, projectsDto.countProjects);
-        } catch (e) {
-            throw new NotFoundException('Проекты не найдены');
-        }
+  public async findCount(pagesDto: PagesDto): Promise<Partial<Project>[]> {
+    try {
+      return this.projectRepo.findCountFrom(pagesDto.skeep, pagesDto.count);
+    } catch (e) {
+      throw new NotFoundException('Проекты не найдены');
     }
+  }
 }
