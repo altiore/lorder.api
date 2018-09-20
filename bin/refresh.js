@@ -1,6 +1,6 @@
-const { Client } = require('pg');
+const { Client } = require("pg");
 
-require('dotenv').config();
+require("dotenv").config();
 
 const client = new Client({
   host: process.env.TYPEORM_HOST,
@@ -10,15 +10,19 @@ const client = new Client({
   database: process.env.TYPEORM_DATABASE,
 });
 
-client.connect();
-
-client.query(`
+client.connect(() => {
+  client.query(
+    `
   DROP SCHEMA public CASCADE;
   CREATE SCHEMA public;
   GRANT ALL ON SCHEMA public TO postgres;
   GRANT ALL ON SCHEMA public TO public;
   COMMENT ON SCHEMA public IS 'standard public schema';
-`, undefined, (err, err2, err3) => {
-  err && console.log(`\x1b[33m${err}\x1b[33m`);
-  client.end();
+`,
+    undefined,
+    (err, err2, err3) => {
+      err && console.log(`\x1b[33m${err}\x1b[33m`);
+      client.end();
+    }
+  );
 });
