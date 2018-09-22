@@ -17,9 +17,9 @@ pipelines:
     staging:
       - step:
           name: Tests one more time before deploy
-          caches:
-            - node
           script:
+            - npm -v
+            - node -v
             - npm i
             - npm run test:remote
           services:
