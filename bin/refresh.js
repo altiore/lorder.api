@@ -10,6 +10,10 @@ const client = new Client({
   database: process.env.TYPEORM_DATABASE,
 });
 
+if (!client || !client.connect) {
+  process.exit(1);
+}
+
 client.connect(err => {
   if (err) {
     console.log(err);
