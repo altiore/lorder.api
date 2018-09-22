@@ -1,7 +1,7 @@
 import { TestHelper } from '../@utils/TestHelper';
 import { usersFixture } from './@fixtures/users';
 
-const h = new TestHelper('/users', undefined, true).addFixture(usersFixture);
+const h = new TestHelper('/users').addFixture(usersFixture);
 
 describe(`GET ${h.url}`, async () => {
   beforeAll(h.before);

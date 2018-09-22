@@ -1,19 +1,17 @@
 import { TypeormTestHelper } from '../typeorm.test.helper';
-import { UserRepository } from '../user/user.repository';
 import { User } from '../user/user.entity';
-import { RoleRepository } from '../role/role.repository';
+import { UserRepository } from '../user/user.repository';
 import { ProjectRepository } from './project.repository';
 
 const tth = new TypeormTestHelper();
 let userRepository: UserRepository;
 let projectRepo: ProjectRepository;
-let roleRepo: RoleRepository;
 let user: User;
 
 describe('The ProjectRepository', () => {
   beforeAll(async () => {
-    [projectRepo, userRepository, roleRepo] = await tth.beforeAll(ProjectRepository, UserRepository, RoleRepository);
-    user = await tth.createUser(userRepository, roleRepo);
+    [projectRepo, userRepository] = await tth.beforeAll(ProjectRepository, UserRepository);
+    user = await userRepository.findOneByEmail('razvanlomov@gmail.com');
   });
 
   afterAll(async () => {
@@ -39,9 +37,8 @@ describe('The ProjectRepository', () => {
     const { user: wrongUser, password } = await userRepository.createWithRoles(
       {
         email: 'wrong@mail.com',
-        resetLink: 'test',
       },
-      [],
+      []
     );
     const project = await projectRepo.createByUser({ title: 'testProject2', monthlyBudget: 10000 }, wrongUser);
     await expect(projectRepo.findOneByOwner(project.id, user)).rejects.toBeInstanceOf(Error);
