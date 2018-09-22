@@ -17,6 +17,7 @@ dist
 .env.test.env
 *.dev
 .DS_Store
+yarn.lock
 
 # Docker
 Dockerfile
