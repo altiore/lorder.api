@@ -1,5 +1,8 @@
 require("dotenv").config();
 
+const baseDir = process.env.BASE_DIR || "dist";
+const scriptExt = baseDir === "dist" ? "js" : "ts";
+
 module.exports = {
   type: process.env.TYPEORM_CONNECTION || "postgres",
 
@@ -9,14 +12,13 @@ module.exports = {
   password: process.env.TYPEORM_PASSWORD,
   database: process.env.TYPEORM_DATABASE,
 
-  entities: [process.env.TYPEORM_ENTITIES || "src/@orm/**/**.entity.ts"],
-  migrations: [process.env.TYPEORM_MIGRATIONS || "src/@orm/@migrations/**.ts"],
+  entities: [`${baseDir}/@orm/**/**.entity.${scriptExt}`],
+  migrations: [`${baseDir}/@orm/@migrations/*.${scriptExt}`],
 
   synchronize: false,
   logging: process.env.TYPEORM_LOGGING === "true",
 
   cli: {
-    entitiesDir: "src/@orm",
-    migrationsDir: "src/@orm/@migrations",
+    migrationsDir: `${baseDir}/@orm/@migrations`,
   },
 };
