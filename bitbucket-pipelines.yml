@@ -20,8 +20,6 @@ pipelines:
           caches:
             - node
           script:
-            - npm -v
-            - node -v
             - npm i
             - npm run test:remote
           services:
