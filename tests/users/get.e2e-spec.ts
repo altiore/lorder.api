@@ -34,6 +34,7 @@ describe(`GET ${h.url}`, async () => {
     await h
       .requestBy('admin@mail.com')
       .get(h.url)
+      .expect(403)
       .expect({
         error: 'Forbidden',
         message: 'Forbidden resource',
