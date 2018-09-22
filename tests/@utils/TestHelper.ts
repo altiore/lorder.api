@@ -2,7 +2,7 @@
 import { INestApplication, ModuleMetadata } from '@nestjs/common/interfaces';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeormFixtures } from 'typeorm-fixtures';
-import { ObjectType, getConnection } from 'typeorm';
+import { ObjectType, getConnection, In } from 'typeorm';
 import * as supertest from 'supertest';
 const defaults = require('superagent-defaults');
 import * as jwt from 'jsonwebtoken';
@@ -21,7 +21,7 @@ export class TestHelper {
     public readonly metadata: ModuleMetadata = { imports: [AppModule] },
     public readonly debug: boolean = false
   ) {
-    this.fixtureHelper = new TypeormFixtures(debug).findEntities({}, Role);
+    this.fixtureHelper = new TypeormFixtures(debug).findEntities({ name: In(['user', 'admin', 'super-admin']) }, Role);
   }
 
   public readonly before = async (): Promise<void> => {
