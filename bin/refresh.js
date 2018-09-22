@@ -2,6 +2,7 @@ const { Client } = require("pg");
 
 require("dotenv").config();
 
+console.log("before create Client");
 const client = new Client({
   host: process.env.TYPEORM_HOST,
   port: process.env.TYPEORM_PORT,
@@ -9,6 +10,7 @@ const client = new Client({
   password: process.env.TYPEORM_PASSWORD,
   database: process.env.TYPEORM_DATABASE,
 });
+console.log("after create Client");
 
 if (!client || !client.connect) {
   process.exit(1);
@@ -19,6 +21,7 @@ client.connect(err => {
     console.log(err);
     process.exit(1);
   }
+  console.log("after connection");
   client.query(
     `
   DROP SCHEMA public CASCADE;
@@ -28,8 +31,12 @@ client.connect(err => {
   COMMENT ON SCHEMA public IS 'standard public schema';
 `,
     undefined,
-    (err, err2, err3) => {
-      err && console.log(`\x1b[33m${err}\x1b[33m`);
+    (err, res) => {
+      if (err) {
+        err && console.log(`\x1b[33m${err}\x1b[33m`);
+        process.exit(1);
+      }
+      console.log("result of query is", res);
       client.end();
     }
   );
