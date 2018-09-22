@@ -2,7 +2,13 @@ const { Client } = require("pg");
 
 require("dotenv").config();
 
-console.log("before create Client");
+console.log("before create Client", {
+  host: process.env.TYPEORM_HOST,
+  port: process.env.TYPEORM_PORT,
+  user: process.env.TYPEORM_USERNAME,
+  password: process.env.TYPEORM_PASSWORD,
+  database: process.env.TYPEORM_DATABASE,
+});
 const client = new Client({
   host: process.env.TYPEORM_HOST,
   port: process.env.TYPEORM_PORT,
