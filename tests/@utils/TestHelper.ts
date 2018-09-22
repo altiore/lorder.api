@@ -19,7 +19,7 @@ export class TestHelper {
   constructor(
     public readonly url: string,
     public readonly metadata: ModuleMetadata = { imports: [AppModule] },
-    public readonly debug: boolean = false
+    public readonly debug: boolean = process.env.TYPEORM_LOGGING === 'true'
   ) {
     this.fixtureHelper = new TypeormFixtures(debug).findEntities({ name: In(['user', 'admin', 'super-admin']) }, Role);
   }
