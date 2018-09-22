@@ -10,7 +10,11 @@ const client = new Client({
   database: process.env.TYPEORM_DATABASE,
 });
 
-client.connect(() => {
+client.connect(err => {
+  if (err) {
+    console.log(err);
+    process.exit(1);
+  }
   client.query(
     `
   DROP SCHEMA public CASCADE;
