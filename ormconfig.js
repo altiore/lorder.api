@@ -1,4 +1,6 @@
-require("dotenv").config();
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 
 const baseDir = process.env.BASE_DIR || "dist";
 const scriptExt = baseDir === "dist" ? "js" : "ts";

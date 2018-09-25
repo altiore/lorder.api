@@ -5,7 +5,9 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from './@common/pipes/validation.pipe';
 import { AppModule } from './app.module';
 
-require('dotenv').config();
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || process.env.HOSTNAME || 'localhost';
