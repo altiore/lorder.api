@@ -1,8 +1,8 @@
 import { omit } from 'lodash';
 import { EntityRepository, Repository } from 'typeorm';
 
-import { FindManyOptions } from 'typeorm/find-options/FindManyOptions';
 import { PaginationDto } from '../../@common/dto/pagination.dto';
+import { ProjectFieldsEnum } from '../../project/dto';
 import { User } from '../user/user.entity';
 import { ProjectDto } from './dto';
 import { Project } from './project.entity';
@@ -46,12 +46,10 @@ export class ProjectRepository extends Repository<Project> {
     };
   }
 
-  public async findWithPagination({
-    skip = 0,
-    count = 20,
-    orderBy = 'createdAt',
-    order = 'desc',
-  }: PaginationDto<Project>): Promise<Partial<Project>[]> {
+  public async findWithPagination(
+    { skip = 0, count = 20, orderBy = ProjectFieldsEnum.createdAt, order = 'desc' }: PaginationDto<ProjectFieldsEnum>,
+    user: User
+  ): Promise<Partial<Project>[]> {
     const entities = await this.find({
       order: { [orderBy]: order.toUpperCase() },
       skip,

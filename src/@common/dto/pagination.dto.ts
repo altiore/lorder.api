@@ -1,7 +1,12 @@
 import { ApiModelPropertyOptional } from '@nestjs/swagger';
 import { IsIn, IsNumberString, IsOptional, IsString } from 'class-validator';
 
-export class PaginationDto<Entity> {
+enum DefaultFieldsEnum {
+  createdAt = 'createdAt',
+  updatedAt = 'updatedAt',
+}
+
+export class PaginationDto<AllowedFieldsEnum = DefaultFieldsEnum> {
   @ApiModelPropertyOptional()
   @IsNumberString()
   @IsOptional()
@@ -15,7 +20,7 @@ export class PaginationDto<Entity> {
   @ApiModelPropertyOptional()
   @IsString()
   @IsOptional()
-  public readonly orderBy?: keyof Entity;
+  public readonly orderBy?: AllowedFieldsEnum;
 
   @ApiModelPropertyOptional()
   @IsString()

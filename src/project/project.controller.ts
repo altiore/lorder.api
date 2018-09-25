@@ -23,7 +23,7 @@ export class ProjectController {
   @Get()
   @Roles('user')
   public async all(@UserJWT() user: User, @Query() pagesDto: ProjectPaginationDto): Promise<Partial<Project>[]> {
-    return this.projectService.findWithPagination(pagesDto);
+    return this.projectService.findWithPagination(pagesDto, user);
   }
 
   @ApiResponse({ status: 200, type: Project })
