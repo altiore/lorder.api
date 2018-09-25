@@ -4,6 +4,9 @@ import { RoleRepository } from './role';
 import { User, UserRepository } from './user';
 const config = require('../../ormconfig');
 
+/**
+ * @deprecated use import { TypeormFixtures } from 'typeorm-fixtures'; instead
+ */
 export class TypeormTestHelper {
   private connection: Connection;
   private repos;

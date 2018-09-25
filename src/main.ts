@@ -1,9 +1,9 @@
-import { NestFactory } from '@nestjs/core';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-import { AppModule } from './app.module';
 import { ValidationPipe } from './@common/pipes/validation.pipe';
+import { AppModule } from './app.module';
 
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || process.env.HOSTNAME || 'localhost';
@@ -35,7 +35,8 @@ async function bootstrap() {
 
   await app.listen(
     PORT,
-    () => process.env.NODE_ENV !== 'production' && console.log(`Listening on ${SCHEMA}://${HOST}:${PORT}/api/`),
+    /* tslint:disable */
+    () => process.env.NODE_ENV !== 'production' && console.log(`Listening on ${SCHEMA}://${HOST}:${PORT}/api/`)
   );
 }
 
