@@ -4,11 +4,15 @@ import { DeleteResult } from 'typeorm';
 
 import { Project, ProjectDto, ProjectRepository } from '../@orm/project';
 import { User } from '../@orm/user';
+import { ACCESS_LEVEL, UserProjectRepository } from '../@orm/user-project';
 import { ProjectPaginationDto } from './dto';
 
 @Injectable()
 export class ProjectService {
-  constructor(@InjectRepository(ProjectRepository) private readonly projectRepo: ProjectRepository) {}
+  constructor(
+    @InjectRepository(ProjectRepository) private readonly projectRepo: ProjectRepository,
+    @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository
+  ) {}
 
   public findAllByUser(user: User): Promise<Partial<Project>[]> {
     return this.projectRepo.findAllByOwner(user);
@@ -22,8 +26,10 @@ export class ProjectService {
     }
   }
 
-  public create(data: ProjectDto, user: User): Promise<Project> {
-    return this.projectRepo.createByUser(data, user);
+  public async create(data: ProjectDto, user: User): Promise<Project> {
+    const project = await this.projectRepo.createByUser(data, user);
+    await this.userProjectRepo.addToProject(project, user, user, ACCESS_LEVEL.VIOLET, 1);
+    return project;
   }
 
   public remove(id: number, user: User): Promise<DeleteResult> {
@@ -32,7 +38,7 @@ export class ProjectService {
 
   public async findWithPaginationByUser(pagesDto: ProjectPaginationDto, user: User): Promise<Partial<Project>[]> {
     if (user.isSuperAdmin) {
-      return this.projectRepo.findAllWithPagination(pagesDto);
+      return this.projectRepo.findAllWithPagination(pagesDto, user);
     } else {
       return this.projectRepo.findWithPaginationByUser(pagesDto, user);
     }

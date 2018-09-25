@@ -4,17 +4,24 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 import { Project } from '../project/project.entity';
 import { User } from '../user/user.entity';
 
+export enum ACCESS_LEVEL {
+  RED = 1,
+  ORANGE = 2,
+  YELLOW = 3,
+  GREEN = 4,
+  BLUE = 5,
+  INDIGO = 6,
+  VIOLET = 7,
+}
+
 @Entity()
 export class UserProject {
-  @ApiModelProperty({ type: User })
   @ManyToOne(type => User, user => user.memberProjects, { primary: true, eager: true })
   member: User;
 
-  @ApiModelProperty({ type: Project })
   @ManyToOne(type => Project, project => project.projectMembers, { primary: true })
   project: Project;
 
-  @ApiModelProperty({ type: User })
   @ManyToOne(type => User, user => user.invitedMembers, { nullable: false })
   inviter: User;
 
@@ -24,5 +31,5 @@ export class UserProject {
 
   @ApiModelProperty()
   @Column()
-  accessLevel: number;
+  accessLevel: ACCESS_LEVEL;
 }

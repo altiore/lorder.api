@@ -2,17 +2,23 @@ import { EntityRepository, Repository } from 'typeorm';
 
 import { Project } from '../project/project.entity';
 import { User } from '../user/user.entity';
-import { UserProject } from './user-project.entity';
+import { ACCESS_LEVEL, UserProject } from './user-project.entity';
 
 @EntityRepository(UserProject)
 export class UserProjectRepository extends Repository<UserProject> {
-  public async addToProject(project: Project, member: User, inviter: User): Promise<UserProject> {
+  public async addToProject(
+    project: Project,
+    member: User,
+    inviter: User,
+    accessLevel: number = ACCESS_LEVEL.RED,
+    status: number = 0
+  ): Promise<UserProject> {
     const entity = this.create({
-      accessLevel: 1,
+      accessLevel,
       inviter,
       member,
       project,
-      status: 0,
+      status,
     });
     return await this.save(entity);
   }

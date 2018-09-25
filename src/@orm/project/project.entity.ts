@@ -77,4 +77,7 @@ export class Project {
       ? this.projectMembers.map(ptt => ptt.member)
       : [];
   }
+
+  @ApiModelPropertyOptional({ type: UserProject, description: 'Access Level for current user in current project' })
+  accessLevel?: UserProject;
 }

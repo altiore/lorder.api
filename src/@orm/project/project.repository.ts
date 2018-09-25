@@ -46,13 +46,18 @@ export class ProjectRepository extends Repository<Project> {
     };
   }
 
-  public async findAllWithPagination({
-    skip = 0,
-    count = 20,
-    orderBy = ProjectFieldsEnum.createdAt,
-    order = 'desc',
-  }: PaginationDto): Promise<Partial<Project>[]> {
+  public async findAllWithPagination(
+    { skip = 0, count = 20, orderBy = ProjectFieldsEnum.createdAt, order = 'desc' }: PaginationDto,
+    user: User
+  ): Promise<Partial<Project>[]> {
     const entities = await this.createQueryBuilder()
+      .leftJoinAndMapOne(
+        'Project.accessLevel',
+        'Project.projectMembers',
+        'projectMembers',
+        '"projectMembers"."memberId" = :memberId',
+        { memberId: user.id }
+      )
       .skip(skip)
       .limit(count)
       .orderBy(`Project.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
@@ -65,9 +70,13 @@ export class ProjectRepository extends Repository<Project> {
     user: User
   ): Promise<Partial<Project>[]> {
     const entities = await this.createQueryBuilder()
-      .innerJoin('Project.projectMembers', 'projectMembers', '"projectMembers"."memberId" = :memberId', {
-        memberId: user.id,
-      })
+      .innerJoinAndMapOne(
+        'Project.accessLevel',
+        'Project.projectMembers',
+        'projectMembers',
+        '"projectMembers"."memberId" = :memberId',
+        { memberId: user.id }
+      )
       .skip(skip)
       .limit(count)
       .orderBy(`Project.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
