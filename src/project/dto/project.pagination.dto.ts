@@ -5,4 +5,4 @@ export enum ProjectFieldsEnum {
   updatedAt = 'updatedAt',
 }
 
-export class ProjectPaginationDto extends PaginationDto<ProjectFieldsEnum> {}
+export class ProjectPaginationDto extends PaginationDto {}

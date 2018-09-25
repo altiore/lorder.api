@@ -66,7 +66,7 @@ export class UserRepository extends Repository<User> {
     skip = 0,
     orderBy = 'createdAt',
     order = 'desc',
-  }: PaginationDto<User>): Promise<User[]> {
+  }: PaginationDto): Promise<User[]> {
     return this.find({
       order: { [orderBy]: order.toUpperCase() },
       skip,
