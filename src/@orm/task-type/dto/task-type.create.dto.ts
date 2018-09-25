@@ -1,5 +1,5 @@
-import { IsNotEmpty, IsString, MinLength, MaxLength } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class TaskTypeCreateDto {
   @ApiModelProperty()

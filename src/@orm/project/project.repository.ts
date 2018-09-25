@@ -46,21 +46,32 @@ export class ProjectRepository extends Repository<Project> {
     };
   }
 
-  public async findWithPagination(
+  public async findAllWithPagination({
+    skip = 0,
+    count = 20,
+    orderBy = ProjectFieldsEnum.createdAt,
+    order = 'desc',
+  }: PaginationDto): Promise<Partial<Project>[]> {
+    const entities = await this.createQueryBuilder()
+      .skip(skip)
+      .limit(count)
+      .orderBy(`Project.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
+      .getMany();
+    return entities.map(this.preparePublic);
+  }
+
+  public async findWithPaginationByUser(
     { skip = 0, count = 20, orderBy = ProjectFieldsEnum.createdAt, order = 'desc' }: PaginationDto,
     user: User
   ): Promise<Partial<Project>[]> {
-    const entities = await this.find({
-      join: {
-        alias: 'projectMembers',
-        innerJoinAndSelect: {
-          'projectMembers.id': 'projectMemberId',
-        },
-      },
-      order: { [orderBy]: order.toUpperCase() },
-      skip,
-      take: count,
-    });
+    const entities = await this.createQueryBuilder()
+      .innerJoin('Project.projectMembers', 'projectMembers', '"projectMembers"."memberId" = :memberId', {
+        memberId: user.id,
+      })
+      .skip(skip)
+      .limit(count)
+      .orderBy(`Project.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
+      .getMany();
     return entities.map(this.preparePublic);
   }
 }

@@ -30,11 +30,11 @@ export class ProjectService {
     return this.projectRepo.delete({ id, owner: user });
   }
 
-  public async findWithPagination(pagesDto: ProjectPaginationDto, user: User): Promise<Partial<Project>[]> {
-    try {
-      return this.projectRepo.findWithPagination(pagesDto, user);
-    } catch (e) {
-      throw new NotFoundException('Проекты не найдены');
+  public async findWithPaginationByUser(pagesDto: ProjectPaginationDto, user: User): Promise<Partial<Project>[]> {
+    if (user.isSuperAdmin) {
+      return this.projectRepo.findAllWithPagination(pagesDto);
+    } else {
+      return this.projectRepo.findWithPaginationByUser(pagesDto, user);
     }
   }
 }

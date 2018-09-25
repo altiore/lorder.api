@@ -90,4 +90,8 @@ export class User {
   get role() {
     return { 1: ROLES.USER, 2: ROLES.ADMIN, 3: ROLES.SUPER_ADMIN }[this.roles.length];
   }
+
+  get isSuperAdmin() {
+    return this.role === ROLES.SUPER_ADMIN;
+  }
 }
