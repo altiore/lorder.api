@@ -1,5 +1,5 @@
-import { IsNotEmpty, IsString, MinLength, MaxLength, IsNumber } from 'class-validator';
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class ProjectDto {
   @ApiModelProperty()
@@ -9,7 +9,8 @@ export class ProjectDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiModelProperty()
+  @ApiModelPropertyOptional()
   @IsNumber()
-  monthlyBudget: number;
+  @IsOptional()
+  monthlyBudget?: number;
 }
