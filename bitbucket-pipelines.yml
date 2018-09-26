@@ -9,6 +9,7 @@ pipelines:
           - node
         script:
           - npm i
+          - npm run build
           - npm run test:remote
         services:
           - postgres
@@ -21,6 +22,7 @@ pipelines:
             - node
           script:
             - npm i
+            - npm run build
             - npm run test:remote
           services:
             - postgres
@@ -38,6 +40,7 @@ pipelines:
             - node
           script:
             - npm i
+            - npm run build
             - npm test:remote
           services:
             - postgres
