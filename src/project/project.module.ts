@@ -6,6 +6,7 @@ import { ProjectTaskTypeRepository } from '../@orm/project-task-type';
 import { TaskTypeRepository } from '../@orm/task-type';
 import { UserProjectRepository } from '../@orm/user-project';
 import { AuthModule } from '../auth/auth.module';
+import { AccessLevelGuard } from './guards';
 import { ProjectMemberController } from './member/project.member.controller';
 import { ProjectMemberService } from './member/project.member.service';
 import { ProjectController } from './project.controller';
@@ -20,6 +21,6 @@ import { ProjectTaskTypeService } from './task-type/project.task-type.service';
     AuthModule,
     TypeOrmModule.forFeature([ProjectRepository, ProjectTaskTypeRepository, TaskTypeRepository, UserProjectRepository]),
   ],
-  providers: [ProjectService, ProjectMemberService, ProjectTaskTypeService],
+  providers: [ProjectService, ProjectMemberService, ProjectTaskTypeService, AccessLevelGuard],
 })
 export class ProjectModule {}

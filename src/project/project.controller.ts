@@ -2,20 +2,22 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query, UseGua
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 import * as jwt from 'jsonwebtoken';
-import { DeleteResult } from 'typeorm';
+import { DeepPartial, DeleteResult } from 'typeorm';
 
-import { Roles } from '../@common/decorators/roles.decorator';
-import { UserJWT } from '../@common/decorators/user-jwt.decorator';
-import { RolesGuard } from '../@common/guards/roles.guard';
+import { Roles, UserJWT } from '../@common/decorators';
+import { RolesGuard } from '../@common/guards';
 import { Project, ProjectDto } from '../@orm/project';
 import { User } from '../@orm/user';
+import { ACCESS_LEVEL } from '../@orm/user-project';
+import { AccessLevel, ProjectParam } from './decorators';
 import { ProjectPaginationDto } from './dto';
+import { AccessLevelGuard } from './guards';
 import { ProjectService } from './project.service';
 
 @ApiBearerAuth()
 @ApiUseTags('projects')
 @Controller('projects')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
@@ -40,10 +42,14 @@ export class ProjectController {
     return this.projectService.create(data, user);
   }
 
-  @ApiResponse({ description: 'Проект успешно удален', status: 201, type: Project })
-  @Delete(':id')
+  @ApiResponse({ description: 'Проект успешно удален. Возвращает id удаленного проекта', status: 200, type: Number })
+  @Delete(':projectId')
   @Roles('user')
-  public delete(@UserJWT() user: User, @Param('id', ParseIntPipe) id: number): Promise<DeleteResult> {
-    return this.projectService.remove(id, user);
+  @AccessLevel(ACCESS_LEVEL.VIOLET)
+  public delete(
+    @Param('projectId', ParseIntPipe) projectId: number, // must be here because of swagger
+    @ProjectParam() project: DeepPartial<Project> // DeepPartial must be here, because of type checking
+  ): Promise<number> {
+    return this.projectService.remove(project.id);
   }
 }

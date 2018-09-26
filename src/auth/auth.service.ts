@@ -161,7 +161,7 @@ export class AuthService {
   /**
    * Используется при создании ключа валидации
    */
-  private createBearerKey(userInfo: JwtPayload, expiresIn: number = 3600): string {
-    return jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn });
+  private createBearerKey(userInfo: JwtPayload): string {
+    return jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: parseInt(process.env.JWT_EXPIRES_IN, 0) || 3600 });
   }
 }

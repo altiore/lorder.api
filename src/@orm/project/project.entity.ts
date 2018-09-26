@@ -64,19 +64,13 @@ export class Project {
       this.projectTaskTypes.length &&
       this.projectTaskTypes[0] &&
       this.projectTaskTypes[0].taskType
-      ? this.projectTaskTypes.sort((a, b) => a.order - b.order).map(ptt => ptt.taskType)
+      ? this.projectTaskTypes.map(ptt => ptt.taskType)
       : [];
   }
 
+  @ApiModelPropertyOptional({ type: UserProject, isArray: true })
   @OneToMany(type => UserProject, userProject => userProject.project)
-  projectMembers: UserProject[];
-
-  @ApiModelPropertyOptional({ type: User, isArray: true })
-  get members() {
-    return this.projectMembers && this.projectMembers.length && this.projectMembers[0] && this.projectMembers[0].member
-      ? this.projectMembers.map(ptt => ptt.member)
-      : [];
-  }
+  members: UserProject[];
 
   @ApiModelPropertyOptional({ type: UserProject, description: 'Access Level for current user in current project' })
   accessLevel?: UserProject;

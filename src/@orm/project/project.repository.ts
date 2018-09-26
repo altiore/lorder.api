@@ -3,6 +3,8 @@ import { EntityRepository, Repository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { ProjectFieldsEnum } from '../../project/dto';
+import { TaskType } from '../task-type/task-type.entity';
+import { UserProject } from '../user-project/user-project.entity';
 import { User } from '../user/user.entity';
 import { ProjectDto } from './dto';
 import { Project } from './project.entity';
@@ -18,12 +20,38 @@ export class ProjectRepository extends Repository<Project> {
     return entities.map(this.preparePublic);
   }
 
-  public async findOneByOwner(id: number, owner: User): Promise<Partial<Project>> {
-    const entity = await this.findOneOrFail({
-      relations: ['owner', 'tasks', 'projectTaskTypes', 'projectMembers'],
+  public async findOneByUser(id: number, user: User): Promise<Project> {
+    const entity = await this.createQueryBuilder()
+      .leftJoinAndMapMany('Project.tasks', 'Project.tasks', 'tasks')
+      .leftJoinAndMapMany('Project.projectTaskTypes', 'Project.projectTaskTypes', 'projectTaskTypes')
+      .leftJoinAndMapOne(
+        'projectTaskTypes.taskType',
+        TaskType,
+        'taskTypes',
+        '"projectTaskTypes"."taskTypeId"="taskTypes"."id"'
+      )
+      .leftJoinAndMapMany('Project.members', 'Project.members', 'projectMembers')
+      .leftJoinAndMapOne('projectMembers.member', 'user', 'users', '"projectMembers"."memberId"="users"."id"')
+      .innerJoinAndMapOne(
+        'Project.accessLevel',
+        UserProject,
+        'accessLevel',
+        '"accessLevel"."memberId" = :memberId AND "accessLevel"."projectId" = "Project"."id"',
+        { memberId: user.id }
+      )
+      .where('"Project"."id" = :projectId', { projectId: id })
+      .orderBy({
+        '"projectTaskTypes"."order"': 'ASC',
+      })
+      .getOne();
+    return this.prepare(entity);
+  }
+
+  public async findOneByOwner(id: number, owner: User): Promise<Project> {
+    return await this.findOneOrFail({
+      relations: ['owner', 'tasks', 'projectTaskTypes', 'members'],
       where: { id, owner },
     });
-    return this.prepare(entity);
   }
 
   public createByUser(data: ProjectDto, creator: User): Promise<Project> {
@@ -35,15 +63,14 @@ export class ProjectRepository extends Repository<Project> {
   }
 
   public preparePublic(project: Project): Partial<Project> {
-    return omit<Project>(project, ['projectTaskTypes', 'projectMembers', 'tasks', 'creator', 'updator']);
+    return omit<Project>(project, ['projectTaskTypes', 'members', 'tasks', 'creator', 'updator']);
   }
 
-  public prepare(project: Project): Partial<Partial<Project>> {
+  public prepare(project: Project): Project {
     return {
-      ...omit<Project>(project, ['projectTaskTypes', 'projectMembers']),
-      members: project.members,
+      ...omit<Project>(project, ['projectTaskTypes']),
       taskTypes: project.taskTypes,
-    };
+    } as Project;
   }
 
   public async findAllWithPagination(
@@ -53,9 +80,9 @@ export class ProjectRepository extends Repository<Project> {
     const entities = await this.createQueryBuilder()
       .leftJoinAndMapOne(
         'Project.accessLevel',
-        'Project.projectMembers',
-        'projectMembers',
-        '"projectMembers"."memberId" = :memberId',
+        'Project.members',
+        'accessLevel',
+        '"accessLevel"."memberId" = :memberId',
         { memberId: user.id }
       )
       .skip(skip)
@@ -72,9 +99,9 @@ export class ProjectRepository extends Repository<Project> {
     const entities = await this.createQueryBuilder()
       .innerJoinAndMapOne(
         'Project.accessLevel',
-        'Project.projectMembers',
-        'projectMembers',
-        '"projectMembers"."memberId" = :memberId',
+        'Project.members',
+        'accessLevel',
+        '"accessLevel"."memberId" = :memberId',
         { memberId: user.id }
       )
       .skip(skip)
