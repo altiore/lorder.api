@@ -34,7 +34,7 @@ export class ProjectMemberController {
     @Param('projectId', ParseIntPipe) projectId: number,
     @UserJWT() user: User
   ): Promise<User> {
-    const project = await this.projectService.findOne(projectId, user);
+    const project = await this.projectService.findOneByMember(projectId, user);
     return this.projectMemberService.invite(project, data, origin, user);
   }
 
@@ -46,7 +46,7 @@ export class ProjectMemberController {
     @Param('projectId', ParseIntPipe) projectId: number,
     @UserJWT() user: User
   ): Promise<boolean> {
-    const project = await this.projectService.findOne(projectId, user);
+    const project = await this.projectService.findOneByMember(projectId, user);
     return this.projectMemberService.removeMemberFromProject(data, project);
   }
 }

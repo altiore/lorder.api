@@ -36,7 +36,7 @@ export class ProjectTaskTypeController {
     @UserJWT() user: User,
     @Param('projectId', ParseIntPipe) projectId: number
   ): Promise<any> {
-    const project = await this.projectService.findOne(projectId, user);
+    const project = await this.projectService.findOneByMember(projectId, user);
     return this.projectTaskTypeService.addTaskType(project, dto.taskTypeId);
   }
 
@@ -52,7 +52,7 @@ export class ProjectTaskTypeController {
     @UserJWT() user: User,
     @Param('projectId', ParseIntPipe) projectId: number
   ): Promise<any> {
-    const project = await this.projectService.findOne(projectId, user);
+    const project = await this.projectService.findOneByMember(projectId, user);
     return this.projectTaskTypeService.update(project, dto.taskTypes);
   }
 
@@ -68,7 +68,7 @@ export class ProjectTaskTypeController {
     @UserJWT() user: User,
     @Param('projectId', ParseIntPipe) projectId: number
   ): Promise<any> {
-    const project = await this.projectService.findOne(projectId, user);
+    const project = await this.projectService.findOneByMember(projectId, user);
     return this.projectTaskTypeService.removeFromProject(project, dto.taskTypeId);
   }
 }
