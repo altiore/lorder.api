@@ -13,7 +13,15 @@ export class ProjectService {
     @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository
   ) {}
 
-  public async findOne(id: number, user: User): Promise<Project> {
+  public async findOne(id: number): Promise<Project> {
+    try {
+      return await this.projectRepo.findOneBySuperAdmin(id);
+    } catch (e) {
+      throw new NotFoundException('Проект не найден');
+    }
+  }
+
+  public async findOneByMember(id: number, user: User): Promise<Project> {
     try {
       return await this.projectRepo.findOneByUser(id, user);
     } catch (e) {

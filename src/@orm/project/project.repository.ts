@@ -47,11 +47,12 @@ export class ProjectRepository extends Repository<Project> {
     return this.prepare(entity);
   }
 
-  public async findOneByOwner(id: number, owner: User): Promise<Project> {
-    return await this.findOneOrFail({
-      relations: ['owner', 'tasks', 'projectTaskTypes', 'members'],
-      where: { id, owner },
+  public async findOneBySuperAdmin(id: number): Promise<Project> {
+    const entity = await this.findOneOrFail({
+      relations: ['tasks', 'projectTaskTypes', 'members'],
+      where: { id },
     });
+    return this.prepare(entity);
   }
 
   public createByUser(data: ProjectDto, creator: User): Promise<Project> {

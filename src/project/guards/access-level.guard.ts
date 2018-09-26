@@ -15,7 +15,7 @@ export class AccessLevelGuard implements CanActivate {
     }
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    const projectId = get(request, 'params.projectId');
+    const projectId = parseInt(get(request, 'params.projectId', 0), 0);
     if (!projectId) {
       throw new NotAcceptableException(
         `Нельзя использовать ${AccessLevelGuard.name} без 'projectId' параметра.
@@ -24,11 +24,11 @@ export class AccessLevelGuard implements CanActivate {
       );
     }
     if (user && user.isSuperAdmin) {
+      request.project = await this.projectService.findOne(projectId);
       return true;
     }
     try {
-      const project = await this.projectService.findOne(parseInt(projectId, 0), user);
-      request.project = project;
+      request.project = await this.projectService.findOneByMember(projectId, user);
     } catch (e) {
       return false;
     }
