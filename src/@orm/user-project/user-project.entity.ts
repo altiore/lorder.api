@@ -19,7 +19,7 @@ export class UserProject {
   @ManyToOne(type => User, user => user.memberProjects, { primary: true, eager: true })
   member: User;
 
-  @ManyToOne(type => Project, project => project.projectMembers, { primary: true })
+  @ManyToOne(type => Project, project => project.members, { primary: true })
   project: Project;
 
   @ManyToOne(type => User, user => user.invitedMembers, { nullable: false })
