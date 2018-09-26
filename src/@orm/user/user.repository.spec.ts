@@ -46,5 +46,6 @@ describe('The UserRepository', () => {
       })).email
     ).toBe(user.email);
     expect((await userRepository.find({ where: { email: user.email } })).length).toBe(1);
+    await userRepository.remove(user);
   });
 });
