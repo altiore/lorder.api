@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query, UseGua
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 import * as jwt from 'jsonwebtoken';
-import { DeepPartial, DeleteResult } from 'typeorm';
+import { DeepPartial } from 'typeorm';
 
 import { Roles, UserJWT } from '../@common/decorators';
 import { RolesGuard } from '../@common/guards';
@@ -32,7 +32,7 @@ export class ProjectController {
   @Get(':id')
   @Roles('user')
   public one(@UserJWT() user: User, @Param('id', ParseIntPipe) id: number): Promise<Partial<Project>> {
-    return this.projectService.findOne(id, user);
+    return this.projectService.findOneByMember(id, user);
   }
 
   @ApiResponse({ description: 'Проект успешно создан', status: 201, type: Project })
