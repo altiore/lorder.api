@@ -8,6 +8,7 @@ import { UserJWT } from '../../@common/decorators/user-jwt.decorator';
 import { IdDto } from '../../@common/dto';
 import { RolesGuard } from '../../@common/guards/roles.guard';
 import { EmailDto, User } from '../../@orm/user';
+import { UserProject } from '../../@orm/user-project';
 import { ProjectService } from '../project.service';
 import { ProjectMemberService } from './project.member.service';
 
@@ -26,14 +27,14 @@ export class ProjectMemberController {
   @ApiResponse({
     description: 'The Invite has been successfully sent.',
     status: 201,
-    type: User,
+    type: UserProject,
   })
   public async invite(
     @Body() data: EmailDto,
     @Headers('origin') origin: string,
     @Param('projectId', ParseIntPipe) projectId: number,
     @UserJWT() user: User
-  ): Promise<User> {
+  ): Promise<UserProject> {
     const project = await this.projectService.findOneByMember(projectId, user);
     return this.projectMemberService.invite(project, data, origin, user);
   }
