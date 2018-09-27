@@ -32,6 +32,8 @@ export class ProjectRepository extends Repository<Project> {
       )
       .leftJoinAndMapMany('Project.members', 'Project.members', 'projectMembers')
       .leftJoinAndMapOne('projectMembers.member', 'user', 'users', '"projectMembers"."memberId"="users"."id"')
+      .leftJoinAndMapMany('users.roles', 'user_roles', 'user_roles', '"users"."id"="user_roles"."userId"')
+      .leftJoinAndMapMany('users.roles', 'role', 'roles', '"roles"."id"="user_roles"."roleId"')
       .innerJoinAndMapOne(
         'Project.accessLevel',
         UserProject,
