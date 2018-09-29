@@ -47,6 +47,8 @@ describe(`GET ${h.url}`, async () => {
       .requestBy('super-admin@mail.com')
       .get(h.url)
       .expect(200);
-    expect(body.map(el => el.email)).toEqual(expect.arrayContaining(['super-admin@mail.com', 'user@mail.com']));
+    expect(body.map(el => el.email)).toEqual(
+      expect.arrayContaining(['admin@mail.com', 'super-admin@mail.com', 'user@mail.com', 'razvanlomov@gmail.com'])
+    );
   });
 });
