@@ -2,9 +2,9 @@ import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/c
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult } from 'typeorm';
 
-import { Project } from '@orm/project';
-import { ProjectTaskTypeRepository } from '@orm/project-task-type';
-import { TaskTypeRepository } from '@orm/task-type';
+import { Project } from '../../@orm/project';
+import { ProjectTaskTypeRepository } from '../../@orm/project-task-type';
+import { TaskTypeRepository } from '../../@orm/task-type';
 
 @Injectable()
 export class ProjectTaskTypeService {

@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Project, ProjectDto, ProjectRepository } from '@orm/project';
-import { User } from '@orm/user';
-import { ACCESS_LEVEL, UserProjectRepository } from '@orm/user-project';
+import { Project, ProjectDto, ProjectRepository } from '../@orm/project';
+import { User } from '../@orm/user';
+import { ACCESS_LEVEL, UserProjectRepository } from '../@orm/user-project';
 import { ProjectPaginationDto } from './@dto';
 
 @Injectable()

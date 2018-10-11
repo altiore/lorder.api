@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { IdDto } from '@common/dto';
-import { Project } from '@orm/project';
-import { EmailDto, User } from '@orm/user';
-import { UserProject, UserProjectRepository } from '@orm/user-project';
+import { IdDto } from '../../@common/dto';
+import { Project } from '../../@orm/project';
+import { EmailDto, User } from '../../@orm/user';
+import { UserProject, UserProjectRepository } from '../../@orm/user-project';
 import { AuthService } from '../../auth/auth.service';
 
 @Injectable()

@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { ProjectRepository } from '@orm/project';
-import { ProjectTaskTypeRepository } from '@orm/project-task-type';
-import { TaskRepository } from '@orm/task';
-import { TaskTypeRepository } from '@orm/task-type';
-import { UserProjectRepository } from '@orm/user-project';
+import { ProjectRepository } from '../@orm/project';
+import { ProjectTaskTypeRepository } from '../@orm/project-task-type';
+import { TaskRepository } from '../@orm/task';
+import { TaskTypeRepository } from '../@orm/task-type';
+import { UserProjectRepository } from '../@orm/user-project';
 import { AuthModule } from '../auth/auth.module';
 import { AccessLevelGuard } from './@common/guards';
 import { ProjectMemberController } from './member/project.member.controller';

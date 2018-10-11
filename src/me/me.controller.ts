@@ -2,10 +2,9 @@ import { Body, Controller, Patch, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 
-import { Roles } from '@common/decorators/roles.decorator';
-import { UserJWT } from '@common/decorators/user-jwt.decorator';
-import { RolesGuard } from '@common/guards/roles.guard';
-import { UpdateUserDto, User } from '@orm/user';
+import { Roles, UserJWT } from '../@common/decorators';
+import { RolesGuard } from '../@common/guards';
+import { UpdateUserDto, User } from '../@orm/user';
 import { MeService } from './me.service';
 
 @ApiBearerAuth()

@@ -2,10 +2,10 @@ import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, UseGuards } fr
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 
-import { Roles } from '@common/decorators/roles.decorator';
-import { RolesGuard } from '@common/guards/roles.guard';
-import { Task } from '@orm/task';
-import { ACCESS_LEVEL } from '@orm/user-project';
+import { Roles } from '../../@common/decorators/roles.decorator';
+import { RolesGuard } from '../../@common/guards/roles.guard';
+import { Task } from '../../@orm/task';
+import { ACCESS_LEVEL } from '../../@orm/user-project';
 import { AccessLevel } from '../@common/decorators';
 import { AccessLevelGuard } from '../@common/guards';
 import { TaskCreateDto } from './dto';

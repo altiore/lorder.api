@@ -4,11 +4,11 @@ import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 import * as jwt from 'jsonwebtoken';
 import { DeepPartial } from 'typeorm';
 
-import { Roles, UserJWT } from '@common/decorators';
-import { RolesGuard } from '@common/guards';
-import { Project, ProjectDto } from '@orm/project';
-import { User } from '@orm/user';
-import { ACCESS_LEVEL } from '@orm/user-project';
+import { Roles, UserJWT } from '../@common/decorators';
+import { RolesGuard } from '../@common/guards';
+import { Project, ProjectDto } from '../@orm/project';
+import { User } from '../@orm/user';
+import { ACCESS_LEVEL } from '../@orm/user-project';
 import { AccessLevel, ProjectParam } from './@common/decorators';
 import { AccessLevelGuard } from './@common/guards';
 import { ProjectPaginationDto } from './@dto';

@@ -12,6 +12,7 @@
     "start": "cross-env NODE_ENV=development nodemon",
     "start:hmr": "node dist/server",
     "first:install": "bin/install.sh",
+    "start:prod": "npm run build && node dist/main.js",
     "postinstall": "npm run build && npm run migration:up",
     "build": "rm -rf dist && tsc",
     "pretest": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && npm run migration:test:up",

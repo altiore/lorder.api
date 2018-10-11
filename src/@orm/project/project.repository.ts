@@ -1,7 +1,7 @@
 import { omit } from 'lodash';
 import { EntityRepository, Repository } from 'typeorm';
 
-import { PaginationDto } from '@common/dto/pagination.dto';
+import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { ProjectFieldsEnum } from '../../project/@dto';
 import { TaskType } from '../task-type/task-type.entity';
 import { UserProject } from '../user-project/user-project.entity';

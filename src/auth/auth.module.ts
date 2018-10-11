@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { UserRepository } from '@orm/user';
-import { UserProjectRepository } from '@orm/user-project';
+import { UserRepository } from '../@orm/user';
+import { UserProjectRepository } from '../@orm/user-project';
 import { MailModule } from '../mail/mail.module';
 import { RedisModule } from '../redis/redis.module';
 import { UserModule } from '../user/user.module';

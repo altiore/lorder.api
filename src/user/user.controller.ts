@@ -13,10 +13,10 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 
-import { Roles } from '@common/decorators/roles.decorator';
-import { UserJWT } from '@common/decorators/user-jwt.decorator';
-import { RolesGuard } from '@common/guards/roles.guard';
-import { User } from '@orm/user';
+import { Roles } from '../@common/decorators/roles.decorator';
+import { UserJWT } from '../@common/decorators/user-jwt.decorator';
+import { RolesGuard } from '../@common/guards/roles.guard';
+import { User } from '../@orm/user';
 import { UserDto, UserPaginationDto } from './dto';
 import { UserService } from './user.service';
 

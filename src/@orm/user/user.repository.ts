@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
 import { DeepPartial, EntityRepository, Repository } from 'typeorm';
 
-import { PaginationDto } from '@common/dto/pagination.dto';
+import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Role } from '../role/role.entity';
 import { User } from './user.entity';
 
