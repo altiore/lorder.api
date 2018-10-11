@@ -1,12 +1,12 @@
 import { Body, Controller, Patch, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiUseTags, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 
-import { RolesGuard } from '../@common/guards/roles.guard';
-import { Roles } from '../@common/decorators/roles.decorator';
-import { UserJWT } from '../@common/decorators/user-jwt.decorator';
+import { Roles } from '@common/decorators/roles.decorator';
+import { UserJWT } from '@common/decorators/user-jwt.decorator';
+import { RolesGuard } from '@common/guards/roles.guard';
+import { UpdateUserDto, User } from '@orm/user';
 import { MeService } from './me.service';
-import { User, UpdateUserDto } from '../@orm/user';
 
 @ApiBearerAuth()
 @ApiUseTags('me')
@@ -18,8 +18,8 @@ export class MeController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('user')
   @ApiResponse({
-    status: 200,
     description: 'The User has been successfully updated.',
+    status: 200,
     type: User,
   })
   public update(@UserJWT() user: User, @Body() data: UpdateUserDto): Promise<User> {

@@ -1,5 +1,5 @@
 import { ApiModelProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, ArrayMinSize } from 'class-validator';
+import { ArrayMinSize, IsNotEmpty, IsNumber } from 'class-validator';
 
 export class TaskTypesDto {
   @ApiModelProperty({ isArray: true, type: Number })

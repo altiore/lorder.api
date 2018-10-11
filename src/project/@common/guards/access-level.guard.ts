@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, Injectable, NotAcceptableException } fro
 import { Reflector } from '@nestjs/core';
 import { get } from 'lodash';
 
-import { ProjectService } from '../project.service';
+import { ProjectService } from '../../project.service';
 
 @Injectable()
 export class AccessLevelGuard implements CanActivate {

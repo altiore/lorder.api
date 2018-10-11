@@ -1,11 +1,11 @@
-import { Get, Controller, Post, Body, Patch, Delete, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiUseTags, ApiResponse } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 import * as jwt from 'jsonwebtoken';
 
-import { RolesGuard } from '../@common/guards/roles.guard';
-import { TaskType, TaskTypeCreateDto } from '../@orm/task-type';
-import { Roles } from '../@common/decorators/roles.decorator';
+import { Roles } from '@common/decorators/roles.decorator';
+import { RolesGuard } from '@common/guards/roles.guard';
+import { TaskType, TaskTypeCreateDto } from '@orm/task-type';
 import { TaskTypeService } from './task-type.service';
 
 @ApiBearerAuth()
@@ -38,21 +38,14 @@ export class TaskTypeController {
     status: 200,
     type: TaskType,
   })
-  public update(
-    @Param('id', ParseIntPipe)
-    id: number,
-    @Body() taskTypeCreateDto: TaskTypeCreateDto,
-  ) {
+  public update(@Param('id', ParseIntPipe) id: number, @Body() taskTypeCreateDto: TaskTypeCreateDto) {
     return this.tasktypeService.update(id, taskTypeCreateDto);
   }
 
   @Delete(':id')
   @Roles('super-admin')
   @ApiResponse({ status: 200 })
-  public remove(
-    @Param('id', ParseIntPipe)
-    id: number,
-  ) {
+  public remove(@Param('id', ParseIntPipe) id: number) {
     return this.tasktypeService.remove(id);
   }
 }

@@ -4,18 +4,18 @@ import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 import * as jwt from 'jsonwebtoken';
 import { DeleteResult } from 'typeorm';
 
-import { Roles } from '../../@common/decorators/roles.decorator';
-import { UserJWT } from '../../@common/decorators/user-jwt.decorator';
-import { RolesGuard } from '../../@common/guards/roles.guard';
-import { Project } from '../../@orm/project';
-import { ProjectTaskType } from '../../@orm/project-task-type';
-import { User } from '../../@orm/user';
-import { TaskTypeDto, TaskTypesDto } from '../dto';
+import { Roles } from '@common/decorators/roles.decorator';
+import { UserJWT } from '@common/decorators/user-jwt.decorator';
+import { RolesGuard } from '@common/guards/roles.guard';
+import { Project } from '@orm/project';
+import { ProjectTaskType } from '@orm/project-task-type';
+import { User } from '@orm/user';
 import { ProjectService } from '../project.service';
+import { TaskTypeDto, TaskTypesDto } from './dto';
 import { ProjectTaskTypeService } from './project.task-type.service';
 
 @ApiBearerAuth()
-@ApiUseTags('projects -> task-types')
+@ApiUseTags('projects -> task-types (role: user)')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('projects/:projectId/task-types')
 export class ProjectTaskTypeController {

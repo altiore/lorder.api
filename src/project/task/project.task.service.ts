@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Task, TaskCreateDto, TaskRepository } from '../@orm/task';
+import { Task, TaskRepository } from '@orm/task';
+import { TaskCreateDto } from './dto';
 
 @Injectable()
-export class TaskService {
+export class ProjectTaskService {
   constructor(@InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository) {}
 
   public findAll(projectId): Promise<Task[]> {

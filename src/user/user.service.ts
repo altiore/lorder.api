@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial } from 'typeorm';
 
-import { RoleRepository } from '../@orm/role';
-import { UpdateUserDto, User, UserRepository } from '../@orm/user';
+import { RoleRepository } from '@orm/role';
+import { UpdateUserDto, User, UserRepository } from '@orm/user';
 import { UserDto, UserPaginationDto } from './dto';
 
 @Injectable()
