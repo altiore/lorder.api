@@ -32,7 +32,7 @@ export class Task {
   description: string;
 
   @ApiModelPropertyOptional()
-  @Column()
+  @Column({ nullable: true })
   value: number;
 
   @ApiModelProperty({ type: UserTask, isArray: true })

@@ -1,9 +1,20 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 
-import { Roles } from '../../@common/decorators/roles.decorator';
-import { RolesGuard } from '../../@common/guards/roles.guard';
+import { Roles } from '../../@common/decorators';
+import { RolesGuard } from '../../@common/guards';
 import { Task } from '../../@orm/task';
 import { ACCESS_LEVEL } from '../../@orm/user-project';
 import { AccessLevel } from '../@common/decorators';
@@ -52,5 +63,17 @@ export class ProjectTaskController {
     @Body() taskCreateDto: TaskCreateDto
   ) {
     return this.taskService.update(id, taskCreateDto, projectId);
+  }
+
+  @Delete(':id')
+  @Roles('user')
+  @AccessLevel(ACCESS_LEVEL.GREEN)
+  @ApiResponse({ status: 200, type: Task, description: 'Доступно для уровня ACCESS_LEVEL.GREEN (4)' })
+  public async delete(@Param('projectId', ParseIntPipe) projectId: number, @Param('id', ParseIntPipe) id: number) {
+    const task = await this.taskService.delete(id, projectId);
+    if (!task) {
+      throw new NotFoundException('Задача для удаления не была найдена');
+    }
+    return task;
   }
 }

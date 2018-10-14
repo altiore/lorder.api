@@ -23,4 +23,13 @@ export class ProjectTaskService {
   public update(id: number, taskCreateDto: TaskCreateDto, projectId: number): Promise<Task> {
     return this.taskRepo.updateByProjectId(id, taskCreateDto, projectId);
   }
+
+  public async delete(id: number, projectId: number): Promise<Task | false> {
+    const task = await this.findOne(id, projectId);
+    if (!task) {
+      return false;
+    }
+    await this.taskRepo.delete({ id });
+    return task;
+  }
 }

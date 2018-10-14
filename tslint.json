@@ -22,5 +22,8 @@
     "no-var-requires": false,
     "only-arrow-functions": false
   },
-  "rulesDirectory": []
+  "rulesDirectory": [],
+  "linterOptions": {
+    "exclude": ["src/@orm/@migrations/*"]
+  }
 }

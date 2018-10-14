@@ -5,7 +5,7 @@ import * as jwt from 'jsonwebtoken';
 
 import { Roles, UserJWT } from '../../@common/decorators';
 import { IdDto } from '../../@common/dto';
-import { RolesGuard } from '../../@common/guards/roles.guard';
+import { RolesGuard } from '../../@common/guards';
 import { EmailDto, User } from '../../@orm/user';
 import { UserProject } from '../../@orm/user-project';
 import { ProjectService } from '../project.service';

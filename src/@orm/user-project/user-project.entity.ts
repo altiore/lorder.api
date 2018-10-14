@@ -3,16 +3,7 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 
 import { Project } from '../project/project.entity';
 import { User } from '../user/user.entity';
-
-export enum ACCESS_LEVEL {
-  RED = 1,
-  ORANGE = 2,
-  YELLOW = 3,
-  GREEN = 4,
-  BLUE = 5,
-  INDIGO = 6,
-  VIOLET = 7,
-}
+import { ACCESS_LEVEL } from './user-project.consts';
 
 @Entity()
 export class UserProject {
@@ -30,6 +21,6 @@ export class UserProject {
   status: number;
 
   @ApiModelProperty()
-  @Column()
+  @Column('integer')
   accessLevel: ACCESS_LEVEL;
 }
