@@ -2,7 +2,7 @@
 import { INestApplication, ModuleMetadata } from '@nestjs/common/interfaces';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeormFixtures } from 'typeorm-fixtures';
-import { ObjectType, getConnection, In } from 'typeorm';
+import { DeleteResult, FindConditions, getConnection, In, ObjectID, ObjectType } from 'typeorm';
 import * as supertest from 'supertest';
 const defaults = require('superagent-defaults');
 import * as jwt from 'jsonwebtoken';
@@ -55,7 +55,21 @@ export class TestHelper {
     return this;
   }
 
+  public async removeCreated<EntityType>(
+    Entity: ObjectType<EntityType>,
+    criteria: string | string[] | number | number[] | Date | Date[] | ObjectID | ObjectID[] | FindConditions<EntityType>
+  ): Promise<DeleteResult> {
+    return this.fixtureHelper.removeCreated(Entity, criteria);
+  }
+
   get entities() {
     return this.fixtureHelper.entities;
+  }
+
+  path(...atrs: (string | number)[]): string {
+    const matches = this.url.match(/\:\w*/g);
+    return atrs.reduce<string>((res: string, atr: string | number, index) => {
+      return res.replace(matches[index], typeof atr === 'number' ? atr.toString() : atr);
+    }, this.url) as string;
   }
 }

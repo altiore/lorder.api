@@ -6,6 +6,7 @@ import { ProjectTaskTypeRepository } from '../@orm/project-task-type';
 import { TaskRepository } from '../@orm/task';
 import { TaskTypeRepository } from '../@orm/task-type';
 import { UserProjectRepository } from '../@orm/user-project';
+import { UserTaskRepository } from '../@orm/user-task';
 import { AuthModule } from '../auth/auth.module';
 import { AccessLevelGuard } from './@common/guards';
 import { ProjectMemberController } from './member/project.member.controller';
@@ -16,9 +17,17 @@ import { ProjectTaskTypeController } from './task-type/project.task-type.control
 import { ProjectTaskTypeService } from './task-type/project.task-type.service';
 import { ProjectTaskController } from './task/project.task.controller';
 import { ProjectTaskService } from './task/project.task.service';
+import { ProjectUserTaskController } from './user-task/project.user-task.controller';
+import { ProjectUserTaskService } from './user-task/project.user-task.service';
 
 @Module({
-  controllers: [ProjectController, ProjectMemberController, ProjectTaskController, ProjectTaskTypeController],
+  controllers: [
+    ProjectController,
+    ProjectMemberController,
+    ProjectTaskController,
+    ProjectTaskTypeController,
+    ProjectUserTaskController,
+  ],
   exports: [ProjectService],
   imports: [
     AuthModule,
@@ -28,8 +37,16 @@ import { ProjectTaskService } from './task/project.task.service';
       TaskRepository,
       TaskTypeRepository,
       UserProjectRepository,
+      UserTaskRepository,
     ]),
   ],
-  providers: [ProjectService, ProjectMemberService, ProjectTaskService, ProjectTaskTypeService, AccessLevelGuard],
+  providers: [
+    AccessLevelGuard,
+    ProjectService,
+    ProjectMemberService,
+    ProjectTaskService,
+    ProjectTaskTypeService,
+    ProjectUserTaskService,
+  ],
 })
 export class ProjectModule {}

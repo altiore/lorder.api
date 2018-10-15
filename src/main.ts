@@ -2,7 +2,6 @@ import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.int
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-import { ValidationPipe } from './@common/pipes/validation.pipe';
 import { AppModule } from './app.module';
 
 if (process.env.NODE_ENV !== 'production') {
@@ -23,7 +22,6 @@ const corsOptions = {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: corsOptions });
-  app.useGlobalPipes(new ValidationPipe());
   app.setGlobalPrefix('v1');
 
   const options = new DocumentBuilder()

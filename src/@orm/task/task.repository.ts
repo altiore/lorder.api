@@ -9,8 +9,8 @@ export class TaskRepository extends Repository<Task> {
     return this.find({ where: { project: { id: projectId } } });
   }
 
-  public findOneByProjectId(id: number, projectId: number): Promise<Task> {
-    return this.findOneOrFail({ where: { id, project: { id: projectId } } });
+  public findOneByProjectId(id: number, projectId: number): Promise<Task | undefined> {
+    return this.findOne({ where: { id, project: { id: projectId } } });
   }
 
   public createByProjectId(data: Partial<Task>, projectId: number): Promise<Task> {

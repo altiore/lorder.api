@@ -1,9 +1,8 @@
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
-import { ValidationPipe } from './@common/pipes/validation.pipe';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 
 declare const module: any;
 
@@ -21,7 +20,6 @@ const corsOptions = {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: corsOptions });
-  app.useGlobalPipes(new ValidationPipe());
   app.setGlobalPrefix('v1');
 
   const options = new DocumentBuilder()
@@ -37,7 +35,8 @@ async function bootstrap() {
 
   await app.listen(
     PORT,
-    () => process.env.NODE_ENV !== 'production' && console.log(`Listening on ${SCHEMA}://${HOST}:${PORT}/api/`),
+    /* tslint:disable */
+    () => process.env.NODE_ENV !== 'production' && console.log(`Listening on ${SCHEMA}://${HOST}:${PORT}/api/`)
   );
   if (module.hot) {
     module.hot.accept();

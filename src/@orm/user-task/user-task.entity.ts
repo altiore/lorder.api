@@ -16,7 +16,7 @@ export class UserTask {
    * Ценность задачи в условных единицах
    */
   @ApiModelProperty()
-  @Column()
+  @Column({ nullable: true })
   value: number;
 
   @ApiModelProperty()
@@ -28,14 +28,14 @@ export class UserTask {
   startAt: Moment;
 
   @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
-  @UpdateDateColumn(momentDateTransformer)
+  @Column({ ...momentDateTransformer, type: 'timestamp', nullable: true })
   finishAt: Moment;
 
   /**
    * Может быть ссылкой на внешний сервис/ресурс
    */
   @ApiModelProperty()
-  @Column()
+  @Column({ nullable: true })
   source: string;
 
   @ApiModelProperty({ type: User })
