@@ -35,7 +35,6 @@ export class Task {
   @Column({ nullable: true })
   value: number;
 
-  @ApiModelProperty({ type: UserTask, isArray: true })
   @OneToMany(type => UserTask, userTask => userTask.task, { eager: false })
   userTasks: UserTask[];
 }

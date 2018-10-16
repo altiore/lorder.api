@@ -7,12 +7,14 @@ import { ACCESS_LEVEL } from './user-project.consts';
 
 @Entity()
 export class UserProject {
+  @ApiModelProperty({ type: User })
   @ManyToOne(type => User, user => user.memberProjects, { primary: true, eager: true })
   member: User;
 
   @ManyToOne(type => Project, project => project.members, { primary: true })
   project: Project;
 
+  @ApiModelProperty({ type: User })
   @ManyToOne(type => User, user => user.invitedMembers, { nullable: false })
   inviter: User;
 

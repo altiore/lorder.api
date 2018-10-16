@@ -71,19 +71,15 @@ export class User {
   @JoinTable({ name: 'user_roles' })
   roles: Role[];
 
-  @ApiModelProperty({ type: Project, isArray: true })
   @OneToMany(type => Project, project => project.owner)
   ownProjects: Project[];
 
-  @ApiModelProperty({ type: UserProject, isArray: true })
   @OneToMany(type => UserProject, userProject => userProject.member)
   memberProjects: UserProject[];
 
-  @ApiModelProperty({ type: UserProject, isArray: true })
   @OneToMany(type => UserProject, userProject => userProject.member)
   invitedMembers: UserProject[];
 
-  @ApiModelProperty({ type: UserTask, isArray: true })
   @OneToMany(type => UserTask, userTask => userTask.user)
   tasks: UserTask[];
 

@@ -18,7 +18,7 @@
     "pretest": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && npm run migration:test:up",
     "test": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest -i -b --detectOpenHandles",
     "pretest:changed:only": "npm run pretest",
-    "test:changed:only": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest -i -b --lastCommit --detectOpenHandles",
+    "test:changed:only": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest -i -b --lastCommit --detectOpenHandles --forceExit",
     "pretest:remote": "node bin/refresh.js && npm run migration:up && echo  \"Please, do NOT run LOCALLY!\"",
     "test:remote": "jest --coverage -i --forceExit && echo -e \"Please, do NOT run LOCALLY!\"",
     "posttest:remote": "codecov --token=d80eff89-9fdc-4a57-a585-70b6cbcf1abc",
