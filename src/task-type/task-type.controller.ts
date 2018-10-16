@@ -15,6 +15,7 @@ import { TaskTypeService } from './task-type.service';
 export class TaskTypeController {
   constructor(private readonly tasktypeService: TaskTypeService) {}
 
+  // TODO: простому пользователю нужны только типы задач, которые есть в проектах пользователя (все не нужны)
   @Get()
   @Roles('user')
   @ApiResponse({ status: 200, type: TaskType, isArray: true })
