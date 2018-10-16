@@ -10,13 +10,13 @@ import { TaskTypeService } from './task-type.service';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard)
-@ApiUseTags('task-types')
+@ApiUseTags('task-types (roles: user(get), super-admin(create/edit/delete))')
 @Controller('task-types')
 export class TaskTypeController {
   constructor(private readonly tasktypeService: TaskTypeService) {}
 
   @Get()
-  @Roles('super-admin')
+  @Roles('user')
   @ApiResponse({ status: 200, type: TaskType, isArray: true })
   public all() {
     return this.tasktypeService.findAll();
