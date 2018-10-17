@@ -1,4 +1,5 @@
 export enum ACCESS_LEVEL {
+  WHITE = 0,
   RED = 1,
   ORANGE = 2,
   YELLOW = 3,

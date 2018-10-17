@@ -7,8 +7,13 @@ import { ACCESS_LEVEL } from './user-project.consts';
 
 @Entity()
 export class UserProject {
-  static INVITED_STATUS = 0;
-  static ACCEPT_INVITATION_STATUS = 1;
+  @ApiModelProperty()
+  @Column('integer')
+  accessLevel: ACCESS_LEVEL;
+
+  @ApiModelProperty({ type: User })
+  @ManyToOne(type => User, user => user.invitedMembers, { nullable: false })
+  inviter: User;
 
   @ApiModelProperty({ type: User })
   @ManyToOne(type => User, user => user.memberProjects, { primary: true, eager: true })
@@ -16,16 +21,4 @@ export class UserProject {
 
   @ManyToOne(type => Project, project => project.members, { primary: true })
   project: Project;
-
-  @ApiModelProperty({ type: User })
-  @ManyToOne(type => User, user => user.invitedMembers, { nullable: false })
-  inviter: User;
-
-  @ApiModelProperty()
-  @Column()
-  status: number;
-
-  @ApiModelProperty()
-  @Column('integer')
-  accessLevel: ACCESS_LEVEL;
 }

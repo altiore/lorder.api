@@ -7,10 +7,9 @@ import { ACCESS_LEVEL, UserProject } from '../../src/@orm/user-project';
 
 export const createUserProjects = fixtureCreator<UserProject>(UserProject, function(entity, index) {
   return {
-    accessLevel: ACCESS_LEVEL.RED,
+    accessLevel: ACCESS_LEVEL.WHITE,
     inviter: one(this, User, entity.inviter),
     member: one(this, User, entity.member),
     project: one(this, Project, entity.project),
-    status: 0,
   };
 });

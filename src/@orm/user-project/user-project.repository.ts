@@ -11,15 +11,13 @@ export class UserProjectRepository extends Repository<UserProject> {
     project: Project,
     member: User,
     inviter: User,
-    accessLevel: number = ACCESS_LEVEL.RED,
-    status: number = UserProject.INVITED_STATUS
+    accessLevel: number = ACCESS_LEVEL.WHITE
   ): Promise<UserProject> {
     const entity = this.create({
       accessLevel,
       inviter,
       member,
       project,
-      status,
     });
     return await this.save(entity);
   }
@@ -29,7 +27,7 @@ export class UserProjectRepository extends Repository<UserProject> {
     const entity = await this.findOneOrFail({
       where: { member, project },
     });
-    entity.status = 1;
+    entity.accessLevel = ACCESS_LEVEL.RED;
     entity.project = project as Project;
     return await this.save(entity);
   }

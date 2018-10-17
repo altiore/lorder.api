@@ -7,7 +7,7 @@ import { userProjectsFixture } from './@fixtures/userProjects';
 import { usersFixture } from './@fixtures/usersForActivate';
 
 import { User } from '../../src/@orm/user';
-import { UserProject } from '../../src/@orm/user-project';
+import { ACCESS_LEVEL, UserProject } from '../../src/@orm/user-project';
 import { RedisService } from '../../src/redis/redis.service';
 
 const h = new TestHelper('/auth/activate')
@@ -152,10 +152,10 @@ describe(`GET ${h.url}`, async () => {
     const addedUserProject = await h.findOne(UserProject, { member: { id: user.id } });
     expect(addedUserProject).toEqual(
       expect.objectContaining({
+        accessLevel: ACCESS_LEVEL.RED,
         member: expect.objectContaining({
           email: user.email,
         }),
-        status: UserProject.ACCEPT_INVITATION_STATUS,
       })
     );
     await h.removeCreated(UserProject, { member: { id: user.id } });

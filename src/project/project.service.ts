@@ -31,7 +31,7 @@ export class ProjectService {
 
   public async create(data: ProjectDto, user: User): Promise<Project> {
     const project = await this.projectRepo.createByUser(data, user);
-    await this.userProjectRepo.addToProject(project, user, user, ACCESS_LEVEL.VIOLET, 1);
+    await this.userProjectRepo.addToProject(project, user, user, ACCESS_LEVEL.VIOLET);
     return project;
   }
 
