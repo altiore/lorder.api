@@ -7,6 +7,9 @@ import { ACCESS_LEVEL } from './user-project.consts';
 
 @Entity()
 export class UserProject {
+  static INVITED_STATUS = 0;
+  static ACCEPT_INVITATION_STATUS = 1;
+
   @ApiModelProperty({ type: User })
   @ManyToOne(type => User, user => user.memberProjects, { primary: true, eager: true })
   member: User;

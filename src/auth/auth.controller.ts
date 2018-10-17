@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Headers, HttpCode, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Headers, HttpCode, Patch, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 
 import { User } from '../@orm/user';

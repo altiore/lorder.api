@@ -12,7 +12,7 @@ export class UserProjectRepository extends Repository<UserProject> {
     member: User,
     inviter: User,
     accessLevel: number = ACCESS_LEVEL.RED,
-    status: number = 0
+    status: number = UserProject.INVITED_STATUS
   ): Promise<UserProject> {
     const entity = this.create({
       accessLevel,

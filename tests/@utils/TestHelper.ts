@@ -10,6 +10,8 @@ import * as jwt from 'jsonwebtoken';
 import { AppModule } from '../../src/app.module';
 import { RedisService } from '../../src/redis/redis.service';
 import { Role } from '../../src/@orm/role';
+import { MailService } from '../../src/mail/mail.service';
+import { MailAcceptedDto } from '../../src/mail/dto';
 
 export class TestHelper {
   private testingModule: TestingModule;
@@ -26,7 +28,19 @@ export class TestHelper {
 
   public readonly before = async (): Promise<void> => {
     await this.fixtureHelper.loadFixtures();
-    this.testingModule = await Test.createTestingModule(this.metadata).compile();
+    this.testingModule = await Test.createTestingModule(this.metadata)
+      .overrideProvider(MailService)
+      .useValue(
+        new class {
+          public async sendMagicLink(): Promise<MailAcceptedDto> {
+            return {
+              statusCode: 202,
+              statusMessage: 'TEST Accepted',
+            };
+          }
+        }()
+      )
+      .compile();
     this.app = await this.testingModule.createNestApplication().init();
   };
 
@@ -62,10 +76,26 @@ export class TestHelper {
     return this.fixtureHelper.removeCreated(Entity, criteria);
   }
 
+  public async findOne<EntityType>(Entity: ObjectType<EntityType>, criteria) {
+    return await this.fixtureHelper.findOneExisting(Entity, criteria);
+  }
+
+  public async findMany<EntityType>(Entity: ObjectType<EntityType>, criteria) {
+    return await this.fixtureHelper.findManyExisting(Entity, criteria);
+  }
+
   get entities() {
     return this.fixtureHelper.entities;
   }
 
+  /**
+   * Return path with replaced params.
+   * For example this url `/users/:userId/projects/:projectId` will be replaced like this:
+   * ```ts
+   *   this.path(15, 84); // it will return such string -> `/users/15/projects/84`
+   * ```
+   * @param atrs
+   */
   path(...atrs: (string | number)[]): string {
     const matches = this.url.match(/\:\w*/g);
     return atrs.reduce<string>((res: string, atr: string | number, index) => {

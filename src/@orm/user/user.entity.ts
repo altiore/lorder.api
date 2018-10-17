@@ -19,6 +19,9 @@ import { UserTask } from '../user-task/user-task.entity';
 
 @Entity()
 export class User {
+  static JUST_CREATED = 1;
+  static ACTIVATED = 10;
+
   @ApiModelProperty()
   @PrimaryGeneratedColumn()
   id: number;
