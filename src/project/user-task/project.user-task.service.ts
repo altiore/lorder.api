@@ -42,4 +42,13 @@ export class ProjectUserTaskService {
       description: userTaskData.description || `${userTaskData.title}${currentlyCreated ? ' 1' : ' 2'}`,
     });
   }
+
+  public async remove(taskId: number, user: User): Promise<UserTask | false> {
+    const task = await this.userTaskRepo.findOne({ user, id: taskId });
+    if (!task) {
+      return false;
+    }
+    await this.userTaskRepo.remove(task);
+    return task;
+  }
 }

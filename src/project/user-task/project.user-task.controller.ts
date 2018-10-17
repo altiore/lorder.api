@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 import { DeepPartial } from 'typeorm';
@@ -32,7 +32,7 @@ export class ProjectUserTaskController {
   @Post()
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.RED)
-  @ApiResponse({ status: 201, type: UserTask, description: 'ACCESS_LEVEL.ORANGE' })
+  @ApiResponse({ status: 201, type: UserTask, description: 'ACCESS_LEVEL.RED' })
   public start(
     @UserJWT() user: User,
     @Param('projectId', ParseIntPipe) projectId: number,
@@ -40,5 +40,21 @@ export class ProjectUserTaskController {
     @Body() userTaskCreateDto: UserTaskCreateDto
   ) {
     return this.userTaskService.start(project, user, userTaskCreateDto);
+  }
+
+  @Delete(':taskId')
+  @Roles('user')
+  @AccessLevel(ACCESS_LEVEL.RED)
+  @ApiResponse({ status: 200, type: UserTask, description: 'ACCESS_LEVEL.RED' })
+  public async delete(
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @Param('taskId', ParseIntPipe) taskId: number,
+    @UserJWT() user: User
+  ): Promise<UserTask> {
+    const task = await this.userTaskService.remove(taskId, user);
+    if (!task) {
+      throw new NotFoundException('Задача не найдена');
+    }
+    return task;
   }
 }

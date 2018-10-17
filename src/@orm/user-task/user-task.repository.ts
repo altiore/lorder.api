@@ -8,7 +8,7 @@ import { UserTask } from './user-task.entity';
 @EntityRepository(UserTask)
 export class UserTaskRepository extends Repository<UserTask> {
   public findAllByUser(user: User): Promise<UserTask[]> {
-    return this.find({ user });
+    return this.find({ order: { startAt: 'DESC' }, where: { user } });
   }
 
   public async startTask(task: Task, user: User, userTaskData: Partial<UserTask>): Promise<UserTask> {
