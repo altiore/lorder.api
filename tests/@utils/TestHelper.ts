@@ -76,7 +76,7 @@ export class TestHelper {
     return this.fixtureHelper.removeCreated(Entity, criteria);
   }
 
-  public async findOne<EntityType>(Entity: ObjectType<EntityType>, criteria) {
+  public async findOne<EntityType>(Entity: ObjectType<EntityType>, criteria): Promise<EntityType> {
     return await this.fixtureHelper.findOneExisting(Entity, criteria);
   }
 

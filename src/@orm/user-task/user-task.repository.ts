@@ -21,8 +21,8 @@ export class UserTaskRepository extends Repository<UserTask> {
     return await this.save(userTask);
   }
 
-  public finishTask(userTask: UserTask): Promise<UserTask> {
+  public async finishTask(userTask: UserTask): Promise<UserTask> {
     userTask.finishAt = moment();
-    return this.save(userTask);
+    return await this.save(userTask);
   }
 }

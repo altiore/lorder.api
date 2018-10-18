@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial } from 'typeorm';
 
@@ -43,8 +43,20 @@ export class ProjectUserTaskService {
     });
   }
 
-  public async remove(taskId: number, user: User): Promise<UserTask | false> {
-    const task = await this.userTaskRepo.findOne({ user, id: taskId });
+  public async stop(project: DeepPartial<Project>, user: User, userTaskId: number): Promise<UserTask> {
+    let userTask;
+    userTask = await this.userTaskRepo.findOne({ user, id: userTaskId });
+    if (!userTask) {
+      throw new NotFoundException('Задача не найдена');
+    }
+    if (userTask.finishAt) {
+      throw new NotAcceptableException('Эта задача уже завершена. Вы не можете завершить одну и ту же задачу дважды');
+    }
+    return this.userTaskRepo.finishTask(userTask);
+  }
+
+  public async remove(userTaskId: number, user: User): Promise<UserTask | false> {
+    const task = await this.userTaskRepo.findOne({ user, id: userTaskId });
     if (!task) {
       return false;
     }

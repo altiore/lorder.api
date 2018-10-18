@@ -1,6 +1,6 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 import { Moment } from 'moment';
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { Task } from '../task/task.entity';
@@ -11,13 +11,6 @@ export class UserTask {
   @ApiModelProperty()
   @PrimaryGeneratedColumn()
   id: number;
-
-  /**
-   * Ценность задачи в условных единицах
-   */
-  @ApiModelProperty()
-  @Column({ nullable: true })
-  value: number;
 
   @ApiModelProperty()
   @Column()
@@ -30,6 +23,13 @@ export class UserTask {
   @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
   @Column({ ...momentDateTransformer, type: 'timestamp', nullable: true })
   finishAt: Moment;
+
+  /**
+   * Ценность задачи в условных единицах
+   */
+  @ApiModelProperty()
+  @Column({ nullable: true })
+  value: number;
 
   /**
    * Может быть ссылкой на внешний сервис/ресурс

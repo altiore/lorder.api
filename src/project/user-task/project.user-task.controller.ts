@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 import { DeepPartial } from 'typeorm';
@@ -38,20 +49,33 @@ export class ProjectUserTaskController {
     @Param('projectId', ParseIntPipe) projectId: number,
     @ProjectParam() project: DeepPartial<Project>,
     @Body() userTaskCreateDto: UserTaskCreateDto
-  ) {
+  ): Promise<UserTask> {
     return this.userTaskService.start(project, user, userTaskCreateDto);
   }
 
-  @Delete(':taskId')
+  @Patch(':userTaskId')
+  @Roles('user')
+  @AccessLevel(ACCESS_LEVEL.RED)
+  @ApiResponse({ status: 200, type: UserTask, description: 'ACCESS_LEVEL.RED' })
+  public stop(
+    @UserJWT() user: User,
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @Param('userTaskId', ParseIntPipe) userTaskId: number,
+    @ProjectParam() project: DeepPartial<Project>
+  ): Promise<UserTask> {
+    return this.userTaskService.stop(project, user, userTaskId);
+  }
+
+  @Delete(':userTaskId')
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.RED)
   @ApiResponse({ status: 200, type: UserTask, description: 'ACCESS_LEVEL.RED' })
   public async delete(
     @Param('projectId', ParseIntPipe) projectId: number,
-    @Param('taskId', ParseIntPipe) taskId: number,
+    @Param('userTaskId', ParseIntPipe) userTaskId: number,
     @UserJWT() user: User
   ): Promise<UserTask> {
-    const task = await this.userTaskService.remove(taskId, user);
+    const task = await this.userTaskService.remove(userTaskId, user);
     if (!task) {
       throw new NotFoundException('Задача не найдена');
     }
