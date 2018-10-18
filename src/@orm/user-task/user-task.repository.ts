@@ -34,7 +34,9 @@ export class UserTaskRepository extends Repository<UserTask> {
   private prepare(userTask: UserTask): UserTask {
     const projectId = userTask.projectId;
     const taskId = userTask.taskId;
+    const taskTypeId = userTask.taskTypeId;
     delete userTask.task;
-    return { ...userTask, projectId, taskId };
+    delete userTask.taskType;
+    return { ...userTask, projectId, taskId, taskTypeId };
   }
 }

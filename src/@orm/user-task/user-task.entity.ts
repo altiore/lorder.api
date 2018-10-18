@@ -3,6 +3,7 @@ import { Moment } from 'moment';
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
+import { TaskType } from '../task-type/task-type.entity';
 import { Task } from '../task/task.entity';
 import { User } from '../user/user.entity';
 
@@ -39,16 +40,25 @@ export class UserTask {
   source: string;
 
   // @ApiModelProperty({ type: User })
-  @ManyToOne(type => User, user => user.tasks, { nullable: false })
+  @ManyToOne(() => User, user => user.tasks, { nullable: false })
   user: User;
 
   @ApiModelProperty({ type: Task })
-  @ManyToOne(type => Task, task => task.userTasks, { nullable: false })
+  @ManyToOne(() => Task, task => task.userTasks, { nullable: false })
   task: Task;
+
+  @ApiModelProperty({ type: TaskType })
+  @ManyToOne(() => TaskType, { eager: true })
+  taskType: TaskType;
 
   @ApiModelProperty({ type: Number })
   get taskId() {
     return this.task ? this.task.id : null;
+  }
+
+  @ApiModelProperty({ type: Number })
+  get taskTypeId() {
+    return this.taskType ? this.taskType.id : null;
   }
 
   @ApiModelProperty({ type: Number })
