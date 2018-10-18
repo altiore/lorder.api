@@ -7,8 +7,13 @@ import { UserTask } from './user-task.entity';
 
 @EntityRepository(UserTask)
 export class UserTaskRepository extends Repository<UserTask> {
-  public findAllByUser(user: User): Promise<UserTask[]> {
-    return this.find({ order: { startAt: 'DESC' }, where: { user } });
+  public async findAllByUser(user: User): Promise<UserTask[]> {
+    const entities = await this.find({
+      order: { startAt: 'DESC' },
+      relations: ['task', 'task.project'],
+      where: { user },
+    });
+    return entities.map(this.prepare);
   }
 
   public async startTask(task: Task, user: User, userTaskData: Partial<UserTask>): Promise<UserTask> {
@@ -18,11 +23,18 @@ export class UserTaskRepository extends Repository<UserTask> {
       task,
       user,
     });
-    return await this.save(userTask);
+    return this.prepare(await this.save(userTask));
   }
 
   public async finishTask(userTask: UserTask): Promise<UserTask> {
     userTask.finishAt = moment();
     return await this.save(userTask);
+  }
+
+  private prepare(userTask: UserTask): UserTask {
+    const projectId = userTask.projectId;
+    const taskId = userTask.taskId;
+    delete userTask.task;
+    return { ...userTask, projectId, taskId };
   }
 }

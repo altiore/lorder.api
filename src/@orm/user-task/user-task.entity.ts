@@ -38,11 +38,21 @@ export class UserTask {
   @Column({ nullable: true })
   source: string;
 
-  @ApiModelProperty({ type: User })
+  // @ApiModelProperty({ type: User })
   @ManyToOne(type => User, user => user.tasks, { nullable: false })
   user: User;
 
   @ApiModelProperty({ type: Task })
   @ManyToOne(type => Task, task => task.userTasks, { nullable: false })
   task: Task;
+
+  @ApiModelProperty({ type: Number })
+  get taskId() {
+    return this.task ? this.task.id : null;
+  }
+
+  @ApiModelProperty({ type: Number })
+  get projectId() {
+    return this.task && this.task.project ? this.task.project.id : null;
+  }
 }
