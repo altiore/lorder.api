@@ -1,34 +1,34 @@
 import * as moment from 'moment';
 
 import { TestHelper } from '../../@utils/TestHelper';
-import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userTasksFixture } from './@fixtures/patch';
+import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/patch';
 
-import { UserTask } from '../../../src/@orm/user-task';
+import { UserWork } from '../../../src/@orm/user-work';
 
-const h = new TestHelper('/projects/:projectId/user-tasks/:userTaskId')
+const h = new TestHelper('/projects/:projectId/user-works/:userTaskId')
   .addFixture(usersFixture)
   .addFixture(projectsFixture)
   .addFixture(userProjectsFixture)
   .addFixture(tasksFixture)
-  .addFixture(userTasksFixture);
+  .addFixture(userWorksFixture);
 
 describe(`PATCH ${h.url}`, async () => {
   let projectId: number;
-  let notFinishedUserTaskId: number;
-  let finishedUserTaskId: number;
+  let notFinishedUserWorkId: number;
+  let finishedUserWorkId: number;
 
   beforeAll(async () => {
     await h.before();
     projectId = h.entities.Project[0].id;
-    notFinishedUserTaskId = h.entities.UserTask.find(el => el.task.title === 'NotFinished').id;
-    finishedUserTaskId = h.entities.UserTask.find(el => el.task.title === 'Finished').id;
+    notFinishedUserWorkId = h.entities.UserWork.find(el => el.task.title === 'NotFinished').id;
+    finishedUserWorkId = h.entities.UserWork.find(el => el.task.title === 'Finished').id;
   });
   afterAll(h.after);
 
   it('by guest', async () => {
     await h
       .requestBy()
-      .patch(h.path(projectId, notFinishedUserTaskId))
+      .patch(h.path(projectId, notFinishedUserWorkId))
       .expect(401)
       .expect({
         error: 'Unauthorized',
@@ -39,7 +39,7 @@ describe(`PATCH ${h.url}`, async () => {
   it('by white-accessLevel@mail.com', async () => {
     await h
       .requestBy('white-accessLevel@mail.com')
-      .patch(h.path(projectId, notFinishedUserTaskId))
+      .patch(h.path(projectId, notFinishedUserWorkId))
       .expect(403)
       .expect({
         error: 'Forbidden',
@@ -51,7 +51,7 @@ describe(`PATCH ${h.url}`, async () => {
   it('by not-invited@mail.com', async () => {
     await h
       .requestBy('not-invited@mail.com')
-      .patch(h.path(projectId, notFinishedUserTaskId))
+      .patch(h.path(projectId, notFinishedUserWorkId))
       .expect(403)
       .expect({
         error: 'Forbidden',
@@ -64,7 +64,7 @@ describe(`PATCH ${h.url}`, async () => {
     const email = 'user@mail.com';
     const { body } = await h
       .requestBy(email)
-      .patch(h.path(projectId, finishedUserTaskId))
+      .patch(h.path(projectId, finishedUserWorkId))
       .expect(406);
     expect(body).toEqual({
       error: 'Not Acceptable',
@@ -77,13 +77,13 @@ describe(`PATCH ${h.url}`, async () => {
     const email = 'user@mail.com';
     await h
       .requestBy(email)
-      .patch(h.path(projectId, notFinishedUserTaskId))
+      .patch(h.path(projectId, notFinishedUserWorkId))
       .expect(200);
     const currentUser = h.entities.User[0];
     expect(currentUser.email).toBe(email);
     // it was not finished before
-    expect(h.entities.UserTask.find(el => el.id === notFinishedUserTaskId).finishAt).toBeNull();
-    const currentUserTask = await h.findOne(UserTask, { id: notFinishedUserTaskId });
-    expect(currentUserTask.finishAt).toEqual(expect.any(moment));
+    expect(h.entities.UserWork.find(el => el.id === notFinishedUserWorkId).finishAt).toBeNull();
+    const currentUserWork = await h.findOne(UserWork, { id: notFinishedUserWorkId });
+    expect(currentUserWork.finishAt).toEqual(expect.any(moment));
   });
 });

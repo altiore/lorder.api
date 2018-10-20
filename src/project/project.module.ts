@@ -6,7 +6,7 @@ import { ProjectTaskTypeRepository } from '../@orm/project-task-type';
 import { TaskRepository } from '../@orm/task';
 import { TaskTypeRepository } from '../@orm/task-type';
 import { UserProjectRepository } from '../@orm/user-project';
-import { UserTaskRepository } from '../@orm/user-task';
+import { UserWorkRepository } from '../@orm/user-work';
 import { AuthModule } from '../auth/auth.module';
 import { AccessLevelGuard } from './@common/guards';
 import { ProjectMemberController } from './member/project.member.controller';
@@ -17,8 +17,8 @@ import { ProjectTaskTypeController } from './task-type/project.task-type.control
 import { ProjectTaskTypeService } from './task-type/project.task-type.service';
 import { ProjectTaskController } from './task/project.task.controller';
 import { ProjectTaskService } from './task/project.task.service';
-import { ProjectUserTaskController } from './user-task/project.user-task.controller';
-import { ProjectUserTaskService } from './user-task/project.user-task.service';
+import { ProjectUserWorkController } from './user-work/project.user-work.controller';
+import { ProjectUserWorkService } from './user-work/project.user-work.service';
 
 @Module({
   controllers: [
@@ -26,7 +26,7 @@ import { ProjectUserTaskService } from './user-task/project.user-task.service';
     ProjectMemberController,
     ProjectTaskController,
     ProjectTaskTypeController,
-    ProjectUserTaskController,
+    ProjectUserWorkController,
   ],
   exports: [ProjectService],
   imports: [
@@ -37,7 +37,7 @@ import { ProjectUserTaskService } from './user-task/project.user-task.service';
       TaskRepository,
       TaskTypeRepository,
       UserProjectRepository,
-      UserTaskRepository,
+      UserWorkRepository,
     ]),
   ],
   providers: [
@@ -46,7 +46,7 @@ import { ProjectUserTaskService } from './user-task/project.user-task.service';
     ProjectMemberService,
     ProjectTaskService,
     ProjectTaskTypeService,
-    ProjectUserTaskService,
+    ProjectUserWorkService,
   ],
 })
 export class ProjectModule {}

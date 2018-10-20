@@ -8,13 +8,13 @@ import { Task } from '../task/task.entity';
 import { User } from '../user/user.entity';
 
 @Entity()
-export class UserTask {
+export class UserWork {
   @ApiModelProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
   @ApiModelProperty()
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
   @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
@@ -39,12 +39,11 @@ export class UserTask {
   @Column({ nullable: true })
   source: string;
 
-  // @ApiModelProperty({ type: User })
-  @ManyToOne(() => User, user => user.tasks, { nullable: false })
+  @ManyToOne(() => User, user => user.works, { nullable: false })
   user: User;
 
   @ApiModelProperty({ type: Task })
-  @ManyToOne(() => Task, task => task.userTasks, { nullable: false })
+  @ManyToOne(() => Task, task => task.userWorks, { nullable: false })
   task: Task;
 
   @ApiModelProperty({ type: TaskType })

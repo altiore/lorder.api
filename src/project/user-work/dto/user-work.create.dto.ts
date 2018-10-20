@@ -1,7 +1,7 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
-export class UserTaskCreateDto {
+export class UserWorkCreateDto {
   @ApiModelProperty()
   @MaxLength(40)
   @MinLength(3)

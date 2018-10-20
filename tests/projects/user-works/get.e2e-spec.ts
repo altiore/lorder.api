@@ -1,7 +1,7 @@
 import { TestHelper } from '../../@utils/TestHelper';
 import { projectsFixture, usersFixture } from './@fixtures';
 
-const h = new TestHelper('/projects/:projectId/user-tasks').addFixture(usersFixture).addFixture(projectsFixture);
+const h = new TestHelper('/projects/:projectId/user-works').addFixture(usersFixture).addFixture(projectsFixture);
 
 describe(`GET ${h.url}`, async () => {
   let projectId: number;

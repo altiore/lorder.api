@@ -2,9 +2,9 @@ import { TestHelper } from '../../@utils/TestHelper';
 import { projectsFixture, usersFixture } from './@fixtures';
 
 import { Task } from '../../../src/@orm/task';
-import { UserTask } from '../../../src/@orm/user-task';
+import { UserWork } from '../../../src/@orm/user-work';
 
-const h = new TestHelper('/projects/:projectId/user-tasks').addFixture(usersFixture).addFixture(projectsFixture);
+const h = new TestHelper('/projects/:projectId/user-works').addFixture(usersFixture).addFixture(projectsFixture);
 
 describe(`POST ${h.url}`, async () => {
   let projectId: number;
@@ -111,15 +111,24 @@ describe(`POST ${h.url}`, async () => {
       .requestBy('super-admin@mail.com')
       .post(h.path(projectId))
       .send({
-        title: 'Новая задача',
+        description: 'Описание новой задачи',
+        title: 'Задача Altiore',
       })
       .expect(201);
     expect(body).toEqual(
       expect.objectContaining({
-        description: 'Новая задача 1',
+        description: 'Описание новой задачи',
+        taskId: expect.any(Number),
       })
     );
-    await h.removeCreated(UserTask, { id: body.id });
-    await h.removeCreated(Task, { title: 'Новая задача' });
+    const task = await h.findOne(Task, { id: body.taskId });
+    expect(task).toEqual({
+      description: '',
+      id: expect.any(Number),
+      title: 'Задача Altiore',
+      value: null,
+    });
+    await h.removeCreated(UserWork, { id: body.id });
+    await h.removeCreated(Task, { id: body.taskId });
   });
 });

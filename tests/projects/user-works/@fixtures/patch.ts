@@ -3,7 +3,7 @@ import {
   createTasks,
   createUserProjects,
   createUsers,
-  createUserTasks,
+  createUserWorks,
 } from '../../../@fixtureCreators';
 
 import { ROLES } from '../../../../src/@orm/role';
@@ -74,7 +74,7 @@ export const tasksFixture = createTasks([
   },
 ]);
 
-export const userTasksFixture = createUserTasks([
+export const userWorksFixture = createUserWorks([
   {
     finishAt: null,
     task: { title: 'NotFinished' },

@@ -14,8 +14,9 @@ import {
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { Project } from '../project/project.entity';
 import { Role, ROLES } from '../role/role.entity';
+import { Task } from '../task/task.entity';
 import { UserProject } from '../user-project/user-project.entity';
-import { UserTask } from '../user-task/user-task.entity';
+import { UserWork } from '../user-work/user-work.entity';
 
 @Entity()
 export class User {
@@ -83,8 +84,12 @@ export class User {
   @OneToMany(type => UserProject, userProject => userProject.member)
   invitedMembers: UserProject[];
 
-  @OneToMany(type => UserTask, userTask => userTask.user)
-  tasks: UserTask[];
+  @OneToMany(type => Task, task => task.users)
+  @JoinTable()
+  tasks: Task[];
+
+  @OneToMany(type => UserWork, userWork => userWork.user)
+  works: UserWork[];
 
   get role() {
     return { 1: ROLES.USER, 2: ROLES.ADMIN, 3: ROLES.SUPER_ADMIN }[this.roles.length];

@@ -19,63 +19,63 @@ import { RolesGuard } from '../../@common/guards';
 import { Project } from '../../@orm/project';
 import { User } from '../../@orm/user';
 import { ACCESS_LEVEL } from '../../@orm/user-project';
-import { UserTask } from '../../@orm/user-task';
+import { UserWork } from '../../@orm/user-work';
 import { AccessLevel, ProjectParam } from '../@common/decorators';
 import { AccessLevelGuard } from '../@common/guards';
-import { UserTaskCreateDto } from './dto';
-import { ProjectUserTaskService } from './project.user-task.service';
+import { UserWorkCreateDto } from './dto';
+import { ProjectUserWorkService } from './project.user-work.service';
 
 @ApiBearerAuth()
-@ApiUseTags('projects -> user-tasks (role: user)')
-@Controller('projects/:projectId/user-tasks')
+@ApiUseTags('projects -> user-works (role: user)')
+@Controller('projects/:projectId/user-works')
 @UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
-export class ProjectUserTaskController {
-  constructor(private readonly userTaskService: ProjectUserTaskService) {}
+export class ProjectUserWorkController {
+  constructor(private readonly userWorkService: ProjectUserWorkService) {}
 
   @Get()
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.RED)
-  @ApiResponse({ status: 200, type: UserTask, isArray: true, description: 'ACCESS_LEVEL.RED' })
-  public all(@Param('projectId', ParseIntPipe) projectId: number, @UserJWT() user: User): Promise<UserTask[]> {
-    return this.userTaskService.findAll(user);
+  @ApiResponse({ status: 200, type: UserWork, isArray: true, description: 'ACCESS_LEVEL.RED' })
+  public all(@Param('projectId', ParseIntPipe) projectId: number, @UserJWT() user: User): Promise<UserWork[]> {
+    return this.userWorkService.findAll(user);
   }
 
   @Post()
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.RED)
-  @ApiResponse({ status: 201, type: UserTask, description: 'ACCESS_LEVEL.RED' })
+  @ApiResponse({ status: 201, type: UserWork, description: 'ACCESS_LEVEL.RED' })
   public start(
     @UserJWT() user: User,
     @Param('projectId', ParseIntPipe) projectId: number,
     @ProjectParam() project: DeepPartial<Project>,
-    @Body() userTaskCreateDto: UserTaskCreateDto
-  ): Promise<UserTask> {
-    return this.userTaskService.start(project, user, userTaskCreateDto);
+    @Body() userWorkCreateDto: UserWorkCreateDto
+  ): Promise<UserWork> {
+    return this.userWorkService.start(project, user, userWorkCreateDto);
   }
 
-  @Patch(':userTaskId')
+  @Patch(':userWorkId')
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.RED)
-  @ApiResponse({ status: 200, type: UserTask, description: 'ACCESS_LEVEL.RED' })
+  @ApiResponse({ status: 200, type: UserWork, description: 'ACCESS_LEVEL.RED' })
   public stop(
     @UserJWT() user: User,
     @Param('projectId', ParseIntPipe) projectId: number,
-    @Param('userTaskId', ParseIntPipe) userTaskId: number,
+    @Param('userWorkId', ParseIntPipe) userWorkId: number,
     @ProjectParam() project: DeepPartial<Project>
-  ): Promise<UserTask> {
-    return this.userTaskService.stop(project, user, userTaskId);
+  ): Promise<UserWork> {
+    return this.userWorkService.stop(project, user, userWorkId);
   }
 
-  @Delete(':userTaskId')
+  @Delete(':userWorkId')
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.RED)
-  @ApiResponse({ status: 200, type: UserTask, description: 'ACCESS_LEVEL.RED' })
+  @ApiResponse({ status: 200, type: UserWork, description: 'ACCESS_LEVEL.RED' })
   public async delete(
     @Param('projectId', ParseIntPipe) projectId: number,
-    @Param('userTaskId', ParseIntPipe) userTaskId: number,
+    @Param('userWorkId', ParseIntPipe) userWorkId: number,
     @UserJWT() user: User
-  ): Promise<UserTask> {
-    const task = await this.userTaskService.remove(userTaskId, user);
+  ): Promise<UserWork> {
+    const task = await this.userWorkService.remove(userWorkId, user);
     if (!task) {
       throw new NotFoundException('Задача не найдена');
     }
