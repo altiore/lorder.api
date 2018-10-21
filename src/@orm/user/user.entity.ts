@@ -84,8 +84,8 @@ export class User {
   @OneToMany(type => UserProject, userProject => userProject.member)
   invitedMembers: UserProject[];
 
-  @OneToMany(type => Task, task => task.users)
-  @JoinTable()
+  @ManyToMany(type => Task, task => task.users, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @JoinTable({ name: 'user_tasks' })
   tasks: Task[];
 
   @OneToMany(type => UserWork, userWork => userWork.user)
