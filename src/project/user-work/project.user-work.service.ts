@@ -30,7 +30,7 @@ export class ProjectUserWorkService {
     if (!task) {
       task = await this.taskRepo.createByProjectId(
         {
-          description: '',
+          description: userWorkData.description || '',
           title: userWorkData.title,
         },
         project.id

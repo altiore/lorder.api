@@ -123,7 +123,7 @@ describe(`POST ${h.url}`, async () => {
     );
     const task = await h.findOne(Task, { id: body.taskId });
     expect(task).toEqual({
-      description: '',
+      description: 'Описание новой задачи',
       id: expect.any(Number),
       title: 'Задача Altiore',
       value: null,
