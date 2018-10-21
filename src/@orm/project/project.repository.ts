@@ -20,9 +20,11 @@ export class ProjectRepository extends Repository<Project> {
     return entities.map(this.preparePublic);
   }
 
-  public async findOneByUser(id: number, user: User): Promise<Project> {
+  public async findOneByUser(projectId: number, user: User): Promise<Project> {
     const entity = await this.createQueryBuilder()
       .leftJoinAndMapMany('Project.tasks', 'Project.tasks', 'tasks')
+      .leftJoinAndSelect('user_tasks', 'userTasks', '"userTasks"."taskId"="tasks"."id"')
+      .leftJoinAndMapMany('tasks.users', 'user', 'userTasksUser', '"userTasksUser"."id"="userTasks"."userId"')
       .leftJoinAndMapMany('Project.projectTaskTypes', 'Project.projectTaskTypes', 'projectTaskTypes')
       .leftJoinAndMapOne(
         'projectTaskTypes.taskType',
@@ -41,7 +43,7 @@ export class ProjectRepository extends Repository<Project> {
         '"accessLevel"."memberId" = :memberId AND "accessLevel"."projectId" = "Project"."id"',
         { memberId: user.id }
       )
-      .where('"Project"."id" = :projectId', { projectId: id })
+      .where('"Project"."id" = :projectId', { projectId })
       .orderBy({
         '"projectTaskTypes"."order"': 'ASC',
       })

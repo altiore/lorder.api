@@ -6,7 +6,11 @@ import { Task } from './task.entity';
 @EntityRepository(Task)
 export class TaskRepository extends Repository<Task> {
   public findAllByProjectId(projectId: number): Promise<Task[]> {
-    return this.find({ where: { project: { id: projectId } } });
+    return this.find({
+      loadRelationIds: true,
+      relations: ['users'],
+      where: { project: { id: projectId } },
+    });
   }
 
   public findOneByProjectId(id: number, projectId: number): Promise<Task | undefined> {

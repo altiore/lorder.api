@@ -29,10 +29,10 @@ export class ProjectController {
   }
 
   @ApiResponse({ status: 200, type: Project })
-  @Get(':id')
+  @Get(':projectId')
   @Roles('user')
-  public one(@UserJWT() user: User, @Param('id', ParseIntPipe) id: number): Promise<Partial<Project>> {
-    return this.projectService.findOneByMember(id, user);
+  public one(@UserJWT() user: User, @Param('projectId', ParseIntPipe) projectId: number): Promise<Partial<Project>> {
+    return this.projectService.findOneByMember(projectId, user);
   }
 
   @ApiResponse({ description: 'Проект успешно создан', status: 201, type: Project })

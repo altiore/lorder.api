@@ -21,9 +21,9 @@ export class ProjectService {
     }
   }
 
-  public async findOneByMember(id: number, user: User): Promise<Project> {
+  public async findOneByMember(projectId: number, user: User): Promise<Project> {
     try {
-      return await this.projectRepo.findOneByUser(id, user);
+      return await this.projectRepo.findOneByUser(projectId, user);
     } catch (e) {
       throw new NotFoundException('Проект не найден');
     }
