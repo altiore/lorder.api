@@ -31,6 +31,7 @@ export class ProjectController {
   @ApiResponse({ status: 200, type: Project })
   @Get(':projectId')
   @Roles('user')
+  @AccessLevel(ACCESS_LEVEL.RED)
   public one(@UserJWT() user: User, @Param('projectId', ParseIntPipe) projectId: number): Promise<Partial<Project>> {
     return this.projectService.findOneByMember(projectId, user);
   }
