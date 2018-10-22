@@ -5,6 +5,7 @@ import { ProjectRepository } from '../@orm/project';
 import { ProjectTaskTypeRepository } from '../@orm/project-task-type';
 import { TaskRepository } from '../@orm/task';
 import { TaskTypeRepository } from '../@orm/task-type';
+import { UserRepository } from '../@orm/user';
 import { UserProjectRepository } from '../@orm/user-project';
 import { UserWorkRepository } from '../@orm/user-work';
 import { AuthModule } from '../auth/auth.module';
@@ -36,6 +37,7 @@ import { ProjectUserWorkService } from './user-work/project.user-work.service';
       ProjectTaskTypeRepository,
       TaskRepository,
       TaskTypeRepository,
+      UserRepository,
       UserProjectRepository,
       UserWorkRepository,
     ]),

@@ -51,5 +51,5 @@ export class Task {
   userWorks: UserWork[];
 
   @ManyToMany(type => User, user => user.tasks)
-  users: User;
+  users: User[];
 }

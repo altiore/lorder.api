@@ -1,12 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
+import { ValidationException } from '../../@common/exceptions/validation.exception';
 import { Task, TaskRepository } from '../../@orm/task';
-import { TaskCreateDto } from './dto';
+import { UserRepository } from '../../@orm/user';
+import { TaskCreateDto, TaskUpdateDto } from './dto';
 
 @Injectable()
 export class ProjectTaskService {
-  constructor(@InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository) {}
+  constructor(
+    @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository,
+    @InjectRepository(UserRepository) private readonly userRepo: UserRepository
+  ) {}
 
   public findAll(projectId): Promise<Task[]> {
     return this.taskRepo.findAllByProjectId(projectId);
@@ -16,12 +21,14 @@ export class ProjectTaskService {
     return this.taskRepo.findOneByProjectId(id, projectId);
   }
 
-  public create(taskCreateDto: TaskCreateDto, projectId: number): Promise<Task> {
-    return this.taskRepo.createByProjectId(taskCreateDto, projectId);
+  public async create(taskCreateDto: TaskCreateDto, projectId: number): Promise<Task> {
+    const preparedData = await this.parseTaskDtoToTaskObj(taskCreateDto);
+    return this.taskRepo.createByProjectId(preparedData, projectId);
   }
 
-  public update(id: number, taskCreateDto: TaskCreateDto, projectId: number): Promise<Task> {
-    return this.taskRepo.updateByProjectId(id, taskCreateDto, projectId);
+  public async update(id: number, taskUpdateDto: TaskUpdateDto, projectId: number): Promise<Task> {
+    const preparedData = await this.parseTaskDtoToTaskObj(taskUpdateDto);
+    return this.taskRepo.updateByProjectId(id, preparedData, projectId);
   }
 
   public async delete(id: number, projectId: number): Promise<Task | false> {
@@ -31,5 +38,26 @@ export class ProjectTaskService {
     }
     await this.taskRepo.delete({ id });
     return task;
+  }
+
+  private async parseTaskDtoToTaskObj(taskDto: TaskCreateDto | TaskUpdateDto): Promise<Partial<Task>> {
+    const preparedData: Partial<Task> = {};
+    if (taskDto.description !== undefined) {
+      preparedData.description = taskDto.description;
+    }
+    if (taskDto.title !== undefined) {
+      preparedData.title = taskDto.title;
+    }
+    if (taskDto.value !== undefined) {
+      preparedData.value = taskDto.value;
+    }
+
+    if (taskDto.users && taskDto.users.length) {
+      preparedData.users = await this.userRepo.findAllByIds(taskDto.users);
+      if (taskDto.users.length !== preparedData.users.length) {
+        throw new ValidationException(undefined, 'Не все пльзователи были найдены');
+      }
+    }
+    return preparedData;
   }
 }

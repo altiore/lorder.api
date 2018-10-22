@@ -1,5 +1,5 @@
 import { createHash } from 'crypto';
-import { DeepPartial, EntityRepository, Repository } from 'typeorm';
+import { DeepPartial, EntityRepository, In, Repository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Role } from '../role/role.entity';
@@ -72,6 +72,10 @@ export class UserRepository extends Repository<User> {
       skip,
       take: count,
     });
+  }
+
+  public findAllByIds(ids: number[]): Promise<User[]> {
+    return this.find({ id: In(ids) });
   }
 
   public hashPassword(password) {

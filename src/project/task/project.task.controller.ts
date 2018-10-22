@@ -21,7 +21,7 @@ import { Task } from '../../@orm/task';
 import { ACCESS_LEVEL } from '../../@orm/user-project';
 import { AccessLevel, ProjectParam } from '../@common/decorators';
 import { AccessLevelGuard } from '../@common/guards';
-import { TaskCreateDto } from './dto';
+import { TaskCreateDto, TaskUpdateDto } from './dto';
 import { ProjectTaskService } from './project.task.service';
 
 @ApiBearerAuth()
@@ -70,7 +70,7 @@ export class ProjectTaskController {
   public update(
     @Param('projectId', ParseIntPipe) projectId: number,
     @Param('id', ParseIntPipe) id: number,
-    @Body() taskCreateDto: TaskCreateDto
+    @Body() taskCreateDto: TaskUpdateDto
   ) {
     return this.taskService.update(id, taskCreateDto, projectId);
   }

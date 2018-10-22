@@ -1,19 +1,21 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
-export class TaskCreateDto {
-  @ApiModelProperty()
+export class TaskUpdateDto {
+  @ApiModelPropertyOptional()
   @MaxLength(40)
   @MinLength(3)
   @IsString()
   @IsNotEmpty()
-  title: string;
+  @IsOptional()
+  title?: string;
 
-  @ApiModelProperty()
+  @ApiModelPropertyOptional()
   @IsNotEmpty()
   @IsString()
   @MinLength(3)
-  description: string;
+  @IsOptional()
+  description?: string;
 
   @ApiModelPropertyOptional()
   @IsNumber()
