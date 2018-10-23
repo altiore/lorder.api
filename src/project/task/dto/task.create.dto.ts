@@ -9,11 +9,10 @@ export class TaskCreateDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiModelProperty()
-  @IsNotEmpty()
+  @ApiModelPropertyOptional()
   @IsString()
-  @MinLength(3)
-  description: string;
+  @IsOptional()
+  description?: string;
 
   @ApiModelPropertyOptional()
   @IsNumber()

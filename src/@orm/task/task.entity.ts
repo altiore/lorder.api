@@ -40,7 +40,7 @@ export class Task {
   title: string;
 
   @ApiModelProperty()
-  @Column('text')
+  @Column('text', { nullable: true })
   description: string;
 
   @ApiModelPropertyOptional()

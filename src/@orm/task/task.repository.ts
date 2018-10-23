@@ -1,14 +1,21 @@
 import { EntityRepository, Repository } from 'typeorm';
 
+import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Project } from '../project/project.entity';
 import { Task } from './task.entity';
 
 @EntityRepository(Task)
 export class TaskRepository extends Repository<Task> {
-  public findAllByProjectId(projectId: number): Promise<Task[]> {
+  public findAllByProjectId(
+    { skip = 0, count = 20, orderBy = 'id', order = 'desc' }: PaginationDto,
+    projectId: number
+  ): Promise<Task[]> {
     return this.find({
       loadRelationIds: true,
+      order: { [orderBy]: order.toUpperCase() },
       relations: ['users'],
+      skip,
+      take: count,
       where: { project: { id: projectId } },
     });
   }

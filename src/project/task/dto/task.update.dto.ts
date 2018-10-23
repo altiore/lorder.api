@@ -6,14 +6,11 @@ export class TaskUpdateDto {
   @MaxLength(40)
   @MinLength(3)
   @IsString()
-  @IsNotEmpty()
   @IsOptional()
   title?: string;
 
   @ApiModelPropertyOptional()
-  @IsNotEmpty()
   @IsString()
-  @MinLength(3)
   @IsOptional()
   description?: string;
 

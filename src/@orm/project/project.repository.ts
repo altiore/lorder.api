@@ -46,6 +46,7 @@ export class ProjectRepository extends Repository<Project> {
       .where('"Project"."id" = :projectId', { projectId })
       .orderBy({
         '"projectTaskTypes"."order"': 'ASC',
+        '"tasks"."id"': 'DESC',
       })
       .getOne();
     return this.prepare(entity);

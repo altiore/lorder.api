@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
+import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { ValidationException } from '../../@common/exceptions/validation.exception';
 import { Task, TaskRepository } from '../../@orm/task';
 import { UserRepository } from '../../@orm/user';
@@ -13,8 +14,8 @@ export class ProjectTaskService {
     @InjectRepository(UserRepository) private readonly userRepo: UserRepository
   ) {}
 
-  public findAll(projectId): Promise<Task[]> {
-    return this.taskRepo.findAllByProjectId(projectId);
+  public findAll(pagesDto: PaginationDto, projectId: number): Promise<Task[]> {
+    return this.taskRepo.findAllByProjectId(pagesDto, projectId);
   }
 
   public findOne(id: number, projectId: number): Promise<Task> {
