@@ -1,16 +1,29 @@
 import moment = require('moment');
 import { EntityRepository, Repository } from 'typeorm';
 
+import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Task } from '../task/task.entity';
 import { User } from '../user/user.entity';
 import { UserWork } from './user-work.entity';
 
 @EntityRepository(UserWork)
 export class UserWorkRepository extends Repository<UserWork> {
-  public async findAllByUser(user: User): Promise<UserWork[]> {
-    const entities = await this.find({
-      order: { startAt: 'DESC' },
+  public async findOneByUser(userWorkId: number, user: User): Promise<UserWork> {
+    return this.findOne({
       relations: ['task', 'task.project'],
+      where: { id: userWorkId, user },
+    });
+  }
+
+  public async findAllWithPagination(
+    { skip = 0, count = 20, orderBy = 'startAt', order = 'desc' }: PaginationDto,
+    user: User
+  ): Promise<UserWork[]> {
+    const entities = await this.find({
+      order: { [orderBy]: order.toUpperCase() },
+      relations: ['task', 'task.project'],
+      skip,
+      take: count,
       where: { user },
     });
     return entities.map(this.prepare);
@@ -35,7 +48,7 @@ export class UserWorkRepository extends Repository<UserWork> {
     const projectId = userWork.projectId;
     const taskId = userWork.taskId;
     const taskTypeId = userWork.taskTypeId;
-    delete userWork.task;
+    // delete userWork.task;
     delete userWork.taskType;
     return { ...userWork, projectId, taskId, taskTypeId };
   }

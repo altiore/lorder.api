@@ -1,7 +1,7 @@
-import { TestHelper } from '../../@utils/TestHelper';
+import { TestHelper } from '../@utils/TestHelper';
 import { projectsFixture, usersFixture } from './@fixtures';
 
-const h = new TestHelper('/projects/:projectId/user-works').addFixture(usersFixture).addFixture(projectsFixture);
+const h = new TestHelper('/user-works').addFixture(usersFixture).addFixture(projectsFixture);
 
 describe(`GET ${h.url}`, async () => {
   let projectId: number;
@@ -15,7 +15,7 @@ describe(`GET ${h.url}`, async () => {
   it('by guest', async () => {
     await h
       .requestBy()
-      .get(h.path(projectId))
+      .get(h.path())
       .expect(401)
       .expect({
         error: 'Unauthorized',
@@ -26,31 +26,23 @@ describe(`GET ${h.url}`, async () => {
   it('by user@mail.com', async () => {
     await h
       .requestBy('user@mail.com')
-      .get(h.path(projectId))
-      .expect(403)
-      .expect({
-        error: 'Forbidden',
-        message: 'Forbidden resource',
-        statusCode: 403,
-      });
+      .get(h.path())
+      .expect(200)
+      .expect([]);
   });
 
   it('by admin@mail.com', async () => {
     await h
       .requestBy('admin@mail.com')
-      .get(h.path(projectId))
-      .expect(403)
-      .expect({
-        error: 'Forbidden',
-        message: 'Forbidden resource',
-        statusCode: 403,
-      });
+      .get(h.path())
+      .expect(200)
+      .expect([]);
   });
 
   it('by owner', async () => {
     await h
       .requestBy('super-admin@mail.com')
-      .get(h.path(projectId))
+      .get(h.path())
       .expect(200)
       .expect([]);
   });

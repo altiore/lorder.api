@@ -72,10 +72,10 @@ export class ProjectRepository extends Repository<Project> {
   }
 
   public prepare(project: Project): Project {
-    return {
-      ...omit<Project>(project, ['projectTaskTypes']),
-      taskTypes: project.taskTypes,
-    } as Project;
+    if (project.taskTypes) {
+      delete project.projectTaskTypes;
+    }
+    return project;
   }
 
   public async findAllWithPagination(

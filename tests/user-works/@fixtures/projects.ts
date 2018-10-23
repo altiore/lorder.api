@@ -1,4 +1,4 @@
-import { createProjects } from '../../../@fixtureCreators';
+import { createProjects } from '../../@fixtureCreators';
 
 export const projectsFixture = createProjects([
   {

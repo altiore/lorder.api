@@ -1,5 +1,5 @@
-import { ROLES } from '../../../../src/@orm/role';
-import { createUsers } from '../../../@fixtureCreators';
+import { ROLES } from '../../../src/@orm/role';
+import { createUsers } from '../../@fixtureCreators';
 
 export const usersFixture = createUsers([
   {

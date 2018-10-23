@@ -3,6 +3,11 @@ import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from
 
 export class UserWorkCreateDto {
   @ApiModelProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  projectId: number;
+
+  @ApiModelProperty()
   @MaxLength(40)
   @MinLength(3)
   @IsString()

@@ -9,10 +9,20 @@ import { MeModule } from './me/me.module';
 import { ProjectModule } from './project/project.module';
 import { RedisModule } from './redis/redis.module';
 import { TaskTypeModule } from './task-type/task-type.module';
+import { UserWorkModule } from './user-work/user-work.module';
 import { UserModule } from './user/user.module';
 
 @Module({
-  imports: [AuthModule, MeModule, ProjectModule, RedisModule, TaskTypeModule, TypeOrmModule.forRoot(), UserModule],
+  imports: [
+    AuthModule,
+    MeModule,
+    ProjectModule,
+    RedisModule,
+    TaskTypeModule,
+    TypeOrmModule.forRoot(),
+    UserModule,
+    UserWorkModule,
+  ],
   providers: [
     {
       provide: APP_FILTER,

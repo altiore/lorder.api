@@ -18,18 +18,10 @@ import { ProjectTaskTypeController } from './task-type/project.task-type.control
 import { ProjectTaskTypeService } from './task-type/project.task-type.service';
 import { ProjectTaskController } from './task/project.task.controller';
 import { ProjectTaskService } from './task/project.task.service';
-import { ProjectUserWorkController } from './user-work/project.user-work.controller';
-import { ProjectUserWorkService } from './user-work/project.user-work.service';
 
 @Module({
-  controllers: [
-    ProjectController,
-    ProjectMemberController,
-    ProjectTaskController,
-    ProjectTaskTypeController,
-    ProjectUserWorkController,
-  ],
-  exports: [ProjectService],
+  controllers: [ProjectController, ProjectMemberController, ProjectTaskController, ProjectTaskTypeController],
+  exports: [AccessLevelGuard, ProjectService],
   imports: [
     AuthModule,
     TypeOrmModule.forFeature([
@@ -42,13 +34,6 @@ import { ProjectUserWorkService } from './user-work/project.user-work.service';
       UserWorkRepository,
     ]),
   ],
-  providers: [
-    AccessLevelGuard,
-    ProjectService,
-    ProjectMemberService,
-    ProjectTaskService,
-    ProjectTaskTypeService,
-    ProjectUserWorkService,
-  ],
+  providers: [AccessLevelGuard, ProjectService, ProjectMemberService, ProjectTaskService, ProjectTaskTypeService],
 })
 export class ProjectModule {}

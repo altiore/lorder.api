@@ -1,10 +1,10 @@
-import { TestHelper } from '../../@utils/TestHelper';
+import { TestHelper } from '../@utils/TestHelper';
 import { projectsFixture, usersFixture } from './@fixtures';
 
-import { Task } from '../../../src/@orm/task';
-import { UserWork } from '../../../src/@orm/user-work';
+import { Task } from '../../src/@orm/task';
+import { UserWork } from '../../src/@orm/user-work';
 
-const h = new TestHelper('/projects/:projectId/user-works').addFixture(usersFixture).addFixture(projectsFixture);
+const h = new TestHelper('/user-works').addFixture(usersFixture).addFixture(projectsFixture);
 
 describe(`POST ${h.url}`, async () => {
   let projectId: number;
@@ -18,7 +18,7 @@ describe(`POST ${h.url}`, async () => {
   it('by guest', async () => {
     await h
       .requestBy()
-      .post(h.path(projectId))
+      .post(h.path())
       .expect(401)
       .expect({
         error: 'Unauthorized',
@@ -26,22 +26,36 @@ describe(`POST ${h.url}`, async () => {
       });
   });
 
-  it('by user@mail.com', async () => {
-    await h
+  it('by user@mail.com without projectId', async () => {
+    const { body } = await h
       .requestBy('user@mail.com')
-      .post(h.path(projectId))
-      .expect(403)
-      .expect({
-        error: 'Forbidden',
-        message: 'Forbidden resource',
-        statusCode: 403,
-      });
+      .post(h.path())
+      .expect(406);
+    expect(body).toEqual({
+      error: 'Not Acceptable',
+      message: expect.any(String),
+      statusCode: 406,
+    });
+  });
+
+  it('by user@mail.com', async () => {
+    const { body } = await h
+      .requestBy('user@mail.com')
+      .post(h.path())
+      .send({ projectId })
+      .expect(403);
+    expect(body).toEqual({
+      error: 'Forbidden',
+      message: 'Forbidden resource',
+      statusCode: 403,
+    });
   });
 
   it('by admin@mail.com', async () => {
     await h
       .requestBy('admin@mail.com')
-      .post(h.path(projectId))
+      .post(h.path())
+      .send({ projectId })
       .expect(403)
       .expect({
         error: 'Forbidden',
@@ -53,9 +67,10 @@ describe(`POST ${h.url}`, async () => {
   it('by owner with validation error (title not set)', async () => {
     await h
       .requestBy('super-admin@mail.com')
-      .post(h.path(projectId))
+      .post(h.path())
       .send({
         description: 'создана автоматически',
+        projectId,
       })
       .expect(422)
       .expect({
@@ -77,41 +92,44 @@ describe(`POST ${h.url}`, async () => {
   });
 
   it('by owner with extra data', async () => {
-    await h
+    const { body } = await h
       .requestBy('super-admin@mail.com')
-      .post(h.path(projectId))
+      .post(h.path())
       .send({
         description: 'создана автоматически',
         extraData: 'extra data',
+        projectId,
         title: 'Новая задача',
       })
-      .expect(422)
-      .expect({
-        errors: [
-          {
-            constraints: {
-              whitelistValidation: 'property extraData should not exist',
-            },
-            property: 'extraData',
-            target: {
-              description: 'создана автоматически',
-              extraData: 'extra data',
-              title: 'Новая задача',
-            },
-            value: 'extra data',
+      .expect(422);
+    expect(body).toEqual({
+      errors: [
+        {
+          constraints: {
+            whitelistValidation: 'property extraData should not exist',
           },
-        ],
-        message: 'Validation Error',
-        statusCode: 422,
-      });
+          property: 'extraData',
+          target: {
+            description: 'создана автоматически',
+            extraData: 'extra data',
+            projectId,
+            title: 'Новая задача',
+          },
+          value: 'extra data',
+        },
+      ],
+      message: 'Validation Error',
+      statusCode: 422,
+    });
   });
 
   it('by owner with correct data', async () => {
     const { body } = await h
       .requestBy('super-admin@mail.com')
-      .post(h.path(projectId))
+      .post(h.path())
       .send({
         description: 'Описание новой задачи',
+        projectId,
         title: 'Задача Altiore',
       })
       .expect(201);

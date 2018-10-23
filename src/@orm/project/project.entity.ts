@@ -14,6 +14,7 @@ import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { ProjectTaskType } from '../project-task-type/project-task-type.entity';
 import { TaskType } from '../task-type/task-type.entity';
 import { Task } from '../task/task.entity';
+import { ACCESS_LEVEL } from '../user-project';
 import { UserProject } from '../user-project/user-project.entity';
 import { User } from '../user/user.entity';
 
@@ -74,4 +75,8 @@ export class Project {
 
   @ApiModelPropertyOptional({ type: UserProject, description: 'Access Level for current user in current project' })
   accessLevel?: UserProject;
+
+  isAccess(accessLevel: ACCESS_LEVEL) {
+    return this.accessLevel && this.accessLevel.accessLevel >= accessLevel;
+  }
 }
