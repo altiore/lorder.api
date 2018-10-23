@@ -52,6 +52,7 @@ export class UserWorkService {
         {
           description: userWorkData.description || '',
           title: userWorkData.title,
+          users: [user],
         },
         project.id
       );
