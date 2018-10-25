@@ -1,7 +1,7 @@
 import { ApiModelPropertyOptional } from '@nestjs/swagger';
 import { IsIn, IsNumberString, IsOptional, IsString } from 'class-validator';
 
-export class PaginationDto {
+export class PaginationDto<OrderBy = string> {
   @ApiModelPropertyOptional()
   @IsNumberString()
   @IsOptional()
@@ -15,7 +15,7 @@ export class PaginationDto {
   @ApiModelPropertyOptional()
   @IsString()
   @IsOptional()
-  public readonly orderBy?: string;
+  public readonly orderBy?: OrderBy;
 
   @ApiModelPropertyOptional()
   @IsString()

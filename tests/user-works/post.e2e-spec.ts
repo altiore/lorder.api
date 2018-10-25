@@ -143,6 +143,7 @@ describe(`POST ${h.url}`, async () => {
     expect(task).toEqual({
       description: 'Описание новой задачи',
       id: expect.any(Number),
+      projectId: expect.any(Number),
       title: 'Задача Altiore',
       value: null,
     });

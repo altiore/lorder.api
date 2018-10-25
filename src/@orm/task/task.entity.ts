@@ -2,7 +2,6 @@ import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 import {
   Column,
   Entity,
-  JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -22,6 +21,10 @@ export class Task {
   @ApiModelProperty()
   @PrimaryGeneratedColumn()
   id: number;
+
+  @ApiModelProperty()
+  @Column({ nullable: false })
+  projectId: number;
 
   @ApiModelProperty({ type: Project })
   @ManyToOne(() => Project, project => project.tasks, { nullable: false })
