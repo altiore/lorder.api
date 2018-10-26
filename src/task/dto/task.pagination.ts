@@ -3,11 +3,7 @@ import { IsIn, IsOptional, IsString } from 'class-validator';
 import { toArray } from 'lodash';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
-
-export enum TaskOrderByField {
-  latest = 'latest',
-  oldest = 'oldest',
-}
+import { TaskOrderByField } from '../../@orm/task';
 
 export class TaskPagination extends PaginationDto {
   @ApiModelPropertyOptional({ type: String /*, enum: TaskOrderByField*/ })

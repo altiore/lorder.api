@@ -6,6 +6,13 @@ import { UserWork } from '../user-work/user-work.entity';
 import { User } from '../user/user.entity';
 import { Task } from './task.entity';
 
+export enum TaskOrderByField {
+  'id' = 'id',
+  'title' = 'title',
+  'description' = 'description',
+  'value' = 'value',
+}
+
 @EntityRepository(Task)
 export class TaskRepository extends Repository<Task> {
   public findAllByProjectId(
@@ -23,11 +30,15 @@ export class TaskRepository extends Repository<Task> {
   }
 
   public async findAllWithPagination(
-    { skip = 0, count = 5, orderBy = 'latest', order = 'desc' }: PaginationDto<'latest' | 'oldest'>,
+    {
+      skip = 0,
+      count = 50, // TODO: сортировать по последнему изменению присвоенной задачи
+      orderBy = TaskOrderByField.id,
+      order = 'desc',
+    }: PaginationDto<TaskOrderByField>,
     user: User
   ): Promise<Task[]> {
     const entities = await this.createQueryBuilder()
-      // .select(['id', 'title', 'description', ])
       .innerJoinAndSelect(
         'user_tasks',
         'UserTasks',
@@ -38,13 +49,19 @@ export class TaskRepository extends Repository<Task> {
         'Task.userWorks',
         UserWork,
         'UserWork',
-        '"UserWork"."userId"="UserTasks"."userId" AND "UserWork"."taskId"="Task"."id"'
+        '"UserWork"."userId"="UserTasks"."userId"' +
+          ' AND "UserWork"."taskId"="Task"."id"' +
+          ' AND "UserWork"."id" IN(' +
+          'SELECT id from user_work where "taskId"="Task"."id"' +
+          ' AND "userId"="UserTasks"."userId" ORDER BY "startAt" DESC LIMIT 10' +
+          ')'
       )
-      // .leftJoinAndMapOne('Task.project', 'project', 'Project', '"Task"."projectId"="Project"."id"')
+      .orderBy(`UserWork.startAt`, 'DESC', 'NULLS LAST')
+      .addOrderBy(`Task.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
       .take(count)
       .skip(skip)
       .getMany();
-    return entities.sort((a, b) => b.id - a.id);
+    return entities;
   }
 
   public findOneByProjectId(id: number, projectId: number): Promise<Task | undefined> {
