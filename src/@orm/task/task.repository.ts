@@ -20,9 +20,8 @@ export class TaskRepository extends Repository<Task> {
     projectId: number
   ): Promise<Task[]> {
     return this.find({
-      loadRelationIds: true,
       order: { [orderBy]: order.toUpperCase() },
-      relations: ['users'],
+      relations: ['users', 'userWorks'],
       skip,
       take: count,
       where: { project: { id: projectId } },
