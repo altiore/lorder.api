@@ -24,8 +24,15 @@ export class ProjectController {
   @ApiResponse({ status: 200, type: Project, isArray: true })
   @Get()
   @Roles('user')
-  public async all(@UserJWT() user: User, @Query() pagesDto: ProjectPaginationDto): Promise<Partial<Project>[]> {
+  public async allOwn(@UserJWT() user: User, @Query() pagesDto: ProjectPaginationDto): Promise<Partial<Project>[]> {
     return this.projectService.findWithPaginationByUser(pagesDto, user);
+  }
+
+  @ApiResponse({ status: 200, type: Project, isArray: true })
+  @Get('all')
+  @Roles('super-admin')
+  public async all(@UserJWT() user: User, @Query() pagesDto: ProjectPaginationDto): Promise<Partial<Project>[]> {
+    return this.projectService.findAllWithPagination(pagesDto, user);
   }
 
   @ApiResponse({ status: 200, type: Project })
