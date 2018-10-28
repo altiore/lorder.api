@@ -33,6 +33,7 @@ describe(`GET ${h.url}`, async () => {
           description: expect.any(String),
           id: expect.any(Number),
           projectId: expect.any(Number),
+          source: null,
           title: expect.any(String),
           userWorks: expect.arrayContaining([
             expect.objectContaining({

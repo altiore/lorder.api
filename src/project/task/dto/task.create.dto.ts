@@ -1,5 +1,5 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
 
 export class TaskCreateDto {
   @ApiModelProperty()
@@ -18,6 +18,12 @@ export class TaskCreateDto {
   @IsNumber()
   @IsOptional()
   value?: number;
+
+  @ApiModelPropertyOptional()
+  @IsString()
+  @IsUrl()
+  @IsOptional()
+  source?: string;
 
   @ApiModelPropertyOptional({ isArray: true, type: Number, example: [1, 2, 3] })
   @IsNumber(undefined, { each: true })

@@ -144,6 +144,7 @@ describe(`POST ${h.url}`, async () => {
       description: 'Описание новой задачи',
       id: expect.any(Number),
       projectId: expect.any(Number),
+      source: null,
       title: 'Задача Altiore',
       value: null,
     });

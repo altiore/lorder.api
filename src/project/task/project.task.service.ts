@@ -52,6 +52,9 @@ export class ProjectTaskService {
     if (taskDto.value !== undefined) {
       preparedData.value = taskDto.value;
     }
+    if (taskDto.source !== undefined) {
+      preparedData.source = taskDto.source;
+    }
 
     if (taskDto.users && taskDto.users.length) {
       preparedData.users = await this.userRepo.findAllByIds(taskDto.users);
