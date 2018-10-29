@@ -12,7 +12,7 @@ import { ACCESS_LEVEL } from '../@orm/user-project';
 import { UserWork } from '../@orm/user-work';
 import { AccessLevel, ProjectParam } from '../project/@common/decorators';
 import { AccessLevelGuard } from '../project/@common/guards';
-import { UserWorkCreateDto } from './dto';
+import { UserWorkCreateDto, UserWorkUpdateDto } from './dto';
 import { UserWorkService } from './user-work.service';
 
 @ApiBearerAuth()
@@ -42,6 +42,18 @@ export class UserWorkController {
   }
 
   @Patch(':userWorkId')
+  @Roles('user')
+  @ApiResponse({ status: 200, type: UserWork, description: 'ACCESS_LEVEL.RED' })
+  public async update(
+    @Param('userWorkId', ParseIntPipe) userWorkId: number,
+    @UserJWT() user: User,
+    @Body() userWorkDto: UserWorkUpdateDto
+  ): Promise<UserWork> {
+    const userWork = await this.userWorkService.findOneByUserAndCheckAccess(userWorkId, user);
+    return this.userWorkService.update(userWork, userWorkDto);
+  }
+
+  @Patch(':userWorkId/stop')
   @Roles('user')
   @ApiResponse({ status: 200, type: UserWork, description: 'ACCESS_LEVEL.RED' })
   public async stop(@Param('userWorkId', ParseIntPipe) userWorkId: number, @UserJWT() user: User): Promise<UserWork> {

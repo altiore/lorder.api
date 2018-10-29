@@ -9,7 +9,7 @@ import { User } from '../@orm/user';
 import { ACCESS_LEVEL } from '../@orm/user-project';
 import { UserWork, UserWorkRepository } from '../@orm/user-work';
 import { ProjectService } from '../project/project.service';
-import { UserWorkCreateDto } from './dto';
+import { UserWorkCreateDto, UserWorkUpdateDto } from './dto';
 
 @Injectable()
 export class UserWorkService {
@@ -71,5 +71,13 @@ export class UserWorkService {
 
   public remove(userWork: UserWork): Promise<UserWork> {
     return this.userWorkRepo.remove(userWork);
+  }
+
+  public async update(userWork: UserWork, userWorkDto: UserWorkUpdateDto): Promise<UserWork> {
+    if (userWorkDto.duration) {
+      userWork.finishAt = userWork.startAt.clone().add(userWorkDto.duration, 'seconds');
+      return await this.userWorkRepo.save(userWork);
+    }
+    return userWork;
   }
 }

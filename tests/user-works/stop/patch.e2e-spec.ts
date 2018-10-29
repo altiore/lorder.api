@@ -1,11 +1,11 @@
 import * as moment from 'moment';
 
-import { TestHelper } from '../@utils/TestHelper';
+import { TestHelper } from '../../@utils/TestHelper';
 import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/patch';
 
-import { UserWork } from '../../src/@orm/user-work';
+import { UserWork } from '../../../src/@orm/user-work';
 
-const h = new TestHelper('/user-works/:userTaskId')
+const h = new TestHelper('/user-works/:userTaskId/stop')
   .addFixture(usersFixture)
   .addFixture(projectsFixture)
   .addFixture(userProjectsFixture)

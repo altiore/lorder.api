@@ -1,7 +1,13 @@
-import { createProjects, createTasks, createUserProjects, createUsers, createUserWorks } from '../../@fixtureCreators';
+import {
+  createProjects,
+  createTasks,
+  createUserProjects,
+  createUsers,
+  createUserWorks,
+} from '../../../@fixtureCreators';
 
-import { ROLES } from '../../../src/@orm/role';
-import { ACCESS_LEVEL } from '../../../src/@orm/user-project';
+import { ROLES } from '../../../../src/@orm/role';
+import { ACCESS_LEVEL } from '../../../../src/@orm/user-project';
 
 export const usersFixture = createUsers([
   {

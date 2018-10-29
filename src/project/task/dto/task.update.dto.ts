@@ -1,5 +1,5 @@
-import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
+import { ApiModelPropertyOptional } from '@nestjs/swagger';
+import { IsNumber, IsOptional, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
 
 export class TaskUpdateDto {
   @ApiModelPropertyOptional()
