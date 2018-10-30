@@ -55,7 +55,7 @@ export class TaskRepository extends Repository<Task> {
           ' AND "userId"="UserTasks"."userId" ORDER BY "startAt" DESC LIMIT 10' +
           ')'
       )
-      .orderBy(`UserWork.startAt`, 'DESC', 'NULLS LAST')
+      .orderBy(`UserWork.startAt`, 'DESC', 'NULLS FIRST')
       .addOrderBy(`Task.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
       .take(count)
       .skip(skip)
