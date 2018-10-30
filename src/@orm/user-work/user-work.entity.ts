@@ -42,26 +42,24 @@ export class UserWork {
   @ManyToOne(() => User, user => user.works, { nullable: false })
   user: User;
 
+  @ApiModelProperty()
+  @Column({ nullable: false })
+  taskId: number;
+
   @ApiModelProperty({ type: Task })
   @ManyToOne(() => Task, task => task.userWorks, { nullable: false })
   task: Task;
+
+  @ApiModelProperty()
+  @Column()
+  taskTypeId: number;
 
   @ApiModelProperty({ type: TaskType })
   @ManyToOne(() => TaskType, { eager: true })
   taskType: TaskType;
 
   @ApiModelProperty({ type: Number })
-  get taskId() {
-    return this.task ? this.task.id : null;
-  }
-
-  @ApiModelProperty({ type: Number })
-  get taskTypeId() {
-    return this.taskType ? this.taskType.id : null;
-  }
-
-  @ApiModelProperty({ type: Number })
   get projectId() {
-    return this.task && this.task.project ? this.task.project.id : null;
+    return this.task ? this.task.projectId : null;
   }
 }

@@ -68,4 +68,11 @@ export class UserWorkController {
     const userWork = await this.userWorkService.findOneByUserAndCheckAccess(userWorkId, user);
     return await this.userWorkService.remove(userWork);
   }
+
+  @Get('last')
+  @Roles('user')
+  @ApiResponse({ status: 200, type: UserWork, isArray: true })
+  public lastDay(@UserJWT() user: User): Promise<UserWork[]> {
+    return this.userWorkService.lastDayInfo(user);
+  }
 }

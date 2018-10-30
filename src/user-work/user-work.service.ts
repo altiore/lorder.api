@@ -80,4 +80,8 @@ export class UserWorkService {
     }
     return userWork;
   }
+
+  public lastDayInfo(user: User): Promise<UserWork[]> {
+    return this.userWorkRepo.lastXHoursInfo(user, 24);
+  }
 }
