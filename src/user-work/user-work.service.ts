@@ -95,6 +95,10 @@ export class UserWorkService {
       userWork.finishAt = userWork.startAt.clone().add(userWorkDto.duration, 'seconds');
       return await this.userWorkRepo.save(userWork);
     }
+    if (userWorkDto.description) {
+      userWork.description = userWorkDto.description;
+      return await this.userWorkRepo.save(userWork);
+    }
     return userWork;
   }
 
