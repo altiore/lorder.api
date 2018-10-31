@@ -12,7 +12,7 @@ import { ACCESS_LEVEL } from '../@orm/user-project';
 import { UserWork } from '../@orm/user-work';
 import { AccessLevel, ProjectParam } from '../project/@common/decorators';
 import { AccessLevelGuard } from '../project/@common/guards';
-import { UserWorkCreateDto, UserWorkUpdateDto } from './dto';
+import { StartResponse, UserWorkCreateDto, UserWorkUpdateDto } from './dto';
 import { UserWorkService } from './user-work.service';
 
 @ApiBearerAuth()
@@ -32,12 +32,12 @@ export class UserWorkController {
   @Post()
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.RED)
-  @ApiResponse({ status: 201, type: UserWork, description: 'ACCESS_LEVEL.RED' })
+  @ApiResponse({ status: 201, type: StartResponse, description: 'ACCESS_LEVEL.RED' })
   public start(
     @Body() userWorkCreateDto: UserWorkCreateDto,
     @ProjectParam() project: DeepPartial<Project>,
     @UserJWT() user: User
-  ): Promise<UserWork> {
+  ): Promise<StartResponse> {
     return this.userWorkService.start(project, user, userWorkCreateDto);
   }
 

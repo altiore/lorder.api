@@ -133,13 +133,14 @@ describe(`POST ${h.url}`, async () => {
         title: 'Задача Altiore',
       })
       .expect(201);
-    expect(body).toEqual(
-      expect.objectContaining({
+    expect(body).toEqual({
+      finished: [],
+      started: expect.objectContaining({
         description: 'Описание новой задачи',
         taskId: expect.any(Number),
-      })
-    );
-    const task = await h.findOne(Task, { id: body.taskId });
+      }),
+    });
+    const task = await h.findOne(Task, { id: body.started.taskId });
     expect(task).toEqual({
       description: 'Описание новой задачи',
       id: expect.any(Number),
@@ -148,7 +149,7 @@ describe(`POST ${h.url}`, async () => {
       title: 'Задача Altiore',
       value: null,
     });
-    await h.removeCreated(UserWork, { id: body.id });
-    await h.removeCreated(Task, { id: body.taskId });
+    await h.removeCreated(UserWork, { id: body.started.id });
+    await h.removeCreated(Task, { id: body.started.taskId });
   });
 });

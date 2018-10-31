@@ -1,5 +1,5 @@
 import moment = require('moment');
-import { EntityRepository, Raw, Repository } from 'typeorm';
+import { EntityRepository, IsNull, Raw, Repository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Task } from '../task/task.entity';
@@ -39,9 +39,16 @@ export class UserWorkRepository extends Repository<UserWork> {
     return this.prepare(await this.save(userWork));
   }
 
-  public async finishTask(userWork: UserWork): Promise<UserWork> {
-    userWork.finishAt = moment();
-    return await this.save(userWork);
+  finishTask(userWork: UserWork): Promise<UserWork>;
+  finishTask(userWork: UserWork[]): Promise<UserWork[]>;
+  public async finishTask(userWork) {
+    if (Array.isArray(userWork)) {
+      userWork.forEach(el => (el.finishAt = moment()));
+      return await this.save(userWork);
+    } else {
+      userWork.finishAt = moment();
+      return await this.save(userWork);
+    }
   }
 
   public async lastXHoursInfo(user: User, hours: 1 | 12 | 24 | 48 = 24): Promise<UserWork[]> {
@@ -61,6 +68,14 @@ export class UserWorkRepository extends Repository<UserWork> {
         startAt: Raw(alias => `${alias} > (NOW() - INTERVAL '${allowedHours[hours]} HOURS')`),
         user,
       },
+    });
+    return entities.map(this.prepare);
+  }
+
+  public async findNotFinishedByUser(user: User): Promise<UserWork[]> {
+    const entities = await this.find({
+      relations: ['task'],
+      where: { finishAt: IsNull(), user },
     });
     return entities.map(this.prepare);
   }

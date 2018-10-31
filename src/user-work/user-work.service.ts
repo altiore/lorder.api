@@ -9,7 +9,7 @@ import { User } from '../@orm/user';
 import { ACCESS_LEVEL } from '../@orm/user-project';
 import { UserWork, UserWorkRepository } from '../@orm/user-work';
 import { ProjectService } from '../project/project.service';
-import { UserWorkCreateDto, UserWorkUpdateDto } from './dto';
+import { StartResponse, UserWorkCreateDto, UserWorkUpdateDto } from './dto';
 
 @Injectable()
 export class UserWorkService {
@@ -39,7 +39,20 @@ export class UserWorkService {
     return userWork;
   }
 
-  public async start(project: DeepPartial<Project>, user: User, userWorkData: UserWorkCreateDto): Promise<UserWork> {
+  public async finishNotFinished(user: User): Promise<UserWork[]> {
+    const userWorks = await this.userWorkRepo.findNotFinishedByUser(user);
+    return await this.userWorkRepo.finishTask(userWorks);
+  }
+
+  public async start(
+    project: DeepPartial<Project>,
+    user: User,
+    userWorkData: UserWorkCreateDto
+  ): Promise<StartResponse> {
+    // 1. Завершить предыдущие задачи, если есть незавершенные
+    const finishedUserWorks = await this.finishNotFinished(user);
+
+    // 2. Создать новую задачу
     let task;
     if (userWorkData.taskId) {
       task = await this.taskRepo.findOneByProjectId(userWorkData.taskId, project.id);
@@ -57,9 +70,13 @@ export class UserWorkService {
         project.id
       );
     }
-    return this.userWorkRepo.startTask(task, user, {
+    const startedUserWork = await this.userWorkRepo.startTask(task, user, {
       description: userWorkData.description,
     });
+    return {
+      finished: finishedUserWorks,
+      started: startedUserWork,
+    };
   }
 
   public async stop(userWork: UserWork): Promise<UserWork> {
