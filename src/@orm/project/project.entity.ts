@@ -76,6 +76,12 @@ export class Project {
   @ApiModelPropertyOptional({ type: UserProject, description: 'Access Level for current user in current project' })
   accessLevel?: UserProject;
 
+  @ApiModelPropertyOptional({ description: 'Время в секундах, потраченное на проект' })
+  timeSum?: number;
+
+  @ApiModelPropertyOptional({ description: 'Сумма всех оцененных задач в проекте' })
+  valueSum?: number;
+
   isAccess(accessLevel: ACCESS_LEVEL) {
     return this.accessLevel && this.accessLevel.accessLevel >= accessLevel;
   }

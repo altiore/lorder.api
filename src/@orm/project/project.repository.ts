@@ -1,5 +1,5 @@
 import { omit } from 'lodash';
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository, Repository, SelectQueryBuilder } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { ProjectFieldsEnum } from '../../project/@dto';
@@ -65,7 +65,7 @@ export class ProjectRepository extends Repository<Project> {
   }
 
   public preparePublic(project: Project): Partial<Project> {
-    return omit<Project>(project, ['projectTaskTypes', 'members', 'tasks', 'creator', 'updator']);
+    return omit<Project>(project, ['projectTaskTypes', 'members', 'creator', 'updator']);
   }
 
   public prepare(project: Project): Project {
@@ -75,41 +75,81 @@ export class ProjectRepository extends Repository<Project> {
     return project;
   }
 
-  public async findAllWithPagination(
-    { skip = 0, count = 20, orderBy = ProjectFieldsEnum.createdAt, order = 'desc' }: PaginationDto,
-    user: User
-  ): Promise<Partial<Project>[]> {
-    const entities = await this.createQueryBuilder()
-      .leftJoinAndMapOne(
-        'Project.accessLevel',
-        'Project.members',
-        'accessLevel',
-        '"accessLevel"."memberId" = :memberId',
-        { memberId: user.id }
-      )
-      .skip(skip)
-      .limit(count)
-      .orderBy(`Project.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
-      .getMany();
+  public async findAllWithPagination(paginationDto: PaginationDto, user: User): Promise<Partial<Project>[]> {
+    const entities = await this.selectOrderedProjects(
+      paginationDto,
+      this.createQueryBuilder().leftJoin('Project.members', 'accessLevel', '"accessLevel"."memberId" = :memberId', {
+        memberId: user.id,
+      })
+    );
     return entities.map(this.preparePublic);
   }
 
-  public async findWithPaginationByUser(
+  public async findWithPaginationByUser(paginationDto: PaginationDto, user: User): Promise<Partial<Project>[]> {
+    const entities = await this.selectOrderedProjects(
+      paginationDto,
+      this.createQueryBuilder().innerJoin('Project.members', 'AccessLevel', '"AccessLevel"."memberId" = :memberId', {
+        memberId: user.id,
+      })
+    );
+    return entities.map(this.preparePublic);
+  }
+
+  private async selectOrderedProjects(
     { skip = 0, count = 20, orderBy = ProjectFieldsEnum.createdAt, order = 'desc' }: PaginationDto,
-    user: User
-  ): Promise<Partial<Project>[]> {
-    const entities = await this.createQueryBuilder()
-      .innerJoinAndMapOne(
-        'Project.accessLevel',
-        'Project.members',
-        'accessLevel',
-        '"accessLevel"."memberId" = :memberId',
-        { memberId: user.id }
-      )
+    query: SelectQueryBuilder<Project>
+  ): Promise<Project[]> {
+    const rawArrayTimeSum = await query
+      .clone()
+      .select('"Project"."id"', 'id')
+      .addSelect('SUM(EXTRACT(EPOCH FROM ("ProjectWorks"."finishAt" - "ProjectWorks"."startAt")))', 'timeSum')
+      .leftJoin('Project.tasks', 'ProjectTasks')
+      .leftJoin('ProjectTasks.userWorks', 'ProjectWorks')
       .skip(skip)
       .limit(count)
       .orderBy(`Project.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
-      .getMany();
-    return entities.map(this.preparePublic);
+      .groupBy('Project.id')
+      .getRawMany();
+
+    // TODO: TWO similar queries here, because I do not know how to combine them
+    // (if combine them than result has wrong `valueSum` value)
+    const rawArray = await query
+      .clone()
+      .select('Project')
+      .leftJoin('Project.tasks', 'ProjectTasks')
+      // MAX here because of must use aggregation function for joined table user_project
+      .addSelect('MAX("AccessLevel"."accessLevel")', 'Project_accessLevel')
+      .addSelect('SUM("ProjectTasks"."value")', 'Project_valueSum')
+      .skip(skip)
+      .limit(count)
+      .orderBy(`Project.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
+      .groupBy('Project.id')
+      .getRawMany();
+
+    const projects = this.rawToProject(rawArray);
+    return projects.map(project => {
+      const rawArrayTimeSumElement = rawArrayTimeSum.find(el => el.id === project.id);
+      project.timeSum = (rawArrayTimeSumElement && rawArrayTimeSumElement.timeSum) || 0;
+      return project;
+    });
+  }
+
+  private rawToProject(rawArray: any[]): Project[] {
+    const res = rawArray.map((el: {}) => {
+      const project = new Project();
+      for (const field in el) {
+        if (!el.hasOwnProperty(field)) {
+          continue;
+        }
+        const arrField = field.split('_');
+        if (arrField[1] === 'timeSum' || arrField[1] === 'valueSum') {
+          project[arrField[1]] = parseInt(el[field], 0) || 0;
+          continue;
+        }
+        project[arrField[1]] = el[field];
+      }
+      return project;
+    });
+    return res;
   }
 }
