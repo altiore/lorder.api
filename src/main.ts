@@ -17,6 +17,7 @@ const corsOptions = {
     'http://localhost:8181', // local
     'https://staging-altiore.herokuapp.com', // staging server
     'http://altiore.loc', // static local server (server from build folder)
+    'https://altiore.org', // production server
   ],
 } as CorsOptions;
 
