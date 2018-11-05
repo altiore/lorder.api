@@ -1,4 +1,4 @@
-import { EntityRepository, In, Repository } from 'typeorm';
+import { DeepPartial, EntityRepository, Repository } from 'typeorm';
 
 import { Project } from '../project/project.entity';
 import { TaskType } from '../task-type/task-type.entity';
@@ -6,6 +6,13 @@ import { ProjectTaskType } from './project-task-type.entity';
 
 @EntityRepository(ProjectTaskType)
 export class ProjectTaskTypeRepository extends Repository<ProjectTaskType> {
+  public findAllByProject(project: DeepPartial<Project>): Promise<ProjectTaskType[]> {
+    return this.find({
+      order: { order: 'ASC' },
+      where: { project },
+    });
+  }
+
   public async createMultiple(project: Project, taskTypes: TaskType[]): Promise<any> {
     await this.delete({ project });
     const entities = taskTypes.map((taskType, order) =>
