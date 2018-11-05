@@ -72,6 +72,7 @@ describe(`GET ${h.url}`, async () => {
       .expect(200);
     expect(body).toEqual({
       bearerKey: expect.any(String),
+      email,
       role: 'user',
     });
     const addedUser = await h.findOne(User, { email });
@@ -104,6 +105,7 @@ describe(`GET ${h.url}`, async () => {
       .expect(200);
     expect(body).toEqual({
       bearerKey: expect.any(String),
+      email,
       role: 'user',
     });
     const addedUser = await h.findOne(User, { email });
@@ -137,6 +139,7 @@ describe(`GET ${h.url}`, async () => {
       .expect(200);
     expect(body).toEqual({
       bearerKey: expect.any(String),
+      email,
       role: 'user',
     });
     const addedUser = await h.findOne(User, { email });

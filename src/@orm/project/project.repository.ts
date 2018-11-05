@@ -78,7 +78,7 @@ export class ProjectRepository extends Repository<Project> {
   public async findAllWithPagination(paginationDto: PaginationDto, user: User): Promise<Partial<Project>[]> {
     const entities = await this.selectOrderedProjects(
       paginationDto,
-      this.createQueryBuilder().leftJoin('Project.members', 'accessLevel', '"accessLevel"."memberId" = :memberId', {
+      this.createQueryBuilder().leftJoin('Project.members', 'AccessLevel', '"AccessLevel"."memberId" = :memberId', {
         memberId: user.id,
       })
     );
