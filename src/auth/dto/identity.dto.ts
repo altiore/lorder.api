@@ -7,4 +7,7 @@ export class IdentityDto {
 
   @ApiModelProperty()
   public readonly role: ROLES;
+
+  @ApiModelProperty()
+  public readonly email: string;
 }

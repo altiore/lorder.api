@@ -74,6 +74,7 @@ export class AuthService {
     }
     return {
       bearerKey: this.createBearerKey({ email: user.email }),
+      email: user.email,
       role: user.role,
     };
   }
@@ -98,6 +99,7 @@ export class AuthService {
 
     return {
       bearerKey: this.createBearerKey({ email: user.email }),
+      email: user.email,
       role: user.role,
     };
   }
