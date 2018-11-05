@@ -13,7 +13,7 @@ export class ProjectTaskTypeRepository extends Repository<ProjectTaskType> {
     });
   }
 
-  public async createMultiple(project: Project, taskTypes: TaskType[]): Promise<any> {
+  public async createMultiple(project: DeepPartial<Project>, taskTypes: TaskType[]): Promise<any> {
     await this.delete({ project });
     const entities = taskTypes.map((taskType, order) =>
       this.create({
@@ -30,7 +30,7 @@ export class ProjectTaskTypeRepository extends Repository<ProjectTaskType> {
     return entities;
   }
 
-  public async addToProject(project: Project, taskType: TaskType): Promise<ProjectTaskType> {
+  public async addToProject(project: DeepPartial<Project>, taskType: TaskType): Promise<ProjectTaskType> {
     const order = await this.count({ where: { project } });
     const entity = this.create({
       order,
@@ -40,7 +40,7 @@ export class ProjectTaskTypeRepository extends Repository<ProjectTaskType> {
     return await this.save(entity);
   }
 
-  public async removeFromProject(project: Project, taskType: TaskType): Promise<any> {
+  public async removeFromProject(project: DeepPartial<Project>, taskType: TaskType): Promise<any> {
     const entities = await this.find({ where: { project }, order: { order: 'ASC' } });
     return this.createMultiple(project, entities.map(el => el.taskType).filter(el => el.id !== taskType.id));
   }

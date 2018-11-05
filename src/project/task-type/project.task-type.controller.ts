@@ -46,12 +46,13 @@ export class ProjectTaskTypeController {
   })
   @Post()
   @Roles('user')
+  @AccessLevel(ACCESS_LEVEL.BLUE)
   public async addTaskTypeToProject(
     @Body() dto: TaskTypeDto,
     @UserJWT() user: User,
-    @Param('projectId', ParseIntPipe) projectId: number
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @ProjectParam() project: DeepPartial<Project>
   ): Promise<any> {
-    const project = await this.projectService.findOneByMember(projectId, user);
     return this.projectTaskTypeService.addTaskType(project, dto.taskTypeId);
   }
 
@@ -62,12 +63,13 @@ export class ProjectTaskTypeController {
   })
   @Put()
   @Roles('user')
+  @AccessLevel(ACCESS_LEVEL.BLUE)
   public async update(
     @Body() dto: TaskTypesDto,
     @UserJWT() user: User,
-    @Param('projectId', ParseIntPipe) projectId: number
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @ProjectParam() project: DeepPartial<Project>
   ): Promise<any> {
-    const project = await this.projectService.findOneByMember(projectId, user);
     return this.projectTaskTypeService.update(project, dto.taskTypes);
   }
 
@@ -78,12 +80,13 @@ export class ProjectTaskTypeController {
   })
   @Delete()
   @Roles('user')
+  @AccessLevel(ACCESS_LEVEL.BLUE)
   public async removeFromProject(
     @Body() dto: TaskTypeDto,
     @UserJWT() user: User,
-    @Param('projectId', ParseIntPipe) projectId: number
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @ProjectParam() project: DeepPartial<Project>
   ): Promise<any> {
-    const project = await this.projectService.findOneByMember(projectId, user);
     return this.projectTaskTypeService.removeFromProject(project, dto.taskTypeId);
   }
 }

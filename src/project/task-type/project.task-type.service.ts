@@ -18,7 +18,7 @@ export class ProjectTaskTypeService {
     return projectTaskTypes.map(ptt => ptt.taskType);
   }
 
-  public async addTaskType(project: Project, taskTypeId: number): Promise<any> {
+  public async addTaskType(project: DeepPartial<Project>, taskTypeId: number): Promise<any> {
     const taskType = await this.taskTypeRepo.findOne(taskTypeId);
     if (!taskType) {
       throw new NotFoundException('Тип задачи не был найден');
@@ -26,7 +26,7 @@ export class ProjectTaskTypeService {
     return this.projectTaskTypeRepo.addToProject(project, taskType);
   }
 
-  public async removeFromProject(project: Project, taskTypeId: number): Promise<DeleteResult> {
+  public async removeFromProject(project: DeepPartial<Project>, taskTypeId: number): Promise<DeleteResult> {
     const taskType = await this.taskTypeRepo.findOne(taskTypeId);
     if (!taskType) {
       throw new NotFoundException('Тип задачи не был найден');
@@ -34,7 +34,7 @@ export class ProjectTaskTypeService {
     return this.projectTaskTypeRepo.removeFromProject(project, taskType);
   }
 
-  public async update(project: Project, taskTypesIds: number[]): Promise<any> {
+  public async update(project: DeepPartial<Project>, taskTypesIds: number[]): Promise<any> {
     const taskTypes = await this.taskTypeRepo.findByIds(taskTypesIds);
     if (taskTypes.length !== taskTypesIds.length) {
       throw new NotAcceptableException(
