@@ -31,7 +31,7 @@ export class ProjectMemberController {
     type: UserProject,
   })
   @Post()
-  @Roles('admin')
+  @Roles('user')
   @AccessLevel(ACCESS_LEVEL.YELLOW)
   public async invite(
     @Body() data: EmailDto,
@@ -45,7 +45,7 @@ export class ProjectMemberController {
 
   @ApiResponse({ status: 200, type: Boolean })
   @Delete()
-  @Roles('admin')
+  @Roles('user')
   @AccessLevel(ACCESS_LEVEL.GREEN)
   public async delete(
     @Body() data: IdDto,
