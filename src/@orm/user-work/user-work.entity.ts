@@ -51,11 +51,11 @@ export class UserWork {
   task: Task;
 
   @ApiModelProperty()
-  @Column()
+  @Column({ nullable: true })
   taskTypeId: number;
 
   @ApiModelProperty({ type: TaskType })
-  @ManyToOne(() => TaskType, { eager: true })
+  @ManyToOne(() => TaskType, { eager: true, nullable: true })
   taskType: TaskType;
 
   @ApiModelProperty({ type: Number })
