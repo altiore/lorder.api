@@ -70,7 +70,7 @@ export class AuthService {
     }
     await this.userService.unsafeUpdate(user, dataForUpdate);
     if (activateDto.project) {
-      await this.userProjectRepo.activateInProject(user, activateDto.project);
+      await this.userProjectRepo.activateInProject(user, { id: parseInt(activateDto.project, 0) });
     }
     return {
       bearerKey: this.createBearerKey({ email: user.email }),

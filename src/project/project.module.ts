@@ -21,7 +21,7 @@ import { ProjectTaskService } from './task/project.task.service';
 
 @Module({
   controllers: [ProjectController, ProjectMemberController, ProjectTaskController, ProjectTaskTypeController],
-  exports: [AccessLevelGuard, ProjectService],
+  exports: [AccessLevelGuard, ProjectService, ProjectMemberService],
   imports: [
     AuthModule,
     TypeOrmModule.forFeature([

@@ -1,4 +1,4 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { DeepPartial, EntityRepository, Repository } from 'typeorm';
 
 import { Project } from '../project/project.entity';
 import { User } from '../user/user.entity';
@@ -8,7 +8,7 @@ import { UserProject } from './user-project.entity';
 @EntityRepository(UserProject)
 export class UserProjectRepository extends Repository<UserProject> {
   public async addToProject(
-    project: Project,
+    project: DeepPartial<Project>,
     member: User,
     inviter: User,
     accessLevel: number = ACCESS_LEVEL.WHITE
@@ -22,11 +22,13 @@ export class UserProjectRepository extends Repository<UserProject> {
     return await this.save(entity);
   }
 
-  public async activateInProject(member: User, projectId: string): Promise<UserProject> {
-    const project = { id: parseInt(projectId, 0) };
+  public async activateInProject(member: User, project: DeepPartial<Project>): Promise<UserProject> {
     const entity = await this.findOneOrFail({
       where: { member, project },
     });
+    if (entity.accessLevel >= ACCESS_LEVEL.RED) {
+      return entity;
+    }
     entity.accessLevel = ACCESS_LEVEL.RED;
     entity.project = project as Project;
     return await this.save(entity);

@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DeepPartial } from 'typeorm';
 
 import { IdDto } from '../../@common/dto';
 import { Project } from '../../@orm/project';
@@ -15,7 +16,7 @@ export class ProjectMemberService {
   ) {}
 
   public async invite(
-    project: Project,
+    project: DeepPartial<Project>,
     invite: EmailDto,
     hostWithProtocol: string,
     inviter: User
@@ -25,8 +26,19 @@ export class ProjectMemberService {
     return await this.userProjectRepo.addToProject(project, member, inviter);
   }
 
-  public async removeMemberFromProject({ id }: IdDto, project: Project): Promise<boolean> {
+  public async removeMemberFromProject({ id }: IdDto, project: DeepPartial<Project>): Promise<boolean> {
     await this.userProjectRepo.delete({ member: { id }, project });
     return true;
+  }
+
+  public async acceptInvitation(user: User, project: DeepPartial<Project>): Promise<UserProject> {
+    const userProject = await this.userProjectRepo.findOne({
+      member: user,
+      project,
+    });
+    if (!userProject) {
+      throw new NotAcceptableException('Приглашение было отозвано');
+    }
+    return await this.userProjectRepo.activateInProject(user, project);
   }
 }

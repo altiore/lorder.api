@@ -11,7 +11,7 @@ export class AccessLevelGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const accessLevel = this.reflector.get<ACCESS_LEVEL>('accessLevel', context.getHandler());
-    if (!accessLevel) {
+    if (typeof accessLevel !== 'number') {
       return true;
     }
     const request = context.switchToHttp().getRequest();
