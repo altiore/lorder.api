@@ -71,6 +71,7 @@ describe(`GET ${h.url}`, async () => {
       })
       .expect(200);
     expect(body).toEqual({
+      avatar: null,
       bearerKey: expect.any(String),
       email,
       role: 'user',
@@ -104,6 +105,7 @@ describe(`GET ${h.url}`, async () => {
       })
       .expect(200);
     expect(body).toEqual({
+      avatar: null,
       bearerKey: expect.any(String),
       email,
       role: 'user',
@@ -138,6 +140,7 @@ describe(`GET ${h.url}`, async () => {
       })
       .expect(200);
     expect(body).toEqual({
+      avatar: null,
       bearerKey: expect.any(String),
       email,
       role: 'user',

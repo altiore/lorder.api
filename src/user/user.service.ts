@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial } from 'typeorm';
+// @see https://github.com/emerleite/node-gravatar
+const gravatar = require('gravatar');
 
 import { RoleRepository } from '../@orm/role';
 import { UpdateUserDto, User, UserRepository } from '../@orm/user';
@@ -52,6 +54,7 @@ export class UserService {
 
   public async createUser(data: DeepPartial<User>) {
     const userRole = await this.roleRepo.findUserRole();
+    data.avatar = gravatar.url(data.email, undefined, true);
     return this.userRepo.createWithRoles(data, [userRole]);
   }
 

@@ -91,6 +91,7 @@ describe(`PATCH ${h.url}`, async () => {
       })
       .expect(200);
     expect(body).toEqual({
+      avatar: null,
       bearerKey: expect.any(String),
       email,
       role: 'user',
@@ -127,6 +128,7 @@ describe(`PATCH ${h.url}`, async () => {
       })
       .expect(200);
     expect(body).toEqual({
+      avatar: null,
       bearerKey: expect.any(String),
       email,
       role: 'admin',
@@ -163,6 +165,7 @@ describe(`PATCH ${h.url}`, async () => {
       })
       .expect(200);
     expect(body).toEqual({
+      avatar: null,
       bearerKey: expect.any(String),
       email,
       role: 'super-admin',

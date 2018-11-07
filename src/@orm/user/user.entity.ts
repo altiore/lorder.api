@@ -62,6 +62,9 @@ export class User {
   @Column({ nullable: true, select: false })
   password: string;
 
+  @Column({ nullable: true })
+  avatar: string;
+
   @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
   @CreateDateColumn(momentDateTransformer)
   createdAt: Moment;
@@ -97,5 +100,13 @@ export class User {
 
   get isSuperAdmin() {
     return this.role === ROLES.SUPER_ADMIN;
+  }
+
+  get publicData(): { avatar?: string; email: string; role: ROLES } {
+    return {
+      avatar: this.avatar,
+      email: this.email,
+      role: this.role,
+    };
   }
 }

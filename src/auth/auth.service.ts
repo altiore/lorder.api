@@ -73,9 +73,8 @@ export class AuthService {
       await this.userProjectRepo.activateInProject(user, { id: parseInt(activateDto.project, 0) });
     }
     return {
+      ...user.publicData,
       bearerKey: this.createBearerKey({ email: user.email }),
-      email: user.email,
-      role: user.role,
     };
   }
 
@@ -98,9 +97,8 @@ export class AuthService {
     }
 
     return {
+      ...user.publicData,
       bearerKey: this.createBearerKey({ email: user.email }),
-      email: user.email,
-      role: user.role,
     };
   }
 
