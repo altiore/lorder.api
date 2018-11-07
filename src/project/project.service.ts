@@ -47,4 +47,8 @@ export class ProjectService {
   public async findAllWithPagination(pagesDto: ProjectPaginationDto, user: User): Promise<Partial<Project>[]> {
     return this.projectRepo.findAllWithPagination(pagesDto, user);
   }
+
+  public findPublicById(id: number): Promise<Project> {
+    return this.projectRepo.findPublicById(id);
+  }
 }

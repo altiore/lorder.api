@@ -7,6 +7,7 @@ import { ValidationPipe } from './@common/pipes/validation.pipe';
 import { AuthModule } from './auth/auth.module';
 import { MeModule } from './me/me.module';
 import { ProjectModule } from './project/project.module';
+import { PublicModule } from './public/public.module';
 import { RedisModule } from './redis/redis.module';
 import { TaskTypeModule } from './task-type/task-type.module';
 import { TaskModule } from './task/task.module';
@@ -18,6 +19,7 @@ import { UserModule } from './user/user.module';
     AuthModule,
     MeModule,
     ProjectModule,
+    PublicModule,
     RedisModule,
     TaskModule,
     TaskTypeModule,

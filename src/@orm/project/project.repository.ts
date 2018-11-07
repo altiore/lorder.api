@@ -95,6 +95,10 @@ export class ProjectRepository extends Repository<Project> {
     return entities.map(this.preparePublic);
   }
 
+  public findPublicById(id: number) {
+    return this.findOneOrFail(id);
+  }
+
   private async selectOrderedProjects(
     { skip = 0, count = 20, orderBy = ProjectFieldsEnum.createdAt, order = 'desc' }: PaginationDto,
     query: SelectQueryBuilder<Project>
