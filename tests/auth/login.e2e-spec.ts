@@ -3,6 +3,7 @@ import moment = require('moment');
 import { TestHelper } from '../@utils/TestHelper';
 import { usersFixture } from './@fixtures/users';
 
+import { Project } from '../../src/@orm/project';
 import { User } from '../../src/@orm/user';
 
 const h = new TestHelper('/auth/login').addFixture(usersFixture);
@@ -76,6 +77,7 @@ describe(`PATCH ${h.url}`, async () => {
         updatedAt: expect.any(moment),
       })
     );
+    await h.removeCreated(Project, { id: addedUser.defaultProjectId });
     await h.removeCreated(User, { email });
   });
 
@@ -93,6 +95,7 @@ describe(`PATCH ${h.url}`, async () => {
     expect(body).toEqual({
       avatar: null,
       bearerKey: expect.any(String),
+      defaultProjectId: null,
       email,
       role: 'user',
     });
@@ -130,6 +133,7 @@ describe(`PATCH ${h.url}`, async () => {
     expect(body).toEqual({
       avatar: null,
       bearerKey: expect.any(String),
+      defaultProjectId: null,
       email,
       role: 'admin',
     });
@@ -167,6 +171,7 @@ describe(`PATCH ${h.url}`, async () => {
     expect(body).toEqual({
       avatar: null,
       bearerKey: expect.any(String),
+      defaultProjectId: null,
       email,
       role: 'super-admin',
     });

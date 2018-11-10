@@ -3,6 +3,7 @@ import moment = require('moment');
 import { TestHelper } from '../@utils/TestHelper';
 import { usersFixture } from './@fixtures/users';
 
+import { Project } from '../../src/@orm/project';
 import { User } from '../../src/@orm/user';
 
 const h = new TestHelper('/auth/magic').addFixture(usersFixture);
@@ -56,6 +57,7 @@ describe(`POST ${h.url}`, async () => {
         updatedAt: expect.any(moment),
       })
     );
+    await h.removeCreated(Project, { id: addedUser.defaultProjectId });
     await h.removeCreated(User, { email });
   });
 

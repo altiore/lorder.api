@@ -9,6 +9,9 @@ export class IdentityDto {
   public readonly bearerKey: string;
 
   @ApiModelProperty()
+  public readonly defaultProjectId: number;
+
+  @ApiModelProperty()
   public readonly role: ROLES;
 
   @ApiModelProperty()

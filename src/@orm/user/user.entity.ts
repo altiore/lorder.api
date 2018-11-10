@@ -65,6 +65,9 @@ export class User {
   @Column({ nullable: true })
   avatar: string;
 
+  @Column({ nullable: true })
+  defaultProjectId: number;
+
   @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
   @CreateDateColumn(momentDateTransformer)
   createdAt: Moment;
@@ -102,9 +105,10 @@ export class User {
     return this.role === ROLES.SUPER_ADMIN;
   }
 
-  get publicData(): { avatar?: string; email: string; role: ROLES } {
+  get publicData(): { avatar?: string; defaultProjectId: number; email: string; role: ROLES } {
     return {
       avatar: this.avatar,
+      defaultProjectId: this.defaultProjectId,
       email: this.email,
       role: this.role,
     };

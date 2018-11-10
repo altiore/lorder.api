@@ -73,6 +73,7 @@ describe(`GET ${h.url}`, async () => {
     expect(body).toEqual({
       avatar: null,
       bearerKey: expect.any(String),
+      defaultProjectId: null,
       email,
       role: 'user',
     });
@@ -107,6 +108,7 @@ describe(`GET ${h.url}`, async () => {
     expect(body).toEqual({
       avatar: null,
       bearerKey: expect.any(String),
+      defaultProjectId: null,
       email,
       role: 'user',
     });
@@ -142,6 +144,7 @@ describe(`GET ${h.url}`, async () => {
     expect(body).toEqual({
       avatar: null,
       bearerKey: expect.any(String),
+      defaultProjectId: null,
       email,
       role: 'user',
     });
