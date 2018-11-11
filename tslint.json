@@ -20,7 +20,8 @@
     "one-line": [false],
     "one-variable-per-declaration": [false],
     "no-var-requires": false,
-    "only-arrow-functions": false
+    "only-arrow-functions": false,
+    "no-namespace": false
   },
   "rulesDirectory": [],
   "linterOptions": {

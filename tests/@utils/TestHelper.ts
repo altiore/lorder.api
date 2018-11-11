@@ -104,9 +104,8 @@ export class TestHelper {
   }
 }
 
-/* tslint:disable */
 expect.extend({
-  toBeWithinRange(received, floor, ceiling) {
+  toBeWithinRange(received: any, floor: any, ceiling: any): { message(): string; pass: boolean } {
     const pass = received >= floor && received <= ceiling;
     if (pass) {
       return {
@@ -120,4 +119,4 @@ expect.extend({
       };
     }
   },
-});
+} as any);
