@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ProjectRepository } from '../@orm/project';
@@ -23,7 +23,7 @@ import { ProjectTaskService } from './task/project.task.service';
   controllers: [ProjectController, ProjectMemberController, ProjectTaskController, ProjectTaskTypeController],
   exports: [AccessLevelGuard, ProjectService, ProjectMemberService],
   imports: [
-    AuthModule,
+    forwardRef(() => AuthModule),
     TypeOrmModule.forFeature([
       ProjectRepository,
       ProjectTaskTypeRepository,

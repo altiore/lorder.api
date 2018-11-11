@@ -4,10 +4,9 @@ import { DeepPartial } from 'typeorm';
 // @see https://github.com/emerleite/node-gravatar
 const gravatar = require('gravatar');
 
-import { ProjectRepository } from '../@orm/project';
 import { RoleRepository } from '../@orm/role';
 import { UpdateUserDto, User, UserRepository } from '../@orm/user';
-import { ACCESS_LEVEL, UserProjectRepository } from '../@orm/user-project';
+import { ProjectService } from '../project/project.service';
 import { UserDto, UserPaginationDto } from './dto';
 
 @Injectable()
@@ -15,8 +14,7 @@ export class UserService {
   constructor(
     @InjectRepository(UserRepository) private readonly userRepo: UserRepository,
     @InjectRepository(RoleRepository) private readonly roleRepo: RoleRepository,
-    @InjectRepository(ProjectRepository) private readonly projectRepo: ProjectRepository,
-    @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository
+    private readonly projectService: ProjectService
   ) {}
 
   public findAll(pagesDto: UserPaginationDto): Promise<User[]> {
@@ -61,15 +59,13 @@ export class UserService {
     data.avatar = gravatar.url(data.email, undefined, true);
     const res = await this.userRepo.createWithRoles(data, [userRole]);
 
-    // TODO: user ProjectService.create method instead
-    const project = await this.projectRepo.createByUser(
+    const project = await this.projectService.create(
       {
         monthlyBudget: 0,
         title: 'Без проекта',
       },
       res.user
     );
-    await this.userProjectRepo.addToProject(project, res.user, res.user, ACCESS_LEVEL.VIOLET);
     await this.userRepo.updateOne(res.user, { defaultProjectId: project.id });
     return res;
   }

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UserRepository } from '../@orm/user';
@@ -13,7 +13,12 @@ import { JwtStrategy } from './jwt.strategy';
 @Module({
   controllers: [AuthController],
   exports: [AuthService],
-  imports: [MailModule, RedisModule, UserModule, TypeOrmModule.forFeature([UserProjectRepository, UserRepository])],
+  imports: [
+    MailModule,
+    RedisModule,
+    forwardRef(() => UserModule),
+    TypeOrmModule.forFeature([UserProjectRepository, UserRepository]),
+  ],
   providers: [AuthService, JwtStrategy],
 })
 export class AuthModule {}
