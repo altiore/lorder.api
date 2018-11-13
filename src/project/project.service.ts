@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { Project, ProjectDto, ProjectRepository } from '../@orm/project';
+import { ProjectPub, ProjectPubRepository } from '../@orm/project-pub';
 import { User } from '../@orm/user';
 import { ACCESS_LEVEL, UserProjectRepository } from '../@orm/user-project';
 import { ProjectPaginationDto } from './@dto';
@@ -10,6 +11,7 @@ import { ProjectPaginationDto } from './@dto';
 export class ProjectService {
   constructor(
     @InjectRepository(ProjectRepository) private readonly projectRepo: ProjectRepository,
+    @InjectRepository(ProjectPubRepository) private readonly projectPubRepo: ProjectPubRepository,
     @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository
   ) {}
 
@@ -48,7 +50,15 @@ export class ProjectService {
     return this.projectRepo.findAllWithPagination(pagesDto, user);
   }
 
-  public findPublicById(id: number): Promise<Project> {
-    return this.projectRepo.findPublicById(id);
+  public async findPublishedByUuid(uuid: string): Promise<ProjectPub> {
+    return await this.projectPubRepo.findPublishedByUuid(uuid);
+  }
+
+  public async publish(project: Project): Promise<Project> {
+    if (await this.projectPubRepo.findPublishedByProject(project)) {
+      throw new NotAcceptableException('Этот проект уже опубликован!');
+    }
+    await this.projectPubRepo.publishNew(project);
+    return project;
   }
 }

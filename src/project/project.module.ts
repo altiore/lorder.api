@@ -2,6 +2,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ProjectRepository } from '../@orm/project';
+import { ProjectPubRepository } from '../@orm/project-pub';
 import { ProjectTaskTypeRepository } from '../@orm/project-task-type';
 import { TaskRepository } from '../@orm/task';
 import { TaskTypeRepository } from '../@orm/task-type';
@@ -25,6 +26,7 @@ import { ProjectTaskService } from './task/project.task.service';
   imports: [
     forwardRef(() => AuthModule),
     TypeOrmModule.forFeature([
+      ProjectPubRepository,
       ProjectRepository,
       ProjectTaskTypeRepository,
       TaskRepository,

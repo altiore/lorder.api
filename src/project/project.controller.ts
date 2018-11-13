@@ -60,4 +60,15 @@ export class ProjectController {
   ): Promise<number> {
     return this.projectService.remove(project.id);
   }
+
+  @ApiResponse({ description: 'Публикация проекта', status: 200, type: Project })
+  @Post(':projectId/publish')
+  @Roles('user')
+  @AccessLevel(ACCESS_LEVEL.VIOLET)
+  public publish(
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @ProjectParam() project: Project
+  ): Promise<Project> {
+    return this.projectService.publish(project);
+  }
 }

@@ -1,7 +1,7 @@
-import { Controller, Get, NotFoundException, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 
-import { Project } from '../@orm/project';
+import { ProjectPub } from '../@orm/project-pub';
 import { ProjectService } from '../project/project.service';
 
 @ApiBearerAuth()
@@ -10,11 +10,11 @@ import { ProjectService } from '../project/project.service';
 export class PublicController {
   constructor(private readonly projectService: ProjectService) {}
 
-  @ApiResponse({ description: 'Публичные данные проекта', status: 200, type: Project })
-  @Get(':projectId')
-  public async publicProject(@Param('projectId', ParseIntPipe) projectId: number): Promise<Project> {
+  @ApiResponse({ description: 'Публичные данные проекта', status: 200, type: ProjectPub })
+  @Get(':uuid')
+  public async publicProject(@Param('uuid') uuid: string): Promise<ProjectPub> {
     try {
-      return await this.projectService.findPublicById(projectId);
+      return await this.projectService.findPublishedByUuid(uuid);
     } catch (e) {
       throw new NotFoundException('Проект не найден');
     }
