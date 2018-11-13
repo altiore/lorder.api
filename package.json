@@ -15,7 +15,7 @@
     "start:prod": "npm run build && node dist/main.js",
     "postinstall": "npm run build && npm run migration:up",
     "build": "rm -rf dist && tsc",
-    "pretest": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && npm run migration:test:up",
+    "pretest": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && sudo -u postgres psql altiore_contrib_test -tAc 'CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";' && npm run migration:test:up",
     "test": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest -i -b --detectOpenHandles",
     "test:coverage": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest -i --forceExit --coverage",
     "pretest:changed:only": "npm run pretest",

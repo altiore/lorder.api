@@ -1,6 +1,6 @@
-const { Client } = require("pg");
+const { Client } = require('pg');
 
-require("dotenv").config();
+require('dotenv').config();
 
 const client = new Client({
   host: process.env.TYPEORM_HOST,
@@ -11,7 +11,7 @@ const client = new Client({
 });
 
 if (!client || !client.connect) {
-  console.log("connection not created", {
+  console.log('connection not created', {
     host: process.env.TYPEORM_HOST,
     port: process.env.TYPEORM_PORT,
     user: process.env.TYPEORM_USERNAME,
@@ -33,6 +33,7 @@ client.connect(err => {
   GRANT ALL ON SCHEMA public TO ${process.env.TYPEORM_USERNAME};
   GRANT ALL ON SCHEMA public TO public;
   COMMENT ON SCHEMA public IS 'standard public schema';
+  ${process.env.REMOTE ? 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";' : ''}
 `,
     undefined,
     (err, res) => {

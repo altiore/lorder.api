@@ -6,11 +6,13 @@ import {
   Entity,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
+import { ProjectPub } from '../project-pub/project-pub.entity';
 import { ProjectTaskType } from '../project-task-type/project-task-type.entity';
 import { TaskType } from '../task-type/task-type.entity';
 import { Task } from '../task/task.entity';
@@ -41,23 +43,26 @@ export class Project {
   updatedAt: Moment;
 
   @ApiModelProperty({ type: User })
-  @ManyToOne(type => User)
+  @ManyToOne(() => User)
   creator: User;
 
   @ApiModelProperty({ type: User })
-  @ManyToOne(type => User)
+  @ManyToOne(() => User)
   updator: User;
 
   @ApiModelProperty({ type: User })
-  @ManyToOne(type => User, user => user.ownProjects, { nullable: false })
+  @ManyToOne(() => User, user => user.ownProjects, { nullable: false })
   owner: User;
 
   @ApiModelProperty({ type: Task, isArray: true })
-  @OneToMany(type => Task, task => task.project)
+  @OneToMany(() => Task, task => task.project)
   tasks: Task[];
 
-  @OneToMany(type => ProjectTaskType, projectTaskType => projectTaskType.project)
+  @OneToMany(() => ProjectTaskType, projectTaskType => projectTaskType.project)
   projectTaskTypes: ProjectTaskType[];
+
+  @OneToOne(() => ProjectPub, pub => pub.project)
+  pub: ProjectPub;
 
   @ApiModelPropertyOptional({ type: TaskType, isArray: true })
   get taskTypes() {
@@ -70,7 +75,7 @@ export class Project {
   }
 
   @ApiModelPropertyOptional({ type: UserProject, isArray: true })
-  @OneToMany(type => UserProject, userProject => userProject.project)
+  @OneToMany(() => UserProject, userProject => userProject.project)
   members: UserProject[];
 
   @ApiModelPropertyOptional({ type: UserProject, description: 'Access Level for current user in current project' })
