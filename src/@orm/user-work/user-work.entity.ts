@@ -18,7 +18,7 @@ export class UserWork {
   description: string;
 
   @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
-  @CreateDateColumn(momentDateTransformer)
+  @Column({ ...momentDateTransformer, type: 'timestamp', nullable: false })
   startAt: Moment;
 
   @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })

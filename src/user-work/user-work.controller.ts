@@ -12,7 +12,7 @@ import { ACCESS_LEVEL } from '../@orm/user-project';
 import { UserWork } from '../@orm/user-work';
 import { AccessLevel, ProjectParam } from '../project/@common/decorators';
 import { AccessLevelGuard } from '../project/@common/guards';
-import { StartResponse, UserWorkCreateDto, UserWorkUpdateDto } from './dto';
+import { StartResponse, StopResponse, UserWorkCreateDto, UserWorkUpdateDto } from './dto';
 import { UserWorkService } from './user-work.service';
 
 @ApiBearerAuth()
@@ -35,7 +35,7 @@ export class UserWorkController {
   @ApiResponse({ status: 201, type: StartResponse, description: 'ACCESS_LEVEL.RED' })
   public start(
     @Body() userWorkCreateDto: UserWorkCreateDto,
-    @ProjectParam() project: DeepPartial<Project>,
+    @ProjectParam() project: DeepPartial<Project>, // projectId from Body
     @UserJWT() user: User
   ): Promise<StartResponse> {
     return this.userWorkService.start(project, user, userWorkCreateDto);
@@ -56,9 +56,12 @@ export class UserWorkController {
   @Patch(':userWorkId/stop')
   @Roles('user')
   @ApiResponse({ status: 200, type: UserWork, description: 'ACCESS_LEVEL.RED' })
-  public async stop(@Param('userWorkId', ParseIntPipe) userWorkId: number, @UserJWT() user: User): Promise<UserWork> {
+  public async stop(
+    @Param('userWorkId', ParseIntPipe) userWorkId: number,
+    @UserJWT() user: User
+  ): Promise<StopResponse> {
     const userWork = await this.userWorkService.findOneByUserAndCheckAccess(userWorkId, user);
-    return this.userWorkService.stop(userWork);
+    return this.userWorkService.stop(userWork, user);
   }
 
   @Delete(':userWorkId')

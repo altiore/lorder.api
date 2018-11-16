@@ -4,6 +4,7 @@ import { DeepPartial } from 'typeorm';
 // @see https://github.com/emerleite/node-gravatar
 const gravatar = require('gravatar');
 
+import { Project } from '../@orm/project';
 import { RoleRepository } from '../@orm/role';
 import { UpdateUserDto, User, UserRepository } from '../@orm/user';
 import { ProjectService } from '../project/project.service';
@@ -59,15 +60,20 @@ export class UserService {
     data.avatar = gravatar.url(data.email, undefined, true);
     const res = await this.userRepo.createWithRoles(data, [userRole]);
 
+    await this.createDefaultProject(res.user);
+    return res;
+  }
+
+  public async createDefaultProject(user: User): Promise<Project> {
     const project = await this.projectService.create(
       {
         monthlyBudget: 0,
         title: 'Без проекта',
       },
-      res.user
+      user
     );
-    await this.userRepo.updateOne(res.user, { defaultProjectId: project.id });
-    return res;
+    await this.userRepo.updateOne(user, { defaultProjectId: project.id });
+    return project;
   }
 
   public async remove(id: number): Promise<void> {

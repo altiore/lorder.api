@@ -9,8 +9,9 @@ import { UserWork } from '../../src/@orm/user-work';
 export const createUserWorks = fixtureCreator<UserWork>(UserWork, function(entity, index) {
   return {
     description: random.words(3),
-    finishAt: moment().add('30', 'minutes'),
+    finishAt: moment(),
     source: internet.url(),
+    startAt: moment().subtract('30', 'minutes'),
     value: random.number(100),
     ...entity,
     task: one(this, Task, entity.task),

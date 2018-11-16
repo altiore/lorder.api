@@ -1,10 +1,16 @@
+import moment = require('moment');
 import { TestHelper } from '../@utils/TestHelper';
-import { projectsFixture, usersFixture } from './@fixtures';
+import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/post';
 
 import { Task } from '../../src/@orm/task';
 import { UserWork } from '../../src/@orm/user-work';
 
-const h = new TestHelper('/user-works').addFixture(usersFixture).addFixture(projectsFixture);
+const h = new TestHelper('/user-works')
+  .addFixture(usersFixture)
+  .addFixture(projectsFixture)
+  .addFixture(userProjectsFixture)
+  .addFixture(tasksFixture)
+  .addFixture(userWorksFixture);
 
 describe(`POST ${h.url}`, async () => {
   let projectId: number;
@@ -149,6 +155,43 @@ describe(`POST ${h.url}`, async () => {
       title: 'Задача Altiore',
       value: null,
     });
+    await h.removeCreated(UserWork, { id: body.started.id });
+    await h.removeCreated(Task, { id: body.started.taskId });
+  });
+
+  it('by owner with correct data, when exists not finished user work', async () => {
+    const { body } = await h
+      .requestBy('exist-not-finished@mail.com')
+      .post(h.path())
+      .send({
+        description: 'Описание новой задачи',
+        projectId,
+        title: 'Задача Altiore',
+      })
+      .expect(201);
+    expect(body).toEqual({
+      finished: expect.arrayContaining([
+        expect.objectContaining({
+          finishAt: expect.any(String),
+          id: expect.any(Number),
+          startAt: expect.any(String),
+        }),
+      ]),
+      started: expect.objectContaining({
+        description: 'Описание новой задачи',
+        taskId: expect.any(Number),
+      }),
+    });
+    const task = await h.findOne(Task, { id: body.started.taskId });
+    expect(task).toEqual({
+      description: 'Описание новой задачи',
+      id: expect.any(Number),
+      projectId: expect.any(Number),
+      source: null,
+      title: 'Задача Altiore',
+      value: null,
+    });
+    expect(body.finished[0].finishAt).toBe(body.started.startAt);
     await h.removeCreated(UserWork, { id: body.started.id });
     await h.removeCreated(Task, { id: body.started.taskId });
   });

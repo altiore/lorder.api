@@ -3,6 +3,7 @@ import * as moment from 'moment';
 import { TestHelper } from '../../@utils/TestHelper';
 import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/patch';
 
+import { Task } from '../../../src/@orm/task';
 import { UserWork } from '../../../src/@orm/user-work';
 
 const h = new TestHelper('/user-works/:userTaskId/stop')
@@ -75,7 +76,7 @@ describe(`PATCH ${h.url}`, async () => {
 
   it('by user@mail.com (finishing not finished userTask)', async () => {
     const email = 'user@mail.com';
-    await h
+    const { body } = await h
       .requestBy(email)
       .patch(h.path(notFinishedUserWorkId))
       .expect(200);
@@ -85,5 +86,12 @@ describe(`PATCH ${h.url}`, async () => {
     expect(h.entities.UserWork.find(el => el.id === notFinishedUserWorkId).finishAt).toBeNull();
     const currentUserWork = await h.findOne(UserWork, { id: notFinishedUserWorkId });
     expect(currentUserWork.finishAt).toEqual(expect.any(moment));
+    expect(body.next).toMatchObject({
+      finishAt: null,
+      startAt: expect.any(String),
+    });
+    expect(body.next.startAt).toBe(currentUserWork.finishAt.toJSON());
+    await h.removeCreated(Task, body.next.task.id);
+    await h.removeCreated(UserWork, body.next.id);
   });
 });

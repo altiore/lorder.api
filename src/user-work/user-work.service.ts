@@ -1,5 +1,6 @@
 import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Moment } from 'moment';
 import { DeepPartial } from 'typeorm';
 
 import { PaginationDto } from '../@common/dto/pagination.dto';
@@ -9,14 +10,16 @@ import { User } from '../@orm/user';
 import { ACCESS_LEVEL } from '../@orm/user-project';
 import { UserWork, UserWorkRepository } from '../@orm/user-work';
 import { ProjectService } from '../project/project.service';
-import { StartResponse, UserWorkCreateDto, UserWorkUpdateDto } from './dto';
+import { UserService } from '../user/user.service';
+import { StartResponse, StopResponse, UserWorkCreateDto, UserWorkUpdateDto } from './dto';
 
 @Injectable()
 export class UserWorkService {
   constructor(
     @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository,
     @InjectRepository(UserWorkRepository) private readonly userWorkRepo: UserWorkRepository,
-    private readonly projectService: ProjectService
+    private readonly projectService: ProjectService,
+    private readonly userService: UserService
   ) {}
 
   public findAll(pagesDto: PaginationDto, user: User): Promise<UserWork[]> {
@@ -53,37 +56,42 @@ export class UserWorkService {
     const finishedUserWorks = await this.finishNotFinished(user);
 
     // 2. Создать новую задачу
-    let task;
-    if (userWorkData.taskId) {
-      task = await this.taskRepo.findOneByProjectId(userWorkData.taskId, project.id);
-      if (!task) {
-        throw new NotFoundException(`Указанная задача ${userWorkData.taskId} не найдена в проекте ${project.title}`);
-      }
+    let startAt;
+    if (finishedUserWorks && finishedUserWorks.length) {
+      startAt = finishedUserWorks[0].finishAt;
     }
-    if (!task) {
-      task = await this.taskRepo.createByProjectId(
-        {
-          description: userWorkData.description || '',
-          title: userWorkData.title,
-          users: [user],
-        },
-        project.id
-      );
-    }
-    const startedUserWork = await this.userWorkRepo.startTask(task, user, {
-      description: userWorkData.description,
-    });
+    const startedUserWork = await this.startNew(project, user, userWorkData, startAt);
     return {
       finished: finishedUserWorks,
       started: startedUserWork,
     };
   }
 
-  public async stop(userWork: UserWork): Promise<UserWork> {
+  public async stop(userWork: UserWork, user: User): Promise<StopResponse> {
     if (userWork.finishAt) {
       throw new NotAcceptableException('Эта задача уже завершена. Вы не можете завершить одну и ту же задачу дважды');
     }
-    return this.userWorkRepo.finishTask(userWork);
+    const previous = await this.userWorkRepo.finishTask(userWork);
+    let defaultProject;
+    if (user.defaultProjectId) {
+      defaultProject = await this.projectService.findOneByMember(user.defaultProjectId, user);
+    } else {
+      defaultProject = await this.userService.createDefaultProject(user);
+    }
+    const next = await this.startNew(
+      defaultProject,
+      user,
+      {
+        description: `После "${previous.task.title}"`,
+        projectId: defaultProject.id,
+        title: 'Перерыв/Отдых',
+      },
+      previous.finishAt
+    );
+    return {
+      next,
+      previous,
+    };
   }
 
   public remove(userWork: UserWork): Promise<UserWork> {
@@ -104,5 +112,38 @@ export class UserWorkService {
 
   public lastDayInfo(user: User): Promise<UserWork[]> {
     return this.userWorkRepo.lastXHoursInfo(user, 24);
+  }
+
+  private async startNew(
+    project: DeepPartial<Project>,
+    user: User,
+    userWorkData: UserWorkCreateDto,
+    startAt: Moment
+  ): Promise<UserWork> {
+    let task;
+    if (userWorkData.taskId) {
+      task = await this.taskRepo.findOneByProjectId(userWorkData.taskId, project.id);
+      if (!task) {
+        throw new NotFoundException(`Указанная задача ${userWorkData.taskId} не найдена в проекте ${project.title}`);
+      }
+    }
+    if (!task) {
+      task = await this.taskRepo.createByProjectId(
+        {
+          description: userWorkData.description || '',
+          title: userWorkData.title,
+          users: [user],
+        },
+        project.id
+      );
+    }
+    return await this.userWorkRepo.startTask(
+      task,
+      user,
+      {
+        description: userWorkData.description,
+      },
+      startAt
+    );
   }
 }

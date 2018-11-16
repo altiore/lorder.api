@@ -1,4 +1,5 @@
 import moment = require('moment');
+import { Moment } from 'moment';
 import { EntityRepository, IsNull, Raw, Repository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
@@ -29,10 +30,10 @@ export class UserWorkRepository extends Repository<UserWork> {
     return entities.map(this.prepare);
   }
 
-  public async startTask(task: Task, user: User, userWorkData: Partial<UserWork>): Promise<UserWork> {
+  public async startTask(task: Task, user: User, userWorkData: Partial<UserWork>, startAt: Moment): Promise<UserWork> {
     const userWork = this.create({
       ...userWorkData,
-      startAt: moment(),
+      startAt: startAt || moment(),
       task,
       user,
     });
