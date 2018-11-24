@@ -39,6 +39,10 @@ export class UserWork {
   @Column({ nullable: true })
   source: string;
 
+  @ApiModelProperty()
+  @Column({ nullable: false })
+  userId: number;
+
   @ManyToOne(() => User, user => user.works, { nullable: false })
   user: User;
 

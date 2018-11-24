@@ -9,6 +9,10 @@ export class ProjectPub {
   @PrimaryGeneratedColumn('uuid')
   uuid: number;
 
+  @ApiModelProperty()
+  @Column({ nullable: false })
+  projectId: number;
+
   @ApiModelProperty({ type: Project })
   @OneToOne(() => Project, project => project.pub, { nullable: false })
   @JoinColumn()
@@ -25,4 +29,8 @@ export class ProjectPub {
   @ApiModelProperty()
   @Column({ default: true })
   isOpen: boolean;
+
+  @ApiModelPropertyOptional()
+  @Column({ type: 'json', default: {} })
+  statistic: object;
 }

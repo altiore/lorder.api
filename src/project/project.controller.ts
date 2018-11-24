@@ -71,4 +71,12 @@ export class ProjectController {
   ): Promise<Project> {
     return this.projectService.publish(project);
   }
+
+  @ApiResponse({ description: 'Обновить статистику по проекту', status: 200, type: Project })
+  @Post(':projectId/statistic')
+  @Roles('user')
+  @AccessLevel(ACCESS_LEVEL.VIOLET)
+  public async statistic(@ProjectParam() project: Project): Promise<Project> {
+    return this.projectService.updateStatistic(project);
+  }
 }

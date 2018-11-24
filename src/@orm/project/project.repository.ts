@@ -3,6 +3,7 @@ import { EntityRepository, Repository, SelectQueryBuilder } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { ProjectFieldsEnum } from '../../project/@dto';
+import { ProjectPub } from '../project-pub/project-pub.entity';
 import { TaskType } from '../task-type/task-type.entity';
 import { UserProject } from '../user-project/user-project.entity';
 import { User } from '../user/user.entity';
@@ -121,13 +122,16 @@ export class ProjectRepository extends Repository<Project> {
       .clone()
       .select('Project')
       .leftJoin('Project.tasks', 'ProjectTasks')
+      .leftJoin('Project.pub', 'ProjectPub')
       // MAX here because of must use aggregation function for joined table user_project
       .addSelect('MAX("AccessLevel"."accessLevel")', 'Project_accessLevel')
       .addSelect('SUM("ProjectTasks"."value")', 'Project_valueSum')
+      .addSelect('"ProjectPub"."uuid"', 'Project_uuid')
       .skip(skip)
       .limit(count)
       .orderBy(`Project.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
       .groupBy('Project.id')
+      .addGroupBy('"ProjectPub"."uuid"')
       .getRawMany();
 
     const projects = this.rawToProject(rawArray);
