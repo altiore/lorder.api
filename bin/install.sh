@@ -55,8 +55,10 @@ createPostgresDatabase () {
 
   sudo -u postgres psql -c "grant all privileges on database $dbname to $dbname;"
   sudo -u postgres psql -c "grant all privileges on database $dbname$testSuffix to $dbname;"
-  sudo -u postgres psql -d $dbname$testSuffix -tAc "ALTER SCHEMA public OWNER TO $dbname;";
-  sudo -u postgres psql -d $dbname -tAc "ALTER SCHEMA public OWNER TO $dbname;";
+  sudo -u postgres psql -d $dbname$testSuffix -tAc "ALTER SCHEMA public OWNER TO $dbname;"
+  sudo -u postgres psql -d $dbname$testSuffix -tAc "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"
+  sudo -u postgres psql -d $dbname -tAc "ALTER SCHEMA public OWNER TO $dbname;"
+  sudo -u postgres psql -d $dbname -tAc "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"
 
   [ -f .env ] || cp .env.example .env
 
@@ -74,6 +76,7 @@ while :; do
     read -r -p 'postgresql не установлен. Установить? (y/n): ' installPostgres
     if [[ "$installPostgres" == "y" ]]; then
       sudo apt-get update && sudo apt-get install postgresql postgresql-contrib
+      # TODO: check port where it was installed!!!
       createPostgresDatabase
     fi
   fi
