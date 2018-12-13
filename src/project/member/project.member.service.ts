@@ -1,10 +1,10 @@
-import { Injectable, NotAcceptableException } from '@nestjs/common';
+import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial } from 'typeorm';
 
 import { IdDto } from '../../@common/dto';
 import { Project } from '../../@orm/project';
-import { EmailDto, User } from '../../@orm/user';
+import { EmailDto, User, UserRepository } from '../../@orm/user';
 import { UserProject, UserProjectRepository } from '../../@orm/user-project';
 import { AuthService } from '../../auth/auth.service';
 
@@ -12,8 +12,27 @@ import { AuthService } from '../../auth/auth.service';
 export class ProjectMemberService {
   constructor(
     @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository,
+    @InjectRepository(UserRepository) private readonly userRepo: UserRepository,
     private readonly authService: AuthService
   ) {}
+
+  public async findMember(id: number, project: Project): Promise<UserProject> {
+    const user = await this.userRepo.findOne(id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return this.userProjectRepo.findOne({ member: user, project });
+  }
+
+  public async updateMember(memberId: number, project: Project, data: DeepPartial<UserProject>) {
+    const member = await this.findMember(memberId, project);
+    if (!member) {
+      throw new NotFoundException('Member not found in this project');
+    }
+    member.accessLevel = data.accessLevel;
+    await this.userProjectRepo.update(member, data);
+    return member;
+  }
 
   public async invite(
     project: DeepPartial<Project>,

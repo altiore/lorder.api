@@ -13,6 +13,7 @@ import { ACCESS_LEVEL, UserProject } from '../../@orm/user-project';
 import { AccessLevel, ProjectParam } from '../@common/decorators';
 import { AccessLevelGuard } from '../@common/guards';
 import { ProjectService } from '../project.service';
+import { UserProjectUpdateDto } from './dto/user-project.update.dto';
 import { ProjectMemberService } from './project.member.service';
 
 @ApiBearerAuth()
@@ -56,7 +57,7 @@ export class ProjectMemberController {
     return this.projectMemberService.removeMemberFromProject(data, project);
   }
 
-  @ApiResponse({ status: 200, type: Boolean })
+  @ApiResponse({ status: 200, type: UserProject })
   @Patch('accept')
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.WHITE)
@@ -66,5 +67,18 @@ export class ProjectMemberController {
     @UserJWT() user: User
   ): Promise<UserProject> {
     return this.projectMemberService.acceptInvitation(user, project);
+  }
+
+  @ApiResponse({ status: 200, type: Boolean })
+  @Patch(':memberId')
+  @Roles('user')
+  @AccessLevel(ACCESS_LEVEL.VIOLET)
+  public async changeLevel(
+    @Body() data: UserProjectUpdateDto,
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @ProjectParam() project: Project,
+    @Param('memberId', ParseIntPipe) memberId: number
+  ) {
+    return this.projectMemberService.updateMember(memberId, project, data);
   }
 }
