@@ -3,9 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { ValidationException } from '../../@common/exceptions/validation.exception';
+import { Project } from '../../@orm/project';
 import { Task, TaskRepository } from '../../@orm/task';
-import { UserRepository } from '../../@orm/user';
-import { TaskCreateDto, TaskUpdateDto } from './dto';
+import { User, UserRepository } from '../../@orm/user';
+import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
 
 @Injectable()
 export class ProjectTaskService {
@@ -30,6 +31,12 @@ export class ProjectTaskService {
   public async update(id: number, taskUpdateDto: TaskUpdateDto, projectId: number): Promise<Task> {
     const preparedData = await this.parseTaskDtoToTaskObj(taskUpdateDto);
     return this.taskRepo.updateByProjectId(id, preparedData, projectId);
+  }
+
+  public async move(task: Task, project: Project, user: User, taskMoveDto: TaskMoveDto): Promise<Task> {
+    // 1. TODO: проверить разрешенное перемещение задачи для данного статуса
+    // 2. TODO: проверить разрешенное перемещение задачи для данного пользователя
+    return this.taskRepo.updateByProjectId(task.id, taskMoveDto, project.id);
   }
 
   public async delete(id: number, projectId: number): Promise<Task | false> {

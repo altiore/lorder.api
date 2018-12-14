@@ -8,6 +8,7 @@ import { User } from '../../src/@orm/user';
 export const createTasks = fixtureCreator<Task>(Task, function(entity, index) {
   return {
     description: random.words(5),
+    status: 0,
     title: company.companyName(),
     value: random.number(100),
     ...entity,

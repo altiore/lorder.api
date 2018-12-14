@@ -54,6 +54,10 @@ export class Task {
   @Column({ nullable: true })
   source: string;
 
+  @ApiModelPropertyOptional()
+  @Column({ default: 0 })
+  status: number;
+
   @OneToMany(type => UserWork, userWork => userWork.task, { eager: false })
   userWorks: UserWork[];
 

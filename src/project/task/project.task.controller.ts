@@ -15,15 +15,16 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 import { DeepPartial } from 'typeorm';
 
-import { Roles } from '../../@common/decorators';
+import { Roles, UserJWT } from '../../@common/decorators';
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { RolesGuard } from '../../@common/guards';
 import { Project } from '../../@orm/project';
 import { Task } from '../../@orm/task';
+import { User } from '../../@orm/user';
 import { ACCESS_LEVEL } from '../../@orm/user-project';
 import { AccessLevel, ProjectParam } from '../@common/decorators';
 import { AccessLevelGuard } from '../@common/guards';
-import { TaskCreateDto, TaskUpdateDto } from './dto';
+import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
 import { ProjectTaskService } from './project.task.service';
 
 @ApiBearerAuth()
@@ -91,5 +92,23 @@ export class ProjectTaskController {
       throw new NotFoundException(`Задача ${taskId} не была найдена в проекте ${project.title}`);
     }
     return task;
+  }
+
+  @Patch(':taskId/move')
+  @Roles('user')
+  @AccessLevel(ACCESS_LEVEL.RED)
+  @ApiResponse({ status: 200, type: Task, description: 'Доступно для уровня ACCESS_LEVEL.RED (1)' })
+  public async move(
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @Param('taskId', ParseIntPipe) taskId: number,
+    @ProjectParam() project: Project,
+    @Body() taskMoveDto: TaskMoveDto,
+    @UserJWT() user: User
+  ) {
+    const task = await this.taskService.findOne(taskId, projectId);
+    if (!task) {
+      throw new NotFoundException(`Задача ${taskId} не была найдена в проекте ${project.title}`);
+    }
+    return this.taskService.move(task, project, user, taskMoveDto);
   }
 }

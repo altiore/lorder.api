@@ -152,6 +152,7 @@ describe(`POST ${h.url}`, async () => {
       id: expect.any(Number),
       projectId: expect.any(Number),
       source: null,
+      status: 0,
       title: 'Задача Altiore',
       value: null,
     });
@@ -188,6 +189,7 @@ describe(`POST ${h.url}`, async () => {
       id: expect.any(Number),
       projectId: expect.any(Number),
       source: null,
+      status: 0,
       title: 'Задача Altiore',
       value: null,
     });
