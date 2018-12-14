@@ -97,10 +97,14 @@ export class ProjectService {
         tasksPortion.map(task => {
           task.userWorks.map(work => {
             if (work.finishAt) {
-              data[work.userId].time += work.finishAt.clone().diff(work.startAt.clone());
+              if (data[work.userId]) {
+                data[work.userId].time += work.finishAt.clone().diff(work.startAt.clone());
+              }
             }
             if (work.value) {
-              data[work.userId].value += work.value;
+              if (data[work.userId]) {
+                data[work.userId].value += work.value;
+              }
             }
           });
         });
