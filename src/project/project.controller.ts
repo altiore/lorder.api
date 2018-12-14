@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 import * as jwt from 'jsonwebtoken';
@@ -73,7 +73,7 @@ export class ProjectController {
   }
 
   @ApiResponse({ description: 'Обновить статистику по проекту', status: 200, type: Project })
-  @Post(':projectId/statistic')
+  @Patch(':projectId/statistic')
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.VIOLET)
   public async statistic(@ProjectParam() project: Project): Promise<Project> {

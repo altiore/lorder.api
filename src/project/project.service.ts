@@ -68,6 +68,7 @@ export class ProjectService {
    * TODO: logic must be more complicated because of can be huge amount of data
    */
   public async updateStatistic(project: Project): Promise<any> {
+    let statistic = {};
     try {
       const projectWithMembers = await this.projectRepo.findOne({
         relations: ['members', 'pub'],
@@ -80,7 +81,7 @@ export class ProjectService {
         },
         {}
       );
-      const step = 10;
+      const step = 2;
       let i = 0;
       let tasksPortion;
       do {
@@ -106,7 +107,7 @@ export class ProjectService {
         i++;
       } while (tasksPortion.length === step);
 
-      const statistic = {
+      statistic = {
         data,
         members: projectWithMembers.members.map(member => ({
           accessLevel: member.accessLevel,
@@ -124,8 +125,8 @@ export class ProjectService {
         );
       }
     } catch (e) {
-      throw new NotAcceptableException(e);
+      throw e;
     }
-    return true;
+    return statistic;
   }
 }
