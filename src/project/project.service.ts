@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { Project, ProjectDto, ProjectRepository } from '../@orm/project';
 import { ProjectPub, ProjectPubRepository } from '../@orm/project-pub';
+import { TaskRepository } from '../@orm/task';
 import { User } from '../@orm/user';
 import { ACCESS_LEVEL, UserProject, UserProjectRepository } from '../@orm/user-project';
 import { ProjectPaginationDto } from './@dto';
@@ -12,7 +13,8 @@ export class ProjectService {
   constructor(
     @InjectRepository(ProjectRepository) private readonly projectRepo: ProjectRepository,
     @InjectRepository(ProjectPubRepository) private readonly projectPubRepo: ProjectPubRepository,
-    @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository
+    @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository,
+    @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository
   ) {}
 
   public async findOne(id: number): Promise<Project> {
@@ -66,41 +68,64 @@ export class ProjectService {
    * TODO: logic must be more complicated because of can be huge amount of data
    */
   public async updateStatistic(project: Project): Promise<any> {
-    const projectWithTasks = await this.projectRepo.findOne({
-      relations: ['tasks', 'members', 'tasks.userWorks', 'pub'],
-      where: { id: project.id },
-    });
-    const data: { [key in any]: { value: number; time: number } } = projectWithTasks.members.reduce(
-      (res, member: UserProject) => {
-        res[member.member.id] = { time: 0, value: 0 };
-        return res;
-      },
-      {}
-    );
-    projectWithTasks.tasks.map(task => {
-      task.userWorks.map(work => {
-        if (work.finishAt) {
-          data[work.userId].time += work.finishAt.diff(work.startAt);
-        }
+    try {
+      const projectWithMembers = await this.projectRepo.findOne({
+        relations: ['members', 'pub'],
+        where: { id: project.id },
       });
-    });
-    const statistic = {
-      data,
-      members: project.members.map(member => ({
-        accessLevel: member.accessLevel,
-        avatar: member.member.avatar,
-        email: member.member.email,
-        id: member.member.id,
-      })),
-    };
-    if (projectWithTasks.pub) {
-      await this.projectPubRepo.update(
-        { project: projectWithTasks },
-        {
-          statistic,
-        }
+      const data: { [key in any]: { value: number; time: number } } = projectWithMembers.members.reduce(
+        (res, member: UserProject) => {
+          res[member.member.id] = { time: 0, value: 0 };
+          return res;
+        },
+        {}
       );
+      const step = 10;
+      let i = 0;
+      let tasksPortion;
+      do {
+        tasksPortion = await this.taskRepo.find({
+          relations: ['userWorks'],
+          skip: step * i,
+          take: step,
+          where: { project },
+        });
+        if (!tasksPortion || !tasksPortion.length) {
+          break;
+        }
+        tasksPortion.map(task => {
+          task.userWorks.map(work => {
+            if (work.finishAt) {
+              data[work.userId].time += work.finishAt.clone().diff(work.startAt.clone());
+            }
+            if (work.value) {
+              data[work.userId].value += work.value;
+            }
+          });
+        });
+        i++;
+      } while (tasksPortion.length === step);
+
+      const statistic = {
+        data,
+        members: projectWithMembers.members.map(member => ({
+          accessLevel: member.accessLevel,
+          avatar: member.member.avatar,
+          email: member.member.email,
+          id: member.member.id,
+        })),
+      };
+      if (projectWithMembers.pub) {
+        await this.projectPubRepo.update(
+          { project: projectWithMembers },
+          {
+            statistic,
+          }
+        );
+      }
+    } catch (e) {
+      throw new NotAcceptableException(e);
     }
-    return statistic;
+    return true;
   }
 }
