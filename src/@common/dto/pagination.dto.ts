@@ -12,7 +12,7 @@ export class PaginationDto<OrderBy = string> {
   @IsOptional()
   public readonly skip?: number;
 
-  @ApiModelPropertyOptional()
+  @ApiModelPropertyOptional({ type: String })
   @IsString()
   @IsOptional()
   public readonly orderBy?: OrderBy;

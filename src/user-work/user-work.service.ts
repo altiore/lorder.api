@@ -110,8 +110,8 @@ export class UserWorkService {
     return userWork;
   }
 
-  public lastDayInfo(user: User): Promise<UserWork[]> {
-    return this.userWorkRepo.lastXHoursInfo(user, 24);
+  public recent(user: User, pagesDto: PaginationDto): Promise<UserWork[]> {
+    return this.userWorkRepo.findWithPaginationByUser(user, pagesDto);
   }
 
   private async startNew(

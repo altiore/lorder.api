@@ -73,6 +73,20 @@ export class UserWorkRepository extends Repository<UserWork> {
     return entities.map(this.prepare);
   }
 
+  public async findWithPaginationByUser(
+    user: User,
+    { count = 8, skip = 0, orderBy = 'startAt', order = 'desc' }: PaginationDto
+  ): Promise<UserWork[]> {
+    const entities = await this.find({
+      order: { [orderBy]: order.toUpperCase() },
+      relations: ['task'],
+      skip,
+      take: count,
+      where: { user },
+    });
+    return entities.map(this.prepare);
+  }
+
   public async findNotFinishedByUser(user: User): Promise<UserWork[]> {
     const entities = await this.find({
       relations: ['task'],

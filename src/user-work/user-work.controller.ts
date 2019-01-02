@@ -72,10 +72,10 @@ export class UserWorkController {
     return await this.userWorkService.remove(userWork);
   }
 
-  @Get('last')
+  @Get('recent')
   @Roles('user')
   @ApiResponse({ status: 200, type: UserWork, isArray: true })
-  public lastDay(@UserJWT() user: User): Promise<UserWork[]> {
-    return this.userWorkService.lastDayInfo(user);
+  public recent(@Query() pagesDto: PaginationDto, @UserJWT() user: User): Promise<UserWork[]> {
+    return this.userWorkService.recent(user, pagesDto);
   }
 }
