@@ -32,6 +32,7 @@ describe(`GET ${h.url}`, async () => {
         {
           description: expect.any(String),
           id: expect.any(Number),
+          performerId: null,
           projectId: expect.any(Number),
           source: null,
           status: 0,

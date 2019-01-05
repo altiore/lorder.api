@@ -6,13 +6,15 @@ import { ValidationException } from '../../@common/exceptions/validation.excepti
 import { Project } from '../../@orm/project';
 import { Task, TaskRepository } from '../../@orm/task';
 import { User, UserRepository } from '../../@orm/user';
+import { UserProjectRepository } from '../../@orm/user-project';
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
 
 @Injectable()
 export class ProjectTaskService {
   constructor(
     @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository,
-    @InjectRepository(UserRepository) private readonly userRepo: UserRepository
+    @InjectRepository(UserRepository) private readonly userRepo: UserRepository,
+    @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository
   ) {}
 
   public findAll(pagesDto: PaginationDto, projectId: number): Promise<Task[]> {
@@ -24,12 +26,12 @@ export class ProjectTaskService {
   }
 
   public async create(taskCreateDto: TaskCreateDto, projectId: number): Promise<Task> {
-    const preparedData = await this.parseTaskDtoToTaskObj(taskCreateDto);
+    const preparedData = await this.parseTaskDtoToTaskObj(taskCreateDto, projectId);
     return this.taskRepo.createByProjectId(preparedData, projectId);
   }
 
   public async update(id: number, taskUpdateDto: TaskUpdateDto, projectId: number): Promise<Task> {
-    const preparedData = await this.parseTaskDtoToTaskObj(taskUpdateDto);
+    const preparedData = await this.parseTaskDtoToTaskObj(taskUpdateDto, projectId);
     return this.taskRepo.updateByProjectId(id, preparedData, projectId);
   }
 
@@ -48,7 +50,10 @@ export class ProjectTaskService {
     return task;
   }
 
-  private async parseTaskDtoToTaskObj(taskDto: TaskCreateDto | TaskUpdateDto): Promise<Partial<Task>> {
+  private async parseTaskDtoToTaskObj(
+    taskDto: TaskCreateDto | TaskUpdateDto,
+    projectId: number
+  ): Promise<Partial<Task>> {
     const preparedData: Partial<Task> = {};
     if (taskDto.description !== undefined) {
       preparedData.description = taskDto.description;
@@ -61,6 +66,23 @@ export class ProjectTaskService {
     }
     if (taskDto.source !== undefined) {
       preparedData.source = taskDto.source;
+    }
+    if (taskDto.performerId !== undefined) {
+      if (!taskDto.performerId) {
+        preparedData.performer = null;
+      } else {
+        const performer = await this.userProjectRepo.findOne({
+          relations: ['member'],
+          where: {
+            member: { id: taskDto.performerId },
+            project: { id: projectId },
+          },
+        });
+        if (!performer) {
+          throw new ValidationException(undefined, 'Исполнитель не был найдет в текущем проекте');
+        }
+        preparedData.performer = performer.member;
+      }
     }
 
     if (taskDto.users && taskDto.users.length) {

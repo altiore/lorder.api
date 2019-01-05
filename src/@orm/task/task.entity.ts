@@ -58,6 +58,14 @@ export class Task {
   @Column({ default: 0 })
   status: number;
 
+  @ApiModelProperty()
+  @Column({ nullable: true })
+  performerId: number;
+
+  @ApiModelProperty({ type: User })
+  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL', onUpdate: 'CASCADE' })
+  performer: User;
+
   @OneToMany(type => UserWork, userWork => userWork.task, { eager: false })
   userWorks: UserWork[];
 
