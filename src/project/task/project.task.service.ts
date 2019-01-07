@@ -67,6 +67,9 @@ export class ProjectTaskService {
     if (taskDto.source !== undefined) {
       preparedData.source = taskDto.source;
     }
+    if (taskDto.status !== undefined) {
+      preparedData.status = taskDto.status;
+    }
     if (taskDto.performerId !== undefined) {
       if (!taskDto.performerId) {
         preparedData.performer = null;
