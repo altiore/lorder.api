@@ -67,11 +67,24 @@ export class UserRepository extends Repository<User> {
     orderBy = 'createdAt',
     order = 'desc',
   }: PaginationDto): Promise<User[]> {
-    return this.find({
-      order: { [orderBy]: order.toUpperCase() },
-      skip,
-      take: count,
-    });
+    return this.createQueryBuilder()
+      .select('User.avatar', 'avatar')
+      .addSelect('User.createdAt', 'createdAt')
+      .addSelect('User.defaultProjectId', 'defaultProjectId')
+      .addSelect('User.email', 'email')
+      .addSelect('User.id', 'id')
+      .addSelect('User.paymentMethod', 'paymentMethod')
+      .addSelect('User.status', 'status')
+      .addSelect('User.tel', 'tel')
+      .addSelect('User.updatedAt', 'updatedAt')
+      .leftJoin('User.memberProjects', 'ProjectsWhereMember')
+      .addSelect('COUNT(DISTINCT "ProjectsWhereMember"."projectId")', 'projectsCount')
+      .leftJoin('user_roles', 'UserRoles', 'User.id=UserRoles.userId')
+      .addSelect('(SELECT "name" FROM role where id = COUNT(DISTINCT "UserRoles"."roleId"))', 'role')
+      .orderBy(`User.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
+      .groupBy('User.id')
+      .limit(count)
+      .getRawMany();
   }
 
   public findAllByIds(ids: number[]): Promise<User[]> {

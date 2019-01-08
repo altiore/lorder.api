@@ -50,6 +50,10 @@ export class Project {
   @ManyToOne(() => User)
   updator: User;
 
+  @ApiModelProperty()
+  @Column({ nullable: false })
+  ownerId: number;
+
   @ApiModelProperty({ type: User })
   @ManyToOne(() => User, user => user.ownProjects, { nullable: false })
   owner: User;
