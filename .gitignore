@@ -21,5 +21,4 @@ yarn.lock
 
 # Docker
 Dockerfile
-docker-compose.yml
 /nbproject/

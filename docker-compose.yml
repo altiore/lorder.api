@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  redis:
+    image: redis
+    volumes:
+      - ${DATA_PATH_HOST}/redis:/data
+    ports:
+      - 6379:6379
+
+  postgres:
+    image: postgres
+    volumes:
+      - ${DATA_PATH_HOST}/postgres:/var/lib/postgresql/data
+      - ./docker/postgres-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ./docker/wait-postgres.sh:/usr/bin/wait-postgres
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_TEST_DB=${POSTGRES_TEST_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - 5432:5432
+
+volumes:
+  postgres:
+    driver: local
+  redis:
+    driver: local
