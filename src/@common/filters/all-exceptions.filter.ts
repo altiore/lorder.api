@@ -48,6 +48,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
               statusCode: status,
             });
           } else {
+            const status = HttpStatus.INTERNAL_SERVER_ERROR;
             response.status(status).json({
               message: (exception && exception.message) || exception.toString ? exception.toString() : 'NO',
               statusCode: status,
