@@ -24,7 +24,7 @@ export class TaskRepository extends Repository<Task> {
       relations: ['users', 'userWorks'],
       skip,
       take: count,
-      where: { project: { id: projectId } },
+      where: { project: { id: projectId }, isArchived: false },
     });
   }
 
@@ -41,8 +41,8 @@ export class TaskRepository extends Repository<Task> {
       .innerJoinAndSelect(
         'user_tasks',
         'UserTasks',
-        '"UserTasks"."taskId"="Task"."id" AND "UserTasks"."userId"=:userId',
-        { userId: user.id }
+        '"UserTasks"."taskId"="Task"."id" AND "UserTasks"."userId"=:userId AND "Task"."isArchived"=:isArchived',
+        { userId: user.id, isArchived: false }
       )
       .leftJoinAndMapMany(
         'Task.userWorks',
@@ -61,6 +61,20 @@ export class TaskRepository extends Repository<Task> {
       .skip(skip)
       .getMany();
     return entities;
+  }
+
+  public findOneByOwner(id: number, ownerId: number): Promise<Task | undefined> {
+    return this.createQueryBuilder()
+      .where('Task.id=:id', {
+        id,
+      })
+      .innerJoinAndSelect(
+        'user_tasks',
+        'UserTasks',
+        '"UserTasks"."taskId"="Task"."id" AND "UserTasks"."userId"=:userId AND "Task"."isArchived"=:isArchived',
+        { userId: ownerId, isArchived: false }
+      )
+      .getOne();
   }
 
   public findOneByProjectId(id: number, projectId: number): Promise<Task | undefined> {

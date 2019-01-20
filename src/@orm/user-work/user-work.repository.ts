@@ -25,7 +25,7 @@ export class UserWorkRepository extends Repository<UserWork> {
       relations: ['task'],
       skip,
       take: count,
-      where: { user },
+      where: { user, task: { isArchived: false } },
     });
     return entities.map(this.prepare);
   }

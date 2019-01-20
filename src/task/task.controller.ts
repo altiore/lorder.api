@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param, ParseIntPipe, Patch, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 
@@ -21,5 +21,18 @@ export class TaskController {
   @ApiResponse({ status: 200, type: Task, isArray: true })
   public all(@Query() pagesDto: TaskPagination, @UserJWT() user: User): Promise<Task[]> {
     return this.taskService.findAll(pagesDto, user);
+  }
+
+  @Patch(':taskId/archive')
+  @Roles('user')
+  @ApiResponse({ status: 200, type: Task, description: 'ACCESS_LEVEL.RED' })
+  public async archive(@Param('taskId', ParseIntPipe) taskId: number, @UserJWT() user: User): Promise<Task> {
+    const task = await this.taskService.archive(taskId, user);
+
+    if (!task) {
+      throw new NotFoundException(`Задача ${taskId} не была найдена`);
+    }
+
+    return task;
   }
 }

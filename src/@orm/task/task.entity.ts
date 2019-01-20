@@ -58,6 +58,9 @@ export class Task {
   @Column({ default: 0 })
   status: number;
 
+  @Column('boolean', { default: false })
+  isArchived: boolean = false;
+
   @ApiModelProperty()
   @Column({ nullable: true })
   performerId: number;
