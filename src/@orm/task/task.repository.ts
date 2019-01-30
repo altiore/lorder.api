@@ -1,4 +1,4 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository, TreeRepository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Project } from '../project/project.entity';
@@ -14,7 +14,7 @@ export enum TaskOrderByField {
 }
 
 @EntityRepository(Task)
-export class TaskRepository extends Repository<Task> {
+export class TaskRepository extends TreeRepository<Task> {
   public findAllByProjectId(
     { skip = 0, count = 20, orderBy = 'id', order = 'desc' }: PaginationDto,
     projectId: number

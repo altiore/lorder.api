@@ -35,4 +35,11 @@ export class TaskController {
 
     return task;
   }
+
+  @Get(':taskId')
+  @Roles('user')
+  @ApiResponse({ status: 200, type: Task })
+  public one(@Param('taskId', ParseIntPipe) taskId: number, @UserJWT() user: User): Promise<Task> {
+    return this.taskService.findOne(taskId, user);
+  }
 }
