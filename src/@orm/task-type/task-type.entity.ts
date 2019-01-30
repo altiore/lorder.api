@@ -2,7 +2,6 @@ import { ApiModelProperty } from '@nestjs/swagger';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { ProjectTaskType } from '../project-task-type/project-task-type.entity';
-import { Project } from '../project/project.entity';
 
 @Entity()
 export class TaskType {
