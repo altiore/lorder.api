@@ -35,6 +35,11 @@ export class TaskCreateDto {
   @IsOptional()
   performerId?: number;
 
+  @ApiModelPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  typeId?: number;
+
   @ApiModelPropertyOptional({ isArray: true, type: Number, example: [1, 2, 3] })
   @IsNumber(undefined, { each: true })
   @IsOptional()

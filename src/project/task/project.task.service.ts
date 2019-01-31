@@ -4,7 +4,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { ValidationException } from '../../@common/exceptions/validation.exception';
 import { Project } from '../../@orm/project';
+import { ProjectTaskTypeRepository } from '../../@orm/project-task-type';
 import { Task, TaskRepository } from '../../@orm/task';
+import { TaskTypeRepository } from '../../@orm/task-type';
 import { User, UserRepository } from '../../@orm/user';
 import { UserProjectRepository } from '../../@orm/user-project';
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
@@ -14,7 +16,9 @@ export class ProjectTaskService {
   constructor(
     @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository,
     @InjectRepository(UserRepository) private readonly userRepo: UserRepository,
-    @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository
+    @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository,
+    @InjectRepository(TaskTypeRepository) private readonly taskTypeRepo: TaskTypeRepository,
+    @InjectRepository(ProjectTaskTypeRepository) private readonly projectTaskTypeRepo: ProjectTaskTypeRepository
   ) {}
 
   public findAll(pagesDto: PaginationDto, projectId: number): Promise<Task[]> {
@@ -69,6 +73,23 @@ export class ProjectTaskService {
     }
     if (taskDto.status !== undefined) {
       preparedData.status = taskDto.status;
+    }
+    if (taskDto.typeId !== undefined) {
+      if (!taskDto.typeId) {
+        preparedData.typeId = null;
+      } else {
+        const projectTaskType = await this.projectTaskTypeRepo.findOne({
+          where: {
+            project: { id: projectId },
+            taskType: { id: taskDto.typeId },
+          },
+        });
+        if (!projectTaskType) {
+          throw new ValidationException(undefined, 'Тип задачи не был найдет в текущем проекте');
+        }
+        preparedData.type = projectTaskType.taskType;
+      }
+      preparedData.typeId = taskDto.typeId;
     }
     if (taskDto.performerId !== undefined) {
       if (!taskDto.performerId) {

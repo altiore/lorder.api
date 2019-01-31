@@ -156,6 +156,7 @@ describe(`POST ${h.url}`, async () => {
       source: null,
       status: 0,
       title: 'Задача Altiore',
+      typeId: null,
       value: null,
     });
     await h.removeCreated(UserWork, { id: body.started.id });
@@ -195,6 +196,7 @@ describe(`POST ${h.url}`, async () => {
       source: null,
       status: 0,
       title: 'Задача Altiore',
+      typeId: null,
       value: null,
     });
     expect(body.finished[0].finishAt).toBe(body.started.startAt);

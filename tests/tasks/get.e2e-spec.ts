@@ -38,6 +38,7 @@ describe(`GET ${h.url}`, async () => {
           source: null,
           status: 0,
           title: expect.any(String),
+          typeId: null,
           userWorks: expect.arrayContaining([
             expect.objectContaining({
               description: expect.any(String),

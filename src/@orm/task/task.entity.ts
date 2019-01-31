@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 
 import { Project } from '../project/project.entity';
+import { TaskType } from '../task-type/task-type.entity';
 import { UserWork } from '../user-work/user-work.entity';
 import { User } from '../user/user.entity';
 
@@ -57,6 +58,14 @@ export class Task {
   @ApiModelPropertyOptional()
   @Column({ default: 0 })
   status: number;
+
+  @ApiModelPropertyOptional()
+  @Column({ nullable: true })
+  typeId: number;
+
+  @ApiModelPropertyOptional()
+  @ManyToOne(() => TaskType, { nullable: true, onDelete: 'SET NULL', onUpdate: 'CASCADE' })
+  type: TaskType;
 
   @Column('boolean', { default: false })
   isArchived: boolean = false;
