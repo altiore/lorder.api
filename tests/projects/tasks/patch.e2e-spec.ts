@@ -29,7 +29,7 @@ describe(`PATCH ${h.url}`, async () => {
       });
   });
 
-  fit('by project owner', async () => {
+  it('by project owner', async () => {
     const { body } = await h
       .requestBy('project-owner@mail.com')
       .patch(h.path(projectId, taskId))

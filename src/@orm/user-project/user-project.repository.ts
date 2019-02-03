@@ -33,4 +33,11 @@ export class UserProjectRepository extends Repository<UserProject> {
     entity.project = project as Project;
     return await this.save(entity);
   }
+
+  public findWithStatistic(project: Project): Promise<UserProject[]> {
+    return this.find({
+      relations: ['member', 'member.works'],
+      where: { project },
+    });
+  }
 }

@@ -16,7 +16,7 @@ export class UserRepository extends Repository<User> {
         return await this.findOne({
           loadEagerRelations: false,
           relations: ['roles'],
-          select: ['avatar', 'email', 'status', 'defaultProjectId', 'password'],
+          select: ['id', 'avatar', 'email', 'status', 'defaultProjectId', 'password'],
           where: { email },
         });
       } catch (e) {

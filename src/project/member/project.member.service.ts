@@ -60,4 +60,8 @@ export class ProjectMemberService {
     }
     return await this.userProjectRepo.activateInProject(user, project);
   }
+
+  public getAllByProject(project: Project, user: User): Promise<UserProject[]> {
+    return this.userProjectRepo.findWithStatistic(project);
+  }
 }
