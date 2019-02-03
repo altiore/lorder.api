@@ -27,6 +27,19 @@ export class ProjectMemberController {
   ) {}
 
   @ApiResponse({
+    description: 'Список всех пользователей проекта',
+    isArray: true,
+    status: 200,
+    type: UserProject,
+  })
+  @Get()
+  @Roles('user')
+  @AccessLevel(ACCESS_LEVEL.GREEN)
+  public async all(@ProjectParam() project: Project, @UserJWT() user: User): Promise<UserProject[]> {
+    return this.projectMemberService.getAllByProject(project, user);
+  }
+
+  @ApiResponse({
     description: 'The Invite has been successfully sent.',
     status: 201,
     type: UserProject,
@@ -80,22 +93,5 @@ export class ProjectMemberController {
     @Param('memberId', ParseIntPipe) memberId: number
   ) {
     return this.projectMemberService.updateMember(memberId, project, data);
-  }
-
-  @ApiResponse({
-    description: 'Список всех пользователей проекта',
-    isArray: true,
-    status: 200,
-    type: UserProject,
-  })
-  @Get()
-  @Roles('user')
-  @AccessLevel(ACCESS_LEVEL.GREEN)
-  public async all(
-    @Param('projectId', ParseIntPipe) projectId: number,
-    @ProjectParam() project: Project,
-    @UserJWT() user: User
-  ): Promise<UserProject[]> {
-    return this.projectMemberService.getAllByProject(project, user);
   }
 }

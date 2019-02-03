@@ -14,11 +14,11 @@ export class TaskType {
   title: string;
 
   @ApiModelProperty()
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   icon: string;
 
   @ApiModelProperty()
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   color: string;
 
   @ApiModelProperty()
