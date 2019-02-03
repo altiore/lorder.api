@@ -131,6 +131,7 @@ export class UserWorkService {
       task = await this.taskRepo.createByProjectId(
         {
           description: userWorkData.description || '',
+          status: 2,
           title: userWorkData.title,
           users: [user],
         },

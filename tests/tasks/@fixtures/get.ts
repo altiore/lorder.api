@@ -25,6 +25,7 @@ export const projectsFixture = createProjects([
 export const tasksFixture = createTasks([
   {
     project: { owner: { email: 'super-admin@mail.com' } },
+    status: 2,
     title: 'First Task',
     users: [{ email: 'user@mail.com' }],
   },

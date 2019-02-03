@@ -1,4 +1,4 @@
-import { EntityRepository, TreeRepository } from 'typeorm';
+import { Between, EntityRepository, TreeRepository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Project } from '../project/project.entity';
@@ -41,8 +41,8 @@ export class TaskRepository extends TreeRepository<Task> {
       .innerJoinAndSelect(
         'user_tasks',
         'UserTasks',
-        '"UserTasks"."taskId"="Task"."id" AND "UserTasks"."userId"=:userId AND "Task"."isArchived"=:isArchived',
-        { userId: user.id, isArchived: false }
+        '"UserTasks"."taskId"="Task"."id" AND "UserTasks"."userId"=:userId',
+        { userId: user.id }
       )
       .leftJoinAndMapMany(
         'Task.userWorks',
@@ -59,6 +59,10 @@ export class TaskRepository extends TreeRepository<Task> {
       .addOrderBy(`Task.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
       .take(count)
       .skip(skip)
+      .where({
+        isArchived: false,
+        status: Between(1, 3),
+      })
       .getMany();
     return entities;
   }
