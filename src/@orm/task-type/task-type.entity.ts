@@ -18,7 +18,7 @@ export class TaskType {
   icon: string;
 
   @ApiModelProperty()
-  @Column({ nullable: true })
+  @Column({ default: '#D5D5D5', nullable: false })
   color: string;
 
   @ApiModelProperty()

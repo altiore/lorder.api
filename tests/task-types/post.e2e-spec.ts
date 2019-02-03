@@ -61,29 +61,32 @@ describe(`POST ${h.url}`, async () => {
             },
             property: 'title',
           },
-          {
-            children: [],
-            constraints: {
-              isNotEmpty: 'icon should not be empty',
-              isString: 'icon must be a string',
-              maxLength: 'icon must be shorter than or equal to 12 characters',
-              minLength: 'icon must be longer than or equal to 3 characters',
-            },
-            property: 'icon',
-          },
-          {
-            children: [],
-            constraints: {
-              isHexColor: 'color must be a hexadecimal color',
-              isNotEmpty: 'color should not be empty',
-              isString: 'color must be a string',
-            },
-            property: 'color',
-          },
         ],
         message: 'Validation Error',
         statusCode: 422,
       });
+  });
+
+  it('by super-admin@mail.com only with title', async () => {
+    const taskType = {
+      title: 'Test type',
+    };
+
+    const { body } = await h
+      .requestBy('super-admin@mail.com')
+      .post(h.path())
+      .send(taskType)
+      .expect(201);
+
+    expect(body).toEqual({
+      ...taskType,
+      color: '#D5D5D5',
+      icon: null,
+      id: expect.any(Number),
+      isPublic: expect.any(Boolean),
+    });
+
+    await h.removeCreated(TaskType, { id: body.id });
   });
 
   it('by super-admin@mail.com with correct data', async () => {
