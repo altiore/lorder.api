@@ -11,8 +11,8 @@ export class TaskTypeService {
     return this.taskTypeRepo.findAll();
   }
 
-  public create(tasktypeCreateDto: TaskTypeCreateDto): Promise<TaskType> {
-    return this.taskTypeRepo.createOne(tasktypeCreateDto);
+  public create(taskTypeCreateDto: TaskTypeCreateDto): Promise<TaskType> {
+    return this.taskTypeRepo.createOne(taskTypeCreateDto);
   }
 
   public update(id: number, taskTypeCreateDto: TaskTypeCreateDto): Promise<TaskType> {

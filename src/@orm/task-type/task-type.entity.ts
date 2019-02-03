@@ -14,6 +14,14 @@ export class TaskType {
   title: string;
 
   @ApiModelProperty()
+  @Column({ nullable: false })
+  icon: string;
+
+  @ApiModelProperty()
+  @Column({ nullable: false })
+  color: string;
+
+  @ApiModelProperty()
   @Column({ default: false, nullable: false })
   isPublic: boolean;
 
