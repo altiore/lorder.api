@@ -24,13 +24,18 @@ export class ProjectMemberService {
     return this.userProjectRepo.findOne({ member: user, project });
   }
 
-  public async updateMember(memberId: number, project: Project, data: DeepPartial<UserProject>) {
+  public async updateMember(memberId: number, project: Project, data: DeepPartial<UserProject>): Promise<UserProject> {
     const member = await this.findMember(memberId, project);
     if (!member) {
       throw new NotFoundException('Member not found in this project');
     }
     member.accessLevel = data.accessLevel;
-    await this.userProjectRepo.update(member, data);
+    await this.userProjectRepo.update(
+      { member: member.member, project },
+      {
+        accessLevel: data.accessLevel,
+      }
+    );
     return member;
   }
 

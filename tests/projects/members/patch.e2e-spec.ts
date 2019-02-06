@@ -1,3 +1,4 @@
+import { ACCESS_LEVEL, UserProject } from '../../../src/@orm/user-project';
 import { TestHelper } from '../../@utils/TestHelper';
 import { projectsFixture, userProjectsFixture, usersFixture } from './@fixtures/patch';
 
@@ -32,13 +33,15 @@ describe(`PATCH ${h.url}`, async () => {
     const { body } = await h
       .requestBy('project-owner@mail.com')
       .patch(h.path(projectId, memberId))
-      .send({ accessLevel: 3 })
+      .send({ accessLevel: ACCESS_LEVEL.YELLOW })
       .expect(200);
     expect(body).toEqual(
       expect.objectContaining({
-        accessLevel: 3,
+        accessLevel: ACCESS_LEVEL.YELLOW,
       })
     );
+    const up = await h.findOne(UserProject, { member: { id: memberId }, project: { id: projectId } });
+    expect(up.accessLevel).toBe(ACCESS_LEVEL.YELLOW);
   });
 
   it('by NOT project owner', async () => {
