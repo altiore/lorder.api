@@ -55,20 +55,18 @@ export class ProjectController {
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.VIOLET)
   public delete(
-    @Param('projectId', ParseIntPipe) projectId: number, // must be here because of swagger
-    @ProjectParam() project: DeepPartial<Project> // DeepPartial must be here, because of type checking
+    @Param('projectId', ParseIntPipe) projectId: number // must be here because of swagger
   ): Promise<number> {
-    return this.projectService.remove(project.id);
+    return this.projectService.remove(projectId);
   }
 
   @ApiResponse({ description: 'Проект успешно удален. Возвращает id удаленного проекта', status: 200, type: Number })
   @Delete(':projectId/admin')
   @Roles('super-admin')
   public adminDelete(
-    @Param('projectId', ParseIntPipe) projectId: number, // must be here because of swagger
-    @ProjectParam() project: DeepPartial<Project> // DeepPartial must be here, because of type checking
+    @Param('projectId', ParseIntPipe) projectId: number // must be here because of swagger
   ): Promise<number> {
-    return this.projectService.remove(project.id);
+    return this.projectService.remove(projectId);
   }
 
   @ApiResponse({ description: 'Публикация проекта', status: 200, type: Project })
