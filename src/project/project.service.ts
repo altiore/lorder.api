@@ -39,7 +39,10 @@ export class ProjectService {
     return project;
   }
 
-  public async remove(id: number): Promise<number> {
+  public async remove(id: number, force: boolean = false): Promise<number> {
+    if (force) {
+      await this.taskRepo.delete({ projectId: id });
+    }
     await this.projectRepo.delete(id);
     return id;
   }

@@ -66,7 +66,7 @@ export class ProjectController {
   public adminDelete(
     @Param('projectId', ParseIntPipe) projectId: number // must be here because of swagger
   ): Promise<number> {
-    return this.projectService.remove(projectId);
+    return this.projectService.remove(projectId, true);
   }
 
   @ApiResponse({ description: 'Публикация проекта', status: 200, type: Project })
