@@ -61,6 +61,16 @@ export class ProjectController {
     return this.projectService.remove(project.id);
   }
 
+  @ApiResponse({ description: 'Проект успешно удален. Возвращает id удаленного проекта', status: 200, type: Number })
+  @Delete(':projectId/admin')
+  @Roles('super-admin')
+  public adminDelete(
+    @Param('projectId', ParseIntPipe) projectId: number, // must be here because of swagger
+    @ProjectParam() project: DeepPartial<Project> // DeepPartial must be here, because of type checking
+  ): Promise<number> {
+    return this.projectService.remove(project.id);
+  }
+
   @ApiResponse({ description: 'Публикация проекта', status: 200, type: Project })
   @Post(':projectId/publish')
   @Roles('user')
