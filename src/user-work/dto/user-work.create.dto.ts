@@ -8,7 +8,7 @@ export class UserWorkCreateDto {
   projectId: number;
 
   @ApiModelProperty()
-  @MaxLength(40)
+  @MaxLength(140)
   @MinLength(3)
   @IsString()
   @IsNotEmpty()

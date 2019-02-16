@@ -3,7 +3,7 @@ import { IsNumber, IsOptional, IsString, IsUrl, MaxLength, MinLength } from 'cla
 
 export class TaskUpdateDto {
   @ApiModelPropertyOptional()
-  @MaxLength(40)
+  @MaxLength(140)
   @MinLength(3)
   @IsString()
   @IsOptional()

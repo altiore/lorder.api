@@ -86,7 +86,7 @@ describe(`POST ${h.url}`, async () => {
             constraints: {
               isNotEmpty: 'title should not be empty',
               isString: 'title must be a string',
-              maxLength: 'title must be shorter than or equal to 40 characters',
+              maxLength: 'title must be shorter than or equal to 140 characters',
               minLength: 'title must be longer than or equal to 3 characters',
             },
             property: 'title',

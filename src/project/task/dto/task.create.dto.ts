@@ -3,7 +3,7 @@ import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, MaxLength, MinLength
 
 export class TaskCreateDto {
   @ApiModelProperty()
-  @MaxLength(40)
+  @MaxLength(140)
   @MinLength(3)
   @IsString()
   @IsNotEmpty()
