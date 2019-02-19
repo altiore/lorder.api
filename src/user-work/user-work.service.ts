@@ -1,5 +1,6 @@
 import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import moment = require('moment');
 import { Moment } from 'moment';
 import { DeepPartial } from 'typeorm';
 
@@ -11,7 +12,7 @@ import { ACCESS_LEVEL } from '../@orm/user-project';
 import { UserWork, UserWorkRepository } from '../@orm/user-work';
 import { ProjectService } from '../project/project.service';
 import { UserService } from '../user/user.service';
-import { StartResponse, StopResponse, UserWorkCreateDto, UserWorkUpdateDto } from './dto';
+import { StartResponse, StopResponse, UserWorkCreateDto, UserWorkEditResultDto, UserWorkPatchDto } from './dto';
 
 @Injectable()
 export class UserWorkService {
@@ -26,6 +27,14 @@ export class UserWorkService {
     return this.userWorkRepo.findAllWithPagination(pagesDto, user);
   }
 
+  public async findOneByUser(userWorkId: number, user: User): Promise<UserWork> {
+    const userWork = await this.userWorkRepo.findOneByUser(userWorkId, user);
+    if (!userWork) {
+      throw new ForbiddenException('Вы можете менять время только своей работы');
+    }
+    return userWork;
+  }
+
   public async findOneByUserAndCheckAccess(
     userWorkId: number,
     user: User,
@@ -33,7 +42,7 @@ export class UserWorkService {
   ): Promise<UserWork> {
     const userWork = await this.userWorkRepo.findOneByUser(userWorkId, user);
     if (!userWork) {
-      throw new ForbiddenException('Задача не найдена');
+      throw new ForbiddenException('Вы пытаетесь изменить чужую работу');
     }
     const project = await this.projectService.findOneByMember(userWork.projectId, user);
     if (!project || !project.isAccess(accessLevel)) {
@@ -98,16 +107,54 @@ export class UserWorkService {
     return this.userWorkRepo.remove(userWork);
   }
 
-  public async update(userWork: UserWork, userWorkDto: UserWorkUpdateDto): Promise<UserWork> {
-    if (userWorkDto.duration) {
-      userWork.finishAt = userWork.startAt.clone().add(userWorkDto.duration, 'seconds');
-      return await this.userWorkRepo.save(userWork);
+  public async update(userWork: UserWork, userWorkDto: UserWorkPatchDto, user: User): Promise<UserWorkEditResultDto> {
+    // 0. Обернуть выполнение в транзакцию
+    let removed = [];
+    let touched = [];
+    if (userWorkDto.startAt || userWorkDto.finishAt) {
+      // 1. найти все задачи, затрагивающие этот промежуток времени
+      const touchedUserWorks = await this.userWorkRepo.findAllTouchedBetween(
+        userWork,
+        user,
+        userWorkDto.startAt ? moment(userWorkDto.startAt) : userWork.startAt,
+        userWorkDto.finishAt ? moment(userWorkDto.finishAt) : userWork.finishAt
+      );
+
+      // 2. удалить все задачи, полностью включенные в этот промежуток времени
+      removed = touchedUserWorks.filter(
+        el =>
+          el.startAt.diff(userWorkDto.startAt ? moment(userWorkDto.startAt) : userWork.startAt) > 0 &&
+          (el.finishAt || moment()).diff(userWorkDto.finishAt ? moment(userWorkDto.finishAt) : userWork.finishAt) < 0
+      );
+      if (removed.length) {
+        await this.userWorkRepo.remove(removed);
+      }
+
+      // 3. изменить все задачи, которые затрагивает этот промежуток времени
+      touched = touchedUserWorks.filter(
+        el =>
+          el.startAt.diff(userWorkDto.startAt ? moment(userWorkDto.startAt) : userWork.startAt) < 0 ||
+          (el.finishAt || moment()).diff(userWorkDto.finishAt ? moment(userWorkDto.finishAt) : userWork.finishAt) > 0
+      );
+      if (touched.length) {
+        touched = touched.map(el => {
+          el.finishAt = moment(userWorkDto.startAt);
+          el.startAt = moment(userWorkDto.finishAt);
+          return el;
+        });
+        await this.userWorkRepo.save(touched);
+      }
     }
-    if (userWorkDto.description) {
-      userWork.description = userWorkDto.description;
-      return await this.userWorkRepo.save(userWork);
-    }
-    return userWork;
+
+    // 4. изменить изменяемую задачу
+    const updateUserWork = this.userWorkRepo.merge(userWork, userWorkDto);
+    const edited = await this.userWorkRepo.save(updateUserWork);
+
+    return {
+      edited,
+      removed,
+      touched,
+    };
   }
 
   public recent(user: User, pagesDto: PaginationDto): Promise<UserWork[]> {

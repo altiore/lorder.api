@@ -95,6 +95,35 @@ export class UserWorkRepository extends Repository<UserWork> {
     return entities.map(this.prepare);
   }
 
+  public async findAllTouchedBetween(
+    changedUserWork: UserWork,
+    user: User,
+    startAt: moment.Moment,
+    finishAt?: moment.Moment
+  ): Promise<UserWork[]> {
+    const query = this.createQueryBuilder().orWhere(
+      `UserWork.id != :id AND UserWork.userId = :userId AND UserWork.startAt BETWEEN :start AND :finish`,
+      {
+        finish: finishAt.format('YYYY-MM-DD HH:mm:ss'),
+        id: changedUserWork.id,
+        start: startAt.format('YYYY-MM-DD HH:mm:ss'),
+        userId: user.id,
+      }
+    );
+    if (finishAt) {
+      query.orWhere(
+        `UserWork.id != :id AND UserWork.userId = :userId AND UserWork.finishAt BETWEEN :start AND :finish`,
+        {
+          finish: finishAt.format('YYYY-MM-DD HH:mm:ss'),
+          id: changedUserWork.id,
+          start: startAt.format('YYYY-MM-DD HH:mm:ss'),
+          userId: user.id,
+        }
+      );
+    }
+    return query.getMany();
+  }
+
   private prepare(userWork: UserWork): UserWork {
     const projectId = userWork.projectId;
     // delete userWork.task;
