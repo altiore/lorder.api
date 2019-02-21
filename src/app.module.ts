@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AllExceptionsFilter } from './@common/filters/all-exceptions.filter';
 import { ValidationPipe } from './@common/pipes/validation.pipe';
 import { AuthModule } from './auth/auth.module';
+import { FeedbackModule } from './feedback/feedback.module';
 import { MeModule } from './me/me.module';
 import { ProjectModule } from './project/project.module';
 import { PublicModule } from './public/public.module';
@@ -17,6 +18,7 @@ import { UserModule } from './user/user.module';
 @Module({
   imports: [
     AuthModule,
+    FeedbackModule,
     MeModule,
     ProjectModule,
     PublicModule,
