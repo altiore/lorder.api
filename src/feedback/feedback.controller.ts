@@ -25,7 +25,7 @@ export class FeedbackController {
 
   @ApiResponse({ description: 'Возвращает обратную связь', status: 200, type: Feedback, isArray: true })
   @Roles('super-admin')
-  @Get('')
+  @Get()
   public async all(@Query() pagesDto: PaginationDto): Promise<Feedback[]> {
     return this.feedbackService.all(pagesDto);
   }
