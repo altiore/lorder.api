@@ -123,23 +123,24 @@ export class UserWorkService {
       // 2. удалить все задачи, полностью включенные в этот промежуток времени
       removed = touchedUserWorks.filter(
         el =>
-          el.startAt.diff(userWorkDto.startAt ? moment(userWorkDto.startAt) : userWork.startAt) > 0 &&
-          (el.finishAt || moment()).diff(userWorkDto.finishAt ? moment(userWorkDto.finishAt) : userWork.finishAt) < 0
+          el.startAt.diff(userWorkDto.startAt ? moment(userWorkDto.startAt) : userWork.startAt) >= 0 &&
+          (el.finishAt
+            ? el.finishAt.diff(userWorkDto.finishAt ? moment(userWorkDto.finishAt) : userWork.finishAt || moment()) <= 0
+            : !userWorkDto.finishAt)
       );
       if (removed.length) {
         await this.userWorkRepo.remove(removed);
       }
 
       // 3. изменить все задачи, которые затрагивает этот промежуток времени
-      touched = touchedUserWorks.filter(
-        el =>
-          el.startAt.diff(userWorkDto.startAt ? moment(userWorkDto.startAt) : userWork.startAt) < 0 ||
-          (el.finishAt || moment()).diff(userWorkDto.finishAt ? moment(userWorkDto.finishAt) : userWork.finishAt) > 0
-      );
+      touched = touchedUserWorks.filter((tuw: any) => removed.findIndex(el => el.id === tuw.id) === -1);
       if (touched.length) {
         touched = touched.map(el => {
-          el.finishAt = moment(userWorkDto.startAt);
-          el.startAt = moment(userWorkDto.finishAt);
+          if (el.startAt.diff(userWorkDto.startAt ? moment(userWorkDto.startAt) : userWork.startAt) < 0) {
+            el.startAt = moment(userWorkDto.finishAt);
+          } else {
+            el.finishAt = moment(userWorkDto.startAt);
+          }
           return el;
         });
         await this.userWorkRepo.save(touched);
