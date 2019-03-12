@@ -2,6 +2,7 @@ import { Between, EntityRepository, TreeRepository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Project } from '../project/project.entity';
+import { ACCESS_LEVEL } from '../user-project';
 import { UserWork } from '../user-work/user-work.entity';
 import { User } from '../user/user.entity';
 import { Task } from './task.entity';
@@ -44,6 +45,18 @@ export class TaskRepository extends TreeRepository<Task> {
         '"UserTasks"."taskId"="Task"."id" AND "UserTasks"."userId"=:userId',
         { userId: user.id }
       )
+      .innerJoin(
+        'user_project',
+        'UserProject',
+        '"Task"."projectId"="UserProject"."projectId"' +
+          ' AND "UserProject"."memberId"=:userId AND "UserProject"."accessLevel">:accessLevel',
+        {
+          accessLevel: ACCESS_LEVEL.WHITE,
+          userId: user.id,
+        }
+      )
+      // TODO:  используется для расчета продолжительности работы на фронте.
+      // Возможно, стоит вернуть только результат такого расчета
       .leftJoinAndMapMany(
         'Task.userWorks',
         UserWork,
@@ -52,7 +65,7 @@ export class TaskRepository extends TreeRepository<Task> {
           ' AND "UserWork"."taskId"="Task"."id"' +
           ' AND "UserWork"."id" IN(' +
           'SELECT id from user_work where "taskId"="Task"."id"' +
-          ' AND "userId"="UserTasks"."userId" ORDER BY "startAt" DESC LIMIT 10' +
+          ' AND "userId"="UserTasks"."userId" ORDER BY "startAt" DESC' +
           ')'
       )
       .orderBy(`UserWork.startAt`, 'DESC', 'NULLS FIRST')

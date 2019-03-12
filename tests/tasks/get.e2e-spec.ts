@@ -1,9 +1,10 @@
 import { TestHelper } from '../@utils/TestHelper';
-import { projectsFixture, tasksFixture, usersFixture, userWorksFixture } from './@fixtures/get';
+import { projectsFixture, tasksFixture, userProjectFixture, usersFixture, userWorksFixture } from './@fixtures/get';
 
 const h = new TestHelper('/tasks')
   .addFixture(usersFixture)
   .addFixture(projectsFixture)
+  .addFixture(userProjectFixture)
   .addFixture(tasksFixture)
   .addFixture(userWorksFixture);
 
@@ -53,6 +54,22 @@ describe(`GET ${h.url}`, async () => {
         },
       ])
     );
+  });
+
+  it('by removed@mail.com', async () => {
+    const { body } = await h
+      .requestBy('removed@mail.com')
+      .get(h.path())
+      .expect(200);
+    expect(body).toEqual([]);
+  });
+
+  it('by white-status@mail.com', async () => {
+    const { body } = await h
+      .requestBy('white-status@mail.com')
+      .get(h.path())
+      .expect(200);
+    expect(body).toEqual([]);
   });
 
   it('by admin@mail.com', async () => {
