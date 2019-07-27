@@ -33,6 +33,7 @@
     "ln:typeorm:fixtures": "rm -rf node_modules/typeorm-fixtures && ln -s $PWD/../../typeorm-fixtures $PWD/node_modules/typeorm-fixtures"
   },
   "dependencies": {
+    "@google-cloud/storage": "3.0.3",
     "@nestjs/common": "6.5.3",
     "@nestjs/core": "6.5.3",
     "@nestjs/microservices": "6.5.3",
@@ -54,6 +55,7 @@
     "jsonwebtoken": "8.3.0",
     "lodash": "^4.17.15",
     "moment": "2.22.2",
+    "multer": "^1.4.2",
     "mustache": "2.3.0",
     "passport": "0.4.0",
     "passport-http-bearer": "1.0.1",

@@ -51,14 +51,16 @@ export class ProjectMemberService {
   }
 
   public async removeMemberFromProject({ id }: IdDto, project: DeepPartial<Project>): Promise<boolean> {
-    await this.userProjectRepo.delete({ member: { id }, project });
+    await this.userProjectRepo.delete({ member: { id }, project: { id: project.id } });
     return true;
   }
 
   public async acceptInvitation(user: User, project: DeepPartial<Project>): Promise<UserProject> {
     const userProject = await this.userProjectRepo.findOne({
-      member: user,
-      project,
+      where: {
+        member: user,
+        project,
+      },
     });
     if (!userProject) {
       throw new NotAcceptableException('Приглашение было отозвано');

@@ -18,6 +18,9 @@ dist
 *.dev
 .DS_Store
 yarn.lock
+google-api-key.json
+./uploads
+./temp
 
 # Docker
 Dockerfile

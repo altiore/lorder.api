@@ -14,7 +14,7 @@ export class ProjectTaskTypeRepository extends Repository<ProjectTaskType> {
   }
 
   public async createMultiple(project: DeepPartial<Project>, taskTypes: TaskType[]): Promise<any> {
-    await this.delete({ project });
+    await this.delete({ project: { id: project.id } });
     const entities = taskTypes.map((taskType, order) =>
       this.create({
         order,

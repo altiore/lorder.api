@@ -35,7 +35,11 @@ export class ProjectMemberController {
   @Get()
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.GREEN)
-  public async all(@ProjectParam() project: Project, @UserJWT() user: User): Promise<UserProject[]> {
+  public async all(
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @ProjectParam() project: Project,
+    @UserJWT() user: User
+  ): Promise<UserProject[]> {
     return this.projectMemberService.getAllByProject(project, user);
   }
 
