@@ -11,6 +11,7 @@ import { MeModule } from './me/me.module';
 import { ProjectModule } from './project/project.module';
 import { PublicModule } from './public/public.module';
 import { RedisModule } from './redis/redis.module';
+import { StatisticsModule } from './statistics/statistics.module';
 import { TaskTypeModule } from './task-type/task-type.module';
 import { TaskModule } from './task/task.module';
 import { UserWorkModule } from './user-work/user-work.module';
@@ -25,6 +26,7 @@ import { UserModule } from './user/user.module';
     ProjectModule,
     PublicModule,
     RedisModule,
+    StatisticsModule,
     TaskModule,
     TaskTypeModule,
     TypeOrmModule.forRoot(),
