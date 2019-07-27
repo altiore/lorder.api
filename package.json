@@ -9,7 +9,7 @@
     "node": ">=8.11.3"
   },
   "scripts": {
-    "start": "cross-env NODE_ENV=development nodemon",
+    "start": "sh bin/start.sh && cross-env NODE_ENV=development nodemon",
     "start:hmr": "node dist/server",
     "start:prod": "npm run build && node dist/main.js",
     "postinstall": "npm run build && npm run migration:up",
