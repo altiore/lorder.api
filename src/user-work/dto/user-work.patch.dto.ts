@@ -17,10 +17,9 @@ export class UserWorkPatchDto {
   startAt?: string;
 
   @ApiModelPropertyOptional({ example: '2018-05-26T09:05:39.378Z' })
-  @Validate(IsMomentString)
-  @Validate(MomentMaxDate)
-  @Validate(MomentMaxDate)
   @Validate(LaterThenField, ['startAt'])
+  @Validate(MomentMaxDate)
+  @Validate(IsMomentString)
   @IsOptional()
   finishAt?: string;
 

@@ -122,10 +122,10 @@ describe(`PATCH ${h.url}`, async () => {
       .patch(h.path(userWorkId))
       .send({
         description: 1,
-        finishAt: 'asdfasdfasdf',
+        finishAt: '2019-07-22',
         projectId,
         source: 2,
-        startAt: 'asdfasdfasdf',
+        startAt: '2019-07-22',
         taskId: 'asdfasdfasdf',
         value: 'string',
       })

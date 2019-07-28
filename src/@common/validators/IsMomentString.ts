@@ -4,7 +4,8 @@ import moment = require('moment');
 @ValidatorConstraint({ name: 'isMomentString', async: false })
 export class IsMomentString implements ValidatorConstraintInterface {
   validate(propertyValue: string, args: ValidationArguments) {
-    return propertyValue === moment(propertyValue).toISOString();
+    const isValid = propertyValue === moment(propertyValue).toISOString();
+    return isValid;
   }
 
   defaultMessage(args: ValidationArguments) {
