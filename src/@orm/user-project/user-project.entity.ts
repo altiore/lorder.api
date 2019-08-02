@@ -2,6 +2,7 @@ import { ApiModelProperty } from '@nestjs/swagger';
 import { Column, Entity, ManyToOne } from 'typeorm';
 
 import { Project } from '../project/project.entity';
+import { Specialty } from '../specialty';
 import { User } from '../user/user.entity';
 import { ACCESS_LEVEL } from './user-project.consts';
 

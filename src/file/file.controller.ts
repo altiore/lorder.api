@@ -1,12 +1,13 @@
 import { Controller, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiImplicitFile, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 
 import { Roles } from '../@common/decorators';
 import { RolesGuard } from '../@common/guards';
+import { Media } from '../@orm/media';
 import { FileService } from './file.service';
 
 @ApiBearerAuth()
@@ -17,7 +18,8 @@ export class FileController {
   constructor(private readonly taskService: FileService) {}
 
   @Roles('user')
-  @ApiResponse({ status: 200, type: String })
+  @ApiResponse({ status: 200, type: Media })
+  @ApiImplicitFile({ name: 'file', required: true, description: 'Media File' })
   @Post('upload')
   @UseInterceptors(
     FileInterceptor('file', {

@@ -19,8 +19,9 @@ dist
 .DS_Store
 yarn.lock
 google-api-key.json
-./uploads
+uploads
 ./temp
+altiore-1298-e837eac2c685.json
 
 # Docker
 Dockerfile

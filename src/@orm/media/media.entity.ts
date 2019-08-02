@@ -1,5 +1,5 @@
 import { ApiModelProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum MEDIA_TYPE {
   IMAGE = 'image',
@@ -10,7 +10,7 @@ export enum MEDIA_TYPE {
 @Entity()
 export class Media {
   @ApiModelProperty()
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
   @ApiModelProperty()

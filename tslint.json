@@ -9,7 +9,7 @@
     "quotemark": [true, "single"],
     "indent": false,
     "member-access": [false],
-    "max-line-length": [true, 120],
+    "max-line-length": [true, 100],
     "no-unused-variable": true,
     "curly": false,
     "interface-name": [false],
