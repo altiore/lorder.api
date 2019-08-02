@@ -12,6 +12,7 @@
     "start": "sh bin/start.sh && cross-env NODE_ENV=development nodemon",
     "start:hmr": "node dist/server",
     "start:prod": "npm run build && node dist/main.js",
+    "preinstall": "node bin/gcpSetup.js",
     "postinstall": "npm run build && npm run migration:up",
     "build": "rm -rf dist && tsc",
     "pretest": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && npm run migration:test:up",
@@ -111,13 +112,13 @@
   },
   "lint-staged": {
     "*.{js,jsx,json,css,md}": [
-      "prettier --write --print-width 120 --single-quote --trailing-comma es5",
+      "prettier --write --print-width 100 --single-quote --trailing-comma es5",
       "git add"
     ],
     "*.{ts,tsx}": [
-      "prettier --write --print-width 120 --single-quote --trailing-comma es5 --parser typescript",
+      "prettier --write --print-width 100 --single-quote --trailing-comma es5 --parser typescript",
       "tslint --fix -t verbose",
-      "prettier --write --print-width 120 --single-quote --trailing-comma es5 --parser typescript",
+      "prettier --write --print-width 100 --single-quote --trailing-comma es5 --parser typescript",
       "git add"
     ]
   }

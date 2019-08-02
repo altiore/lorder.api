@@ -23,9 +23,7 @@ export class FileService {
   constructor(@InjectRepository(MediaRepository) private readonly mediaRepo: MediaRepository) {}
 
   public async saveToGoogleCloudStorage(file: any): Promise<Media> {
-    const storage = new Storage({
-      keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-    });
+    const storage = new Storage();
 
     const res = await storage.bucket(process.env.GOOGLE_APPLICATION_BUCKET).upload(file.path, {
       // Support for HTTP requests made with `Accept-Encoding: gzip`
@@ -53,8 +51,10 @@ export class FileService {
   }
 
   private getMediaUrl(uploadResponse: UploadResponse) {
-    return ['https:/', `${uploadResponse[0].metadata.bucket}.${BASE_GOOGLE_URL}`, uploadResponse[0].metadata.name].join(
-      '/'
-    );
+    return [
+      'https:/',
+      `${uploadResponse[0].metadata.bucket}.${BASE_GOOGLE_URL}`,
+      uploadResponse[0].metadata.name,
+    ].join('/');
   }
 }
