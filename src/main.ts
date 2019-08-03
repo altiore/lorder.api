@@ -13,7 +13,7 @@ const HOST = process.env.HOST || process.env.HOSTNAME || 'localhost';
 const SCHEMA = process.env.NODE_ENV === 'production' ? 'https' : 'http';
 
 const corsOptions = {
-  allowedHeaders: ['Authorization'],
+  allowedHeaders: ['Authorization', 'Content-Type'],
   credentials: true,
   exposedHeaders: [],
   origin:
