@@ -124,7 +124,7 @@ export class ProjectService {
         data,
         members: projectWithMembers.members.map(member => ({
           accessLevel: member.accessLevel,
-          avatar: member.member.avatar.url,
+          avatar: member.member.avatarUrl,
           email: member.member.email,
           id: member.member.id,
         })),

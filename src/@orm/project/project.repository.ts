@@ -23,7 +23,11 @@ export class ProjectRepository extends Repository<Project> {
 
   public async findOneByUser(projectId: number, user: User): Promise<Project> {
     const entity = await this.createQueryBuilder()
-      .leftJoinAndMapMany('Project.projectTaskTypes', 'Project.projectTaskTypes', 'projectTaskTypes')
+      .leftJoinAndMapMany(
+        'Project.projectTaskTypes',
+        'Project.projectTaskTypes',
+        'projectTaskTypes'
+      )
       .leftJoinAndMapOne(
         'projectTaskTypes.taskType',
         TaskType,
@@ -31,8 +35,19 @@ export class ProjectRepository extends Repository<Project> {
         '"projectTaskTypes"."taskTypeId"="taskTypes"."id"'
       )
       .leftJoinAndMapMany('Project.members', 'Project.members', 'projectMembers')
-      .leftJoinAndMapOne('projectMembers.member', 'user', 'users', '"projectMembers"."memberId"="users"."id"')
-      .leftJoinAndMapMany('users.roles', 'user_roles', 'user_roles', '"users"."id"="user_roles"."userId"')
+      .leftJoinAndMapOne(
+        'projectMembers.member',
+        'user',
+        'users',
+        '"projectMembers"."memberId"="users"."id"'
+      )
+      .leftJoinAndMapOne('users.avatar', 'media', 'medias', '"users"."avatarId"="medias"."id"')
+      .leftJoinAndMapMany(
+        'users.roles',
+        'user_roles',
+        'user_roles',
+        '"users"."id"="user_roles"."userId"'
+      )
       .leftJoinAndMapMany('users.roles', 'role', 'roles', '"roles"."id"="user_roles"."roleId"')
       .innerJoinAndMapOne(
         'Project.accessLevel',
@@ -73,25 +88,48 @@ export class ProjectRepository extends Repository<Project> {
     if (project.taskTypes) {
       delete project.projectTaskTypes;
     }
+    (project.members as any) = project.members.map(({ accessLevel, member }) => ({
+      accessLevel,
+      member: {
+        ...member,
+        avatar: member.avatarUrl,
+      },
+    }));
     return project;
   }
 
-  public async findAllWithPagination(paginationDto: PaginationDto, user: User): Promise<Partial<Project>[]> {
+  public async findAllWithPagination(
+    paginationDto: PaginationDto,
+    user: User
+  ): Promise<Partial<Project>[]> {
     const entities = await this.selectOrderedProjects(
       paginationDto,
-      this.createQueryBuilder().leftJoin('Project.members', 'AccessLevel', '"AccessLevel"."memberId" = :memberId', {
-        memberId: user.id,
-      })
+      this.createQueryBuilder().leftJoin(
+        'Project.members',
+        'AccessLevel',
+        '"AccessLevel"."memberId" = :memberId',
+        {
+          memberId: user.id,
+        }
+      )
     );
     return entities.map(this.preparePublic);
   }
 
-  public async findWithPaginationByUser(paginationDto: PaginationDto, user: User): Promise<Partial<Project>[]> {
+  public async findWithPaginationByUser(
+    paginationDto: PaginationDto,
+    user: User
+  ): Promise<Partial<Project>[]> {
     const entities = await this.selectOrderedProjects(
       paginationDto,
-      this.createQueryBuilder().innerJoin('Project.members', 'AccessLevel', '"AccessLevel"."memberId" = :memberId', {
-        memberId: user.id,
-      })
+      this.createQueryBuilder().innerJoin(
+        'Project.members',
+        'AccessLevel',
+        '"AccessLevel"."memberId" = :memberId',
+        {
+          memberId: user.id,
+        }
+      )
     );
     return entities.map(this.preparePublic);
   }
@@ -107,7 +145,10 @@ export class ProjectRepository extends Repository<Project> {
     const rawArrayTimeSum = await query
       .clone()
       .select('"Project"."id"', 'id')
-      .addSelect('SUM(EXTRACT(EPOCH FROM ("ProjectWorks"."finishAt" - "ProjectWorks"."startAt")))', 'timeSum')
+      .addSelect(
+        'SUM(EXTRACT(EPOCH FROM ("ProjectWorks"."finishAt" - "ProjectWorks"."startAt")))',
+        'timeSum'
+      )
       .leftJoin('Project.tasks', 'ProjectTasks')
       .leftJoin('ProjectTasks.userWorks', 'ProjectWorks')
       .skip(skip)
