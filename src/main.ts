@@ -13,12 +13,13 @@ const HOST = process.env.HOST || process.env.HOSTNAME || 'localhost';
 const SCHEMA = process.env.NODE_ENV === 'production' ? 'https' : 'http';
 
 const corsOptions = {
-  origin: [
-    'http://localhost:8181', // local
-    'https://staging-altiore.herokuapp.com', // staging server
-    'http://altiore.loc', // static local server (server from build folder)
-    'https://altiore.org', // production server
-  ],
+  allowedHeaders: ['Authorization'],
+  credentials: true,
+  exposedHeaders: [],
+  origin:
+    process.env.NODE_ENV === 'production'
+      ? ['https://altiore.org'] // production server
+      : ['http://localhost:8181'], // local
 } as CorsOptions;
 
 async function bootstrap() {
@@ -39,7 +40,9 @@ async function bootstrap() {
   await app.listen(
     PORT,
     /* tslint:disable */
-    () => process.env.NODE_ENV !== 'production' && console.log(`Listening on ${SCHEMA}://${HOST}:${PORT}/api/`)
+    () =>
+      process.env.NODE_ENV !== 'production' &&
+      console.log(`Listening on ${SCHEMA}://${HOST}:${PORT}/api/`)
   );
 }
 
