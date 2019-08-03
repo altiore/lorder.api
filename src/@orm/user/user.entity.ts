@@ -4,14 +4,17 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
+import { Media } from '../media/media.entity';
 import { Project } from '../project/project.entity';
 import { Role, ROLES } from '../role/role.entity';
 import { Task } from '../task/task.entity';
@@ -62,8 +65,10 @@ export class User {
   @Column({ nullable: true, select: false })
   password: string;
 
-  @Column({ nullable: true })
-  avatar: string;
+  @ApiModelProperty({ type: Media })
+  @OneToOne(() => Media, { eager: true, nullable: true })
+  @JoinColumn()
+  avatar?: Media;
 
   @Column({ nullable: true })
   defaultProjectId: number;
@@ -105,9 +110,13 @@ export class User {
     return this.role === ROLES.SUPER_ADMIN;
   }
 
+  get avatarUrl() {
+    return this.avatar ? this.avatar.url : null;
+  }
+
   get publicData(): { avatar?: string; defaultProjectId: number; email: string; role: ROLES } {
     return {
-      avatar: this.avatar,
+      avatar: this.avatarUrl,
       defaultProjectId: this.defaultProjectId,
       email: this.email,
       role: this.role,

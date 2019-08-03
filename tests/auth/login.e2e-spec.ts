@@ -3,6 +3,7 @@ import moment = require('moment');
 import { TestHelper } from '../@utils/TestHelper';
 import { usersFixture } from './@fixtures/users';
 
+import { Media } from '../../src/@orm/media';
 import { Project } from '../../src/@orm/project';
 import { User } from '../../src/@orm/user';
 
@@ -79,6 +80,7 @@ describe(`PATCH ${h.url}`, async () => {
     );
     await h.removeCreated(Project, { id: addedUser.defaultProjectId });
     await h.removeCreated(User, { email });
+    await h.removeCreated(Media, { id: addedUser.avatar.id });
   });
 
   it('by user with password (own email)', async () => {

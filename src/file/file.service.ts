@@ -2,8 +2,10 @@ import { Storage, UploadResponse } from '@google-cloud/storage';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as fs from 'fs';
+import { get } from 'lodash';
 
-import { Media, MEDIA_TYPE, MediaRepository } from '../@orm/media';
+import { parseGoogleObjName } from '../@common/helpers/parseGoogleObjName';
+import { CLOUD_TYPE, Media, MEDIA_TYPE, MediaRepository } from '../@orm/media';
 
 const BASE_GOOGLE_URL = 'storage.googleapis.com';
 
@@ -22,7 +24,7 @@ const removeFile = fileName => {
 export class FileService {
   constructor(@InjectRepository(MediaRepository) private readonly mediaRepo: MediaRepository) {}
 
-  public async saveToGoogleCloudStorage(file: any): Promise<Media> {
+  public async saveToGoogleCloudStorage(file: any, media?: Media): Promise<Media> {
     const storage = new Storage();
 
     const res = await storage.bucket(process.env.GOOGLE_APPLICATION_BUCKET).upload(file.path, {
@@ -44,10 +46,38 @@ export class FileService {
       throw new InternalServerErrorException('Could not remove temporary created file');
     }
 
+    if (media && media.url) {
+      return this.mediaRepo.updateUrl(media, this.getMediaUrl(res));
+    }
+
     return await this.mediaRepo.createOne({
+      cloud: CLOUD_TYPE.GOOGLE,
       type: MEDIA_TYPE.IMAGE,
       url: this.getMediaUrl(res),
     });
+  }
+
+  public async updateOrCreateObjInGoogleCloudStorage(file: any, media: Media): Promise<Media> {
+    // 1. check that media is from google cloud storage
+    if (get(media, 'cloud') === CLOUD_TYPE.GOOGLE) {
+      const storage = new Storage();
+
+      const res = await storage.bucket(process.env.GOOGLE_APPLICATION_BUCKET).upload(file.path, {
+        destination: this.getObjectName(media),
+        gzip: true,
+        metadata: {
+          cacheControl: 'public, max-age=31536000',
+        },
+      });
+
+      return this.mediaRepo.updateUrl(media, this.getMediaUrl(res));
+    }
+
+    return this.saveToGoogleCloudStorage(file, media);
+  }
+
+  public async createOne(data: Partial<Media>): Promise<Media> {
+    return await this.mediaRepo.createOne(data);
   }
 
   private getMediaUrl(uploadResponse: UploadResponse) {
@@ -56,5 +86,9 @@ export class FileService {
       `${uploadResponse[0].metadata.bucket}.${BASE_GOOGLE_URL}`,
       uploadResponse[0].metadata.name,
     ].join('/');
+  }
+
+  private getObjectName(media: Media): string {
+    return parseGoogleObjName(media.url);
   }
 }

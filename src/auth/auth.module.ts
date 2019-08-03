@@ -16,7 +16,7 @@ import { JwtStrategy } from './jwt.strategy';
   imports: [
     MailModule,
     RedisModule,
-    forwardRef(() => UserModule),
+    UserModule,
     TypeOrmModule.forFeature([UserProjectRepository, UserRepository]),
   ],
   providers: [AuthService, JwtStrategy],

@@ -1,4 +1,4 @@
-import { fixtureCreator, many } from 'typeorm-fixtures';
+import { fixtureCreator, many, one } from 'typeorm-fixtures';
 
 import { Role } from '../../src/@orm/role';
 import { User } from '../../src/@orm/user';

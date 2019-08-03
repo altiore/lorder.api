@@ -9,7 +9,7 @@ import { FileService } from './file.service';
 @Module({
   controllers: [FileController],
   exports: [FileService],
-  imports: [AuthModule, TypeOrmModule.forFeature([MediaRepository])],
+  imports: [TypeOrmModule.forFeature([MediaRepository])],
   providers: [FileService],
 })
 export class FileModule {}

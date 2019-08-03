@@ -7,16 +7,14 @@ import { User } from './user.entity';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
-  /**
-   * Испльзуется при входе по паролю
-   */
+  // Испльзуется при входе по паролю
   public async findOneByEmail(email: string, withPassword: boolean = false): Promise<User> {
     if (withPassword) {
       try {
         return await this.findOne({
           loadEagerRelations: false,
-          relations: ['roles'],
-          select: ['id', 'avatar', 'email', 'status', 'defaultProjectId', 'password'],
+          relations: ['avatar', 'roles'],
+          select: ['id', 'email', 'status', 'defaultProjectId', 'password'],
           where: { email },
         });
       } catch (e) {
@@ -26,9 +24,7 @@ export class UserRepository extends Repository<User> {
     return await this.findOne({ where: { email } });
   }
 
-  /**
-   * Используется при валидации JWT ключа
-   */
+  // Используется при валидации JWT ключа
   public findOneActiveByEmail(email: string): Promise<User> {
     return this.findOneOrFail({ where: { email, status: 10 } });
   }
@@ -38,7 +34,10 @@ export class UserRepository extends Repository<User> {
     return this.save(user);
   }
 
-  public async createWithRoles(data: DeepPartial<User>, roles: Role[]): Promise<{ user: User; password?: string }> {
+  public async createWithRoles(
+    data: DeepPartial<User>,
+    roles: Role[]
+  ): Promise<{ user: User; password?: string }> {
     const user = this.create(data);
     // создаваемый пользователь всегда неактивен
     user.status = 1;
@@ -68,8 +67,7 @@ export class UserRepository extends Repository<User> {
     order = 'desc',
   }: PaginationDto): Promise<User[]> {
     return this.createQueryBuilder()
-      .select('User.avatar', 'avatar')
-      .addSelect('User.createdAt', 'createdAt')
+      .select('User.createdAt', 'createdAt')
       .addSelect('User.defaultProjectId', 'defaultProjectId')
       .addSelect('User.email', 'email')
       .addSelect('User.id', 'id')
@@ -80,7 +78,11 @@ export class UserRepository extends Repository<User> {
       .leftJoin('User.memberProjects', 'ProjectsWhereMember')
       .addSelect('COUNT(DISTINCT "ProjectsWhereMember"."projectId")', 'projectsCount')
       .leftJoin('user_roles', 'UserRoles', 'User.id=UserRoles.userId')
-      .addSelect('(SELECT "name" FROM role where id = COUNT(DISTINCT "UserRoles"."roleId"))', 'role')
+      .addSelect(
+        '(SELECT "name" FROM role where id = COUNT(DISTINCT "UserRoles"."roleId"))',
+        'role'
+      )
+      .addSelect('(SELECT "url" FROM media where id = "User"."avatarId")', 'avatar')
       .orderBy(`User.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
       .groupBy('User.id')
       .limit(count)

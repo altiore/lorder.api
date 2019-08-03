@@ -12,4 +12,9 @@ export class MediaRepository extends Repository<Media> {
     const media = this.create(data);
     return await this.save(media);
   }
+
+  public async updateUrl(media: Media, url: string): Promise<Media> {
+    media.url = url;
+    return this.save(media);
+  }
 }

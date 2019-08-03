@@ -7,15 +7,20 @@ import {
   Param,
   ParseIntPipe,
   Patch,
+  Post,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiImplicitFile, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 
 import { Roles } from '../@common/decorators/roles.decorator';
 import { UserJWT } from '../@common/decorators/user-jwt.decorator';
 import { RolesGuard } from '../@common/guards/roles.guard';
+import { MyFileInterceptor } from '../@common/interceptors';
+import { Media } from '../@orm/media';
 import { User } from '../@orm/user';
 import { UserDto, UserPaginationDto } from './dto';
 import { UserService } from './user.service';
@@ -44,9 +49,15 @@ export class UserController {
   @ApiResponse({ status: 200 })
   @Patch(':id')
   @Roles('super-admin')
-  public update(@Body() data: UserDto, @Param('id', ParseIntPipe) id: number, @UserJWT() user: User): Promise<User> {
+  public update(
+    @Body() data: UserDto,
+    @Param('id', ParseIntPipe) id: number,
+    @UserJWT() user: User
+  ): Promise<User> {
     if (id === user.id) {
-      throw new NotAcceptableException('Вы не можете изменить свои данные. Используйте профайл для этого');
+      throw new NotAcceptableException(
+        'Вы не можете изменить свои данные. Используйте профайл для этого'
+      );
     }
     return this.usersService.updateUserById(id, data);
   }
@@ -56,5 +67,14 @@ export class UserController {
   @Roles('super-admin')
   public remove(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.remove(id);
+  }
+
+  @Roles('user')
+  @ApiResponse({ status: 200, type: Media })
+  @ApiImplicitFile({ name: 'file', required: true, description: 'Update User avatar' })
+  @Post('avatar/update')
+  @UseInterceptors(MyFileInterceptor)
+  public updateAvatar(@UploadedFile() file, @UserJWT() user: User) {
+    return this.usersService.updateAvatar(file, user);
   }
 }

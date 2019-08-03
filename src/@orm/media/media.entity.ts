@@ -1,10 +1,14 @@
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum MEDIA_TYPE {
   IMAGE = 'image',
   VIDEO = 'video',
   DOCUMENT = 'document',
+}
+
+export enum CLOUD_TYPE {
+  GOOGLE = 'google',
 }
 
 @Entity()
@@ -17,11 +21,15 @@ export class Media {
   @Column({ unique: true, nullable: false })
   url: string;
 
-  @ApiModelProperty()
+  @ApiModelPropertyOptional()
   @Column({ nullable: true })
   title?: string;
 
   @ApiModelProperty()
   @Column('text')
   type: MEDIA_TYPE;
+
+  @ApiModelPropertyOptional()
+  @Column('text', { nullable: true })
+  cloud?: CLOUD_TYPE;
 }

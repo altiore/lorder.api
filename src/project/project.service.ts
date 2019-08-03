@@ -13,7 +13,8 @@ export class ProjectService {
   constructor(
     @InjectRepository(ProjectRepository) private readonly projectRepo: ProjectRepository,
     @InjectRepository(ProjectPubRepository) private readonly projectPubRepo: ProjectPubRepository,
-    @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository,
+    @InjectRepository(UserProjectRepository)
+    private readonly userProjectRepo: UserProjectRepository,
     @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository
   ) {}
 
@@ -47,11 +48,17 @@ export class ProjectService {
     return id;
   }
 
-  public async findWithPaginationByUser(pagesDto: ProjectPaginationDto, user: User): Promise<Partial<Project>[]> {
+  public async findWithPaginationByUser(
+    pagesDto: ProjectPaginationDto,
+    user: User
+  ): Promise<Partial<Project>[]> {
     return this.projectRepo.findWithPaginationByUser(pagesDto, user);
   }
 
-  public async findAllWithPagination(pagesDto: ProjectPaginationDto, user: User): Promise<Partial<Project>[]> {
+  public async findAllWithPagination(
+    pagesDto: ProjectPaginationDto,
+    user: User
+  ): Promise<Partial<Project>[]> {
     return this.projectRepo.findAllWithPagination(pagesDto, user);
   }
 
@@ -77,13 +84,12 @@ export class ProjectService {
         relations: ['members', 'pub'],
         where: { id: project.id },
       });
-      const data: { [key in any]: { value: number; time: number } } = projectWithMembers.members.reduce(
-        (res, member: UserProject) => {
-          res[member.member.id] = { time: 0, value: 0 };
-          return res;
-        },
-        {}
-      );
+      const data: {
+        [key in any]: { value: number; time: number }
+      } = projectWithMembers.members.reduce((res, member: UserProject) => {
+        res[member.member.id] = { time: 0, value: 0 };
+        return res;
+      }, {});
       const step = 2;
       let i = 0;
       let tasksPortion;
@@ -118,7 +124,7 @@ export class ProjectService {
         data,
         members: projectWithMembers.members.map(member => ({
           accessLevel: member.accessLevel,
-          avatar: member.member.avatar,
+          avatar: member.member.avatar.url,
           email: member.member.email,
           id: member.member.id,
         })),
