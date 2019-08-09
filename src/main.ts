@@ -16,6 +16,7 @@ const corsOptions = {
   allowedHeaders: ['Authorization', 'Content-Type'],
   credentials: true,
   exposedHeaders: [],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
   origin:
     process.env.NODE_ENV === 'production'
       ? ['https://altiore.org'] // production server
