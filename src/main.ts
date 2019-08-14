@@ -16,11 +16,8 @@ const corsOptions = {
   allowedHeaders: ['Authorization', 'Content-Type'],
   credentials: true,
   exposedHeaders: [],
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
-  origin:
-    process.env.NODE_ENV === 'production'
-      ? ['https://altiore.org'] // production server
-      : ['http://localhost:8181'], // local
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  origin: ['https://altiore.org', 'http://localhost:8181'],
 } as CorsOptions;
 
 async function bootstrap() {
