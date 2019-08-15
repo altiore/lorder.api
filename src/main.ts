@@ -8,16 +8,17 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
 
+const IS_PROD = process.env.NODE_ENV === 'production';
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || process.env.HOSTNAME || 'localhost';
-const SCHEMA = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+const SCHEMA = IS_PROD ? 'https' : 'http';
 
 const corsOptions = {
-  allowedHeaders: ['Authorization', 'Content-Type'],
+  allowedHeaders: ['Accept', 'Authorization', 'Content-Type', 'Origin', 'X-Requested-With'],
   credentials: true,
-  exposedHeaders: [],
+  // exposedHeaders: [],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  origin: ['https://altiore.org', 'http://localhost:8181'],
+  origin: IS_PROD ? 'https://altiore.org' : 'http://localhost:8181',
 } as CorsOptions;
 
 async function bootstrap() {
