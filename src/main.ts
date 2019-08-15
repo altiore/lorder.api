@@ -1,4 +1,7 @@
-import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
+import {
+  CorsOptions,
+  CustomOrigin,
+} from '@nestjs/common/interfaces/external/cors-options.interface';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
@@ -13,16 +16,24 @@ const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || process.env.HOSTNAME || 'localhost';
 const SCHEMA = IS_PROD ? 'https' : 'http';
 
+const whitelist = ['https://altiore.org', 'http://localhost:8181'];
 const corsOptions = {
   allowedHeaders: ['Authorization', 'Content-Type'],
   credentials: true,
   exposedHeaders: ['Authorization'],
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-  origin: ['https://altiore.org', 'http://localhost:8181'],
+  origin: function(origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  } as CustomOrigin,
 } as CorsOptions;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: corsOptions });
+  const app = await NestFactory.create(AppModule);
+  app.enableCors(corsOptions);
   app.setGlobalPrefix('v1');
 
   const options = new DocumentBuilder()
