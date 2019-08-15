@@ -4,6 +4,7 @@ import {
 } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as helmet from 'helmet';
 
 import { AppModule } from './app.module';
 
@@ -34,6 +35,7 @@ const corsOptions = {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors(corsOptions);
+  app.use(helmet());
   app.setGlobalPrefix('v1');
 
   const options = new DocumentBuilder()
