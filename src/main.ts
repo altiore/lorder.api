@@ -14,11 +14,13 @@ const HOST = process.env.HOST || process.env.HOSTNAME || 'localhost';
 const SCHEMA = IS_PROD ? 'https' : 'http';
 
 const corsOptions = {
-  allowedHeaders: ['Accept', 'Authorization', 'Content-Type', 'Origin', 'X-Requested-With'],
+  allowedHeaders: ['Authorization', 'Content-Type'],
   credentials: true,
   // exposedHeaders: [],
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  origin: IS_PROD ? 'https://altiore.org' : 'http://localhost:8181',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  optionsSuccessStatus: 204,
+  origin: ['https://altiore.org', 'http://localhost:8181'],
+  preflightContinue: true,
 } as CorsOptions;
 
 async function bootstrap() {
