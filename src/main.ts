@@ -17,10 +17,8 @@ const corsOptions = {
   allowedHeaders: ['Authorization', 'Content-Type'],
   credentials: true,
   exposedHeaders: ['Authorization'],
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  optionsSuccessStatus: 204,
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
   origin: ['https://altiore.org', 'http://localhost:8181'],
-  preflightContinue: true,
 } as CorsOptions;
 
 async function bootstrap() {
