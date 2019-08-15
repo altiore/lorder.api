@@ -16,7 +16,7 @@ const SCHEMA = IS_PROD ? 'https' : 'http';
 const corsOptions = {
   allowedHeaders: ['Authorization', 'Content-Type'],
   credentials: true,
-  // exposedHeaders: [],
+  exposedHeaders: ['Authorization'],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   optionsSuccessStatus: 204,
   origin: ['https://altiore.org', 'http://localhost:8181'],
