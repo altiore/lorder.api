@@ -18,10 +18,10 @@ const SCHEMA = IS_PROD ? 'https' : 'http';
 
 const whitelist = ['https://altiore.org', 'http://localhost:8181'];
 const corsOptions = {
-  allowedHeaders: ['Authorization', 'Content-Type'],
+  allowedHeaders: 'Authorization,Accept,Content-Type',
   credentials: true,
-  exposedHeaders: ['Authorization'],
-  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  exposedHeaders: 'Authorization',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   origin: function(origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
       callback(null, true);
