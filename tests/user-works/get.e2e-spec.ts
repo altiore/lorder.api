@@ -3,7 +3,7 @@ import { projectsFixture, usersFixture } from './@fixtures/get';
 
 const h = new TestHelper('/user-works').addFixture(usersFixture).addFixture(projectsFixture);
 
-describe(`GET ${h.url}`, async () => {
+describe(`GET ${h.url}`, () => {
   let projectId: number;
 
   beforeAll(async () => {

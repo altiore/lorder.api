@@ -1,5 +1,10 @@
 import { TestHelper } from '../../@utils/TestHelper';
-import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture } from './@fixtures/patch';
+import {
+  projectsFixture,
+  tasksFixture,
+  userProjectsFixture,
+  usersFixture,
+} from './@fixtures/patch';
 
 const h = new TestHelper('/projects/:projectId/tasks/:taskId/move')
   .addFixture(usersFixture)
@@ -10,7 +15,7 @@ const h = new TestHelper('/projects/:projectId/tasks/:taskId/move')
 let projectId: number;
 let taskId: number;
 
-describe(`PATCH ${h.url}`, async () => {
+describe(`PATCH ${h.url}`, () => {
   beforeAll(async () => {
     await h.before();
     projectId = h.entities.Project[0].id;

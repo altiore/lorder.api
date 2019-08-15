@@ -1,6 +1,12 @@
 import moment = require('moment');
 import { TestHelper } from '../@utils/TestHelper';
-import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/post';
+import {
+  projectsFixture,
+  tasksFixture,
+  userProjectsFixture,
+  usersFixture,
+  userWorksFixture,
+} from './@fixtures/post';
 
 import { Task } from '../../src/@orm/task';
 import { UserWork } from '../../src/@orm/user-work';
@@ -12,7 +18,7 @@ const h = new TestHelper('/user-works')
   .addFixture(tasksFixture)
   .addFixture(userWorksFixture);
 
-describe(`POST ${h.url}`, async () => {
+describe(`POST ${h.url}`, () => {
   let projectId: number;
 
   beforeAll(async () => {

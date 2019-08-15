@@ -9,7 +9,7 @@ import { User } from '../../src/@orm/user';
 
 const h = new TestHelper('/auth/magic').addFixture(usersFixture);
 
-describe(`POST ${h.url}`, async () => {
+describe(`POST ${h.url}`, () => {
   beforeAll(h.before);
   afterAll(h.after);
 

@@ -1,5 +1,10 @@
 import { TestHelper } from '../@utils/TestHelper';
-import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture } from './@fixtures/archive';
+import {
+  projectsFixture,
+  tasksFixture,
+  userProjectsFixture,
+  usersFixture,
+} from './@fixtures/archive';
 
 const h = new TestHelper('/tasks/:taskId/archive')
   .addFixture(usersFixture)
@@ -10,7 +15,7 @@ const h = new TestHelper('/tasks/:taskId/archive')
 let taskId: number;
 let alreadyArchivedTaskId: number;
 
-describe(`PATCH ${h.url}`, async () => {
+describe(`PATCH ${h.url}`, () => {
   beforeAll(async () => {
     await h.before();
 

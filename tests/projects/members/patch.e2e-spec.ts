@@ -10,7 +10,7 @@ const h = new TestHelper('/projects/:projectId/members/:memberId')
 let projectId: number;
 let memberId: number;
 
-describe(`PATCH ${h.url}`, async () => {
+describe(`PATCH ${h.url}`, () => {
   beforeAll(async () => {
     await h.before();
     projectId = h.entities.Project[0].id;
@@ -40,7 +40,10 @@ describe(`PATCH ${h.url}`, async () => {
         accessLevel: ACCESS_LEVEL.YELLOW,
       })
     );
-    const up = await h.findOne(UserProject, { member: { id: memberId }, project: { id: projectId } });
+    const up = await h.findOne(UserProject, {
+      member: { id: memberId },
+      project: { id: projectId },
+    });
     expect(up.accessLevel).toBe(ACCESS_LEVEL.YELLOW);
   });
 

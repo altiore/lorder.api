@@ -9,7 +9,7 @@ import { User } from '../../src/@orm/user';
 
 const h = new TestHelper('/auth/login').addFixture(usersFixture);
 
-describe(`PATCH ${h.url}`, async () => {
+describe(`PATCH ${h.url}`, () => {
   beforeAll(h.before);
   afterAll(h.after);
 

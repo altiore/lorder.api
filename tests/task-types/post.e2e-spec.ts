@@ -5,7 +5,7 @@ import { taskTypesFixtures, usersFixture } from './@fixtures/post';
 
 const h = new TestHelper('/task-types').addFixture(usersFixture).addFixture(taskTypesFixtures);
 
-describe(`POST ${h.url}`, async () => {
+describe(`POST ${h.url}`, () => {
   beforeAll(h.before);
   afterAll(h.after);
 

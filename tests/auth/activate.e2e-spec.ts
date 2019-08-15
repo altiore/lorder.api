@@ -15,7 +15,7 @@ const h = new TestHelper('/auth/activate')
   .addFixture(projectsFixture)
   .addFixture(userProjectsFixture);
 
-describe(`GET ${h.url}`, async () => {
+describe(`GET ${h.url}`, () => {
   beforeAll(h.before);
   afterAll(h.after);
 

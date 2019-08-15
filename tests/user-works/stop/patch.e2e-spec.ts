@@ -1,7 +1,13 @@
 import * as moment from 'moment';
 
 import { TestHelper } from '../../@utils/TestHelper';
-import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/patch';
+import {
+  projectsFixture,
+  tasksFixture,
+  userProjectsFixture,
+  usersFixture,
+  userWorksFixture,
+} from './@fixtures/patch';
 
 import { Task } from '../../../src/@orm/task';
 import { UserWork } from '../../../src/@orm/user-work';
@@ -13,7 +19,7 @@ const h = new TestHelper('/user-works/:userTaskId/stop')
   .addFixture(tasksFixture)
   .addFixture(userWorksFixture);
 
-describe(`PATCH ${h.url}`, async () => {
+describe(`PATCH ${h.url}`, () => {
   let projectId: number;
   let notFinishedUserWorkId: number;
   let finishedUserWorkId: number;

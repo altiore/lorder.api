@@ -3,7 +3,7 @@ import { taskTypesFixtures, usersFixture } from './@fixtures/get';
 
 const h = new TestHelper('/task-types').addFixture(usersFixture).addFixture(taskTypesFixtures);
 
-describe(`GET ${h.url}`, async () => {
+describe(`GET ${h.url}`, () => {
   beforeAll(h.before);
   afterAll(h.after);
 

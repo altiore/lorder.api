@@ -1,5 +1,11 @@
 import { TestHelper } from '../@utils/TestHelper';
-import { projectsFixture, tasksFixture, userProjectFixture, usersFixture, userWorksFixture } from './@fixtures/get';
+import {
+  projectsFixture,
+  tasksFixture,
+  userProjectFixture,
+  usersFixture,
+  userWorksFixture,
+} from './@fixtures/get';
 
 const h = new TestHelper('/tasks')
   .addFixture(usersFixture)
@@ -8,7 +14,7 @@ const h = new TestHelper('/tasks')
   .addFixture(tasksFixture)
   .addFixture(userWorksFixture);
 
-describe(`GET ${h.url}`, async () => {
+describe(`GET ${h.url}`, () => {
   beforeAll(h.before);
   afterAll(h.after);
 

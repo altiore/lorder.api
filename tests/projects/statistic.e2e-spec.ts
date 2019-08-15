@@ -1,6 +1,12 @@
 import { ACCESS_LEVEL } from '../../src/@orm/user-project';
 import { TestHelper } from '../@utils/TestHelper';
-import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/get';
+import {
+  projectsFixture,
+  tasksFixture,
+  userProjectsFixture,
+  usersFixture,
+  userWorksFixture,
+} from './@fixtures/get';
 
 const h = new TestHelper('/projects/:projectId/statistic')
   .addFixture(usersFixture)
@@ -9,7 +15,7 @@ const h = new TestHelper('/projects/:projectId/statistic')
   .addFixture(tasksFixture)
   .addFixture(userWorksFixture);
 
-describe(`GET ${h.url}`, async () => {
+describe(`GET ${h.url}`, () => {
   let projectId: number;
   let memberId: number;
 

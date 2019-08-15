@@ -1,6 +1,12 @@
 import { ACCESS_LEVEL } from '../../src/@orm/user-project';
 import { TestHelper } from '../@utils/TestHelper';
-import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/get';
+import {
+  projectsFixture,
+  tasksFixture,
+  userProjectsFixture,
+  usersFixture,
+  userWorksFixture,
+} from './@fixtures/get';
 
 const h = new TestHelper('/projects')
   .addFixture(usersFixture)
@@ -9,7 +15,7 @@ const h = new TestHelper('/projects')
   .addFixture(tasksFixture)
   .addFixture(userWorksFixture);
 
-describe(`GET ${h.url}`, async () => {
+describe(`GET ${h.url}`, () => {
   let projectId: number;
 
   beforeAll(async () => {
@@ -50,9 +56,16 @@ describe(`GET ${h.url}`, async () => {
           timeSum: expect.toBeWithinRange(30 * 60 - 1, 30 * 60 + 1),
           accessLevel: ACCESS_LEVEL.WHITE,
         }),
-        expect.objectContaining({ title: 'Fourth', valueSum: 0, timeSum: 0, accessLevel: ACCESS_LEVEL.RED }),
+        expect.objectContaining({
+          title: 'Fourth',
+          valueSum: 0,
+          timeSum: 0,
+          accessLevel: ACCESS_LEVEL.RED,
+        }),
       ])
     );
-    expect(body).not.toEqual(expect.arrayContaining([expect.objectContaining({ title: 'Second' })]));
+    expect(body).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ title: 'Second' })])
+    );
   });
 });
