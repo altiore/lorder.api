@@ -1,4 +1,17 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  CacheInterceptor,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 import * as jwt from 'jsonwebtoken';
@@ -17,20 +30,27 @@ import { ProjectService } from './project.service';
 @ApiUseTags('projects')
 @Controller('projects')
 @UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
+@UseInterceptors(CacheInterceptor)
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @ApiResponse({ status: 200, type: Project, isArray: true })
   @Get()
   @Roles('user')
-  public async allOwn(@UserJWT() user: User, @Query() pagesDto: ProjectPaginationDto): Promise<Partial<Project>[]> {
+  public async allOwn(
+    @UserJWT() user: User,
+    @Query() pagesDto: ProjectPaginationDto
+  ): Promise<Partial<Project>[]> {
     return this.projectService.findWithPaginationByUser(pagesDto, user);
   }
 
   @ApiResponse({ status: 200, type: Project, isArray: true })
   @Get('all')
   @Roles('super-admin')
-  public async all(@UserJWT() user: User, @Query() pagesDto: ProjectPaginationDto): Promise<Partial<Project>[]> {
+  public async all(
+    @UserJWT() user: User,
+    @Query() pagesDto: ProjectPaginationDto
+  ): Promise<Partial<Project>[]> {
     return this.projectService.findAllWithPagination(pagesDto, user);
   }
 
@@ -38,7 +58,10 @@ export class ProjectController {
   @Get(':projectId')
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.RED)
-  public one(@UserJWT() user: User, @Param('projectId', ParseIntPipe) projectId: number): Promise<Partial<Project>> {
+  public one(
+    @UserJWT() user: User,
+    @Param('projectId', ParseIntPipe) projectId: number
+  ): Promise<Partial<Project>> {
     return this.projectService.findOneByMember(projectId, user);
   }
 
@@ -49,7 +72,11 @@ export class ProjectController {
     return this.projectService.create(data, user);
   }
 
-  @ApiResponse({ description: 'Проект успешно удален. Возвращает id удаленного проекта', status: 200, type: Number })
+  @ApiResponse({
+    description: 'Проект успешно удален. Возвращает id удаленного проекта',
+    status: 200,
+    type: Number,
+  })
   @Delete(':projectId')
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.VIOLET)
@@ -59,7 +86,11 @@ export class ProjectController {
     return this.projectService.remove(projectId);
   }
 
-  @ApiResponse({ description: 'Проект успешно удален. Возвращает id удаленного проекта', status: 200, type: Number })
+  @ApiResponse({
+    description: 'Проект успешно удален. Возвращает id удаленного проекта',
+    status: 200,
+    type: Number,
+  })
   @Delete(':projectId/admin')
   @Roles('super-admin')
   public adminDelete(

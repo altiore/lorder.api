@@ -1,4 +1,17 @@
-import { Body, Controller, Delete, Get, Headers, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  CacheInterceptor,
+  Controller,
+  Delete,
+  Get,
+  Headers,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 import * as jwt from 'jsonwebtoken';
@@ -20,6 +33,7 @@ import { ProjectMemberService } from './project.member.service';
 @ApiUseTags('projects -> members (role: user)')
 @UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
 @Controller('projects/:projectId/members')
+@UseInterceptors(CacheInterceptor)
 export class ProjectMemberController {
   constructor(
     private readonly projectService: ProjectService,

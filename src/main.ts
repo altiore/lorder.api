@@ -23,13 +23,15 @@ const corsOptions = {
   credentials: true,
   exposedHeaders: 'Authorization',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  origin: function(origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  } as CustomOrigin,
+  origin: IS_PROD
+    ? (function(origin, callback) {
+        if (whitelist.indexOf(origin) !== -1) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      } as CustomOrigin)
+    : true,
 } as CorsOptions;
 
 async function bootstrap() {

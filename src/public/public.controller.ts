@@ -1,12 +1,19 @@
-import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
+import {
+  CacheInterceptor,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 
 import { ProjectPub } from '../@orm/project-pub';
 import { ProjectService } from '../project/project.service';
 
-@ApiBearerAuth()
 @ApiUseTags('public')
 @Controller('public')
+@UseInterceptors(CacheInterceptor)
 export class PublicController {
   constructor(private readonly projectService: ProjectService) {}
 

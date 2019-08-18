@@ -1,13 +1,13 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { CacheModuleOptions, Inject, Injectable } from '@nestjs/common';
 import { RedisClient } from 'redis';
 import * as guid from 'uuid/v4';
 
 import { UserDataDto } from './dto/user.data.dto';
-import { RedisClientProvider } from './redis.constants';
+import { REDIS_CACHE_MANAGER } from './redis.constants';
 
 @Injectable()
 export class RedisService {
-  constructor(@Inject(RedisClientProvider) private readonly redis: RedisClient) {}
+  constructor(@Inject(REDIS_CACHE_MANAGER) private readonly redis: any) {}
 
   createOneTimeToken(userData: UserDataDto, expiresInSeconds: number = 300): Promise<string> {
     const token = guid();
@@ -63,5 +63,9 @@ export class RedisService {
         }
       });
     });
+  }
+
+  resetAll() {
+    return this.redis.flushdb();
   }
 }

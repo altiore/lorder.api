@@ -1,1 +1,1 @@
-export const RedisClientProvider = "import { RedisClient } from 'redis';";
+export const REDIS_CACHE_MANAGER = 'REDIS_CACHE_MANAGER';

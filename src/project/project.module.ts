@@ -10,6 +10,7 @@ import { UserRepository } from '../@orm/user';
 import { UserProjectRepository } from '../@orm/user-project';
 import { UserWorkRepository } from '../@orm/user-work';
 import { AuthModule } from '../auth/auth.module';
+import { RedisModule } from '../redis/redis.module';
 import { AccessLevelGuard } from './@common/guards';
 import { ProjectMemberController } from './member/project.member.controller';
 import { ProjectMemberService } from './member/project.member.service';
@@ -21,10 +22,16 @@ import { ProjectTaskController } from './task/project.task.controller';
 import { ProjectTaskService } from './task/project.task.service';
 
 @Module({
-  controllers: [ProjectController, ProjectMemberController, ProjectTaskController, ProjectTaskTypeController],
+  controllers: [
+    ProjectController,
+    ProjectMemberController,
+    ProjectTaskController,
+    ProjectTaskTypeController,
+  ],
   exports: [AccessLevelGuard, ProjectService, ProjectMemberService],
   imports: [
     forwardRef(() => AuthModule),
+    RedisModule.registerCache(),
     TypeOrmModule.forFeature([
       ProjectPubRepository,
       ProjectRepository,
@@ -36,6 +43,12 @@ import { ProjectTaskService } from './task/project.task.service';
       UserWorkRepository,
     ]),
   ],
-  providers: [AccessLevelGuard, ProjectService, ProjectMemberService, ProjectTaskService, ProjectTaskTypeService],
+  providers: [
+    AccessLevelGuard,
+    ProjectService,
+    ProjectMemberService,
+    ProjectTaskService,
+    ProjectTaskTypeService,
+  ],
 })
 export class ProjectModule {}
