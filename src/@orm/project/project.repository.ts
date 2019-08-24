@@ -156,7 +156,7 @@ export class ProjectRepository extends Repository<Project> {
       .orderBy(`Project.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
       .groupBy('Project.id')
       .getRawMany();
-
+    console.log('selectOrderedProjects.rawArrayTimeSum', process.memoryUsage(), rawArrayTimeSum);
     // TODO: TWO similar queries here, because I do not know how to combine them
     // (if combine them than result has wrong `valueSum` value)
     const rawArray = await query
@@ -175,10 +175,16 @@ export class ProjectRepository extends Repository<Project> {
       .addGroupBy('"ProjectPub"."uuid"')
       .getRawMany();
 
+    console.log('selectOrderedProjects.rawArray', process.memoryUsage(), rawArray);
     const projects = this.rawToProject(rawArray);
+    console.log('selectOrderedProjects.rawToProject', process.memoryUsage(), projects);
     return projects.map(project => {
       const rawArrayTimeSumElement = rawArrayTimeSum.find(el => el.id === project.id);
       project.timeSum = (rawArrayTimeSumElement && rawArrayTimeSumElement.timeSum) || 0;
+      console.log('selectOrderedProjects.projects.map', {
+        memory: process.memoryUsage(),
+        projectId: project.id,
+      });
       return project;
     });
   }

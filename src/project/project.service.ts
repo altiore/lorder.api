@@ -55,7 +55,10 @@ export class ProjectService {
     pagesDto: ProjectPaginationDto,
     user: User
   ): Promise<Partial<Project>[]> {
-    return this.projectRepo.findWithPaginationByUser(pagesDto, user);
+    console.log('ProjectService.findWithPaginationByUser:before', process.memoryUsage());
+    const res = await this.projectRepo.findWithPaginationByUser(pagesDto, user);
+    console.log('ProjectService.findWithPaginationByUser:before', process.memoryUsage());
+    return res;
   }
 
   public async findAllWithPagination(
