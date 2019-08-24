@@ -16,13 +16,18 @@ export class ProjectTaskService {
   constructor(
     @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository,
     @InjectRepository(UserRepository) private readonly userRepo: UserRepository,
-    @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository,
+    @InjectRepository(UserProjectRepository)
+    private readonly userProjectRepo: UserProjectRepository,
     @InjectRepository(TaskTypeRepository) private readonly taskTypeRepo: TaskTypeRepository,
-    @InjectRepository(ProjectTaskTypeRepository) private readonly projectTaskTypeRepo: ProjectTaskTypeRepository
+    @InjectRepository(ProjectTaskTypeRepository)
+    private readonly projectTaskTypeRepo: ProjectTaskTypeRepository
   ) {}
 
-  public findAll(pagesDto: PaginationDto, projectId: number): Promise<Task[]> {
-    return this.taskRepo.findAllByProjectId(pagesDto, projectId);
+  public async findAll(pagesDto: PaginationDto, projectId: number): Promise<Task[]> {
+    console.log('ProjectTaskService.findAll:before', process.memoryUsage());
+    const res = await this.taskRepo.findAllByProjectId(pagesDto, projectId);
+    console.log('ProjectTaskService.findAll:after', process.memoryUsage());
+    return res;
   }
 
   public findOne(id: number, projectId: number): Promise<Task> {
@@ -39,7 +44,12 @@ export class ProjectTaskService {
     return this.taskRepo.updateByProjectId(id, preparedData, projectId);
   }
 
-  public async move(task: Task, project: Project, user: User, taskMoveDto: TaskMoveDto): Promise<Task> {
+  public async move(
+    task: Task,
+    project: Project,
+    user: User,
+    taskMoveDto: TaskMoveDto
+  ): Promise<Task> {
     // 1. TODO: проверить разрешенное перемещение задачи для данного статуса
     // 2. TODO: проверить разрешенное перемещение задачи для данного пользователя
     return this.taskRepo.updateByProjectId(task.id, taskMoveDto, project.id);

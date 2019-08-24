@@ -14,11 +14,15 @@ export class TaskService {
     @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository
   ) {}
 
-  public findAll(pagesDto: TaskPagination, user: User): Promise<Task[]> {
-    return this.taskRepo.findAllWithPagination(pagesDto, user);
+  public async findAll(pagesDto: TaskPagination, user: User): Promise<Task[]> {
+    console.log('TaskService.findAll:before', process.memoryUsage());
+    const res = await this.taskRepo.findAllWithPagination(pagesDto, user);
+    console.log('TaskService.findAll:after', process.memoryUsage());
+    return res;
   }
 
   public async findOne(taskId: number, user: User): Promise<Task> {
+    console.log('TaskService.findOne:before', process.memoryUsage());
     const task = await this.taskRepo.findOne({
       relations: ['performer', 'userWorks', 'users'],
       where: {
@@ -33,6 +37,7 @@ export class TaskService {
       throw new ForbiddenException('Доступ к этой задаче запрещен');
     }
     task.children = await this.taskRepo.findDescendants(task);
+    console.log('TaskService.findOne:before', process.memoryUsage());
     return task;
   }
 
@@ -51,7 +56,9 @@ export class TaskService {
     }
     task.project = await this.projectService.findOneByMember(task.projectId, user);
     if (!task.project || !task.project.isAccess(ACCESS_LEVEL.YELLOW)) {
-      throw new ForbiddenException('Архивировать задачи могут пользователи начиная с Желтого уровня');
+      throw new ForbiddenException(
+        'Архивировать задачи могут пользователи начиная с Желтого уровня'
+      );
     }
 
     task.isArchived = true;

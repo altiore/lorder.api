@@ -28,7 +28,10 @@ export class ProjectService {
 
   public async findOneByMember(projectId: number, user: User): Promise<Project> {
     try {
-      return await this.projectRepo.findOneByUser(projectId, user);
+      console.log('ProjectService.findOneByMember:before', process.memoryUsage());
+      const res = await this.projectRepo.findOneByUser(projectId, user);
+      console.log('ProjectService.findOneByMember:before', process.memoryUsage());
+      return res;
     } catch (e) {
       throw new NotFoundException('Проект не найден');
     }
