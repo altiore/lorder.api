@@ -28,9 +28,21 @@ export class ProjectService {
 
   public async findOneByMember(projectId: number, user: User): Promise<Project> {
     try {
-      console.log('ProjectService.findOneByMember:before', process.memoryUsage());
+      const memory = process.memoryUsage();
+      console.log('ProjectService.findOneByMember:before', {
+        external: Math.round((memory.external / 1024 / 1024) * 100) / 100 + 'Mb',
+        heapTotal: Math.round((memory.heapTotal / 1024 / 1024) * 100) / 100 + 'Mb',
+        heapUsed: Math.round((memory.heapUsed / 1024 / 1024) * 100) / 100 + 'Mb',
+        rss: Math.round((memory.rss / 1024 / 1024) * 100) / 100 + 'Mb',
+      });
       const res = await this.projectRepo.findOneByUser(projectId, user);
-      console.log('ProjectService.findOneByMember:before', process.memoryUsage());
+      const memory2 = process.memoryUsage();
+      console.log('ProjectService.findOneByMember:after', {
+        external: Math.round((memory2.external / 1024 / 1024) * 100) / 100 + 'Mb',
+        heapTotal: Math.round((memory2.heapTotal / 1024 / 1024) * 100) / 100 + 'Mb',
+        heapUsed: Math.round((memory2.heapUsed / 1024 / 1024) * 100) / 100 + 'Mb',
+        rss: Math.round((memory2.rss / 1024 / 1024) * 100) / 100 + 'Mb',
+      });
       return res;
     } catch (e) {
       throw new NotFoundException('Проект не найден');
@@ -55,9 +67,21 @@ export class ProjectService {
     pagesDto: ProjectPaginationDto,
     user: User
   ): Promise<Partial<Project>[]> {
-    console.log('ProjectService.findWithPaginationByUser:before', process.memoryUsage());
+    let memory = process.memoryUsage();
+    console.log('ProjectService.findWithPaginationByUser:before', {
+      external: Math.round((memory.external / 1024 / 1024) * 100) / 100 + 'Mb',
+      heapTotal: Math.round((memory.heapTotal / 1024 / 1024) * 100) / 100 + 'Mb',
+      heapUsed: Math.round((memory.heapUsed / 1024 / 1024) * 100) / 100 + 'Mb',
+      rss: Math.round((memory.rss / 1024 / 1024) * 100) / 100 + 'Mb',
+    });
     const res = await this.projectRepo.findWithPaginationByUser(pagesDto, user);
-    console.log('ProjectService.findWithPaginationByUser:before', process.memoryUsage());
+    memory = process.memoryUsage();
+    console.log('ProjectService.findWithPaginationByUser:after', {
+      external: Math.round((memory.external / 1024 / 1024) * 100) / 100 + 'Mb',
+      heapTotal: Math.round((memory.heapTotal / 1024 / 1024) * 100) / 100 + 'Mb',
+      heapUsed: Math.round((memory.heapUsed / 1024 / 1024) * 100) / 100 + 'Mb',
+      rss: Math.round((memory.rss / 1024 / 1024) * 100) / 100 + 'Mb',
+    });
     return res;
   }
 

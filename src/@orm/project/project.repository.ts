@@ -2,6 +2,7 @@ import { omit } from 'lodash';
 import { EntityRepository, Repository, SelectQueryBuilder } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
+// import { memoryUsageLog } from '../../@common/helpers/memoryUsageLog';
 import { ProjectFieldsEnum } from '../../project/@dto';
 import { ProjectPub } from '../project-pub/project-pub.entity';
 import { TaskType } from '../task-type/task-type.entity';
@@ -156,7 +157,7 @@ export class ProjectRepository extends Repository<Project> {
       .orderBy(`Project.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
       .groupBy('Project.id')
       .getRawMany();
-    console.log('selectOrderedProjects.rawArrayTimeSum', process.memoryUsage(), rawArrayTimeSum);
+    // memoryUsageLog('selectOrderedProjects.rawArrayTimeSum');
     // TODO: TWO similar queries here, because I do not know how to combine them
     // (if combine them than result has wrong `valueSum` value)
     const rawArray = await query
@@ -175,16 +176,13 @@ export class ProjectRepository extends Repository<Project> {
       .addGroupBy('"ProjectPub"."uuid"')
       .getRawMany();
 
-    console.log('selectOrderedProjects.rawArray', process.memoryUsage(), rawArray);
+    // memoryUsageLog('selectOrderedProjects.rawArray');
     const projects = this.rawToProject(rawArray);
-    console.log('selectOrderedProjects.rawToProject', process.memoryUsage(), projects);
+    // memoryUsageLog('selectOrderedProjects.rawToProject');
     return projects.map(project => {
       const rawArrayTimeSumElement = rawArrayTimeSum.find(el => el.id === project.id);
       project.timeSum = (rawArrayTimeSumElement && rawArrayTimeSumElement.timeSum) || 0;
-      console.log('selectOrderedProjects.projects.map', {
-        memory: process.memoryUsage(),
-        projectId: project.id,
-      });
+      // memoryUsageLog('selectOrderedProjects.projects.map');
       return project;
     });
   }
