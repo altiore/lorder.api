@@ -1,5 +1,11 @@
-import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { get } from 'lodash';
 
 import { Project, ProjectDto, ProjectRepository } from '../@orm/project';
 import { ProjectPub, ProjectPubRepository } from '../@orm/project-pub';
@@ -28,22 +34,23 @@ export class ProjectService {
 
   public async findOneByMember(projectId: number, user: User): Promise<Project> {
     try {
-      const memory = process.memoryUsage();
-      console.log('ProjectService.findOneByMember:before', {
-        external: Math.round((memory.external / 1024 / 1024) * 100) / 100 + 'Mb',
-        heapTotal: Math.round((memory.heapTotal / 1024 / 1024) * 100) / 100 + 'Mb',
-        heapUsed: Math.round((memory.heapUsed / 1024 / 1024) * 100) / 100 + 'Mb',
-        rss: Math.round((memory.rss / 1024 / 1024) * 100) / 100 + 'Mb',
+      // 1. check user access
+      const access = await this.userProjectRepo.findOne({
+        where: {
+          member: { id: user.id },
+          project: { id: projectId },
+        },
       });
-      const res = await this.projectRepo.findOneByUser(projectId, user);
-      const memory2 = process.memoryUsage();
-      console.log('ProjectService.findOneByMember:after', {
-        external: Math.round((memory2.external / 1024 / 1024) * 100) / 100 + 'Mb',
-        heapTotal: Math.round((memory2.heapTotal / 1024 / 1024) * 100) / 100 + 'Mb',
-        heapUsed: Math.round((memory2.heapUsed / 1024 / 1024) * 100) / 100 + 'Mb',
-        rss: Math.round((memory2.rss / 1024 / 1024) * 100) / 100 + 'Mb',
-      });
-      return res;
+      if (!(get(access, 'accessLevel') >= ACCESS_LEVEL.WHITE)) {
+        throw new ForbiddenException(
+          'Пользователь не может просматритьва подробную информацию' +
+            ' об этом проекте. Пожалуйста подайте заявку на получение доступа!'
+        );
+      }
+      // 2. load project if has correct access to it
+      const project = await this.projectRepo.findOneByProjectId(projectId);
+      project.accessLevel = project.members.find(el => el.member.id === user.id);
+      return project;
     } catch (e) {
       throw new NotFoundException('Проект не найден');
     }
@@ -67,22 +74,7 @@ export class ProjectService {
     pagesDto: ProjectPaginationDto,
     user: User
   ): Promise<Partial<Project>[]> {
-    let memory = process.memoryUsage();
-    console.log('ProjectService.findWithPaginationByUser:before', {
-      external: Math.round((memory.external / 1024 / 1024) * 100) / 100 + 'Mb',
-      heapTotal: Math.round((memory.heapTotal / 1024 / 1024) * 100) / 100 + 'Mb',
-      heapUsed: Math.round((memory.heapUsed / 1024 / 1024) * 100) / 100 + 'Mb',
-      rss: Math.round((memory.rss / 1024 / 1024) * 100) / 100 + 'Mb',
-    });
-    const res = await this.projectRepo.findWithPaginationByUser(pagesDto, user);
-    memory = process.memoryUsage();
-    console.log('ProjectService.findWithPaginationByUser:after', {
-      external: Math.round((memory.external / 1024 / 1024) * 100) / 100 + 'Mb',
-      heapTotal: Math.round((memory.heapTotal / 1024 / 1024) * 100) / 100 + 'Mb',
-      heapUsed: Math.round((memory.heapUsed / 1024 / 1024) * 100) / 100 + 'Mb',
-      rss: Math.round((memory.rss / 1024 / 1024) * 100) / 100 + 'Mb',
-    });
-    return res;
+    return await this.projectRepo.findWithPaginationByUser(pagesDto, user);
   }
 
   public async findAllWithPagination(

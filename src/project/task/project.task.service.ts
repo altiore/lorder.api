@@ -24,10 +24,7 @@ export class ProjectTaskService {
   ) {}
 
   public async findAll(pagesDto: PaginationDto, projectId: number): Promise<Task[]> {
-    console.log('ProjectTaskService.findAll:before', process.memoryUsage());
-    const res = await this.taskRepo.findAllByProjectId(pagesDto, projectId);
-    console.log('ProjectTaskService.findAll:after', process.memoryUsage());
-    return res;
+    return await this.taskRepo.findAllByProjectId(pagesDto, projectId);
   }
 
   public findOne(id: number, projectId: number): Promise<Task> {

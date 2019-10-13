@@ -22,6 +22,13 @@ export class ProjectRepository extends Repository<Project> {
     return entities.map(this.preparePublic);
   }
 
+  public async findOneByProjectId(projectId: number): Promise<Project> {
+    return await this.findOne({
+      relations: ['members'],
+      where: { id: projectId },
+    });
+  }
+
   public async findOneByUser(projectId: number, user: User): Promise<Project> {
     const entity = await this.createQueryBuilder()
       .leftJoinAndMapMany(

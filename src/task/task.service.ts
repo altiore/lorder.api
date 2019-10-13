@@ -15,14 +15,10 @@ export class TaskService {
   ) {}
 
   public async findAll(pagesDto: TaskPagination, user: User): Promise<Task[]> {
-    console.log('TaskService.findAll:before', process.memoryUsage());
-    const res = await this.taskRepo.findAllWithPagination(pagesDto, user);
-    console.log('TaskService.findAll:after', process.memoryUsage());
-    return res;
+    return await this.taskRepo.findAllWithPagination(pagesDto, user);
   }
 
   public async findOne(taskId: number, user: User): Promise<Task> {
-    console.log('TaskService.findOne:before', process.memoryUsage());
     const task = await this.taskRepo.findOne({
       relations: ['performer', 'userWorks', 'users'],
       where: {
@@ -37,7 +33,6 @@ export class TaskService {
       throw new ForbiddenException('Доступ к этой задаче запрещен');
     }
     task.children = await this.taskRepo.findDescendants(task);
-    console.log('TaskService.findOne:before', process.memoryUsage());
     return task;
   }
 
