@@ -5,10 +5,17 @@ import { TaskType } from '../task-type/task-type.entity';
 
 @Entity()
 export class ProjectTaskType {
-  @ManyToOne(type => Project, project => project.projectTaskTypes, { primary: true })
+  @ManyToOne(type => Project, project => project.projectTaskTypes, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    primary: true,
+  })
   project: Project;
 
-  @ManyToOne(type => TaskType, taskType => taskType.projectTaskTypes, { primary: true, eager: true })
+  @ManyToOne(type => TaskType, taskType => taskType.projectTaskTypes, {
+    eager: true,
+    primary: true,
+  })
   taskType: TaskType;
 
   @Column()

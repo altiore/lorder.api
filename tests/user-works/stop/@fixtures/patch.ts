@@ -76,7 +76,7 @@ export const tasksFixture = createTasks([
 
 export const userWorksFixture = createUserWorks([
   {
-    finishAt: null,
+    finishAt: undefined,
     task: { title: 'NotFinished' },
     user: { email: 'user@mail.com' },
   },

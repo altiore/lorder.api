@@ -23,7 +23,7 @@ export class UserWork {
 
   @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
   @Column({ ...momentDateTransformer, type: 'timestamp', nullable: true })
-  finishAt: Moment;
+  finishAt?: Moment;
 
   /**
    * Ценность задачи в условных единицах
@@ -43,7 +43,11 @@ export class UserWork {
   @Column({ nullable: false })
   userId: number;
 
-  @ManyToOne(() => User, user => user.works, { nullable: false })
+  @ManyToOne(() => User, user => user.works, {
+    nullable: false,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   user: User;
 
   @ApiModelProperty()
@@ -51,7 +55,11 @@ export class UserWork {
   taskId: number;
 
   @ApiModelProperty({ type: Task })
-  @ManyToOne(() => Task, task => task.userWorks, { nullable: false })
+  @ManyToOne(() => Task, task => task.userWorks, {
+    nullable: false,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   task: Task;
 
   @ApiModelProperty()

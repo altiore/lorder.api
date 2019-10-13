@@ -36,7 +36,7 @@ export class Task {
   parent?: Task;
 
   // ApiModel does not work here due to circular dependency
-  @TreeChildren()
+  @TreeChildren({ cascade: ['update', 'remove'] })
   children?: Task[];
 
   @ApiModelProperty()

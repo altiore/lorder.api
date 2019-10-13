@@ -20,6 +20,10 @@ export class UserProject {
   @ManyToOne(type => User, user => user.memberProjects, { primary: true, eager: true })
   member: User;
 
-  @ManyToOne(type => Project, project => project.members, { primary: true })
+  @ManyToOne(type => Project, project => project.members, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    primary: true,
+  })
   project: Project;
 }

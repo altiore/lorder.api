@@ -55,7 +55,11 @@ export class Project {
   ownerId: number;
 
   @ApiModelProperty({ type: User })
-  @ManyToOne(() => User, user => user.ownProjects, { nullable: false })
+  @ManyToOne(() => User, user => user.ownProjects, {
+    nullable: false,
+    onDelete: 'CASCADE',
+    onUpdate: 'NO ACTION',
+  })
   owner: User;
 
   @ApiModelProperty({ type: Task, isArray: true })
@@ -82,7 +86,10 @@ export class Project {
   @OneToMany(() => UserProject, userProject => userProject.project)
   members: UserProject[];
 
-  @ApiModelPropertyOptional({ type: UserProject, description: 'Access Level for current user in current project' })
+  @ApiModelPropertyOptional({
+    description: 'Access Level for current user in current project',
+    type: UserProject,
+  })
   accessLevel?: UserProject;
 
   @ApiModelPropertyOptional({ description: 'Время в секундах, потраченное на проект' })

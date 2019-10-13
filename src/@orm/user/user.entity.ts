@@ -82,7 +82,11 @@ export class User {
   updatedAt: Moment;
 
   @ApiModelProperty({ type: Role, isArray: true })
-  @ManyToMany(() => Role, undefined, { eager: true, cascade: ['insert'] })
+  @ManyToMany(() => Role, undefined, {
+    eager: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinTable({ name: 'user_roles' })
   roles: Role[];
 
@@ -95,7 +99,10 @@ export class User {
   @OneToMany(type => UserProject, userProject => userProject.member)
   invitedMembers: UserProject[];
 
-  @ManyToMany(type => Task, task => task.users, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @ManyToMany(type => Task, task => task.users, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinTable({ name: 'user_tasks' })
   tasks: Task[];
 
