@@ -2,7 +2,6 @@ import { ApiModelProperty } from '@nestjs/swagger';
 import { Column, Entity, ManyToOne } from 'typeorm';
 
 import { Project } from '../project/project.entity';
-import { Specialty } from '../specialty';
 import { User } from '../user/user.entity';
 import { ACCESS_LEVEL } from './user-project.consts';
 
@@ -17,7 +16,7 @@ export class UserProject {
   inviter: User;
 
   @ApiModelProperty({ type: User })
-  @ManyToOne(type => User, user => user.memberProjects, { primary: true, eager: true })
+  @ManyToOne(type => User, user => user.memberProjects, { eager: true, primary: true })
   member: User;
 
   @ManyToOne(type => Project, project => project.members, {
@@ -26,4 +25,10 @@ export class UserProject {
     primary: true,
   })
   project: Project;
+
+  @Column('float8', { default: 0 })
+  timeSum: number;
+
+  @Column('float8', { default: 0 })
+  valueSum: number;
 }

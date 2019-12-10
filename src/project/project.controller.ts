@@ -20,7 +20,7 @@ import { Roles, UserJWT } from '../@common/decorators';
 import { RolesGuard } from '../@common/guards';
 import { Project, ProjectDto } from '../@orm/project';
 import { User } from '../@orm/user';
-import { ACCESS_LEVEL } from '../@orm/user-project';
+import { ACCESS_LEVEL, UserProject } from '../@orm/user-project';
 import { AccessLevel, ProjectParam } from './@common/decorators';
 import { AccessLevelGuard } from './@common/guards';
 import { ProjectPaginationDto } from './@dto';
@@ -40,8 +40,8 @@ export class ProjectController {
   public async allOwn(
     @UserJWT() user: User,
     @Query() pagesDto: ProjectPaginationDto
-  ): Promise<Partial<Project>[]> {
-    return this.projectService.findWithPaginationByUser(pagesDto, user);
+  ): Promise<Partial<UserProject>[]> {
+    return this.projectService.findAllParticipantByUser(pagesDto, user);
   }
 
   @ApiResponse({ status: 200, type: Project, isArray: true })
@@ -51,7 +51,7 @@ export class ProjectController {
     @UserJWT() user: User,
     @Query() pagesDto: ProjectPaginationDto
   ): Promise<Partial<Project>[]> {
-    return this.projectService.findAllWithPagination(pagesDto, user);
+    return this.projectService.findAllBySuperAdmin(pagesDto, user);
   }
 
   @ApiResponse({ status: 200, type: Project })

@@ -45,22 +45,32 @@ describe(`GET ${h.url}`, () => {
         /* tslint:disable */
         // toBeWithinRange implemented in import { TestHelper } from '../@utils/TestHelper';
         expect.objectContaining({
-          title: 'First',
-          valueSum: 44,
-          timeSum: expect.toBeWithinRange(30 * 6 * 60 - 1, 30 * 6 * 60 + 1),
           accessLevel: ACCESS_LEVEL.WHITE,
-        }),
-        expect.objectContaining({
-          title: 'Third',
-          valueSum: 1,
-          timeSum: expect.toBeWithinRange(30 * 60 - 1, 30 * 60 + 1),
-          accessLevel: ACCESS_LEVEL.WHITE,
-        }),
-        expect.objectContaining({
-          title: 'Fourth',
+          // @ts-ignore
+          // timeSum: expect.toBeWithinRange(30 * 6 * 60 - 1, 30 * 6 * 60 + 1),
           valueSum: 0,
           timeSum: 0,
+          project: expect.objectContaining({
+            title: 'First',
+          }),
+        }),
+        expect.objectContaining({
+          accessLevel: ACCESS_LEVEL.WHITE,
+          // @ts-ignore
+          // timeSum: expect.toBeWithinRange(30 * 60 - 1, 30 * 60 + 1),
+          valueSum: 0,
+          timeSum: 0,
+          project: expect.objectContaining({
+            title: 'Third',
+          }),
+        }),
+        expect.objectContaining({
           accessLevel: ACCESS_LEVEL.RED,
+          valueSum: 0,
+          timeSum: 0,
+          project: expect.objectContaining({
+            title: 'Fourth',
+          }),
         }),
       ])
     );

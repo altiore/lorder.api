@@ -23,7 +23,10 @@ export class TestHelper {
     public readonly metadata: ModuleMetadata = { imports: [AppModule] },
     public readonly debug: boolean = process.env.TYPEORM_LOGGING === 'true'
   ) {
-    this.fixtureHelper = new TypeormFixtures(debug).findEntities({ name: In(['user', 'admin', 'super-admin']) }, Role);
+    this.fixtureHelper = new TypeormFixtures(debug).findEntities(
+      { name: In(['user', 'admin', 'super-admin']) },
+      Role
+    );
   }
 
   public readonly before = async (): Promise<void> => {
@@ -64,14 +67,26 @@ export class TestHelper {
     return request;
   };
 
-  public addFixture<EntityType>(data: { fixtures: (loadedFixtures: any) => any[]; Entity: ObjectType<EntityType> }) {
+  public addFixture<EntityType>(data: {
+    fixtures: (loadedFixtures: any) => any[];
+    Entity: ObjectType<EntityType>;
+  }) {
     this.fixtureHelper.addFixture(data);
     return this;
   }
 
   public async removeCreated<EntityType>(
     Entity: ObjectType<EntityType>,
-    criteria: string | string[] | number | number[] | Date | Date[] | ObjectID | ObjectID[] | FindConditions<EntityType>
+    criteria:
+      | string
+      | string[]
+      | number
+      | number[]
+      | Date
+      | Date[]
+      | ObjectID
+      | ObjectID[]
+      | FindConditions<EntityType>
   ): Promise<DeleteResult> {
     return this.fixtureHelper.removeCreated(Entity, criteria);
   }
@@ -105,6 +120,7 @@ export class TestHelper {
 }
 
 expect.extend({
+  // @ts-ignore
   toBeWithinRange(received: any, floor: any, ceiling: any): { message(): string; pass: boolean } {
     const pass = received >= floor && received <= ceiling;
     if (pass) {

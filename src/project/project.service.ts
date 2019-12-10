@@ -70,14 +70,14 @@ export class ProjectService {
     return id;
   }
 
-  public async findWithPaginationByUser(
+  public async findAllParticipantByUser(
     pagesDto: ProjectPaginationDto,
     user: User
-  ): Promise<Partial<Project>[]> {
-    return await this.projectRepo.findWithPaginationByUser(pagesDto, user);
+  ): Promise<Partial<UserProject>[]> {
+    return await this.userProjectRepo.findAllOwnProjects(pagesDto, user);
   }
 
-  public async findAllWithPagination(
+  public async findAllBySuperAdmin(
     pagesDto: ProjectPaginationDto,
     user: User
   ): Promise<Partial<Project>[]> {

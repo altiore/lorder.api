@@ -9,7 +9,7 @@ services:
       - ${REDIS_PORT}:6379
 
   postgres:
-    image: postgres:11.5
+    image: postgres:11.6
     restart: always
     volumes:
       - ./docker/postgres-entrypoint-initdb.d:/docker-entrypoint-initdb.d
