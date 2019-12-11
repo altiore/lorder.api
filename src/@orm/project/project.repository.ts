@@ -106,46 +106,21 @@ export class ProjectRepository extends Repository<Project> {
     return project;
   }
 
-  public async findAllWithPagination(
-    paginationDto: PaginationDto,
-    user: User
-  ): Promise<Partial<Project>[]> {
-    const entities = await this.selectOrderedProjects(
-      paginationDto,
-      this.createQueryBuilder().leftJoin(
-        'Project.members',
-        'AccessLevel',
-        '"AccessLevel"."memberId" = :memberId',
-        {
-          memberId: user.id,
-        }
-      )
-    );
-    return entities.map(this.preparePublic);
-  }
-
-  public async findWithPaginationByUser(
-    paginationDto: PaginationDto,
-    user: User
-  ): Promise<Partial<Project>[]> {
-    const entities = await this.selectOrderedProjects(
-      paginationDto,
-      this.createQueryBuilder().innerJoin(
-        'Project.members',
-        'AccessLevel',
-        '"AccessLevel"."memberId" = :memberId',
-        {
-          memberId: user.id,
-        }
-      )
-    );
-    return entities.map(this.preparePublic);
+  public async findAllWithPagination(paginationDto: PaginationDto): Promise<Project[]> {
+    return this.find({
+      order: { [paginationDto.orderBy]: paginationDto.order.toUpperCase() },
+      skip: paginationDto.skip,
+      take: paginationDto.count,
+    });
   }
 
   public findPublicById(id: number) {
     return this.findOneOrFail(id);
   }
 
+  /**
+   * MUST be simplified!!! Please, do not use this query!
+   */
   private async selectOrderedProjects(
     { skip = 0, count = 20, orderBy = ProjectFieldsEnum.createdAt, order = 'desc' }: PaginationDto,
     query: SelectQueryBuilder<Project>
@@ -164,7 +139,6 @@ export class ProjectRepository extends Repository<Project> {
       .orderBy(`Project.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
       .groupBy('Project.id')
       .getRawMany();
-    // memoryUsageLog('selectOrderedProjects.rawArrayTimeSum');
     // TODO: TWO similar queries here, because I do not know how to combine them
     // (if combine them than result has wrong `valueSum` value)
     const rawArray = await query
@@ -183,13 +157,11 @@ export class ProjectRepository extends Repository<Project> {
       .addGroupBy('"ProjectPub"."uuid"')
       .getRawMany();
 
-    // memoryUsageLog('selectOrderedProjects.rawArray');
     const projects = this.rawToProject(rawArray);
-    // memoryUsageLog('selectOrderedProjects.rawToProject');
+
     return projects.map(project => {
       const rawArrayTimeSumElement = rawArrayTimeSum.find(el => el.id === project.id);
       project.timeSum = (rawArrayTimeSumElement && rawArrayTimeSumElement.timeSum) || 0;
-      // memoryUsageLog('selectOrderedProjects.projects.map');
       return project;
     });
   }

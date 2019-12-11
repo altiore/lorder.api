@@ -40,7 +40,7 @@ export class ProjectController {
   public async allOwn(
     @UserJWT() user: User,
     @Query() pagesDto: ProjectPaginationDto
-  ): Promise<Partial<UserProject>[]> {
+  ): Promise<UserProject[]> {
     return this.projectService.findAllParticipantByUser(pagesDto, user);
   }
 
@@ -50,8 +50,8 @@ export class ProjectController {
   public async all(
     @UserJWT() user: User,
     @Query() pagesDto: ProjectPaginationDto
-  ): Promise<Partial<Project>[]> {
-    return this.projectService.findAllBySuperAdmin(pagesDto, user);
+  ): Promise<Project[]> {
+    return this.projectService.findAllBySuperAdmin(pagesDto);
   }
 
   @ApiResponse({ status: 200, type: Project })

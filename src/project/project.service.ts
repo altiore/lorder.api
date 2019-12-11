@@ -73,15 +73,12 @@ export class ProjectService {
   public async findAllParticipantByUser(
     pagesDto: ProjectPaginationDto,
     user: User
-  ): Promise<Partial<UserProject>[]> {
+  ): Promise<UserProject[]> {
     return await this.userProjectRepo.findAllOwnProjects(pagesDto, user);
   }
 
-  public async findAllBySuperAdmin(
-    pagesDto: ProjectPaginationDto,
-    user: User
-  ): Promise<Partial<Project>[]> {
-    return this.projectRepo.findAllWithPagination(pagesDto, user);
+  public async findAllBySuperAdmin(pagesDto: ProjectPaginationDto): Promise<Project[]> {
+    return this.projectRepo.findAllWithPagination(pagesDto);
   }
 
   public async findPublishedByUuid(uuid: string): Promise<ProjectPub> {
