@@ -1,4 +1,4 @@
-import { DeepPartial, EntityRepository, Repository } from 'typeorm';
+import { DeepPartial, EntityRepository, MoreThanOrEqual, Repository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Project } from '../project/project.entity';
@@ -45,9 +45,10 @@ export class UserProjectRepository extends Repository<UserProject> {
     });
   }
 
-  public async findAllOwnProjects(
+  public async findAllParticipantProjects(
     { skip = 0, count = 20 }: PaginationDto,
-    user: User
+    user: User,
+    minimumAccessLevel: ACCESS_LEVEL = ACCESS_LEVEL.WHITE
   ): Promise<UserProject[]> {
     return await this.find({
       loadEagerRelations: false,
@@ -55,6 +56,7 @@ export class UserProjectRepository extends Repository<UserProject> {
       skip,
       take: count,
       where: {
+        accessLevel: MoreThanOrEqual(minimumAccessLevel),
         member: user,
       },
     });

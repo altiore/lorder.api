@@ -12,6 +12,7 @@ export const createTasks = fixtureCreator<Task>(Task, function(entity, index) {
     title: company.companyName(),
     value: random.number(100),
     ...entity,
+    performer: entity.performer ? one(this, User, entity.performer) : undefined,
     project: one(this, Project, entity.project),
     users: many(this, User, entity.users),
   };

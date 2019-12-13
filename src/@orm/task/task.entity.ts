@@ -1,6 +1,8 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { Moment } from 'moment';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   ManyToMany,
   ManyToOne,
@@ -9,8 +11,10 @@ import {
   Tree,
   TreeChildren,
   TreeParent,
+  UpdateDateColumn,
 } from 'typeorm';
 
+import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { Project } from '../project/project.entity';
 import { TaskType } from '../task-type/task-type.entity';
 import { UserWork } from '../user-work/user-work.entity';
@@ -83,4 +87,12 @@ export class Task {
 
   @ManyToMany(type => User, user => user.tasks)
   users: User[];
+
+  @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
+  @CreateDateColumn(momentDateTransformer)
+  createdAt: Moment;
+
+  @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
+  @UpdateDateColumn(momentDateTransformer)
+  updatedAt: Moment;
 }

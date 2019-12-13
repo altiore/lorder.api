@@ -1,4 +1,5 @@
 import moment = require('moment');
+
 import { TestHelper } from '../@utils/TestHelper';
 import {
   projectsFixture,
@@ -154,6 +155,7 @@ describe(`POST ${h.url}`, () => {
     });
     const task = await h.findOne(Task, { id: body.started.taskId });
     expect(task).toEqual({
+      createdAt: expect.any(moment),
       description: 'Описание новой задачи',
       id: expect.any(Number),
       isArchived: false,
@@ -163,6 +165,7 @@ describe(`POST ${h.url}`, () => {
       status: 2,
       title: 'Задача Altiore',
       typeId: null,
+      updatedAt: expect.any(moment),
       value: null,
     });
     await h.removeCreated(UserWork, { id: body.started.id });
@@ -194,6 +197,7 @@ describe(`POST ${h.url}`, () => {
     });
     const task = await h.findOne(Task, { id: body.started.taskId });
     expect(task).toEqual({
+      createdAt: expect.any(moment),
       description: 'Описание новой задачи',
       id: expect.any(Number),
       isArchived: false,
@@ -203,6 +207,7 @@ describe(`POST ${h.url}`, () => {
       status: 2,
       title: 'Задача Altiore',
       typeId: null,
+      updatedAt: expect.any(moment),
       value: null,
     });
     expect(body.finished[0].finishAt).toBe(body.started.startAt);

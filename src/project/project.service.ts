@@ -72,9 +72,14 @@ export class ProjectService {
 
   public async findAllParticipantByUser(
     pagesDto: ProjectPaginationDto,
-    user: User
+    user: User,
+    minimumAccessLevel?: ACCESS_LEVEL
   ): Promise<UserProject[]> {
-    return await this.userProjectRepo.findAllOwnProjects(pagesDto, user);
+    return await this.userProjectRepo.findAllParticipantProjects(
+      pagesDto,
+      user,
+      minimumAccessLevel
+    );
   }
 
   public async findAllBySuperAdmin(pagesDto: ProjectPaginationDto): Promise<Project[]> {

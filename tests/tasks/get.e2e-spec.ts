@@ -37,15 +37,17 @@ describe(`GET ${h.url}`, () => {
     expect(body).toEqual(
       expect.arrayContaining([
         {
+          createdAt: expect.any(String),
           description: expect.any(String),
           id: expect.any(Number),
           isArchived: false,
-          performerId: null,
+          performerId: expect.any(Number),
           projectId: expect.any(Number),
           source: null,
           status: 2,
           title: expect.any(String),
           typeId: null,
+          updatedAt: expect.any(String),
           userWorks: expect.arrayContaining([
             expect.objectContaining({
               description: expect.any(String),
