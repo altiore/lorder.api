@@ -54,6 +54,7 @@ async function bootstrap() {
 
   await app.listen(
     PORT,
+    '0.0.0.0',
     /* tslint:disable */
     () =>
       process.env.NODE_ENV !== 'production' &&
