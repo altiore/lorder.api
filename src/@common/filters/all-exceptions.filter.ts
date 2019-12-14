@@ -10,13 +10,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // const request = ctx.getRequest();
 
     if (exception.getResponse && exception.getStatus) {
-      response.status(exception.getStatus()).json(exception.getResponse());
+      response.status(exception.getStatus()).send(exception.getResponse());
     } else if (exception.message && exception.name) {
       switch (exception.name) {
         case 'EntityNotFound': {
           const status = HttpStatus.NOT_FOUND;
-          response.status(status).json({
-            message: process.env.NODE_ENV === 'development' ? exception.message : 'Requested Entity not found',
+          response.status(status).send({
+            message:
+              process.env.NODE_ENV === 'development'
+                ? exception.message
+                : 'Requested Entity not found',
             statusCode: status,
           });
           break;
@@ -27,13 +30,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
             const status = HttpStatus.UNPROCESSABLE_ENTITY;
             parsedDetail = parseDetail(exception.detail);
             if (!parsedDetail) {
-              response.status(status).json({
+              response.status(status).send({
                 message: exception.detail,
                 statusCode: status,
               });
               break;
             }
-            response.status(status).json({
+            response.status(status).send({
               errors: [
                 {
                   children: [],
@@ -49,8 +52,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
             });
           } else {
             const status = HttpStatus.INTERNAL_SERVER_ERROR;
-            response.status(status).json({
-              message: (exception && exception.message) || exception.toString ? exception.toString() : 'NO',
+            response.status(status).send({
+              message:
+                (exception && exception.message) || exception.toString
+                  ? exception.toString()
+                  : 'NO',
               statusCode: status,
             });
           }
@@ -59,7 +65,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         }
         default: {
           const status = HttpStatus.NOT_ACCEPTABLE;
-          response.status(status).json({
+          response.status(status).send({
             message: exception.message,
             statusCode: status,
           });
@@ -72,7 +78,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         console.error(exception + '1');
         /* tslint:enable */
       }
-      response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
         message: 'Internal Server Error',
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
