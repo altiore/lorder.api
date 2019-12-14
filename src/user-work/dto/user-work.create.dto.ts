@@ -4,6 +4,11 @@ import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from
 export class UserWorkCreateDto {
   @ApiModelProperty()
   @IsNumber()
+  @IsOptional()
+  performerId?: number;
+
+  @ApiModelProperty()
+  @IsNumber()
   @IsNotEmpty()
   projectId: number;
 
@@ -15,7 +20,6 @@ export class UserWorkCreateDto {
   title: string;
 
   @ApiModelPropertyOptional()
-  @IsNotEmpty()
   @IsString()
   @MinLength(3)
   @IsOptional()

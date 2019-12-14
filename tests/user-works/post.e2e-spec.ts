@@ -10,6 +10,7 @@ import {
 } from './@fixtures/post';
 
 import { Task } from '../../src/@orm/task';
+import { User } from '../../src/@orm/user';
 import { UserWork } from '../../src/@orm/user-work';
 
 const h = new TestHelper('/user-works')
@@ -159,7 +160,7 @@ describe(`POST ${h.url}`, () => {
       description: 'Описание новой задачи',
       id: expect.any(Number),
       isArchived: false,
-      performerId: null,
+      performerId: (await h.findOne(User, { email: 'super-admin@mail.com' })).id,
       projectId: expect.any(Number),
       source: null,
       status: 2,
@@ -201,7 +202,7 @@ describe(`POST ${h.url}`, () => {
       description: 'Описание новой задачи',
       id: expect.any(Number),
       isArchived: false,
-      performerId: null,
+      performerId: (await h.findOne(User, { email: 'exist-not-finished@mail.com' })).id,
       projectId: expect.any(Number),
       source: null,
       status: 2,
