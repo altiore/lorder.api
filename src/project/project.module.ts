@@ -19,6 +19,7 @@ import { ProjectService } from './project.service';
 import { ProjectTaskTypeController } from './task-type/project.task-type.controller';
 import { ProjectTaskTypeService } from './task-type/project.task-type.service';
 import { ProjectTaskController } from './task/project.task.controller';
+import { ProjectTaskGateway } from './task/project.task.gateway';
 import { ProjectTaskService } from './task/project.task.service';
 
 @Module({
@@ -47,6 +48,7 @@ import { ProjectTaskService } from './task/project.task.service';
     AccessLevelGuard,
     ProjectService,
     ProjectMemberService,
+    ProjectTaskGateway,
     ProjectTaskService,
     ProjectTaskTypeService,
   ],

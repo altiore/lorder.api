@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || process.env.HOSTNAME || 'localhost';
 const SCHEMA = IS_PROD ? 'https' : 'http';
 
-const whitelist = ['https://altiore.org', 'http://localhost:8181'];
+const whitelist = ['https://altiore.org', 'http://localhost:8181', 'http://192.168.1.37:8181'];
 const corsOptions = {
   allowedHeaders: 'Authorization,Accept,Content-Type',
   credentials: true,
