@@ -29,7 +29,7 @@ import { ProjectTaskService } from './task/project.task.service';
     ProjectTaskController,
     ProjectTaskTypeController,
   ],
-  exports: [AccessLevelGuard, ProjectService, ProjectMemberService],
+  exports: [AccessLevelGuard, ProjectService, ProjectTaskGateway, ProjectMemberService],
   imports: [
     forwardRef(() => AuthModule),
     RedisModule.registerCache(),

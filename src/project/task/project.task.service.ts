@@ -10,6 +10,7 @@ import { TaskTypeRepository } from '../../@orm/task-type';
 import { User, UserRepository } from '../../@orm/user';
 import { UserProjectRepository } from '../../@orm/user-project';
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
+import { ProjectTaskGateway } from './project.task.gateway';
 
 @Injectable()
 export class ProjectTaskService {
@@ -20,7 +21,8 @@ export class ProjectTaskService {
     private readonly userProjectRepo: UserProjectRepository,
     @InjectRepository(TaskTypeRepository) private readonly taskTypeRepo: TaskTypeRepository,
     @InjectRepository(ProjectTaskTypeRepository)
-    private readonly projectTaskTypeRepo: ProjectTaskTypeRepository
+    private readonly projectTaskTypeRepo: ProjectTaskTypeRepository,
+    private readonly taskGateway: ProjectTaskGateway
   ) {}
 
   public async findAll(pagesDto: PaginationDto, projectId: number): Promise<Task[]> {
@@ -38,7 +40,9 @@ export class ProjectTaskService {
 
   public async update(id: number, taskUpdateDto: TaskUpdateDto, projectId: number): Promise<Task> {
     const preparedData = await this.parseTaskDtoToTaskObj(taskUpdateDto, projectId);
-    return this.taskRepo.updateByProjectId(id, preparedData, projectId);
+    const updatedTask = await this.taskRepo.updateByProjectId(id, preparedData, projectId);
+    this.taskGateway.updateTaskForAll(updatedTask);
+    return updatedTask;
   }
 
   public async move(

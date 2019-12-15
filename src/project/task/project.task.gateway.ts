@@ -7,11 +7,14 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  WsResponse,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway({ namespace: '/projects/tasks' })
+import { Task } from '../../@orm/task';
+
+const PROJECT_ROOM_PREFIX = 'ProjectRoom';
+
+@WebSocketGateway({ namespace: '/v1/projects/tasks' })
 export class ProjectTaskGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
   @WebSocketServer()
   wss: Server;
@@ -30,8 +33,22 @@ export class ProjectTaskGateway implements OnGatewayConnection, OnGatewayDisconn
     this.logger.log('Client connected: ' + client.id);
   }
 
-  @SubscribeMessage('taskUpdated')
-  async taskUpdated(@MessageBody() data: string): Promise<void> {
-    this.wss.emit('taskUpdated', data);
+  updateTaskForAll(@MessageBody() task: Task): void {
+    this.wss.to(`${PROJECT_ROOM_PREFIX}${task.projectId}`).emit('taskUpdated', task);
+  }
+
+  @SubscribeMessage('joinAllParticipantProjectRooms')
+  handleJoinAllParticipantProjects(client: Socket, projectIds: number[]) {
+    // TODO: check project access before joining the project room
+    projectIds.forEach(projectId => {
+      client.join(`${PROJECT_ROOM_PREFIX}${projectId}`);
+      client.emit('joinParticipantProjectRoom', projectId);
+    });
+  }
+
+  @SubscribeMessage('leaveAllParticipantProjectRooms')
+  handleLeaveRoom(client: Socket) {
+    client.leaveAll();
+    client.emit('leaveAllRooms');
   }
 }
