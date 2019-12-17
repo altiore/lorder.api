@@ -77,14 +77,16 @@ export class ProjectTaskController {
 
   @Patch(':id')
   @Roles('user')
-  @AccessLevel(ACCESS_LEVEL.YELLOW)
-  @ApiResponse({ status: 200, type: Task, description: 'ACCESS_LEVEL.YELLOW' })
+  @AccessLevel(ACCESS_LEVEL.RED)
+  @ApiResponse({ status: 200, type: Task, description: 'ACCESS_LEVEL.RED' })
   public update(
     @Param('projectId', ParseIntPipe) projectId: number,
     @Param('id', ParseIntPipe) id: number,
+    @ProjectParam() project: Project,
+    @UserJWT() user: User,
     @Body() taskCreateDto: TaskUpdateDto
   ) {
-    return this.taskService.update(id, taskCreateDto, projectId);
+    return this.taskService.update(id, taskCreateDto, projectId, project, user);
   }
 
   @Delete(':taskId')

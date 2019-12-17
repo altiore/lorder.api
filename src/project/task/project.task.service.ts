@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
@@ -8,7 +8,7 @@ import { ProjectTaskTypeRepository } from '../../@orm/project-task-type';
 import { Task, TaskRepository } from '../../@orm/task';
 import { TaskTypeRepository } from '../../@orm/task-type';
 import { User, UserRepository } from '../../@orm/user';
-import { UserProjectRepository } from '../../@orm/user-project';
+import { ACCESS_LEVEL, UserProjectRepository } from '../../@orm/user-project';
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
 import { ProjectTaskGateway } from './project.task.gateway';
 
@@ -38,9 +38,24 @@ export class ProjectTaskService {
     return this.taskRepo.createByProjectId(preparedData, projectId);
   }
 
-  public async update(id: number, taskUpdateDto: TaskUpdateDto, projectId: number): Promise<Task> {
+  public async update(
+    id: number,
+    taskUpdateDto: TaskUpdateDto,
+    projectId: number,
+    project: Project,
+    user: User
+  ): Promise<Task> {
     const preparedData = await this.parseTaskDtoToTaskObj(taskUpdateDto, projectId);
-    const updatedTask = await this.taskRepo.updateByProjectId(id, preparedData, projectId);
+    let updatedTask = await this.taskRepo.findOne(id);
+    if (project.accessLevel.accessLevel < ACCESS_LEVEL.YELLOW) {
+      if (updatedTask.performerId !== user.id) {
+        throw new ForbiddenException({
+          message: 'Ваш уровень доступа позволяет редактировать только назначенные на вас задачи!',
+          task: updatedTask,
+        });
+      }
+    }
+    updatedTask = await this.taskRepo.updateByProjectId(id, preparedData, projectId);
     this.taskGateway.updateTaskForAll(updatedTask);
     return updatedTask;
   }
