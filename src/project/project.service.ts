@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { find, get, omit } from 'lodash';
+import { find, get, pick } from 'lodash';
 
 import { Project, ProjectDto, ProjectRepository } from '../@orm/project';
 import { ProjectPub, ProjectPubRepository } from '../@orm/project-pub';
@@ -49,9 +49,7 @@ export class ProjectService {
       }
       // 2. load project if has correct access to it
       const project = await this.projectRepo.findOneByProjectId(projectId);
-      project.accessLevel = omit(find(project.members, el => el.member.id === user.id) || {}, [
-        'member',
-      ]);
+      project.accessLevel = pick(access, UserProject.simpleFields);
       return project;
     } catch (e) {
       throw new NotFoundException('Проект не найден');

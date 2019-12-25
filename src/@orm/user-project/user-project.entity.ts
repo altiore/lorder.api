@@ -7,6 +7,8 @@ import { ACCESS_LEVEL } from './user-project.consts';
 
 @Entity()
 export class UserProject {
+  static simpleFields = ['accessLevel', 'timeSum', 'valueSum'];
+
   @ApiModelProperty()
   @Column('integer')
   accessLevel: ACCESS_LEVEL;

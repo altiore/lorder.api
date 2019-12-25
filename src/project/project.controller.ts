@@ -58,11 +58,8 @@ export class ProjectController {
   @Get(':projectId')
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.RED)
-  public one(
-    @UserJWT() user: User,
-    @Param('projectId', ParseIntPipe) projectId: number
-  ): Promise<Partial<Project>> {
-    return this.projectService.findOneByMember(projectId, user);
+  public one(@ProjectParam() project: Project): Partial<Project> {
+    return project;
   }
 
   @ApiResponse({ description: 'Проект успешно создан', status: 201, type: Project })
