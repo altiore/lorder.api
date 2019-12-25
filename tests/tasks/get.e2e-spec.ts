@@ -38,6 +38,7 @@ describe(`GET ${h.url}`, () => {
       expect.arrayContaining([
         {
           createdAt: expect.any(String),
+          createdById: null,
           description: expect.any(String),
           id: expect.any(Number),
           isArchived: false,

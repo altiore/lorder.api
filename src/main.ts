@@ -3,7 +3,7 @@ import {
   CustomOrigin,
 } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { NestFactory } from '@nestjs/core';
-import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+// import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 // import * as helmet from 'helmet';
 
@@ -36,7 +36,8 @@ const corsOptions = {
 } as CorsOptions;
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
+  // const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
+  const app = await NestFactory.create(AppModule);
   app.enableCors(corsOptions);
   // app.use(helmet());
   app.setGlobalPrefix('v1');
@@ -54,7 +55,7 @@ async function bootstrap() {
 
   await app.listen(
     PORT,
-    '0.0.0.0',
+    // '0.0.0.0',
     /* tslint:disable */
     () =>
       process.env.NODE_ENV !== 'production' &&

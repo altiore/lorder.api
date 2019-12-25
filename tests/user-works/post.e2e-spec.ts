@@ -157,6 +157,7 @@ describe(`POST ${h.url}`, () => {
     const task = await h.findOne(Task, { id: body.started.taskId });
     expect(task).toEqual({
       createdAt: expect.any(moment),
+      createdById: null,
       description: 'Описание новой задачи',
       id: expect.any(Number),
       isArchived: false,
@@ -199,6 +200,7 @@ describe(`POST ${h.url}`, () => {
     const task = await h.findOne(Task, { id: body.started.taskId });
     expect(task).toEqual({
       createdAt: expect.any(moment),
+      createdById: null,
       description: 'Описание новой задачи',
       id: expect.any(Number),
       isArchived: false,

@@ -1,2 +1,2 @@
-export * from './task.entity';
-export * from './task.repository';
+export * from './task-log.entity';
+export * from './task-log.repository';
