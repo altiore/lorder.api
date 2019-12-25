@@ -90,7 +90,7 @@ export class Project {
     description: 'Access Level for current user in current project',
     type: UserProject,
   })
-  accessLevel?: UserProject;
+  accessLevel?: Partial<UserProject>;
 
   @ApiModelPropertyOptional({ description: 'Время в секундах, потраченное на проект' })
   timeSum?: number;
