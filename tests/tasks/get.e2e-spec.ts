@@ -49,16 +49,7 @@ describe(`GET ${h.url}`, () => {
           title: expect.any(String),
           typeId: null,
           updatedAt: expect.any(String),
-          userWorks: expect.arrayContaining([
-            expect.objectContaining({
-              description: expect.any(String),
-              finishAt: expect.any(String),
-              id: expect.any(Number),
-              source: expect.any(String),
-              startAt: expect.any(String),
-              value: expect.any(Number),
-            }),
-          ]),
+          users: expect.any(Array),
           value: expect.any(Number),
         },
       ])

@@ -24,7 +24,7 @@ export class TaskRepository extends TreeRepository<Task> {
   ): Promise<Task[]> {
     return this.find({
       order: { [orderBy]: order.toUpperCase() },
-      relations: ['users', 'userWorks'],
+      relations: ['users'],
       skip,
       take: count,
       where: { project: { id: projectId }, isArchived: false },
@@ -45,13 +45,14 @@ export class TaskRepository extends TreeRepository<Task> {
       order: {
         [orderBy]: order.toUpperCase(),
       },
-      relations: ['userWorks'],
+      relations: ['users'],
       skip,
       take: count,
       where: {
         isArchived: false,
         performerId: user.id,
         projectId: In(allowedProjectIds),
+        // TODO: заменить на статусы работы для этого пользователя
         status: Between(1, 3),
         userWorks: {
           userId: user.id,
