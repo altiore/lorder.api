@@ -41,7 +41,7 @@ pipelines:
           script:
             - npm i
             - npm run build
-            - npm test:remote
+            - npm run test:remote
           services:
             - postgres
             - redis
