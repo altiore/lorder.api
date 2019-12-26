@@ -3,7 +3,7 @@ image: node:12.14.0
 pipelines:
   default:
     - step:
-        name: Migrations and test (look at postinstall script)
+        name: Build, migrations and tests
         deployment: test
         caches:
           - node
@@ -43,22 +43,12 @@ pipelines:
           deployment: staging
           script:
             - cd heroku
-            - rm -rf bin
-            - rm -rf dist
-            - rm -rf .git
-            - rm -rf mails
-            - rm -rf package.json
-            - rm -rf package-lock.json
-            - cp -r ../bin ./bin
-            - cp -r ../dist ./dist
-            - cp -r ../mails ./mails
-            - cp ../ormconfig.js ./ormconfig.js
-            - cp ../package.json ./package.json
+            - rm -rf bin dist .git mails package.json package-lock.json
+            - cp -r ../bin ../dist ../mails ../ormconfig.js ../package.json ../package-lock.json ./
             - sed "s/rm -rf dist && tsc/echo NO NEED BUILD PREFERATION/" -i package.json
-            - cp ../package-lock.json ./package-lock.json
             - git init
             - git add .
-            - git config user.email "razvanlomov@gmail.com"
+            - git config user.email "commits-noreply@bitbucket.org"
             - git config user.name "bitbucket-pipelines"
             - git commit -m 'dynamic version'
             - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$STAGING_APP_NAME.git -f HEAD:master
@@ -90,22 +80,12 @@ pipelines:
           deployment: production
           script:
             - cd heroku
-            - rm -rf bin
-            - rm -rf dist
-            - rm -rf .git
-            - rm -rf mails
-            - rm -rf package.json
-            - rm -rf package-lock.json
-            - cp -r ../bin ./bin
-            - cp -r ../dist ./dist
-            - cp -r ../mails ./mails
-            - cp ../ormconfig.js ./ormconfig.js
-            - cp ../package.json ./package.json
+            - rm -rf bin dist .git mails package.json package-lock.json
+            - cp -r ../bin ../dist ../mails ../ormconfig.js ../package.json ../package-lock.json ./
             - sed "s/rm -rf dist && tsc/echo NO NEED BUILD PREFERATION/" -i package.json
-            - cp ../package-lock.json ./package-lock.json
             - git init
             - git add .
-            - git config user.email "razvanlomov@gmail.com"
+            - git config user.email "commits-noreply@bitbucket.org"
             - git config user.name "bitbucket-pipelines"
             - git commit -m 'dynamic version'
             - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$PRODUCTION_APP_NAME.git -f HEAD:master
