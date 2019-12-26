@@ -52,7 +52,7 @@ export class UserProjectRepository extends Repository<UserProject> {
   ): Promise<UserProject[]> {
     return await this.find({
       loadEagerRelations: false,
-      relations: ['project'],
+      relations: ['project', 'project.pub'],
       skip,
       take: count,
       where: {
