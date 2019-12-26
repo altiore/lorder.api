@@ -17,31 +17,43 @@ pipelines:
   branches:
     staging:
       - step:
-          name: Tests one more time before deploy
+          name: Staging build
           caches:
             - node
           script:
             - npm i
             - npm run build
-            - npm run test:remote
           services:
             - postgres
             - redis
           artifacts: # defining the artifacts to be passed to each future step.
             - dist/**
+            - node_modules/**
       - step:
-          name: Deploy to STAGING
+          name: Staging tests
+          caches:
+            - node
+          script:
+            - npm run test:remote
+          services:
+            - postgres
+            - redis
+      - step:
+          name: Staging DEPLOY
           caches:
             - node
           deployment: staging
           script:
             - cd heroku
+            - rm -rf bin
             - rm -rf dist
             - rm -rf .git
+            - rm -rf mails
             - rm -rf package.json
             - rm -rf package-lock.json
             - cp -r ../bin ./bin
             - cp -r ../dist ./dist
+            - cp -r ../mails ./mails
             - cp ../ormconfig.js ./ormconfig.js
             - cp ../package.json ./package.json
             - sed "s/rm -rf dist && tsc/echo NO NEED BUILD PREFERATION/" -i package.json

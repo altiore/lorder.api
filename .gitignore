@@ -30,6 +30,7 @@ Dockerfile
 # production
 /heroku/bin
 /heroku/dist
+/heroku/mails
 /heroku/package.json
 /heroku/package-lock.json
 /heroku/ormconfig.js
