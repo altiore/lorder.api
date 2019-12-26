@@ -3,11 +3,11 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 export class taskCreateUpdate1576244263646 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
     await queryRunner.query(
-      `ALTER TABLE "task" ADD "createdAt" TIMESTAMP NOT NULL DEFAULT now()`,
+      `ALTER TABLE "task" ADD IF NOT EXISTS "createdAt" TIMESTAMP NOT NULL DEFAULT now()`,
       undefined
     );
     await queryRunner.query(
-      `ALTER TABLE "task" ADD "updatedAt" TIMESTAMP NOT NULL DEFAULT now()`,
+      `ALTER TABLE "task" ADD IF NOT EXISTS "updatedAt" TIMESTAMP NOT NULL DEFAULT now()`,
       undefined
     );
   }
