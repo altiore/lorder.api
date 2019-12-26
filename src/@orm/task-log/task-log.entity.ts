@@ -1,12 +1,6 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 import { Moment } from 'moment';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { Task } from '../task/task.entity';
@@ -32,7 +26,7 @@ export class TaskLog {
 
   @ApiModelProperty()
   @Column({ type: 'enum', enum: TASK_CHANGE_TYPE, default: TASK_CHANGE_TYPE.UPDATE })
-  changeType: number;
+  changeType: TASK_CHANGE_TYPE;
 
   @ApiModelProperty()
   @Column('simple-json', { nullable: true })

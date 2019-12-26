@@ -9,12 +9,14 @@ import { Task, TaskRepository } from '../../@orm/task';
 import { TaskTypeRepository } from '../../@orm/task-type';
 import { User, UserRepository } from '../../@orm/user';
 import { ACCESS_LEVEL, UserProjectRepository } from '../../@orm/user-project';
+import { TaskService } from '../../task/task.service';
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
 import { ProjectTaskGateway } from './project.task.gateway';
 
 @Injectable()
 export class ProjectTaskService {
   constructor(
+    // TODO: remove taskRepo from this file and use taskService instead!!!
     @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository,
     @InjectRepository(UserRepository) private readonly userRepo: UserRepository,
     @InjectRepository(UserProjectRepository)
@@ -22,7 +24,8 @@ export class ProjectTaskService {
     @InjectRepository(TaskTypeRepository) private readonly taskTypeRepo: TaskTypeRepository,
     @InjectRepository(ProjectTaskTypeRepository)
     private readonly projectTaskTypeRepo: ProjectTaskTypeRepository,
-    private readonly taskGateway: ProjectTaskGateway
+    private readonly taskGateway: ProjectTaskGateway,
+    private readonly taskService: TaskService
   ) {}
 
   public async findAll(pagesDto: PaginationDto, projectId: number): Promise<Task[]> {
@@ -33,42 +36,41 @@ export class ProjectTaskService {
     return this.taskRepo.findOneByProjectId(id, projectId);
   }
 
-  public async create(taskCreateDto: TaskCreateDto, projectId: number): Promise<Task> {
-    const preparedData = await this.parseTaskDtoToTaskObj(taskCreateDto, projectId);
-    return this.taskRepo.createByProjectId(preparedData, projectId);
+  public async create(taskCreateDto: TaskCreateDto, project: Project, user: User): Promise<Task> {
+    const preparedData = await this.parseTaskDtoToTaskObj(taskCreateDto, project.id);
+    return await this.taskService.createByProject(preparedData, project, user);
   }
 
   public async update(
-    id: number,
+    taskId: number,
     taskUpdateDto: TaskUpdateDto,
-    projectId: number,
     project: Project,
     user: User
   ): Promise<Task> {
-    const preparedData = await this.parseTaskDtoToTaskObj(taskUpdateDto, projectId);
-    let updatedTask = await this.taskRepo.findOne(id);
-    if (project.accessLevel.accessLevel < ACCESS_LEVEL.YELLOW) {
-      if (updatedTask.performerId !== user.id) {
-        throw new ForbiddenException({
-          message: 'Ваш уровень доступа позволяет редактировать только назначенные на вас задачи!',
-          task: updatedTask,
-        });
-      }
-    }
-    updatedTask = await this.taskRepo.updateByProjectId(id, preparedData, projectId);
+    // 1. Проверить соответсвие проекта задаче и уровень доступа пользователя к проекту
+    const checkedTask = await this.checkAccess(taskId, project, user, ACCESS_LEVEL.YELLOW);
+    // 2. Подготовить данные для обновления задачи
+    const preparedData = await this.parseTaskDtoToTaskObj(taskUpdateDto, project.id);
+    // 3. Обновить задачу
+    const updatedTask = await this.taskService.updateByUser(checkedTask, preparedData, user);
+    // 4. Отправить всем пользователям обновленные данные задачи
     this.taskGateway.updateTaskForAll(updatedTask);
+    // 5. Вернуть измененную задачу
     return updatedTask;
   }
 
   public async move(
-    task: Task,
+    taskId: number,
     project: Project,
     user: User,
     taskMoveDto: TaskMoveDto
   ): Promise<Task> {
-    // 1. TODO: проверить разрешенное перемещение задачи для данного статуса
-    // 2. TODO: проверить разрешенное перемещение задачи для данного пользователя
-    return this.taskRepo.updateByProjectId(task.id, taskMoveDto, project.id);
+    // 1. Проверить соответсвие проекта задаче и уровень доступа пользователя к проекту
+    const checkedTask = await this.checkAccess(taskId, project, user);
+    // 2. TODO: проверить разрешенное перемещение задачи для данного статуса
+    // 3. TODO: проверить разрешенное перемещение задачи для данного пользователя
+    // 4. Обновить и вернуть обновленную задачу
+    return this.taskService.updateByUser(checkedTask, taskMoveDto, user);
   }
 
   public async delete(id: number, projectId: number): Promise<Task | false> {
@@ -78,6 +80,31 @@ export class ProjectTaskService {
     }
     await this.taskRepo.delete({ id });
     return task;
+  }
+
+  private async checkAccess(
+    taskId: number,
+    project: Project,
+    user: User,
+    statusLevel: ACCESS_LEVEL = ACCESS_LEVEL.RED
+  ): Promise<Task> {
+    const checkedTask = await this.taskService.findOne(taskId, user);
+    if (project.id !== checkedTask.projectId) {
+      throw new ForbiddenException({
+        message:
+          'Вы пытаетесь отредактировать задачу, которая не принадлежит выбранному проекту.' +
+          ' Скорее всего, вы пытаетесь взломать сайт, но мы вам этого не позволим! ;)',
+      });
+    }
+    if (project.accessLevel.accessLevel < statusLevel) {
+      if (checkedTask.performerId !== user.id) {
+        throw new ForbiddenException({
+          message: 'Ваш уровень доступа позволяет редактировать только назначенные на вас задачи!',
+          task: checkedTask,
+        });
+      }
+    }
+    return checkedTask;
   }
 
   private async parseTaskDtoToTaskObj(

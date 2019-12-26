@@ -52,7 +52,7 @@ export class UserWorkController {
   @ApiResponse({ status: 201, type: StartResponse, description: 'ACCESS_LEVEL.RED' })
   public start(
     @Body() userWorkCreateDto: UserWorkCreateDto,
-    @ProjectParam() project: DeepPartial<Project>, // projectId from Body
+    @ProjectParam() project: Project,
     @UserJWT() user: User
   ): Promise<StartResponse> {
     return this.userWorkService.start(project, user, userWorkCreateDto);
@@ -65,7 +65,7 @@ export class UserWorkController {
   public async update(
     @Body() userWorkDto: UserWorkPatchDto,
     @Param('userWorkId', ParseIntPipe) userWorkId: number,
-    @ProjectParam() project: DeepPartial<Project>, // projectId from Body
+    @ProjectParam() project: Project, // projectId from Body
     @UserJWT() user: User
   ): Promise<UserWorkEditResultDto> {
     const userWork = await this.userWorkService.findOneByUser(userWorkId, user);

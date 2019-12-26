@@ -11,6 +11,7 @@ import { UserProjectRepository } from '../@orm/user-project';
 import { UserWorkRepository } from '../@orm/user-work';
 import { AuthModule } from '../auth/auth.module';
 import { RedisModule } from '../redis/redis.module';
+import { TaskModule } from '../task/task.module';
 import { AccessLevelGuard } from './@common/guards';
 import { ProjectMemberController } from './member/project.member.controller';
 import { ProjectMemberService } from './member/project.member.service';
@@ -31,6 +32,7 @@ import { ProjectTaskService } from './task/project.task.service';
   ],
   exports: [AccessLevelGuard, ProjectService, ProjectTaskGateway, ProjectMemberService],
   imports: [
+    forwardRef(() => TaskModule),
     forwardRef(() => AuthModule),
     RedisModule.registerCache(),
     TypeOrmModule.forFeature([

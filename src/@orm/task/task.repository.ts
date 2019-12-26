@@ -2,8 +2,6 @@ import { Between, EntityRepository, In, TreeRepository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Project } from '../project/project.entity';
-import { ACCESS_LEVEL } from '../user-project';
-import { UserWork } from '../user-work/user-work.entity';
 import { User } from '../user/user.entity';
 import { Task } from './task.entity';
 
@@ -79,19 +77,9 @@ export class TaskRepository extends TreeRepository<Task> {
     return this.findOne({ where: { id, project: { id: projectId } } });
   }
 
-  public createByProjectId(data: Partial<Task>, projectId: number): Promise<Task> {
+  public createByProject(data: Partial<Task>, project: Project): Task {
     const entity = this.create(data);
-    entity.project = { id: projectId } as Project;
-    return this.save(entity);
-  }
-
-  public async updateByProjectId(
-    id: number,
-    data: Partial<Task>,
-    projectId: number
-  ): Promise<Task> {
-    let entity = await this.findOneOrFail(id);
-    entity = this.merge(entity, data, { project: { id: projectId } });
-    return this.save(entity);
+    entity.project = project;
+    return entity;
   }
 }

@@ -55,7 +55,7 @@ export class ProjectTaskController {
   public async one(
     @Param('projectId', ParseIntPipe) projectId: number,
     @Param('taskId', ParseIntPipe) taskId: number,
-    @ProjectParam() project: DeepPartial<Project>
+    @ProjectParam() project: Project
   ): Promise<Task> {
     const task = await this.taskService.findOne(taskId, projectId);
     if (!task) {
@@ -69,10 +69,11 @@ export class ProjectTaskController {
   @AccessLevel(ACCESS_LEVEL.ORANGE)
   @ApiResponse({ status: 201, type: Task, description: 'ACCESS_LEVEL.ORANGE' })
   public create(
-    @Param('projectId', ParseIntPipe) projectId: number,
-    @Body() taskCreateDto: TaskCreateDto
+    @Body() taskCreateDto: TaskCreateDto,
+    @ProjectParam() project: Project,
+    @UserJWT() user: User
   ) {
-    return this.taskService.create(taskCreateDto, projectId);
+    return this.taskService.create(taskCreateDto, project, user);
   }
 
   @Patch(':id')
@@ -80,13 +81,25 @@ export class ProjectTaskController {
   @AccessLevel(ACCESS_LEVEL.RED)
   @ApiResponse({ status: 200, type: Task, description: 'ACCESS_LEVEL.RED' })
   public update(
-    @Param('projectId', ParseIntPipe) projectId: number,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) taskId: number,
     @ProjectParam() project: Project,
     @UserJWT() user: User,
     @Body() taskCreateDto: TaskUpdateDto
   ) {
-    return this.taskService.update(id, taskCreateDto, projectId, project, user);
+    return this.taskService.update(taskId, taskCreateDto, project, user);
+  }
+
+  @Patch(':taskId/move')
+  @Roles('user')
+  @AccessLevel(ACCESS_LEVEL.RED)
+  @ApiResponse({ status: 200, type: Task, description: 'Доступно для уровня ACCESS_LEVEL.RED (1)' })
+  public async move(
+    @Param('taskId', ParseIntPipe) taskId: number,
+    @ProjectParam() project: Project,
+    @Body() taskMoveDto: TaskMoveDto,
+    @UserJWT() user: User
+  ) {
+    return this.taskService.move(taskId, project, user, taskMoveDto);
   }
 
   @Delete(':taskId')
@@ -107,23 +120,5 @@ export class ProjectTaskController {
       throw new NotFoundException(`Задача ${taskId} не была найдена в проекте ${project.title}`);
     }
     return task;
-  }
-
-  @Patch(':taskId/move')
-  @Roles('user')
-  @AccessLevel(ACCESS_LEVEL.RED)
-  @ApiResponse({ status: 200, type: Task, description: 'Доступно для уровня ACCESS_LEVEL.RED (1)' })
-  public async move(
-    @Param('projectId', ParseIntPipe) projectId: number,
-    @Param('taskId', ParseIntPipe) taskId: number,
-    @ProjectParam() project: Project,
-    @Body() taskMoveDto: TaskMoveDto,
-    @UserJWT() user: User
-  ) {
-    const task = await this.taskService.findOne(taskId, projectId);
-    if (!task) {
-      throw new NotFoundException(`Задача ${taskId} не была найдена в проекте ${project.title}`);
-    }
-    return this.taskService.move(task, project, user, taskMoveDto);
   }
 }

@@ -11,11 +11,11 @@ import { DeepPartial } from 'typeorm';
 
 import { PaginationDto } from '../@common/dto/pagination.dto';
 import { Project } from '../@orm/project';
-import { TaskRepository } from '../@orm/task';
 import { User } from '../@orm/user';
 import { ACCESS_LEVEL } from '../@orm/user-project';
 import { UserWork, UserWorkRepository } from '../@orm/user-work';
 import { ProjectService } from '../project/project.service';
+import { TaskService } from '../task/task.service';
 import { UserService } from '../user/user.service';
 import {
   StartResponse,
@@ -28,10 +28,10 @@ import {
 @Injectable()
 export class UserWorkService {
   constructor(
-    @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository,
     @InjectRepository(UserWorkRepository) private readonly userWorkRepo: UserWorkRepository,
     private readonly projectService: ProjectService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly taskService: TaskService
   ) {}
 
   public findAll(pagesDto: PaginationDto, user: User): Promise<UserWork[]> {
@@ -70,10 +70,11 @@ export class UserWorkService {
   }
 
   public async start(
-    project: DeepPartial<Project>,
+    project: Project,
     user: User,
     userWorkData: UserWorkCreateDto
   ): Promise<StartResponse> {
+    // TODO: добавить транзакции на процесс создания всех частей задачи
     // 1. Завершить предыдущие задачи, если есть незавершенные
     const finishedUserWorks = await this.finishNotFinished(user);
 
@@ -190,14 +191,14 @@ export class UserWorkService {
   }
 
   private async startNew(
-    project: DeepPartial<Project>,
+    project: Project,
     user: User,
     userWorkData: UserWorkCreateDto,
     startAt: Moment
   ): Promise<UserWork> {
     let task;
     if (userWorkData.taskId) {
-      task = await this.taskRepo.findOneByProjectId(userWorkData.taskId, project.id);
+      task = await this.taskService.findOneByProjectId(userWorkData.taskId, project.id);
       if (!task) {
         throw new NotFoundException(
           `Указанная задача ${userWorkData.taskId} не найдена в проекте ${project.title}`
@@ -205,16 +206,13 @@ export class UserWorkService {
       }
     }
     if (!task) {
-      task = await this.taskRepo.createByProjectId(
-        {
-          description: userWorkData.description || '',
-          performerId: userWorkData.performerId || user.id,
-          status: 2,
-          title: userWorkData.title,
-          users: [user],
-        },
-        project.id
-      );
+      const taskData = {
+        description: userWorkData.description || '',
+        performerId: userWorkData.performerId || user.id,
+        status: 2,
+        title: userWorkData.title,
+      };
+      task = await this.taskService.createByProject(taskData, project, user);
     }
     return await this.userWorkRepo.startTask(
       task,
