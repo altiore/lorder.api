@@ -3,7 +3,7 @@
     <mj-section>
       <mj-column>
         <mj-text font-size="24px" color="#1E1E2A" font-family="helvetica" align="center">
-          Привет! Рад видеть
+          Привет! Рад видеть тебя
         </mj-text>
         <mj-divider border-color="#1E1E2A"></mj-divider>
         <mj-text font-size="20px" color="#1E1E2A" font-family="helvetica" align="center">
