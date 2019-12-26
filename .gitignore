@@ -26,3 +26,10 @@ altiore-1298-e837eac2c685.json
 # Docker
 Dockerfile
 /nbproject/
+
+# production
+/heroku/bin
+/heroku/dist
+/heroku/package.json
+/heroku/package-lock.json
+/heroku/ormconfig.js

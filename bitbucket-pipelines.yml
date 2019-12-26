@@ -27,11 +27,31 @@ pipelines:
           services:
             - postgres
             - redis
+          artifacts: # defining the artifacts to be passed to each future step.
+            - dist/**
       - step:
-          name: Deploy to altiore-staging
+          name: Deploy to STAGING
+          caches:
+            - node
           deployment: staging
           script:
-            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git -f HEAD:master
+            - cd heroku
+            - rm -rf dist
+            - rm -rf .git
+            - rm -rf package.json
+            - rm -rf package-lock.json
+            - cp -r ../bin ./bin
+            - cp -r ../dist ./dist
+            - cp ../ormconfig.js ./ormconfig.js
+            - cp ../package.json ./package.json
+            - sed "s/rm -rf dist && tsc/echo NO NEED BUILD PREFERATION/" -i package.json
+            - cp ../package-lock.json ./package-lock.json
+            - git init
+            - git add .
+            - git config user.email "razvanlomov@gmail.com"
+            - git config user.name "bitbucket-pipelines"
+            - git commit -m 'dynamic version'
+            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$STAGING_APP_NAME.git -f HEAD:master
     master:
       - step:
           name: Tests one more time before deploy
