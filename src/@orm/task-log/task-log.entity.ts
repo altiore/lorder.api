@@ -28,11 +28,11 @@ export class TaskLog {
   @Column({ type: 'enum', enum: TASK_CHANGE_TYPE, default: TASK_CHANGE_TYPE.UPDATE })
   changeType: TASK_CHANGE_TYPE;
 
-  @ApiModelProperty()
-  @Column('simple-json', { nullable: true })
+  @ApiModelPropertyOptional()
+  @Column('simple-json', { default: {}, nullable: false })
   prevVersion: Partial<Task>;
 
-  @ApiModelProperty()
+  @ApiModelPropertyOptional()
   @Column('text', { nullable: true })
   description: string;
 

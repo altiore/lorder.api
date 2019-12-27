@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
@@ -82,7 +82,7 @@ export class ProjectTaskService {
     return task;
   }
 
-  private async checkAccess(
+  public async checkAccess(
     taskId: number,
     project: Project,
     user: User,
@@ -90,7 +90,7 @@ export class ProjectTaskService {
   ): Promise<Task> {
     const checkedTask = await this.taskService.findOne(taskId, user);
     if (project.id !== checkedTask.projectId) {
-      throw new ForbiddenException({
+      throw new NotAcceptableException({
         message:
           'Вы пытаетесь отредактировать задачу, которая не принадлежит выбранному проекту.' +
           ' Скорее всего, вы пытаетесь взломать сайт, но мы вам этого не позволим! ;)',

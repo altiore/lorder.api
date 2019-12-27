@@ -22,6 +22,7 @@ import { ProjectTaskTypeService } from './task-type/project.task-type.service';
 import { ProjectTaskController } from './task/project.task.controller';
 import { ProjectTaskGateway } from './task/project.task.gateway';
 import { ProjectTaskService } from './task/project.task.service';
+import { TaskLogModule } from './task/task-log/task-log.module';
 
 @Module({
   controllers: [
@@ -30,10 +31,17 @@ import { ProjectTaskService } from './task/project.task.service';
     ProjectTaskController,
     ProjectTaskTypeController,
   ],
-  exports: [AccessLevelGuard, ProjectService, ProjectTaskGateway, ProjectMemberService],
+  exports: [
+    AccessLevelGuard,
+    ProjectService,
+    ProjectTaskGateway,
+    ProjectTaskService,
+    ProjectMemberService,
+  ],
   imports: [
-    forwardRef(() => TaskModule),
     forwardRef(() => AuthModule),
+    forwardRef(() => TaskLogModule),
+    forwardRef(() => TaskModule),
     RedisModule.registerCache(),
     TypeOrmModule.forFeature([
       ProjectPubRepository,

@@ -82,10 +82,12 @@ export class Task {
   @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL', onUpdate: 'CASCADE' })
   performer: User;
 
+  // TODO: can be removed. Redundant and exists in task-log table
   @ApiModelProperty()
   @Column({ nullable: true })
   createdById: number;
 
+  // TODO: can be removed. Redundant and exists in task-log table
   @ApiModelProperty({ type: User })
   @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL', onUpdate: 'CASCADE' })
   createdBy: User;
@@ -96,10 +98,12 @@ export class Task {
   @ManyToMany(type => User, user => user.tasks)
   users: User[];
 
+  // TODO: can be removed. Redundant and exists in task-log table
   @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
   @CreateDateColumn(momentDateTransformer)
   createdAt: Moment;
 
+  // TODO: can be removed. Redundant and exists in task-log table
   @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
   @UpdateDateColumn(momentDateTransformer)
   updatedAt: Moment;

@@ -1,4 +1,4 @@
-import { company, date, internet, random } from 'faker';
+import { internet, random } from 'faker';
 import moment = require('moment');
 import { fixtureCreator, one } from 'typeorm-fixtures';
 

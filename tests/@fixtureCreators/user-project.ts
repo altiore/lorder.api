@@ -1,4 +1,4 @@
-import { company, random } from 'faker';
+// import { company, random } from 'faker';
 import { fixtureCreator, one } from 'typeorm-fixtures';
 
 import { Project } from '../../src/@orm/project';
