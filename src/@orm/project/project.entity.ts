@@ -13,6 +13,7 @@ import {
 
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { ProjectPub } from '../project-pub/project-pub.entity';
+import { ProjectRole } from '../project-role/project-role.entity';
 import { ProjectTaskType } from '../project-task-type/project-task-type.entity';
 import { TaskType } from '../task-type/task-type.entity';
 import { Task } from '../task/task.entity';
@@ -85,6 +86,10 @@ export class Project {
   @ApiModelPropertyOptional({ type: UserProject, isArray: true })
   @OneToMany(() => UserProject, userProject => userProject.project)
   members: UserProject[];
+
+  @ApiModelPropertyOptional({ type: ProjectRole, isArray: true })
+  @OneToMany(() => ProjectRole, projectRole => projectRole.project)
+  roles: ProjectRole[];
 
   @ApiModelPropertyOptional({
     description: 'Access Level for current user in current project',
