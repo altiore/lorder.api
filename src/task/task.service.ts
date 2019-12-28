@@ -110,15 +110,15 @@ export class TaskService {
   async updateByUser(task: Task, newTaskData: Partial<Task>, user: User): Promise<Task> {
     let updatedTask: Task;
     await this.taskRepo.manager.transaction(async entityManager => {
-      updatedTask = this.taskRepo.merge(task, newTaskData);
-      await entityManager.save(updatedTask);
-
       const changeType =
         typeof newTaskData.status !== 'undefined' && task.status !== newTaskData.status
           ? TASK_CHANGE_TYPE.MOVE
           : TASK_CHANGE_TYPE.UPDATE;
       const taskLog = this.taskLogRepo.createTaskLogByType(changeType, task, user);
       await entityManager.save(taskLog);
+
+      updatedTask = this.taskRepo.merge(task, newTaskData);
+      await entityManager.save(updatedTask);
     });
     return updatedTask;
   }

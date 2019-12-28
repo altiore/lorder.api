@@ -1,3 +1,4 @@
+import { omit } from 'lodash';
 import { EntityRepository, TreeRepository } from 'typeorm';
 
 import { Task } from '../task/task.entity';
@@ -15,7 +16,13 @@ export class TaskLogRepository extends TreeRepository<TaskLog> {
     return this.create({
       changeType: taskChangeType,
       createdBy: performer,
-      prevVersion: prevVersion || task,
+      prevVersion: omit(prevVersion || task, [
+        'performer',
+        'userWorks',
+        'users',
+        'project',
+        'children',
+      ]),
       task,
     });
   }

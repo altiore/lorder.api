@@ -27,6 +27,7 @@ export class TaskLogService {
     let beforeStartCount = 0;
     if (listDto.startId) {
       const [beforeStartListFromDB, beforeStartCountFromDB] = await this.taskLogRepo.findAndCount({
+        loadRelationIds: true,
         order: { [listDto.orderBy || 'id']: listDto.order ? listDto.order.toUpperCase() : 'DESC' },
         where: {
           id: MoreThan(listDto.startId),
@@ -48,6 +49,7 @@ export class TaskLogService {
     let afterEndList = [];
     if (take > 0) {
       afterEndList = await this.taskLogRepo.find({
+        loadRelationIds: true,
         order: { [listDto.orderBy || 'id']: listDto.order ? listDto.order.toUpperCase() : 'DESC' },
         take,
         where: whereForAfter,
