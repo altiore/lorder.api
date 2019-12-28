@@ -72,7 +72,6 @@ describe(`GET ${h.url}`, () => {
   it('last 2 item by correct user and was created one more last item', async () => {
     const startId = h.entities.TaskLog.find(el => el.description === '2').id;
     const endId = h.entities.TaskLog.find(el => el.description === '3').id;
-    expect(endId).toBe(3);
     const { body } = await h
       .requestBy('user@mail.com')
       .get(h.path(projectId, taskId))
