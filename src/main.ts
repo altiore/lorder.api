@@ -28,7 +28,7 @@ const whitelist = [
 const corsOptions = {
   allowedHeaders: 'Authorization,Accept,Content-Type',
   credentials: true,
-  exposedHeaders: 'Authorization',
+  exposedHeaders: 'Authorization,Set-Cookie',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   origin: IS_PROD
     ? (function(origin, callback) {
