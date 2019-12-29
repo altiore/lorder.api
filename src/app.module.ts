@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AllExceptionsFilter } from './@common/filters/all-exceptions.filter';
+import { CookieMiddleware } from './@common/middlewares/cookie.middleware';
 import { ValidationPipe } from './@common/pipes/validation.pipe';
 import { AuthModule } from './auth/auth.module';
 import { FeedbackModule } from './feedback/feedback.module';
@@ -44,4 +45,8 @@ import { UserModule } from './user/user.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): any {
+    consumer.apply(CookieMiddleware);
+  }
+}
