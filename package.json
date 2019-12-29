@@ -10,6 +10,7 @@
   },
   "scripts": {
     "start": "sh bin/start.sh && cross-env NODE_ENV=development nodemon",
+    "start:dev": "cross-env NODE_ENV=development nodemon",
     "stop": "sh bin/stop.sh",
     "start:hmr": "node dist/server",
     "start:prod": "npm run build && node dist/main.js",
