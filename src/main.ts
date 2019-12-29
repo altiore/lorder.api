@@ -21,7 +21,8 @@ const SCHEMA = IS_PROD ? 'https' : 'http';
 const whitelist = [
   'https://altiore.org', // production
   'https://staging-altiore.herokuapp.com', // staging
-  'http://localhost:8181',
+  'https://staging-altiore-api.herokuapp.com', // staging for swagger
+  'http://localhost:8181', // localhost
   'http://192.168.1.37:8181',
 ];
 const corsOptions = {
