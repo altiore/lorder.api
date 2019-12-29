@@ -7,7 +7,8 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 // import * as helmet from 'helmet';
 
-import { CookieMiddleware } from './@common/middlewares/cookie.middleware';
+// import { CookieMiddleware } from './@common/middlewares/cookie.middleware';
+// import { RedisIoAdapter } from './adapters/redis-io.adapter';
 import { AppModule } from './app.module';
 
 if (process.env.NODE_ENV !== 'production') {
@@ -46,7 +47,8 @@ async function bootstrap() {
   // const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
   const app = await NestFactory.create(AppModule);
   app.enableCors(corsOptions);
-  app.use(new CookieMiddleware().use);
+  // app.use(new CookieMiddleware().use);
+  // app.useWebSocketAdapter(new RedisIoAdapter(app));
   // app.use(helmet());
   app.setGlobalPrefix('v1');
 
