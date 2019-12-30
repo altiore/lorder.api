@@ -19,6 +19,8 @@
     "build": "rm -rf dist && tsc",
     "pretest": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && npm run migration:test:up",
     "test": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest -i -b --detectOpenHandles",
+    "pretest:dev": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && npm run migration:test:up",
+    "test:dev": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest -i -b --detectOpenHandles --forceExit --watch",
     "test:coverage": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest -i --forceExit --coverage",
     "pretest:changed:only": "npm run pretest",
     "test:changed:only": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest -i -b --lastCommit --detectOpenHandles --forceExit",
