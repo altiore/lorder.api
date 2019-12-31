@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -11,6 +12,7 @@ import {
   Tree,
   TreeChildren,
   TreeParent,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -21,11 +23,17 @@ import { UserWork } from '../user-work/user-work.entity';
 import { User } from '../user/user.entity';
 
 @Entity()
-@Tree('closure-table')
+@Tree('materialized-path')
+// @Index(['projectId', 'sequenceNumber'])
+// @Unique(['projectId', 'sequenceNumber'])
 export class Task {
   @ApiModelProperty()
   @PrimaryGeneratedColumn()
   id: number;
+
+  @ApiModelProperty()
+  @Column({ nullable: true })
+  sequenceNumber: number;
 
   @ApiModelProperty()
   @Column({ nullable: false })
