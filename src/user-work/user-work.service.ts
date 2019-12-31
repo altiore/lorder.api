@@ -5,10 +5,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import moment = require('moment');
 import { Moment } from 'moment';
-import { DeepPartial } from 'typeorm';
 
+import moment = require('moment');
 import { PaginationDto } from '../@common/dto/pagination.dto';
 import { Project } from '../@orm/project';
 import { User } from '../@orm/user';
@@ -198,7 +197,7 @@ export class UserWorkService {
   ): Promise<UserWork> {
     let task;
     if (userWorkData.taskId) {
-      task = await this.taskService.findOneByProjectId(userWorkData.taskId, project.id);
+      task = await this.taskService.findOneById(userWorkData.taskId, user);
       if (!task) {
         throw new NotFoundException(
           `Указанная задача ${userWorkData.taskId} не найдена в проекте ${project.title}`

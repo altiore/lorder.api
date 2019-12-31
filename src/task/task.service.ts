@@ -37,10 +37,11 @@ export class TaskService {
     taskId: number,
     user: User,
     accessLevel: ACCESS_LEVEL = ACCESS_LEVEL.RED,
-    where = {}
+    where = {},
+    withoutRelations = false
   ): Promise<Task> {
     const task = await this.taskRepo.findOne({
-      relations: ['performer', 'userWorks', 'users'],
+      relations: withoutRelations ? [] : ['performer', 'userWorks', 'users'],
       where: {
         id: taskId,
         ...where,
