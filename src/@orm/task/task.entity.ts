@@ -1,7 +1,6 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 import { Moment } from 'moment';
 import {
-  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
