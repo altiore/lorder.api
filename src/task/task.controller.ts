@@ -1,4 +1,13 @@
-import { Controller, Get, NotFoundException, Param, ParseIntPipe, Patch, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 
@@ -26,7 +35,10 @@ export class TaskController {
   @Patch(':taskId/archive')
   @Roles('user')
   @ApiResponse({ status: 200, type: Task, description: 'ACCESS_LEVEL.RED' })
-  public async archive(@Param('taskId', ParseIntPipe) taskId: number, @UserJWT() user: User): Promise<Task> {
+  public async archive(
+    @Param('taskId', ParseIntPipe) taskId: number,
+    @UserJWT() user: User
+  ): Promise<Task> {
     const task = await this.taskService.archive(taskId, user);
 
     if (!task) {
@@ -34,12 +46,5 @@ export class TaskController {
     }
 
     return task;
-  }
-
-  @Get(':taskId')
-  @Roles('user')
-  @ApiResponse({ status: 200, type: Task })
-  public one(@Param('taskId', ParseIntPipe) taskId: number, @UserJWT() user: User): Promise<Task> {
-    return this.taskService.findOne(taskId, user);
   }
 }

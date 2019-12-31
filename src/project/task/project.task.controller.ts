@@ -48,18 +48,20 @@ export class ProjectTaskController {
     return this.taskService.findAll(pagesDto, projectId);
   }
 
-  @Get(':taskId')
+  @Get(':sequenceNumber')
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.RED)
   @ApiResponse({ status: 200, type: Task, description: 'ACCESS_LEVEL.RED' })
   public async one(
     @Param('projectId', ParseIntPipe) projectId: number,
-    @Param('taskId', ParseIntPipe) taskId: number,
+    @Param('sequenceNumber', ParseIntPipe) sequenceNumber: number,
     @ProjectParam() project: Project
   ): Promise<Task> {
-    const task = await this.taskService.findOne(taskId, projectId);
+    const task = await this.taskService.findOne(sequenceNumber, projectId);
     if (!task) {
-      throw new NotFoundException(`Задача ${taskId} не найдена в проекте "${project.title}"`);
+      throw new NotFoundException(
+        `Задача ${sequenceNumber} не найдена в проекте "${project.title}"`
+      );
     }
     return task;
   }
@@ -76,33 +78,33 @@ export class ProjectTaskController {
     return this.taskService.create(taskCreateDto, project, user);
   }
 
-  @Patch(':id')
+  @Patch(':sequenceNumber')
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.RED)
   @ApiResponse({ status: 200, type: Task, description: 'ACCESS_LEVEL.RED' })
   public update(
-    @Param('id', ParseIntPipe) taskId: number,
+    @Param('sequenceNumber', ParseIntPipe) sequenceNumber: number,
     @ProjectParam() project: Project,
     @UserJWT() user: User,
     @Body() taskCreateDto: TaskUpdateDto
   ) {
-    return this.taskService.update(taskId, taskCreateDto, project, user);
+    return this.taskService.update(sequenceNumber, taskCreateDto, project, user);
   }
 
-  @Patch(':taskId/move')
+  @Patch(':sequenceNumber/move')
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.RED)
   @ApiResponse({ status: 200, type: Task, description: 'Доступно для уровня ACCESS_LEVEL.RED (1)' })
   public async move(
-    @Param('taskId', ParseIntPipe) taskId: number,
+    @Param('sequenceNumber', ParseIntPipe) sequenceNumber: number,
     @ProjectParam() project: Project,
     @Body() taskMoveDto: TaskMoveDto,
     @UserJWT() user: User
   ) {
-    return this.taskService.move(taskId, project, user, taskMoveDto);
+    return this.taskService.move(sequenceNumber, project, user, taskMoveDto);
   }
 
-  @Delete(':taskId')
+  @Delete(':sequenceNumber')
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.GREEN)
   @ApiResponse({
@@ -112,12 +114,14 @@ export class ProjectTaskController {
   })
   public async delete(
     @Param('projectId', ParseIntPipe) projectId: number,
-    @Param('taskId', ParseIntPipe) taskId: number,
+    @Param('sequenceNumber', ParseIntPipe) sequenceNumber: number,
     @ProjectParam() project: DeepPartial<Project>
   ) {
-    const task = await this.taskService.delete(taskId, projectId);
+    const task = await this.taskService.delete(sequenceNumber, projectId);
     if (!task) {
-      throw new NotFoundException(`Задача ${taskId} не была найдена в проекте ${project.title}`);
+      throw new NotFoundException(
+        `Задача ${sequenceNumber} не была найдена в проекте ${project.title}`
+      );
     }
     return task;
   }

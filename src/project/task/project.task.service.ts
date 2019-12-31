@@ -32,8 +32,8 @@ export class ProjectTaskService {
     return await this.taskRepo.findAllByProjectId(pagesDto, projectId);
   }
 
-  public findOne(id: number, projectId: number): Promise<Task> {
-    return this.taskRepo.findOneByProjectId(id, projectId);
+  public findOne(sequenceNumber: number, projectId: number): Promise<Task> {
+    return this.taskRepo.findOneByProjectId(sequenceNumber, projectId);
   }
 
   public async create(taskCreateDto: TaskCreateDto, project: Project, user: User): Promise<Task> {
@@ -42,13 +42,13 @@ export class ProjectTaskService {
   }
 
   public async update(
-    taskId: number,
+    sequenceNumber: number,
     taskUpdateDto: TaskUpdateDto,
     project: Project,
     user: User
   ): Promise<Task> {
     // 1. Проверить соответсвие проекта задаче и уровень доступа пользователя к проекту
-    const checkedTask = await this.checkAccess(taskId, project, user, ACCESS_LEVEL.YELLOW);
+    const checkedTask = await this.checkAccess(sequenceNumber, project, user, ACCESS_LEVEL.YELLOW);
     // 2. Подготовить данные для обновления задачи
     const preparedData = await this.parseTaskDtoToTaskObj(taskUpdateDto, project.id);
     // 3. Обновить задачу
@@ -60,46 +60,39 @@ export class ProjectTaskService {
   }
 
   public async move(
-    taskId: number,
+    sequenceNumber: number,
     project: Project,
     user: User,
     taskMoveDto: TaskMoveDto
   ): Promise<Task> {
     // 1. Проверить соответсвие проекта задаче и уровень доступа пользователя к проекту
-    const checkedTask = await this.checkAccess(taskId, project, user);
+    const checkedTask = await this.checkAccess(sequenceNumber, project, user);
     // 2. TODO: проверить разрешенное перемещение задачи для данного статуса
     // 3. TODO: проверить разрешенное перемещение задачи для данного пользователя
     // 4. Обновить и вернуть обновленную задачу
     return this.taskService.updateByUser(checkedTask, taskMoveDto, user);
   }
 
-  public async delete(id: number, projectId: number): Promise<Task | false> {
-    const task = await this.findOne(id, projectId);
+  public async delete(sequenceNumber: number, projectId: number): Promise<Task | false> {
+    const task = await this.findOne(sequenceNumber, projectId);
     if (!task) {
       return false;
     }
-    await this.taskRepo.delete({ id });
+    await this.taskRepo.delete({ sequenceNumber, project: { id: projectId } });
     return task;
   }
 
   public async checkAccess(
-    taskId: number,
+    sequenceNumber: number,
     project: Project,
     user: User,
     statusLevel: ACCESS_LEVEL = ACCESS_LEVEL.RED
   ): Promise<Task> {
-    const checkedTask = await this.taskService.findOne(taskId, user);
-    if (project.id !== checkedTask.projectId) {
-      throw new NotAcceptableException({
-        message:
-          'Вы пытаетесь отредактировать задачу, которая не принадлежит выбранному проекту.' +
-          ' Скорее всего, вы пытаетесь взломать сайт, но мы вам этого не позволим! ;)',
-      });
-    }
+    const checkedTask = await this.taskService.findOne(sequenceNumber, project, user);
     if (project.accessLevel.accessLevel < statusLevel) {
       if (checkedTask.performerId !== user.id) {
         throw new ForbiddenException({
-          message: 'Ваш уровень доступа позволяет редактировать только назначенные на вас задачи!',
+          message: 'У вас нет доступа к редактированию этой задачи',
           task: checkedTask,
         });
       }

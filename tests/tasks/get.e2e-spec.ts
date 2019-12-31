@@ -44,7 +44,7 @@ describe(`GET ${h.url}`, () => {
           isArchived: false,
           performerId: expect.any(Number),
           projectId: expect.any(Number),
-          sequenceNumber: null,
+          sequenceNumber: expect.any(Number),
           source: null,
           status: 2,
           title: expect.any(String),

@@ -59,27 +59,17 @@ export class TaskRepository extends TreeRepository<Task> {
     });
   }
 
-  public findOneByOwner(id: number, ownerId: number): Promise<Task | undefined> {
-    return this.createQueryBuilder()
-      .where('Task.id=:id', {
-        id,
-      })
-      .innerJoinAndSelect(
-        'user_tasks',
-        'UserTasks',
-        '"UserTasks"."taskId"="Task"."id" AND "UserTasks"."userId"=:userId AND "Task"."isArchived"=:isArchived',
-        { userId: ownerId, isArchived: false }
-      )
-      .getOne();
+  public findOneByProjectId(sequenceNumber: number, projectId: number): Promise<Task | undefined> {
+    return this.findOne({ where: { sequenceNumber, project: { id: projectId } } });
   }
 
-  public findOneByProjectId(id: number, projectId: number): Promise<Task | undefined> {
-    return this.findOne({ where: { id, project: { id: projectId } } });
-  }
-
-  public createByProject(data: Partial<Task>, project: Project): Task {
+  public async createByProject(data: Partial<Task>, project: Project): Promise<Task> {
+    const taskCount = await this.count({
+      where: { project },
+    });
     const entity = this.create(data);
     entity.project = project;
+    entity.sequenceNumber = taskCount + 1;
     return entity;
   }
 }

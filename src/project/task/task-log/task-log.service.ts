@@ -17,11 +17,11 @@ export class TaskLogService {
 
   public async findAll(
     project: Project,
-    taskId: number,
+    sequenceNumber: number,
     listDto: ListDto,
     user: User
   ): Promise<TaskLog[]> {
-    const checkedTask = await this.projectTaskService.checkAccess(taskId, project, user);
+    const checkedTask = await this.projectTaskService.checkAccess(sequenceNumber, project, user);
 
     let beforeStartList = [];
     let beforeStartCount = 0;

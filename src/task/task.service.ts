@@ -33,15 +33,17 @@ export class TaskService {
     return await this.taskRepo.findAllWithPagination(pagesDto, user, projectIds);
   }
 
-  public async findOneByProjectId(taskId: number, projectId: number): Promise<Task> {
-    return this.taskRepo.findOneByProjectId(taskId, projectId);
-  }
-
-  public async findOne(taskId: number, user: User): Promise<Task> {
+  public async findOneById(
+    taskId: number,
+    user: User,
+    accessLevel: ACCESS_LEVEL = ACCESS_LEVEL.RED,
+    where = {}
+  ): Promise<Task> {
     const task = await this.taskRepo.findOne({
       relations: ['performer', 'userWorks', 'users'],
       where: {
         id: taskId,
+        ...where,
       },
     });
     if (!task) {
@@ -50,32 +52,15 @@ export class TaskService {
     task.project = await this.projectService.findOneByMember(task.projectId, user);
     // Эта проверка ДОЛЖНА быть здесь. Если ее убрать, то можно будет в url написать проект, к которому есть доступ
     // и отредактировать произвольную задачу из произвольного проекта
-    if (!task.project || !task.project.isAccess(ACCESS_LEVEL.RED)) {
+    if (!task.project || !task.project.isAccess(accessLevel)) {
       throw new ForbiddenException('Доступ к этой задаче запрещен');
     }
     task.children = await this.taskRepo.findDescendants(task);
     return task;
   }
 
-  public async archive(id: number, user: User): Promise<Task> {
-    const task = await this.taskRepo.findOne({
-      where: {
-        id,
-        isArchived: false,
-      },
-    });
-
-    if (!task) {
-      throw new NotFoundException(
-        'Задача не найдена. Возмжоно вы пытаетесь заархивировать уже заархивированную задачу'
-      );
-    }
-    task.project = await this.projectService.findOneByMember(task.projectId, user);
-    if (!task.project || !task.project.isAccess(ACCESS_LEVEL.YELLOW)) {
-      throw new ForbiddenException(
-        'Архивировать задачи могут пользователи начиная с Желтого уровня'
-      );
-    }
+  public async archive(taskId: number, user: User): Promise<Task> {
+    const task = await this.findOneById(taskId, user, ACCESS_LEVEL.YELLOW, { isArchived: false });
 
     await this.taskRepo.manager.transaction(async entityManager => {
       const prevTaskVersion = cloneDeep(task);
@@ -93,10 +78,29 @@ export class TaskService {
     return task;
   }
 
+  public async findOneByProjectId(sequenceNumber: number, projectId: number): Promise<Task> {
+    return this.taskRepo.findOneByProjectId(sequenceNumber, projectId);
+  }
+
+  public async findOne(sequenceNumber: number, project: Project, user: User): Promise<Task> {
+    const task = await this.taskRepo.findOne({
+      relations: ['performer', 'userWorks', 'users'],
+      where: {
+        project,
+        sequenceNumber,
+      },
+    });
+    if (!task) {
+      throw new NotFoundException('Задача не была найдена');
+    }
+    task.children = await this.taskRepo.findDescendants(task);
+    return task;
+  }
+
   async createByProject(taskData: Partial<Task>, project: Project, user: User): Promise<Task> {
     let task: Task;
     await this.taskRepo.manager.transaction(async entityManager => {
-      task = this.taskRepo.createByProject(taskData, project);
+      task = await this.taskRepo.createByProject(taskData, project);
       task.performerId = taskData.performerId || user.id;
       task.users = [user];
       task = await entityManager.save(task);

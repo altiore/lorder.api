@@ -17,7 +17,7 @@ import { TaskLogService } from './task-log.service';
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
 @ApiUseTags('projects -> tasks -> task-logs (role: user)')
-@Controller('projects/:projectId/tasks/:taskId/task-logs')
+@Controller('projects/:projectId/tasks/:sequenceNumber/task-logs')
 export class TaskLogController {
   constructor(private readonly taskLogService: TaskLogService) {}
 
@@ -26,11 +26,11 @@ export class TaskLogController {
   @AccessLevel(ACCESS_LEVEL.RED)
   @ApiResponse({ status: 200, type: TaskLog, isArray: true })
   public all(
-    @Param('taskId') taskId: number,
+    @Param('sequenceNumber') sequenceNumber: number,
     @ProjectParam() project: Project,
     @Query() pagesDto: ListDto,
     @UserJWT() user: User
   ) {
-    return this.taskLogService.findAll(project, taskId, pagesDto, user);
+    return this.taskLogService.findAll(project, sequenceNumber, pagesDto, user);
   }
 }

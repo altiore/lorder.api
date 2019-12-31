@@ -1,6 +1,7 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 import { Moment } from 'moment';
 import {
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -24,15 +25,15 @@ import { User } from '../user/user.entity';
 
 @Entity()
 @Tree('materialized-path')
-// @Index(['projectId', 'sequenceNumber'])
-// @Unique(['projectId', 'sequenceNumber'])
+@Index(['projectId', 'sequenceNumber'])
+@Unique(['projectId', 'sequenceNumber'])
 export class Task {
   @ApiModelProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
   @ApiModelProperty()
-  @Column({ nullable: true })
+  @Column({ nullable: false, update: false })
   sequenceNumber: number;
 
   @ApiModelProperty()
