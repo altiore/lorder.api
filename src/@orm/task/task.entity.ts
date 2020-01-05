@@ -40,7 +40,11 @@ export class Task {
   projectId: number;
 
   @ApiModelProperty({ type: Project })
-  @ManyToOne(() => Project, project => project.tasks, { nullable: false })
+  @ManyToOne(() => Project, project => project.tasks, {
+    nullable: false,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   project: Project;
 
   // ApiModel does not work here due to circular dependency
