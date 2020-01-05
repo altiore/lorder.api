@@ -123,7 +123,7 @@ export class TaskService {
         ? TASK_CHANGE_TYPE.MOVE
         : TASK_CHANGE_TYPE.UPDATE;
     const taskLog = this.taskLogRepo.createTaskLogByType(changeType, task, user);
-    const updatedTask = this.taskRepo.merge(task, newTaskData);
+    const updatedTask = this.taskRepo.merge(cloneDeep(task), newTaskData);
     try {
       await this.taskRepo.manager.transaction(async entityManager => {
         await entityManager.save(taskLog);
