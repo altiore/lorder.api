@@ -23,7 +23,7 @@ import { UserWork } from '../user-work/user-work.entity';
 import { User } from '../user/user.entity';
 
 @Entity()
-@Tree('materialized-path')
+@Tree('closure-table')
 @Index(['projectId', 'sequenceNumber'])
 @Unique(['projectId', 'sequenceNumber'])
 export class Task {

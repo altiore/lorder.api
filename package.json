@@ -76,7 +76,7 @@
     "rxjs": "6.3.2",
     "socket.io-redis": "5.2.0",
     "swagger-ui-express": "4.0.7",
-    "typeorm": "0.2.19"
+    "typeorm": "0.2.22"
   },
   "devDependencies": {
     "@types/express": "4.16.1",

@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { cloneDeep } from 'lodash';
@@ -113,18 +118,20 @@ export class TaskService {
   }
 
   async updateByUser(task: Task, newTaskData: Partial<Task>, user: User): Promise<Task> {
-    let updatedTask: Task;
-    await this.taskRepo.manager.transaction(async entityManager => {
-      const changeType =
-        typeof newTaskData.status !== 'undefined' && task.status !== newTaskData.status
-          ? TASK_CHANGE_TYPE.MOVE
-          : TASK_CHANGE_TYPE.UPDATE;
-      const taskLog = this.taskLogRepo.createTaskLogByType(changeType, task, user);
-      await entityManager.save(taskLog);
-
-      updatedTask = this.taskRepo.merge(task, newTaskData);
-      await entityManager.save(updatedTask);
-    });
-    return updatedTask;
+    const changeType =
+      typeof newTaskData.status !== 'undefined' && task.status !== newTaskData.status
+        ? TASK_CHANGE_TYPE.MOVE
+        : TASK_CHANGE_TYPE.UPDATE;
+    const taskLog = this.taskLogRepo.createTaskLogByType(changeType, task, user);
+    const updatedTask = this.taskRepo.merge(task, newTaskData);
+    try {
+      await this.taskRepo.manager.transaction(async entityManager => {
+        await entityManager.save(taskLog);
+        await entityManager.save(updatedTask);
+      });
+      return updatedTask;
+    } catch (e) {
+      throw new NotAcceptableException('Не удается переместить задачу...');
+    }
   }
 }
