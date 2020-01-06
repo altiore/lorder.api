@@ -1,7 +1,7 @@
-import { ForbiddenException, Injectable, NotAcceptableException } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { PaginationDto } from '../../@common/dto/pagination.dto';
+import { ListResponseDto, PaginationDto } from '../../@common/dto';
 import { ValidationException } from '../../@common/exceptions/validation.exception';
 import { Project } from '../../@orm/project';
 import { ProjectTaskTypeRepository } from '../../@orm/project-task-type';
@@ -28,8 +28,9 @@ export class ProjectTaskService {
     private readonly taskService: TaskService
   ) {}
 
-  public async findAll(pagesDto: PaginationDto, projectId: number): Promise<Task[]> {
-    return await this.taskRepo.findAllByProjectId(pagesDto, projectId);
+  public async findAll(pagesDto: PaginationDto, projectId: number): Promise<ListResponseDto<Task>> {
+    const [list, total] = await this.taskRepo.findAllByProjectId(pagesDto, projectId);
+    return { list, total };
   }
 
   public findOne(sequenceNumber: number, projectId: number): Promise<Task> {

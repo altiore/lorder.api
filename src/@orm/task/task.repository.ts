@@ -19,8 +19,8 @@ export class TaskRepository extends TreeRepository<Task> {
   public findAllByProjectId(
     { skip = 0, count = 20, orderBy = 'id', order = 'desc' }: PaginationDto,
     projectId: number
-  ): Promise<Task[]> {
-    return this.find({
+  ): Promise<[Task[], number]> {
+    return this.findAndCount({
       order: { [orderBy]: order.toUpperCase() },
       relations: ['users'],
       skip,

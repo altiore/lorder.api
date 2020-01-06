@@ -18,7 +18,7 @@ import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 import { DeepPartial } from 'typeorm';
 
 import { Roles, UserJWT } from '../../@common/decorators';
-import { PaginationDto } from '../../@common/dto/pagination.dto';
+import { ListResponseDto, PaginationDto } from '../../@common/dto';
 import { RolesGuard } from '../../@common/guards';
 import { Project } from '../../@orm/project';
 import { Task } from '../../@orm/task';
@@ -40,11 +40,11 @@ export class ProjectTaskController {
   @Get()
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.RED)
-  @ApiResponse({ status: 200, type: Task, isArray: true, description: 'ACCESS_LEVEL.RED' })
+  @ApiResponse({ status: 200, type: ListResponseDto, description: 'ACCESS_LEVEL.RED' })
   public all(
     @Query() pagesDto: PaginationDto,
     @Param('projectId', ParseIntPipe) projectId: number
-  ): Promise<Task[]> {
+  ): Promise<ListResponseDto<Task>> {
     return this.taskService.findAll(pagesDto, projectId);
   }
 
