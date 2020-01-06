@@ -66,6 +66,9 @@ export class TaskRepository extends TreeRepository<Task> {
   public async createByProject(data: Partial<Task>, project: Project): Promise<Task> {
     const { max } = await this.createQueryBuilder()
       .select('MAX("sequenceNumber")', 'max')
+      .where({
+        project,
+      })
       .getRawOne();
     const entity = this.create(data);
     entity.project = project;
