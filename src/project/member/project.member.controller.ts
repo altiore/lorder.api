@@ -78,7 +78,7 @@ export class ProjectMemberController {
   @ApiResponse({ status: 200, type: Boolean })
   @Delete()
   @Roles('user')
-  @AccessLevel(ACCESS_LEVEL.GREEN)
+  @AccessLevel(ACCESS_LEVEL.VIOLET)
   public async delete(
     @Body() data: IdDto,
     @Param('projectId', ParseIntPipe) projectId: number,
