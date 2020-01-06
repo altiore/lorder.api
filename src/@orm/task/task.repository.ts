@@ -64,12 +64,12 @@ export class TaskRepository extends TreeRepository<Task> {
   }
 
   public async createByProject(data: Partial<Task>, project: Project): Promise<Task> {
-    const taskCount = await this.count({
-      where: { project },
-    });
+    const { max } = await this.createQueryBuilder()
+      .select('MAX("sequenceNumber")', 'max')
+      .getRawOne();
     const entity = this.create(data);
     entity.project = project;
-    entity.sequenceNumber = taskCount + 1;
+    entity.sequenceNumber = (max || 0) + 1;
     return entity;
   }
 }
