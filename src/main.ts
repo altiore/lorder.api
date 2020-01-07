@@ -46,10 +46,6 @@ const corsOptions = {
 async function bootstrap() {
   // const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
   const app = await NestFactory.create(AppModule);
-  app.enableCors(corsOptions);
-  // app.use(new CookieMiddleware().use);
-  // app.useWebSocketAdapter(new RedisIoAdapter(app));
-  // app.use(helmet());
   app.setGlobalPrefix('v1');
 
   const options = new DocumentBuilder()
@@ -62,6 +58,11 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
+
+  app.enableCors(corsOptions);
+  // app.use(new CookieMiddleware().use);
+  // app.useWebSocketAdapter(new RedisIoAdapter(app));
+  // app.use(helmet());
 
   await app.listen(
     PORT,
