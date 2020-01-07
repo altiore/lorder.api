@@ -56,7 +56,10 @@ async function bootstrap() {
     .setSchemes(SCHEMA)
     .setBasePath('v1')
     .build();
-  const document = SwaggerModule.createDocument(app, options);
+  const document = SwaggerModule.createDocument(app, {
+    ...options,
+    securityDefinitions: { bearer: { type: 'apiKey', name: 'Authorization', in: 'header' } },
+  });
   SwaggerModule.setup('api', app, document);
 
   app.enableCors(corsOptions);
