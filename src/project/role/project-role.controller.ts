@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as jwt from 'jsonwebtoken';
 
 import { Roles, UserJWT } from '../../@common/decorators';
@@ -18,7 +18,7 @@ import { ProjectRoleService } from './project-role.service';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
-@ApiUseTags('projects -> project-role (role: user)')
+@ApiTags('projects -> project-role (role: user)')
 @Controller('projects/:projectId/roles')
 export class ProjectRoleController {
   constructor(private readonly projectRoleService: ProjectRoleService) {}

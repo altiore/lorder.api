@@ -6,12 +6,12 @@ import {
   Param,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { ProjectPub } from '../@orm/project-pub';
 import { ProjectService } from '../project/project.service';
 
-@ApiUseTags('public')
+@ApiTags('public')
 @Controller('public')
 @UseInterceptors(CacheInterceptor)
 export class PublicController {

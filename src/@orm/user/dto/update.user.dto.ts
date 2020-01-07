@@ -1,19 +1,19 @@
-import { ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, Length } from 'class-validator';
 
 export class UpdateUserDto {
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @Length(12, 24)
   @IsString()
   @IsOptional()
   public readonly tel?: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   public readonly resetLink?: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   public password?: string;

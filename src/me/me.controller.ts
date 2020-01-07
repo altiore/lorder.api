@@ -1,6 +1,6 @@
 import { Body, Controller, Patch, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Roles, UserJWT } from '../@common/decorators';
 import { RolesGuard } from '../@common/guards';
@@ -8,7 +8,7 @@ import { UpdateUserDto, User } from '../@orm/user';
 import { MeService } from './me.service';
 
 @ApiBearerAuth()
-@ApiUseTags('me')
+@ApiTags('me')
 @Controller('me')
 export class MeController {
   constructor(private readonly meService: MeService) {}

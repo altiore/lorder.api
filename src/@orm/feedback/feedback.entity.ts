@@ -1,31 +1,31 @@
-import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { User } from '../user/user.entity';
 
 @Entity()
 export class Feedback {
-  @ApiModelProperty()
+  @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   userId: number;
 
-  @ApiModelPropertyOptional({ type: User })
+  @ApiPropertyOptional({ type: User })
   @ManyToOne(() => User, { nullable: true })
   user: User;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ nullable: false })
   email: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ nullable: false })
   name: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ type: 'text', nullable: false })
   feedback: string;
 }

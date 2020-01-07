@@ -1,46 +1,46 @@
-import { ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNumber, IsOptional, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
 
 export class TaskUpdateDto {
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @MaxLength(140)
   @MinLength(3)
   @IsString()
   @IsOptional()
   title?: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   description?: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
   value?: number;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsString()
   @IsUrl()
   @IsOptional()
   source?: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
   status?: number;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
   performerId?: number;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
   typeId?: number;
 
-  @ApiModelPropertyOptional({ isArray: true, type: Number, example: [1, 2, 3] })
+  @ApiPropertyOptional({ isArray: true, type: Number, example: [1, 2, 3] })
   @IsNumber(undefined, { each: true })
   @IsOptional()
   users?: number[];

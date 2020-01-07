@@ -1,31 +1,31 @@
-import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class UserWorkCreateDto {
-  @ApiModelProperty()
+  @ApiProperty()
   @IsNumber()
   @IsOptional()
   performerId?: number;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @IsNumber()
   @IsNotEmpty()
   projectId: number;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @MaxLength(140)
   @MinLength(3)
   @IsString()
   @IsNotEmpty()
   title: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsString()
   @MinLength(3)
   @IsOptional()
   description?: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
   taskId?: number;

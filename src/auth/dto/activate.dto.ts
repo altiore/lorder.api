@@ -1,13 +1,13 @@
-import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumberString, IsOptional, IsString } from 'class-validator';
 
 export class ActivateDto {
-  @ApiModelProperty()
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   public readonly oneTimeToken: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsNumberString()
   @IsOptional()
   public readonly project?: string;

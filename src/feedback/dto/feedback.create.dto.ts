@@ -1,26 +1,26 @@
-import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class FeedbackCreateDto {
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
   userId?: number;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @IsEmail()
   @MinLength(6)
   @IsString()
   @IsNotEmpty()
   email: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @MinLength(2)
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @MinLength(3)
   @IsString()
   @IsNotEmpty()

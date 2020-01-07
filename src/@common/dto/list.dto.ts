@@ -1,28 +1,28 @@
-import { ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsIn, IsNumberString, IsOptional, IsString } from 'class-validator';
 
 export class ListDto<OrderBy = string> {
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsNumberString()
   @IsOptional()
   public readonly count?: number;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsNumberString()
   @IsOptional()
   public readonly startId?: number;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsNumberString()
   @IsOptional()
   public readonly endId?: number;
 
-  @ApiModelPropertyOptional({ type: String })
+  @ApiPropertyOptional({ type: String })
   @IsString()
   @IsOptional()
   public readonly orderBy?: OrderBy;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   @IsIn(['asc', 'desc'])

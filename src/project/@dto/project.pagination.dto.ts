@@ -1,4 +1,4 @@
-import { ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsIn, IsOptional, IsString } from 'class-validator';
 import { toArray } from 'lodash';
 
@@ -10,7 +10,7 @@ export enum ProjectFieldsEnum {
 }
 
 export class ProjectPaginationDto extends PaginationDto<ProjectFieldsEnum> {
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsString()
   @IsIn(toArray(ProjectFieldsEnum))
   @IsOptional()

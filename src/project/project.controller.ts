@@ -13,7 +13,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as jwt from 'jsonwebtoken';
 
 import { Roles, UserJWT } from '../@common/decorators';
@@ -27,7 +27,7 @@ import { ProjectPaginationDto } from './@dto';
 import { ProjectService } from './project.service';
 
 @ApiBearerAuth()
-@ApiUseTags('projects')
+@ApiTags('projects')
 @Controller('projects')
 @UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
 @UseInterceptors(CacheInterceptor)

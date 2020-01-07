@@ -1,20 +1,20 @@
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class WorkFlow {
-  @ApiModelProperty()
+  @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
   test: number;
 }
 
 export class ProjectRoleCreateDto {
-  @ApiModelProperty()
+  @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
   roleId: number;
 
-  @ApiModelProperty({ type: WorkFlow })
+  @ApiProperty({ type: WorkFlow })
   @IsNotEmpty()
   workFlow: WorkFlow;
 }

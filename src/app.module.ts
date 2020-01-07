@@ -1,6 +1,8 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
 
 import { AllExceptionsFilter } from './@common/filters/all-exceptions.filter';
 import { ValidationPipe } from './@common/pipes/validation.pipe';
@@ -26,6 +28,9 @@ import { UserModule } from './user/user.module';
     ProjectModule,
     PublicModule,
     RedisModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
     StatisticsModule,
     TaskModule,
     TaskTypeModule,

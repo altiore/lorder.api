@@ -1,6 +1,16 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as jwt from 'jsonwebtoken';
 
 import { Roles } from '../@common/decorators';
@@ -10,7 +20,7 @@ import { TaskTypeService } from './task-type.service';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard)
-@ApiUseTags('task-types (roles: user(get), super-admin(create/edit/delete))')
+@ApiTags('task-types (roles: user(get), super-admin(create/edit/delete))')
 @Controller('task-types')
 export class TaskTypeController {
   constructor(private readonly tasktypeService: TaskTypeService) {}
@@ -39,7 +49,10 @@ export class TaskTypeController {
     status: 200,
     type: TaskType,
   })
-  public update(@Param('id', ParseIntPipe) id: number, @Body() taskTypeCreateDto: TaskTypeCreateDto) {
+  public update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() taskTypeCreateDto: TaskTypeCreateDto
+  ) {
     return this.tasktypeService.update(id, taskTypeCreateDto);
   }
 

@@ -1,7 +1,9 @@
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class MailAcceptedDto {
-  @ApiModelProperty() public readonly statusCode: number;
+  @ApiProperty()
+  public readonly statusCode: number;
 
-  @ApiModelProperty() public readonly statusMessage: string;
+  @ApiProperty()
+  public readonly statusMessage: string;
 }

@@ -1,6 +1,16 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as jwt from 'jsonwebtoken';
 import { DeepPartial, DeleteResult } from 'typeorm';
 
@@ -18,7 +28,7 @@ import { CreateTaskTypeDto, TaskTypeDto, TaskTypesDto } from './dto';
 import { ProjectTaskTypeService } from './project.task-type.service';
 
 @ApiBearerAuth()
-@ApiUseTags('projects -> task-types (role: user)')
+@ApiTags('projects -> task-types (role: user)')
 @UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
 @Controller('projects/:projectId/task-types')
 export class ProjectTaskTypeController {
@@ -27,7 +37,12 @@ export class ProjectTaskTypeController {
     private readonly projectTaskTypeService: ProjectTaskTypeService
   ) {}
 
-  @ApiResponse({ description: 'All project task types', isArray: true, status: 200, type: ProjectTaskType })
+  @ApiResponse({
+    description: 'All project task types',
+    isArray: true,
+    status: 200,
+    type: ProjectTaskType,
+  })
   @Get()
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.RED)

@@ -1,4 +1,4 @@
-import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Moment } from 'moment';
 import {
   Column,
@@ -23,39 +23,39 @@ import { User } from '../user/user.entity';
 
 @Entity()
 export class Project {
-  @ApiModelProperty()
+  @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column()
   title: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column('int', { nullable: true })
   monthlyBudget: number;
 
-  @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
+  @ApiProperty({ example: '2018-05-26T09:05:39.378Z' })
   @CreateDateColumn(momentDateTransformer)
   createdAt: Moment;
 
-  @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
+  @ApiProperty({ example: '2018-05-26T09:05:39.378Z' })
   @UpdateDateColumn(momentDateTransformer)
   updatedAt: Moment;
 
-  @ApiModelProperty({ type: User })
+  @ApiProperty({ type: User })
   @ManyToOne(() => User)
   creator: User;
 
-  @ApiModelProperty({ type: User })
+  @ApiProperty({ type: User })
   @ManyToOne(() => User)
   updator: User;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ nullable: false })
   ownerId: number;
 
-  @ApiModelProperty({ type: User })
+  @ApiProperty({ type: User })
   @ManyToOne(() => User, user => user.ownProjects, {
     nullable: false,
     onDelete: 'CASCADE',
@@ -63,7 +63,7 @@ export class Project {
   })
   owner: User;
 
-  @ApiModelProperty({ type: Task, isArray: true })
+  @ApiProperty({ type: Task, isArray: true })
   @OneToMany(() => Task, task => task.project)
   tasks: Task[];
 
@@ -73,7 +73,7 @@ export class Project {
   @OneToOne(() => ProjectPub, pub => pub.project)
   pub: ProjectPub;
 
-  @ApiModelPropertyOptional({ type: TaskType, isArray: true })
+  @ApiPropertyOptional({ type: TaskType, isArray: true })
   get taskTypes() {
     return this.projectTaskTypes &&
       this.projectTaskTypes.length &&
@@ -83,24 +83,24 @@ export class Project {
       : [];
   }
 
-  @ApiModelPropertyOptional({ type: UserProject, isArray: true })
+  @ApiPropertyOptional({ type: UserProject, isArray: true })
   @OneToMany(() => UserProject, userProject => userProject.project)
   members: UserProject[];
 
-  @ApiModelPropertyOptional({ type: ProjectRole, isArray: true })
+  @ApiPropertyOptional({ type: ProjectRole, isArray: true })
   @OneToMany(() => ProjectRole, projectRole => projectRole.project)
   roles: ProjectRole[];
 
-  @ApiModelPropertyOptional({
+  @ApiPropertyOptional({
     description: 'Access Level for current user in current project',
     type: UserProject,
   })
   accessLevel?: Partial<UserProject>;
 
-  @ApiModelPropertyOptional({ description: 'Время в секундах, потраченное на проект' })
+  @ApiPropertyOptional({ description: 'Время в секундах, потраченное на проект' })
   timeSum?: number;
 
-  @ApiModelPropertyOptional({ description: 'Сумма всех оцененных задач в проекте' })
+  @ApiPropertyOptional({ description: 'Сумма всех оцененных задач в проекте' })
   valueSum?: number;
 
   isAccess(accessLevel: ACCESS_LEVEL) {

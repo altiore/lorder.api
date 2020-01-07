@@ -14,7 +14,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { DeepPartial } from 'typeorm';
 
 import { Roles, UserJWT } from '../../@common/decorators';
@@ -30,7 +30,7 @@ import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
 import { ProjectTaskService } from './project.task.service';
 
 @ApiBearerAuth()
-@ApiUseTags('projects -> tasks (role: user)')
+@ApiTags('projects -> tasks (role: user)')
 @Controller('projects/:projectId/tasks')
 @UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
 @UseInterceptors(CacheInterceptor)

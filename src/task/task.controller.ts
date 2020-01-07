@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Roles, UserJWT } from '../@common/decorators';
 import { RolesGuard } from '../@common/guards';
@@ -19,7 +19,7 @@ import { TaskPagination } from './dto';
 import { TaskService } from './task.service';
 
 @ApiBearerAuth()
-@ApiUseTags('tasks (role: user)')
+@ApiTags('tasks (role: user)')
 @Controller('tasks')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class TaskController {

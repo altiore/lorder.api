@@ -1,36 +1,36 @@
-import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Project } from '../project/project.entity';
 
 @Entity()
 export class ProjectPub {
-  @ApiModelProperty()
+  @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   uuid: number;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ nullable: false })
   projectId: number;
 
-  @ApiModelProperty({ type: Project })
+  @ApiProperty({ type: () => Project })
   @OneToOne(() => Project, project => project.pub, { nullable: false })
   @JoinColumn()
   project: Project;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   domain: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   title: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ default: true })
   isOpen: boolean;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @Column({ type: 'json', default: {} })
   statistic: object;
 }

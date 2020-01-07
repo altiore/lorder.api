@@ -1,14 +1,14 @@
-import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class UserDataDto {
-  @ApiModelProperty()
+  @ApiProperty()
   @IsEmail()
   @IsString()
   @IsNotEmpty()
   public readonly email: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsString()
   @MinLength(6)
   @IsNotEmpty()

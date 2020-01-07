@@ -1,15 +1,15 @@
-import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class ProjectDto {
-  @ApiModelProperty()
+  @ApiProperty()
   @MaxLength(40)
   @MinLength(3)
   @IsString()
   @IsNotEmpty()
   title: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
   monthlyBudget?: number;

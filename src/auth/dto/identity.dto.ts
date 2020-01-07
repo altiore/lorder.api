@@ -1,19 +1,19 @@
-import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ROLES } from '../../@orm/role';
 
 export class IdentityDto {
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   public readonly avatar?: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   public readonly bearerKey: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   public readonly defaultProjectId: number;
 
-  @ApiModelProperty()
+  @ApiProperty()
   public readonly role: ROLES;
 
-  @ApiModelProperty()
+  @ApiProperty()
   public readonly email: string;
 }

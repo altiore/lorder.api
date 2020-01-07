@@ -13,7 +13,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as jwt from 'jsonwebtoken';
 import { DeepPartial } from 'typeorm';
 
@@ -30,7 +30,7 @@ import { UserProjectUpdateDto } from './dto/user-project.update.dto';
 import { ProjectMemberService } from './project.member.service';
 
 @ApiBearerAuth()
-@ApiUseTags('projects -> members (role: user)')
+@ApiTags('projects -> members (role: user)')
 @UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
 @Controller('projects/:projectId/members')
 @UseInterceptors(CacheInterceptor)

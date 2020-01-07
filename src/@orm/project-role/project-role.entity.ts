@@ -1,4 +1,4 @@
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, ManyToOne } from 'typeorm';
 
 import { Project } from '../project/project.entity';
@@ -6,11 +6,11 @@ import { Role } from '../role/role.entity';
 
 @Entity()
 export class ProjectRole {
-  @ApiModelProperty({ type: Role })
+  @ApiProperty({ type: Role })
   @ManyToOne(type => Role, { eager: true, primary: true })
   role: Role;
 
-  @ApiModelProperty({ type: Project })
+  @ApiProperty({ type: () => Project })
   @ManyToOne(type => Project, project => project.roles, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
@@ -18,7 +18,7 @@ export class ProjectRole {
   })
   project: Project;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column('simple-json', { nullable: false })
   workFlow: object;
 }

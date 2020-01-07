@@ -1,46 +1,54 @@
-import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUrl,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class TaskCreateDto {
-  @ApiModelProperty()
+  @ApiProperty()
   @MaxLength(140)
   @MinLength(3)
   @IsString()
   @IsNotEmpty()
   title: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   description?: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
   value?: number;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsString()
   @IsUrl()
   @IsOptional()
   source?: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
   status?: number;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
   performerId?: number;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
   typeId?: number;
 
-  @ApiModelPropertyOptional({ isArray: true, type: Number, example: [1, 2, 3] })
+  @ApiPropertyOptional({ isArray: true, type: Number, example: [1, 2, 3] })
   @IsNumber(undefined, { each: true })
   @IsOptional()
   users?: number[];

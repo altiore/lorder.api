@@ -1,4 +1,4 @@
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, ManyToOne } from 'typeorm';
 
 import { Project } from '../project/project.entity';
@@ -9,15 +9,15 @@ import { ACCESS_LEVEL } from './user-project.consts';
 export class UserProject {
   static simpleFields = ['accessLevel', 'timeSum', 'valueSum'];
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column('integer')
   accessLevel: ACCESS_LEVEL;
 
-  @ApiModelProperty({ type: User })
+  @ApiProperty({ type: () => User })
   @ManyToOne(type => User, user => user.invitedMembers, { nullable: false })
   inviter: User;
 
-  @ApiModelProperty({ type: User })
+  @ApiProperty({ type: () => User })
   @ManyToOne(type => User, user => user.memberProjects, { eager: true, primary: true })
   member: User;
 

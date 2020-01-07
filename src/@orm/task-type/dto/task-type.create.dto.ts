@@ -1,22 +1,29 @@
-import { ApiModelProperty } from '@nestjs/swagger';
-import { IsHexColor, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsHexColor,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class TaskTypeCreateDto {
-  @ApiModelProperty()
+  @ApiProperty()
   @MaxLength(40)
   @MinLength(3)
   @IsString()
   @IsNotEmpty()
   title: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @MaxLength(12)
   @MinLength(3)
   @IsString()
   @IsOptional()
   icon: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @IsHexColor()
   @IsOptional()
   color: string;

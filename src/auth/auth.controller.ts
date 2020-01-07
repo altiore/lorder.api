@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Headers, HttpCode, Patch, Post, Query } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { User } from '../@orm/user';
 import { EmailDto, LoginUserDto } from '../@orm/user/dto';
@@ -8,7 +8,7 @@ import { AuthService } from './auth.service';
 import { ActivateDto, IdentityDto } from './dto';
 
 @ApiBearerAuth()
-@ApiUseTags('auth (guest)')
+@ApiTags('auth (guest)')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -16,7 +16,10 @@ export class AuthController {
   @ApiResponse({ status: 202, type: MailAcceptedDto })
   @HttpCode(202)
   @Post('magic')
-  public async magic(@Body() data: EmailDto, @Headers('origin') origin: string): Promise<MailAcceptedDto> {
+  public async magic(
+    @Body() data: EmailDto,
+    @Headers('origin') origin: string
+  ): Promise<MailAcceptedDto> {
     return (await this.authService.sendMagicLink(data, origin)) as MailAcceptedDto;
   }
 

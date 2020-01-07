@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Roles } from '../@common/decorators';
 import { PaginationDto } from '../@common/dto/pagination.dto';
@@ -10,7 +10,7 @@ import { FeedbackCreateDto } from './dto';
 import { FeedbackService } from './feedback.service';
 
 @ApiBearerAuth()
-@ApiUseTags('feedback')
+@ApiTags('feedback')
 @Controller('feedback')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class FeedbackController {
@@ -23,7 +23,12 @@ export class FeedbackController {
     return await this.feedbackService.create(data);
   }
 
-  @ApiResponse({ description: 'Возвращает обратную связь', status: 200, type: Feedback, isArray: true })
+  @ApiResponse({
+    description: 'Возвращает обратную связь',
+    isArray: true,
+    status: 200,
+    type: Feedback,
+  })
   @Roles('super-admin')
   @Get()
   public async all(@Query() pagesDto: PaginationDto): Promise<Feedback[]> {

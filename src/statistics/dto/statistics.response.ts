@@ -1,15 +1,15 @@
-import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class StatisticsResponse {
-  @ApiModelProperty()
+  @ApiProperty()
   public readonly activeProjectsCount: number;
 
-  @ApiModelProperty()
+  @ApiProperty()
   public readonly activeUsersCount: number;
 
-  @ApiModelProperty()
+  @ApiProperty()
   public readonly activity: number;
 
-  @ApiModelProperty()
+  @ApiProperty()
   public readonly publicProjectsCount: number;
 }

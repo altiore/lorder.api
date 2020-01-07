@@ -14,10 +14,11 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiImplicitFile, ApiResponse, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Roles } from '../@common/decorators/roles.decorator';
 import { UserJWT } from '../@common/decorators/user-jwt.decorator';
+import { FileUploadDto } from '../@common/dto';
 import { RolesGuard } from '../@common/guards/roles.guard';
 import { MyFileInterceptor } from '../@common/interceptors';
 import { Media } from '../@orm/media';
@@ -26,7 +27,7 @@ import { UserDto, UserPaginationDto } from './dto';
 import { UserService } from './user.service';
 
 @ApiBearerAuth()
-@ApiUseTags('users (super-admin)')
+@ApiTags('users (super-admin)')
 @Controller('users')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class UserController {
@@ -71,7 +72,11 @@ export class UserController {
 
   @Roles('user')
   @ApiResponse({ status: 200, type: Media })
-  @ApiImplicitFile({ name: 'file', required: true, description: 'Update User avatar' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'User Avatar',
+    type: FileUploadDto,
+  })
   @Post('avatar/update')
   @UseInterceptors(MyFileInterceptor)
   public updateAvatar(@UploadedFile() file, @UserJWT() user: User) {

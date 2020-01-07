@@ -1,4 +1,4 @@
-import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Moment } from 'moment';
 import {
   Column,
@@ -27,19 +27,19 @@ import { User } from '../user/user.entity';
 @Index(['projectId', 'sequenceNumber'])
 @Unique(['projectId', 'sequenceNumber'])
 export class Task {
-  @ApiModelProperty()
+  @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ nullable: false, update: false })
   sequenceNumber: number;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ nullable: false })
   projectId: number;
 
-  @ApiModelProperty({ type: Project })
+  @ApiProperty({ type: () => Project })
   @ManyToOne(() => Project, project => project.tasks, {
     nullable: false,
     onDelete: 'CASCADE',
@@ -55,52 +55,52 @@ export class Task {
   @TreeChildren({ cascade: ['update', 'remove'] })
   children?: Task[];
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ nullable: false })
   title: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column('text', { nullable: true })
   description: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   value: number;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   source: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @Column({ default: 0 })
   status: number;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   typeId: number;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @ManyToOne(() => TaskType, { nullable: true, onDelete: 'SET NULL', onUpdate: 'CASCADE' })
   type: TaskType;
 
   @Column('boolean', { default: false })
   isArchived: boolean = false;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ nullable: true })
   performerId: number;
 
-  @ApiModelProperty({ type: User })
+  @ApiProperty({ type: User })
   @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL', onUpdate: 'CASCADE' })
   performer: User;
 
   // TODO: can be removed. Redundant and exists in task-log table
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ nullable: true })
   createdById: number;
 
   // TODO: can be removed. Redundant and exists in task-log table
-  @ApiModelProperty({ type: User })
+  @ApiProperty({ type: User })
   @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL', onUpdate: 'CASCADE' })
   createdBy: User;
 
@@ -111,12 +111,12 @@ export class Task {
   users: User[];
 
   // TODO: can be removed. Redundant and exists in task-log table
-  @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
+  @ApiProperty({ example: '2018-05-26T09:05:39.378Z' })
   @CreateDateColumn(momentDateTransformer)
   createdAt: Moment;
 
   // TODO: can be removed. Redundant and exists in task-log table
-  @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
+  @ApiProperty({ example: '2018-05-26T09:05:39.378Z' })
   @UpdateDateColumn(momentDateTransformer)
   updatedAt: Moment;
 }

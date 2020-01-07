@@ -1,4 +1,4 @@
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { Moment } from 'moment';
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -9,37 +9,37 @@ import { User } from '../user/user.entity';
 
 @Entity()
 export class UserWork {
-  @ApiModelProperty()
+  @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ nullable: true })
   description: string;
 
-  @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
+  @ApiProperty({ example: '2018-05-26T09:05:39.378Z' })
   @Column({ ...momentDateTransformer, type: 'timestamp', nullable: false })
   startAt: Moment;
 
-  @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
+  @ApiProperty({ example: '2018-05-26T09:05:39.378Z' })
   @Column({ ...momentDateTransformer, type: 'timestamp', nullable: true })
   finishAt?: Moment;
 
   /**
    * Ценность задачи в условных единицах
    */
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ nullable: true })
   value: number;
 
   /**
    * Может быть ссылкой на внешний сервис/ресурс
    */
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ nullable: true })
   source: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ nullable: false })
   userId: number;
 
@@ -50,11 +50,11 @@ export class UserWork {
   })
   user: User;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ nullable: false })
   taskId: number;
 
-  @ApiModelProperty({ type: Task })
+  @ApiProperty({ type: () => Task })
   @ManyToOne(() => Task, task => task.userWorks, {
     nullable: false,
     onDelete: 'CASCADE',
@@ -62,15 +62,15 @@ export class UserWork {
   })
   task: Task;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ nullable: true })
   taskTypeId: number;
 
-  @ApiModelProperty({ type: TaskType })
+  @ApiProperty({ type: TaskType })
   @ManyToOne(() => TaskType, { eager: true, nullable: true })
   taskType: TaskType;
 
-  @ApiModelProperty({ type: Number })
+  @ApiProperty({ type: Number })
   get projectId() {
     return this.task ? this.task.projectId : null;
   }

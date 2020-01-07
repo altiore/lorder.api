@@ -1,4 +1,4 @@
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { Moment } from 'moment';
 import {
   Column,
@@ -26,11 +26,11 @@ export class User {
   static JUST_CREATED = 1;
   static ACTIVATED = 10;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({
     length: 254,
     nullable: true,
@@ -42,7 +42,7 @@ export class User {
   })
   email: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({
     length: 13,
     nullable: true,
@@ -54,18 +54,18 @@ export class User {
   })
   tel: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column('int')
   status: number;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ type: 'int', nullable: true })
   paymentMethod: number;
 
   @Column({ nullable: true, select: false })
   password: string;
 
-  @ApiModelProperty({ type: Media })
+  @ApiProperty({ type: Media })
   @OneToOne(() => Media, { eager: true, nullable: true })
   @JoinColumn()
   avatar?: Media;
@@ -73,15 +73,15 @@ export class User {
   @Column({ nullable: true })
   defaultProjectId: number;
 
-  @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
+  @ApiProperty({ example: '2018-05-26T09:05:39.378Z' })
   @CreateDateColumn(momentDateTransformer)
   createdAt: Moment;
 
-  @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
+  @ApiProperty({ example: '2018-05-26T09:05:39.378Z' })
   @UpdateDateColumn(momentDateTransformer)
   updatedAt: Moment;
 
-  @ApiModelProperty({ type: Role, isArray: true })
+  @ApiProperty({ type: Role, isArray: true })
   @ManyToMany(() => Role, undefined, {
     eager: true,
     onDelete: 'CASCADE',

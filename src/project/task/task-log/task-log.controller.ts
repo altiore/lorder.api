@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as jwt from 'jsonwebtoken';
 
 import { Roles, UserJWT } from '../../../@common/decorators';
@@ -16,7 +16,7 @@ import { TaskLogService } from './task-log.service';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
-@ApiUseTags('projects -> tasks -> task-logs (role: user)')
+@ApiTags('projects -> tasks -> task-logs (role: user)')
 @Controller('projects/:projectId/tasks/:sequenceNumber/task-logs')
 export class TaskLogController {
   constructor(private readonly taskLogService: TaskLogService) {}

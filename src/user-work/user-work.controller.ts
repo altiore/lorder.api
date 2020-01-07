@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { DeepPartial } from 'typeorm';
 
 import { Roles, UserJWT } from '../@common/decorators';
@@ -33,7 +33,7 @@ import {
 import { UserWorkService } from './user-work.service';
 
 @ApiBearerAuth()
-@ApiUseTags('user-works (role: user)')
+@ApiTags('user-works (role: user)')
 @Controller('user-works')
 @UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
 export class UserWorkController {

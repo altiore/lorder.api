@@ -1,11 +1,11 @@
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 import { UserWork } from '../../@orm/user-work';
 
 export class StartResponse {
-  @ApiModelProperty({ type: UserWork, isArray: true })
+  @ApiProperty({ type: UserWork, isArray: true })
   finished: UserWork[];
 
-  @ApiModelProperty({ type: UserWork })
+  @ApiProperty({ type: UserWork })
   started: UserWork;
 }

@@ -1,9 +1,9 @@
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class ListResponseDto<Entity = {}> {
-  @ApiModelProperty()
+  @ApiProperty()
   public readonly total: number;
 
-  @ApiModelProperty({ isArray: true, type: Object })
+  @ApiProperty({ isArray: true, type: Object })
   public readonly list: Entity[];
 }

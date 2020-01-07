@@ -1,4 +1,4 @@
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 export enum ROLES {
@@ -9,11 +9,11 @@ export enum ROLES {
 
 @Entity()
 export class Role {
-  @ApiModelProperty()
+  @ApiProperty()
   @PrimaryColumn()
   id: number;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ unique: true })
   name: string;
 }

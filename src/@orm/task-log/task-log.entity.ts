@@ -1,4 +1,4 @@
-import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Moment } from 'moment';
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -16,31 +16,31 @@ export enum TASK_CHANGE_TYPE {
 
 @Entity()
 export class TaskLog {
-  @ApiModelProperty()
+  @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiModelProperty({ type: Task })
+  @ApiProperty({ type: () => Task })
   @ManyToOne(() => Task, { nullable: false, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   task: Task;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @Column({ type: 'enum', enum: TASK_CHANGE_TYPE, default: TASK_CHANGE_TYPE.UPDATE })
   changeType: TASK_CHANGE_TYPE;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @Column('simple-json', { default: {}, nullable: false })
   prevVersion: Partial<Task>;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @Column('text', { nullable: true })
   description: string;
 
-  @ApiModelProperty({ type: User })
+  @ApiProperty({ type: User })
   @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL', onUpdate: 'CASCADE' })
   createdBy: User;
 
-  @ApiModelProperty({ example: '2018-05-26T09:05:39.378Z' })
+  @ApiProperty({ example: '2018-05-26T09:05:39.378Z' })
   @CreateDateColumn(momentDateTransformer)
   createdAt: Moment;
 }

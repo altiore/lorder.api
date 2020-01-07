@@ -1,15 +1,16 @@
 import { Controller, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiImplicitFile, ApiResponse, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Roles } from '../@common/decorators';
+import { FileUploadDto } from '../@common/dto';
 import { RolesGuard } from '../@common/guards';
 import { MyFileInterceptor } from '../@common/interceptors';
 import { Media } from '../@orm/media';
 import { FileService } from './file.service';
 
 @ApiBearerAuth()
-@ApiUseTags('file (role: user)')
+@ApiTags('file (role: user)')
 @Controller('file')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class FileController {
@@ -17,7 +18,11 @@ export class FileController {
 
   @Roles('user')
   @ApiResponse({ status: 200, type: Media })
-  @ApiImplicitFile({ name: 'file', required: true, description: 'Media File' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Avatar File',
+    type: FileUploadDto,
+  })
   @Post('upload')
   @UseInterceptors(MyFileInterceptor)
   public uploadFile(@UploadedFile() file) {
