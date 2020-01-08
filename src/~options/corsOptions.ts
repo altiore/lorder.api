@@ -19,5 +19,5 @@ export const corsOptions = (isProd: boolean) =>
      */
     exposedHeaders: 'Authorization',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    origin: isProd ? process.env.SERVER_ORIGIN : true,
+    origin: isProd ? process.env.SERVER_ORIGIN : 'http://localhost:8181',
   } as CorsOptions);
