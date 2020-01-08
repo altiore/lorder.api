@@ -9,9 +9,9 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
 
-const IS_PROD = process.env.NODE_ENV === 'production';
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || process.env.HOSTNAME || 'localhost';
+const IS_PROD = process.env.NODE_ENV === 'production' && HOST !== 'localhost';
 const SCHEMA = IS_PROD ? 'https' : 'http';
 
 async function bootstrap() {
