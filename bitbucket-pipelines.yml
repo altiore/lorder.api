@@ -36,6 +36,7 @@ pipelines:
             - node
             - buildfolder
           script:
+            - ls -l
             - npm run test:remote
           services:
             - postgres
@@ -98,7 +99,7 @@ pipelines:
 
 definitions:
   caches:
-    buildfolder: ~/build
+    buildfolder: dist
   services:
     postgres:
       image: postgres:11.5
