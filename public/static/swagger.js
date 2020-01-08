@@ -23,11 +23,15 @@
     }
 
     // 2. If token was not set yet, save it to sessionStorage
-    const openBtn = document.querySelector('btn authorize unlocked');
+    const openBtnCollection = document.getElementsByClassName('btn authorize unlocked');
+    const openBtn = openBtnCollection.item(0);
     if (openBtn) {
       openBtn.addEventListener('click', function() {
         setTimeout(function() {
-          const authBtn = document.querySelector('btn modal-btn auth authorize button');
+          const authBtnCollection = document.getElementsByClassName(
+            'btn modal-btn auth authorize button'
+          );
+          const authBtn = authBtnCollection.item(0);
           authBtn.addEventListener('click', function(e) {
             const tokenInput = document.querySelector('input:not([class])');
             if (tokenInput && tokenInput.value) {
