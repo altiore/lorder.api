@@ -1,3 +1,21 @@
 .swagger-ui .topbar {
-  background-color: rgb(255, 178, 0);
+  background-color: #242426;
+}
+
+.swagger-ui .scheme-container {
+  background-color: gray;
+}
+
+.swagger-ui .btn.authorize {
+  color: #ffb200;
+  border-color: #fff0b5;
+}
+
+.swagger-ui .btn.authorize:hover {
+  border-color: #ffb200;
+  background-color: rgba(255, 240, 181, 0.08);
+}
+
+.swagger-ui .btn.authorize svg {
+  fill: #ffb200;
 }
