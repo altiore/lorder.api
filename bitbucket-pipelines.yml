@@ -24,12 +24,11 @@ pipelines:
           services:
             - postgres
             - redis
-          artifacts: # defining the artifacts to be passed to each future step.
-            - dist/**
       - step:
           name: Staging tests
           caches:
             - node
+            - buildfolder
           script:
             - npm run test:remote
           services:
@@ -59,12 +58,11 @@ pipelines:
           services:
             - postgres
             - redis
-          artifacts: # defining the artifacts to be passed to each future step.
-            - dist/**
       - step:
           name: Production tests
           caches:
             - node
+            - buildfolder
           script:
             - npm run test:remote
           services:
@@ -87,7 +85,7 @@ pipelines:
 
 definitions:
   caches:
-    buildfolder: ~/.gradle/build
+    buildfolder: ~/build
   services:
     postgres:
       image: postgres:11.5
