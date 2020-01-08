@@ -5,9 +5,8 @@ pipelines:
     - step:
         name: Build, migrations and tests
         deployment: test
-        caches:
-          - node
         script:
+          - rm -rf dist
           - npm ci
           - npm run build
           - npm run test:remote
@@ -18,9 +17,8 @@ pipelines:
     staging:
       - step:
           name: Staging build
-          caches:
-            - node
           script:
+            - rm -rf dist
             - npm ci
             - npm run build
           services:
@@ -54,9 +52,8 @@ pipelines:
     master:
       - step:
           name: Production build
-          caches:
-            - node
           script:
+            - rm -rf dist
             - npm ci
             - npm run build
           services:
@@ -64,7 +61,6 @@ pipelines:
             - redis
           artifacts: # defining the artifacts to be passed to each future step.
             - dist/**
-            - node_modules/**
       - step:
           name: Production tests
           caches:
@@ -90,6 +86,8 @@ pipelines:
             - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$PRODUCTION_APP_NAME.git -f HEAD:master
 
 definitions:
+  caches:
+    buildfolder: ~/.gradle/build
   services:
     postgres:
       image: postgres:11.5
