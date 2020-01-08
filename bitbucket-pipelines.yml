@@ -28,7 +28,6 @@ pipelines:
             - redis
           artifacts: # defining the artifacts to be passed to each future step.
             - dist/**
-            - node_modules/**
       - step:
           name: Staging tests
           caches:
