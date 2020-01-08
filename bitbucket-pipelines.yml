@@ -22,6 +22,7 @@ pipelines:
           name: Staging build
           caches:
             - node
+            - buildfolder
           script:
             - rm -rf dist
             - npm ci
@@ -60,6 +61,7 @@ pipelines:
           name: Production build
           caches:
             - node
+            - buildfolder
           script:
             - rm -rf dist
             - npm ci
