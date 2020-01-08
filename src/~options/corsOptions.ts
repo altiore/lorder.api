@@ -1,4 +1,9 @@
-import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
+import {
+  CorsOptions,
+  CustomOrigin,
+} from '@nestjs/common/interfaces/external/cors-options.interface';
+
+const whitelist = ['http://localhost:8181', process.env.SEVER_ORIGIN];
 
 export const corsOptions = (isProd: boolean) =>
   ({
@@ -19,5 +24,13 @@ export const corsOptions = (isProd: boolean) =>
      */
     exposedHeaders: 'Authorization',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    origin: isProd ? process.env.SERVER_ORIGIN : 'http://localhost:8181',
+    origin: isProd
+      ? (function(origin, callback) {
+          if (whitelist.indexOf(origin) !== -1) {
+            callback(null, true);
+          } else {
+            callback(new Error('Not allowed by CORS'));
+          }
+        } as CustomOrigin)
+      : true,
   } as CorsOptions);
