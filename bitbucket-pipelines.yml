@@ -48,8 +48,8 @@ pipelines:
             - buildfolder
           script:
             - cd heroku
-            - rm -rf bin dist .git mails package.json package-lock.json
-            - cp -r ../bin ../dist ../mails ../ormconfig.js ../package.json ../package-lock.json ./
+            - rm -rf bin dist public .git mails package.json package-lock.json
+            - cp -r ../bin ../dist ../public ../mails ../ormconfig.js ../package.json ../package-lock.json ./
             - sed "s/rm -rf dist && tsc/echo NO NEED BUILD PREFERATION/" -i package.json
             - git init
             - git add .
@@ -87,8 +87,8 @@ pipelines:
             - buildfolder
           script:
             - cd heroku
-            - rm -rf bin dist .git mails package.json package-lock.json
-            - cp -r ../bin ../dist ../mails ../ormconfig.js ../package.json ../package-lock.json ./
+            - rm -rf bin dist public .git mails package.json package-lock.json
+            - cp -r ../bin ../dist ../public ../mails ../ormconfig.js ../package.json ../package-lock.json ./
             - sed "s/rm -rf dist && tsc/echo NO NEED BUILD PREFERATION/" -i package.json
             - git init
             - git add .
