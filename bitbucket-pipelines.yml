@@ -5,6 +5,9 @@ pipelines:
     - step:
         name: Build, migrations and tests
         deployment: test
+        caches:
+          - node
+          - buildfolder
         script:
           - rm -rf dist
           - npm ci
@@ -17,6 +20,8 @@ pipelines:
     staging:
       - step:
           name: Staging build
+          caches:
+            - node
           script:
             - rm -rf dist
             - npm ci
@@ -37,6 +42,8 @@ pipelines:
       - step:
           name: Staging DEPLOY
           deployment: staging
+          caches:
+            - buildfolder
           script:
             - cd heroku
             - rm -rf bin dist .git mails package.json package-lock.json
@@ -51,6 +58,8 @@ pipelines:
     master:
       - step:
           name: Production build
+          caches:
+            - node
           script:
             - rm -rf dist
             - npm ci
@@ -71,6 +80,8 @@ pipelines:
       - step:
           name: Production DEPLOY
           deployment: production
+          caches:
+            - buildfolder
           script:
             - cd heroku
             - rm -rf bin dist .git mails package.json package-lock.json
