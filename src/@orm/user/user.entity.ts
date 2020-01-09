@@ -121,11 +121,18 @@ export class User {
     return this.avatar ? this.avatar.url : null;
   }
 
-  get publicData(): { avatar?: string; defaultProjectId: number; email: string; role: ROLES } {
+  get publicData(): {
+    avatar?: string;
+    defaultProjectId: number;
+    email: string;
+    id: number;
+    role: ROLES;
+  } {
     return {
       avatar: this.avatarUrl,
       defaultProjectId: this.defaultProjectId,
       email: this.email,
+      id: this.id,
       role: this.role,
     };
   }
