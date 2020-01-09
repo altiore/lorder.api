@@ -75,6 +75,7 @@ describe(`GET ${h.url}`, () => {
       bearerKey: expect.any(String),
       defaultProjectId: null,
       email,
+      id: expect.any(Number),
       role: 'user',
     });
     const addedUser = await h.findOne(User, { email });
@@ -110,6 +111,7 @@ describe(`GET ${h.url}`, () => {
       bearerKey: expect.any(String),
       defaultProjectId: null,
       email,
+      id: expect.any(Number),
       role: 'user',
     });
     const addedUser = await h.findOne(User, { email });
@@ -146,6 +148,7 @@ describe(`GET ${h.url}`, () => {
       bearerKey: expect.any(String),
       defaultProjectId: null,
       email,
+      id: expect.any(Number),
       role: 'user',
     });
     const addedUser = await h.findOne(User, { email });

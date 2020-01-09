@@ -99,6 +99,7 @@ describe(`PATCH ${h.url}`, () => {
       bearerKey: expect.any(String),
       defaultProjectId: null,
       email,
+      id: expect.any(Number),
       role: 'user',
     });
   });
@@ -137,6 +138,7 @@ describe(`PATCH ${h.url}`, () => {
       bearerKey: expect.any(String),
       defaultProjectId: null,
       email,
+      id: expect.any(Number),
       role: 'admin',
     });
   });
@@ -175,6 +177,7 @@ describe(`PATCH ${h.url}`, () => {
       bearerKey: expect.any(String),
       defaultProjectId: null,
       email,
+      id: expect.any(Number),
       role: 'super-admin',
     });
   });
