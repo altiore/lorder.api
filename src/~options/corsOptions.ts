@@ -3,7 +3,7 @@ import {
   CustomOrigin,
 } from '@nestjs/common/interfaces/external/cors-options.interface';
 
-const whitelist = ['http://localhost:8181', process.env.SEVER_ORIGIN];
+const whitelist = ['http://localhost:8181', process.env.SERVER_ORIGIN];
 
 export const corsOptions = (isProd: boolean) =>
   ({
