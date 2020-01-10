@@ -3,7 +3,11 @@ import {
   CustomOrigin,
 } from '@nestjs/common/interfaces/external/cors-options.interface';
 
-const whitelist = ['http://localhost:8181', process.env.SERVER_ORIGIN];
+const whitelist = [
+  'http://localhost:8181',
+  process.env.SERVER_ORIGIN,
+  'https://staging-altiore-api.herokuapp.com',
+];
 
 export const corsOptions = (isProd: boolean) =>
   ({

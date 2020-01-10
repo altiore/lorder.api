@@ -1,6 +1,5 @@
 import {
   Body,
-  CacheInterceptor,
   Controller,
   Delete,
   Get,
@@ -10,7 +9,6 @@ import {
   Post,
   Query,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -30,7 +28,6 @@ import { ProjectService } from './project.service';
 @ApiTags('projects')
 @Controller('projects')
 @UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
-@UseInterceptors(CacheInterceptor)
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
