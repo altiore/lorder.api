@@ -9,7 +9,7 @@ import { find, get, pick } from 'lodash';
 
 import { Project, ProjectDto, ProjectRepository } from '../@orm/project';
 import { ProjectPub, ProjectPubRepository } from '../@orm/project-pub';
-import { TaskRepository } from '../@orm/task';
+import { Task, TaskRepository } from '../@orm/task';
 import { User } from '../@orm/user';
 import { ACCESS_LEVEL, UserProject, UserProjectRepository } from '../@orm/user-project';
 import { ProjectPaginationDto } from './@dto';
@@ -119,7 +119,7 @@ export class ProjectService {
       let tasksPortion;
       do {
         tasksPortion = await this.taskRepo.find({
-          relations: ['userWorks'],
+          relations: ['userWorks', 'users'],
           skip: step * i,
           take: step,
           where: { project },
@@ -127,7 +127,7 @@ export class ProjectService {
         if (!tasksPortion || !tasksPortion.length) {
           break;
         }
-        tasksPortion.map(task => {
+        tasksPortion.map((task: Task) => {
           task.userWorks.map(work => {
             if (work.finishAt) {
               if (data[work.userId]) {
@@ -135,14 +135,14 @@ export class ProjectService {
               }
             }
           });
-          const membersCount = get(task, ['members', 'length']);
+          const membersCount = get(task, ['users', 'length']);
           if (membersCount && task.value) {
-            task.members.map(taskMember => {
+            task.users.map(taskUser => {
               // TODO: нужно избавиться здесь от проверки и запретить удалять пользователей из
               //  проекта, если у них есть хотя бы одна не нулевая работа
-              if (data[taskMember.userId]) {
+              if (data[taskUser.id]) {
                 // TODO: учитывать так же коэффициент роли пользователя
-                data[taskMember.userId].value += (task.value || 0) / membersCount;
+                data[taskUser.id].value += (task.value || 0) / membersCount;
               }
             });
           }
