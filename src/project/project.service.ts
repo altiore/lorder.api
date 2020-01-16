@@ -137,10 +137,14 @@ export class ProjectService {
           });
           const membersCount = get(task, ['members', 'length']);
           if (membersCount && task.value) {
-            // task.members.map(taskMember => {
-            //   // TODO: учитывать так же коэффициент роли пользователя
-            //   data[taskMember.userId].value += (task.value || 0)/membersCount;
-            // });
+            task.members.map(taskMember => {
+              // TODO: нужно избавиться здесь от проверки и запретить удалять пользователей из
+              //  проекта, если у них есть хотя бы одна не нулевая работа
+              if (data[taskMember.userId]) {
+                // TODO: учитывать так же коэффициент роли пользователя
+                data[taskMember.userId].value += (task.value || 0) / membersCount;
+              }
+            });
           }
         });
         i++;
