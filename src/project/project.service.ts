@@ -142,7 +142,8 @@ export class ProjectService {
               //  проекта, если у них есть хотя бы одна не нулевая работа
               if (data[taskUser.id]) {
                 // TODO: учитывать так же коэффициент роли пользователя
-                data[taskUser.id].value += (task.value || 0) / membersCount;
+                data[taskUser.id].value +=
+                  Math.round((100 * (task.value || 0)) / membersCount) / 100;
               }
             });
           }
