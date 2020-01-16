@@ -134,12 +134,14 @@ export class ProjectService {
                 data[work.userId].time += work.finishAt.clone().diff(work.startAt.clone());
               }
             }
-            if (work.value) {
-              if (data[work.userId]) {
-                data[work.userId].value += work.value;
-              }
-            }
           });
+          const membersCount = get(task, ['members', 'length']);
+          if (membersCount && task.value) {
+            // task.members.map(taskMember => {
+            //   // TODO: учитывать так же коэффициент роли пользователя
+            //   data[taskMember.userId].value += (task.value || 0)/membersCount;
+            // });
+          }
         });
         i++;
       } while (tasksPortion.length === step);
