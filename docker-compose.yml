@@ -16,8 +16,8 @@ services:
     container_name: altiore_postgres
     restart: always
     volumes:
-      - postgres-altiore:/docker-entrypoint-initdb.d
-      - postgres-altiore:/usr/bin/wait-postgres
+      - ./docker/postgres-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ./docker/wait-postgres.sh:/usr/bin/wait-postgres
     environment:
       - POSTGRES_DB=${TYPEORM_DATABASE}
       - POSTGRES_TEST_DB=${POSTGRES_TEST_DB}
@@ -27,5 +27,6 @@ services:
       - ${TYPEORM_PORT}:5432
 
 volumes:
-  postgres-altiore:
+  postgres:
+    driver: local
   redis-altiore:
