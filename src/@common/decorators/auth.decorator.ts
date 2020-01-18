@@ -12,7 +12,7 @@ import { ACCESS_LEVEL } from '../../@orm/user-project';
 import { AccessLevelGuard } from '../../project/@common/guards';
 import { RolesGuard } from '../guards';
 
-export const r = (entity: any, description?: string) => ({
+export const res = (entity: any, description?: string) => ({
   c: {
     description: description || `Изменение`,
     status: 200,
@@ -65,7 +65,7 @@ export function Auth(
   return applyDecorators(
     ApiResponse(apiResponseOpts),
     SetMetadata('roles', roles),
-    UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard),
+    UseGuards(AuthGuard('jwt'), RolesGuard),
     ApiBearerAuth(),
     ApiUnauthorizedResponse({ description: 'Unauthorized"' })
   );

@@ -15,8 +15,7 @@ fi
 
 if [ -z `docker ps -q --no-trunc | grep $(docker-compose ps -q postgres)` ]; then
   echo "\n \033[0;32m   starting docker...\033[0;30m"
-  docker-compose down
-  docker-compose up -d
+  docker-compose down && docker-compose up -d
   sleep 10
 
   echo "\n \033[0;32m   run migrations...\033[0;30m"

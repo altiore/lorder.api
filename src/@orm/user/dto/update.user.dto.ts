@@ -9,12 +9,8 @@ export class UpdateUserDto {
   public readonly tel?: string;
 
   @ApiPropertyOptional()
+  @Length(3, 64)
   @IsString()
   @IsOptional()
-  public readonly resetLink?: string;
-
-  @ApiPropertyOptional()
-  @IsString()
-  @IsOptional()
-  public password?: string;
+  public displayName?: string;
 }

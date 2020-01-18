@@ -1,26 +1,18 @@
-import { Body, Controller, Patch, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Patch } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
-import { Roles, UserJWT } from '../@common/decorators';
-import { RolesGuard } from '../@common/guards';
+import { Auth, res, UserJWT } from '../@common/decorators';
+import { ROLES } from '../@orm/role';
 import { UpdateUserDto, User } from '../@orm/user';
 import { MeService } from './me.service';
 
-@ApiBearerAuth()
 @ApiTags('me')
 @Controller('me')
 export class MeController {
   constructor(private readonly meService: MeService) {}
 
   @Patch()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('user')
-  @ApiResponse({
-    description: 'The User has been successfully updated.',
-    status: 200,
-    type: User,
-  })
+  @Auth(res(User).updateOne, ROLES.USER)
   public update(@UserJWT() user: User, @Body() data: UpdateUserDto): Promise<User> {
     return this.meService.update(user, data);
   }

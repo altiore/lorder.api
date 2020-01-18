@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Moment } from 'moment';
 import {
   Column,
@@ -90,6 +90,10 @@ export class User {
   @JoinTable({ name: 'user_roles' })
   roles: Role[];
 
+  @ApiPropertyOptional()
+  @Column({ nullable: true })
+  displayName: string;
+
   @OneToMany(type => Project, project => project.owner)
   ownProjects: Project[];
 
@@ -124,6 +128,7 @@ export class User {
   get publicData(): {
     avatar?: string;
     defaultProjectId: number;
+    displayName: string;
     email: string;
     id: number;
     role: ROLES;
@@ -131,6 +136,7 @@ export class User {
     return {
       avatar: this.avatarUrl,
       defaultProjectId: this.defaultProjectId,
+      displayName: this.displayName,
       email: this.email,
       id: this.id,
       role: this.role,

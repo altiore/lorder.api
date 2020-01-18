@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { Auth, r, UserJWT } from '../@common/decorators';
+import { Auth, res, UserJWT } from '../@common/decorators';
 import { Project, ProjectDto } from '../@orm/project';
 import { ROLES } from '../@orm/role';
 import { User } from '../@orm/user';
@@ -26,7 +26,7 @@ export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @Get()
-  @Auth(r(Project).getMany, ROLES.USER)
+  @Auth(res(Project).getMany, ROLES.USER)
   public async allOwn(
     @UserJWT() user: User,
     @Query() pagesDto: ProjectPaginationDto
@@ -35,7 +35,7 @@ export class ProjectController {
   }
 
   @Get('all')
-  @Auth(r(Project).getMany, ROLES.SUPER_ADMIN)
+  @Auth(res(Project).getMany, ROLES.SUPER_ADMIN)
   public async all(
     @UserJWT() user: User,
     @Query() pagesDto: ProjectPaginationDto
@@ -44,19 +44,19 @@ export class ProjectController {
   }
 
   @Get(':projectId')
-  @Auth(r(Project).getOne, ROLES.USER, ACCESS_LEVEL.RED)
+  @Auth(res(Project).getOne, ROLES.USER, ACCESS_LEVEL.RED)
   public one(@ProjectParam() project: Project): Partial<Project> {
     return project;
   }
 
   @Post()
-  @Auth(r(Project).createOne, ROLES.USER)
+  @Auth(res(Project).createOne, ROLES.USER)
   public create(@UserJWT() user: User, @Body() data: ProjectDto): Promise<Project> {
     return this.projectService.create(data, user);
   }
 
   @Delete(':projectId')
-  @Auth(r(Project).deleteOne, ROLES.USER, ACCESS_LEVEL.VIOLET)
+  @Auth(res(Project).deleteOne, ROLES.USER, ACCESS_LEVEL.VIOLET)
   public delete(
     @Param('projectId', ParseIntPipe) projectId: number // must be here because of swagger
   ): Promise<number> {
@@ -64,7 +64,7 @@ export class ProjectController {
   }
 
   @Delete(':projectId/admin')
-  @Auth(r(Project, 'Возвращает id удаленного проекта').deleteOne, ROLES.SUPER_ADMIN)
+  @Auth(res(Project, 'Возвращает id удаленного проекта').deleteOne, ROLES.SUPER_ADMIN)
   public adminDelete(
     @Param('projectId', ParseIntPipe) projectId: number // must be here because of swagger
   ): Promise<number> {
@@ -72,7 +72,7 @@ export class ProjectController {
   }
 
   @Post(':projectId/publish')
-  @Auth(r(Project, 'Опубликовать проект').c, ROLES.USER, ACCESS_LEVEL.VIOLET)
+  @Auth(res(Project, 'Опубликовать проект').c, ROLES.USER, ACCESS_LEVEL.VIOLET)
   public publish(
     @Param('projectId', ParseIntPipe) projectId: number,
     @ProjectParam() project: Project
@@ -81,7 +81,7 @@ export class ProjectController {
   }
 
   @Patch(':projectId/statistic')
-  @Auth(r(Project, 'Обновить статистику проекта').c, ROLES.USER, ACCESS_LEVEL.VIOLET)
+  @Auth(res(Project, 'Обновить статистику проекта').c, ROLES.USER, ACCESS_LEVEL.VIOLET)
   public async statistic(@ProjectParam() project: Project): Promise<Project> {
     return this.projectService.updateStatistic(project);
   }
