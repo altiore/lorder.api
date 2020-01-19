@@ -156,7 +156,7 @@ export class ProjectService {
         members: projectWithMembers.members.map(member => ({
           accessLevel: member.accessLevel,
           avatar: member.member.avatarUrl,
-          email: member.member.email,
+          email: member.member.displayName || member.member.email,
           id: member.member.id,
         })),
       };
