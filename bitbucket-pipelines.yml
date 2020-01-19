@@ -95,7 +95,7 @@ pipelines:
             - git config user.email "commits-noreply@bitbucket.org"
             - git config user.name "bitbucket-pipelines"
             - git commit -m 'dynamic version'
-            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$PRODUCTION_APP_NAME.git -f HEAD:master
+            - GIT_CURL_VERBOSE=1 GIT_TRACE=1 git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$PRODUCTION_APP_NAME.git -f HEAD:master
 
 definitions:
   caches:
