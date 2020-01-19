@@ -53,7 +53,7 @@ describe(`GET ${h.url}`, () => {
         {
           accessLevel: ACCESS_LEVEL.WHITE,
           avatar: null,
-          email: 'user@mail.com',
+          email: expect.any(String),
           id: memberId,
         },
       ],
