@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": ["node_modules", "tests", "bin", "coverage", "dist", "docker", "heroku", "mails", "uploads"]
+}

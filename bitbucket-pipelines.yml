@@ -24,7 +24,6 @@ pipelines:
             - node
             - buildfolder
           script:
-            - rm -rf dist
             - npm ci
             - npm run build
           services:
@@ -50,7 +49,7 @@ pipelines:
             - cd heroku
             - rm -rf bin dist public .git mails package.json package-lock.json
             - cp -r ../bin ../dist ../public ../mails ../ormconfig.js ../package.json ../package-lock.json ./
-            - sed "s/rm -rf dist && tsc/echo NO NEED BUILD PREFERATION/" -i package.json
+            - sed "s/rm -rf dist && nest build/echo NO NEED BUILD PREFERATION/" -i package.json
             - git init
             - git config user.email "razvanlomov@gmail.com"
             - git config user.name "Razzwan-CI"
@@ -89,7 +88,7 @@ pipelines:
             - cd heroku
             - rm -rf bin dist public .git mails package.json package-lock.json
             - cp -r ../bin ../dist ../public ../mails ../ormconfig.js ../package.json ../package-lock.json ./
-            - sed "s/rm -rf dist && tsc/echo NO NEED BUILD PREFERATION/" -i package.json
+            - sed "s/rm -rf dist && nest build/echo NO NEED BUILD PREFERATION/" -i package.json
             - git init
             - git config user.email "razvanlomov@gmail.com"
             - git config user.name "Razzwan-CI"

@@ -16,7 +16,7 @@
     "start:prod": "npm run build && node dist/main.js",
     "preinstall": "node bin/gcpSetup.js",
     "postinstall": "npm run build && npm run migration:up",
-    "build": "rm -rf dist && tsc",
+    "build": "rm -rf dist && nest build",
     "pretest": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && npm run migration:test:up",
     "test": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest --coverage -i -b --detectOpenHandles",
     "pretest:dev": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && npm run migration:test:up",
@@ -50,7 +50,6 @@
     "@nestjs/platform-socket.io": "6.10.11",
     "@nestjs/serve-static": "1.0.2",
     "@nestjs/swagger": "4.1.2",
-    "@nestjs/testing": "6.10.11",
     "@nestjs/typeorm": "6.2.0",
     "@nestjs/websockets": "6.10.11",
     "@sendgrid/mail": "6.3.1",
@@ -83,6 +82,9 @@
     "typeorm": "0.2.22"
   },
   "devDependencies": {
+    "@nestjs/cli": "6.14.1",
+    "@nestjs/schematics": "6.9.0",
+    "@nestjs/testing": "6.10.11",
     "@types/express": "4.16.1",
     "@types/faker": "4.1.5",
     "@types/jest": "24.0.17",

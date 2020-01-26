@@ -1,12 +1,13 @@
 import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+
 import { get, pick } from 'lodash';
 
-import { Project, ProjectDto, ProjectRepository } from '../@orm/project';
-import { ProjectPub, ProjectPubRepository } from '../@orm/project-pub';
-import { Task, TaskRepository } from '../@orm/task';
-import { User } from '../@orm/user';
-import { ACCESS_LEVEL, UserProject, UserProjectRepository } from '../@orm/user-project';
+import { Project, ProjectDto, ProjectRepository } from '@orm/project';
+import { ProjectPub, ProjectPubRepository } from '@orm/project-pub';
+import { Task, TaskRepository } from '@orm/task';
+import { User } from '@orm/user';
+import { ACCESS_LEVEL, UserProject, UserProjectRepository } from '@orm/user-project';
 
 import { ProjectPaginationDto } from './@dto';
 
