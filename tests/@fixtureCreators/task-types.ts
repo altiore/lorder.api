@@ -1,5 +1,5 @@
-import { company, date, internet, random } from 'faker';
-import { fixtureCreator, one } from 'typeorm-fixtures';
+import { internet, random } from 'faker';
+import { fixtureCreator } from 'typeorm-fixtures';
 
 import { TaskType } from '../../src/@orm/task-type';
 

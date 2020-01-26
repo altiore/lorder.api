@@ -52,9 +52,9 @@ pipelines:
             - cp -r ../bin ../dist ../public ../mails ../ormconfig.js ../package.json ../package-lock.json ./
             - sed "s/rm -rf dist && tsc/echo NO NEED BUILD PREFERATION/" -i package.json
             - git init
+            - git config user.email "razvanlomov@gmail.com"
+            - git config user.name "Razzwan-CI"
             - git add .
-            - git config user.email "commits-noreply@bitbucket.org"
-            - git config user.name "bitbucket-pipelines"
             - git commit -m 'dynamic version'
             - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$STAGING_APP_NAME.git -f HEAD:master
     master:
@@ -91,11 +91,11 @@ pipelines:
             - cp -r ../bin ../dist ../public ../mails ../ormconfig.js ../package.json ../package-lock.json ./
             - sed "s/rm -rf dist && tsc/echo NO NEED BUILD PREFERATION/" -i package.json
             - git init
+            - git config user.email "razvanlomov@gmail.com"
+            - git config user.name "Razzwan-CI"
             - git add .
-            - git config user.email "commits-noreply@bitbucket.org"
-            - git config user.name "bitbucket-pipelines"
             - git commit -m 'dynamic version'
-            - GIT_CURL_VERBOSE=1 GIT_TRACE=1 git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$PRODUCTION_APP_NAME.git -f HEAD:master
+            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$PRODUCTION_APP_NAME.git -f HEAD:master
 
 definitions:
   caches:

@@ -3,6 +3,7 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 
 import { Project } from '../project/project.entity';
 import { User } from '../user/user.entity';
+
 import { ACCESS_LEVEL } from './user-project.consts';
 
 @Entity()

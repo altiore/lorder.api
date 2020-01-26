@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import * as jwt from 'jsonwebtoken';
 
 import { Roles, UserJWT } from '../../@common/decorators';
 import { ListDto } from '../../@common/dto';
@@ -13,6 +12,7 @@ import { User } from '../../@orm/user';
 import { ACCESS_LEVEL } from '../../@orm/user-project';
 import { AccessLevel, ProjectParam } from '../@common/decorators';
 import { AccessLevelGuard } from '../@common/guards';
+
 import { ProjectRoleCreateDto } from './dto';
 import { ProjectRoleService } from './project-role.service';
 

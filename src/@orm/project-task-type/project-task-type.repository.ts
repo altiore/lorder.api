@@ -2,6 +2,7 @@ import { DeepPartial, EntityRepository, Repository } from 'typeorm';
 
 import { Project } from '../project/project.entity';
 import { TaskType } from '../task-type/task-type.entity';
+
 import { ProjectTaskType } from './project-task-type.entity';
 
 @EntityRepository(ProjectTaskType)

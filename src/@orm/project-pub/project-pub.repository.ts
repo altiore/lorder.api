@@ -1,6 +1,7 @@
 import { EntityRepository, Repository } from 'typeorm';
 
 import { Project } from '../project/project.entity';
+
 import { ProjectPub } from './project-pub.entity';
 
 @EntityRepository(ProjectPub)

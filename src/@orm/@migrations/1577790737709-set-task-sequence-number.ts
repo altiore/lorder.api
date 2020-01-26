@@ -29,9 +29,7 @@ export class setTaskSequenceNumber1577790737709 implements MigrationInterface {
             await Promise.all(
               tasks.map(async (task, index) => {
                 return await queryRunner.query(
-                  `UPDATE "task" SET "sequenceNumber"=${page * perRequestCount +
-                    index +
-                    1} where "id"='${task.id}'
+                  `UPDATE "task" SET "sequenceNumber"=${page * perRequestCount + index + 1} where "id"='${task.id}'
             `
                 );
               })

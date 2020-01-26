@@ -1,21 +1,11 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import * as jwt from 'jsonwebtoken';
 
 import { Roles } from '../@common/decorators';
 import { RolesGuard } from '../@common/guards';
 import { TaskType, TaskTypeCreateDto } from '../@orm/task-type';
+
 import { TaskTypeService } from './task-type.service';
 
 @ApiBearerAuth()
@@ -49,10 +39,7 @@ export class TaskTypeController {
     status: 200,
     type: TaskType,
   })
-  public update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() taskTypeCreateDto: TaskTypeCreateDto
-  ) {
+  public update(@Param('id', ParseIntPipe) id: number, @Body() taskTypeCreateDto: TaskTypeCreateDto) {
     return this.tasktypeService.update(id, taskTypeCreateDto);
   }
 

@@ -1,3 +1,6 @@
+import { Roles, UserJWT } from '@common/decorators';
+import { ListResponseDto, PaginationDto } from '@common/dto';
+import { RolesGuard } from '@common/guards';
 import {
   Body,
   CacheInterceptor,
@@ -15,17 +18,14 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Project } from '@orm/project';
+import { Task } from '@orm/task';
+import { User } from '@orm/user';
+import { ACCESS_LEVEL } from '@orm/user-project';
+import { AccessLevel, ProjectParam } from 'project/@common/decorators';
+import { AccessLevelGuard } from 'project/@common/guards';
 import { DeepPartial } from 'typeorm';
 
-import { Roles, UserJWT } from '../../@common/decorators';
-import { ListResponseDto, PaginationDto } from '../../@common/dto';
-import { RolesGuard } from '../../@common/guards';
-import { Project } from '../../@orm/project';
-import { Task } from '../../@orm/task';
-import { User } from '../../@orm/user';
-import { ACCESS_LEVEL } from '../../@orm/user-project';
-import { AccessLevel, ProjectParam } from '../@common/decorators';
-import { AccessLevelGuard } from '../@common/guards';
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
 import { ProjectTaskService } from './project.task.service';
 
@@ -59,9 +59,7 @@ export class ProjectTaskController {
   ): Promise<Task> {
     const task = await this.taskService.findOne(sequenceNumber, projectId);
     if (!task) {
-      throw new NotFoundException(
-        `Задача ${sequenceNumber} не найдена в проекте "${project.title}"`
-      );
+      throw new NotFoundException(`Задача ${sequenceNumber} не найдена в проекте "${project.title}"`);
     }
     return task;
   }
@@ -70,11 +68,7 @@ export class ProjectTaskController {
   @Roles('user')
   @AccessLevel(ACCESS_LEVEL.ORANGE)
   @ApiResponse({ status: 201, type: Task, description: 'ACCESS_LEVEL.ORANGE' })
-  public create(
-    @Body() taskCreateDto: TaskCreateDto,
-    @ProjectParam() project: Project,
-    @UserJWT() user: User
-  ) {
+  public create(@Body() taskCreateDto: TaskCreateDto, @ProjectParam() project: Project, @UserJWT() user: User) {
     return this.taskService.create(taskCreateDto, project, user);
   }
 
@@ -119,9 +113,7 @@ export class ProjectTaskController {
   ) {
     const task = await this.taskService.delete(sequenceNumber, projectId);
     if (!task) {
-      throw new NotFoundException(
-        `Задача ${sequenceNumber} не была найдена в проекте ${project.title}`
-      );
+      throw new NotFoundException(`Задача ${sequenceNumber} не была найдена в проекте ${project.title}`);
     }
     return task;
   }

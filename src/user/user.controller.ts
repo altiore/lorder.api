@@ -23,6 +23,7 @@ import { RolesGuard } from '../@common/guards/roles.guard';
 import { MyFileInterceptor } from '../@common/interceptors';
 import { Media } from '../@orm/media';
 import { User } from '../@orm/user';
+
 import { UserDto, UserPaginationDto } from './dto';
 import { UserService } from './user.service';
 
@@ -50,15 +51,9 @@ export class UserController {
   @ApiResponse({ status: 200 })
   @Patch(':id')
   @Roles('super-admin')
-  public update(
-    @Body() data: UserDto,
-    @Param('id', ParseIntPipe) id: number,
-    @UserJWT() user: User
-  ): Promise<User> {
+  public update(@Body() data: UserDto, @Param('id', ParseIntPipe) id: number, @UserJWT() user: User): Promise<User> {
     if (id === user.id) {
-      throw new NotAcceptableException(
-        'Вы не можете изменить свои данные. Используйте профайл для этого'
-      );
+      throw new NotAcceptableException('Вы не можете изменить свои данные. Используйте профайл для этого');
     }
     return this.usersService.updateUserById(id, data);
   }

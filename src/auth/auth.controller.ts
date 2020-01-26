@@ -4,6 +4,7 @@ import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from '../@orm/user';
 import { EmailDto, LoginUserDto } from '../@orm/user/dto';
 import { MailAcceptedDto } from '../mail/dto';
+
 import { AuthService } from './auth.service';
 import { ActivateDto, IdentityDto } from './dto';
 
@@ -16,10 +17,7 @@ export class AuthController {
   @ApiResponse({ status: 202, type: MailAcceptedDto })
   @HttpCode(202)
   @Post('magic')
-  public async magic(
-    @Body() data: EmailDto,
-    @Headers('origin') origin: string
-  ): Promise<MailAcceptedDto> {
+  public async magic(@Body() data: EmailDto, @Headers('origin') origin: string): Promise<MailAcceptedDto> {
     return (await this.authService.sendMagicLink(data, origin)) as MailAcceptedDto;
   }
 

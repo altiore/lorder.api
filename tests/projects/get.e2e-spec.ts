@@ -1,12 +1,7 @@
 import { ACCESS_LEVEL } from '../../src/@orm/user-project';
 import { TestHelper } from '../@utils/TestHelper';
-import {
-  projectsFixture,
-  tasksFixture,
-  userProjectsFixture,
-  usersFixture,
-  userWorksFixture,
-} from './@fixtures/get';
+
+import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/get';
 
 const h = new TestHelper('/projects')
   .addFixture(usersFixture)
@@ -16,11 +11,8 @@ const h = new TestHelper('/projects')
   .addFixture(userWorksFixture);
 
 describe(`GET ${h.url}`, () => {
-  let projectId: number;
-
   beforeAll(async () => {
     await h.before();
-    projectId = h.entities.Project[0].id;
   });
   afterAll(h.after);
 
@@ -74,8 +66,6 @@ describe(`GET ${h.url}`, () => {
         }),
       ])
     );
-    expect(body).not.toEqual(
-      expect.arrayContaining([expect.objectContaining({ title: 'Second' })])
-    );
+    expect(body).not.toEqual(expect.arrayContaining([expect.objectContaining({ title: 'Second' })]));
   });
 });

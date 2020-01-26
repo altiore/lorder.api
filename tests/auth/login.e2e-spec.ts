@@ -1,11 +1,11 @@
 import moment = require('moment');
 
-import { TestHelper } from '../@utils/TestHelper';
-import { usersFixture } from './@fixtures/users';
-
 import { Media } from '../../src/@orm/media';
 import { Project } from '../../src/@orm/project';
 import { User } from '../../src/@orm/user';
+import { TestHelper } from '../@utils/TestHelper';
+
+import { usersFixture } from './@fixtures/users';
 
 const h = new TestHelper('/auth/login').addFixture(usersFixture);
 

@@ -1,10 +1,6 @@
 import { TestHelper } from '../@utils/TestHelper';
-import {
-  projectsFixture,
-  tasksFixture,
-  userProjectsFixture,
-  usersFixture,
-} from './@fixtures/archive';
+
+import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture } from './@fixtures/archive';
 
 const h = new TestHelper('/tasks/:taskId/archive')
   .addFixture(usersFixture)

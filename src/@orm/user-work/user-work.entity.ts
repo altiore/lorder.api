@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Moment } from 'moment';
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { TaskType } from '../task-type/task-type.entity';

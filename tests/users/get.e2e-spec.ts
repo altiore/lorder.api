@@ -1,4 +1,5 @@
 import { TestHelper } from '../@utils/TestHelper';
+
 import { usersFixture } from './@fixtures/users';
 
 const h = new TestHelper('/users').addFixture(usersFixture);
@@ -48,12 +49,7 @@ describe(`GET ${h.url}`, () => {
       .get(h.url)
       .expect(200);
     expect(body.map(el => el.email)).toEqual(
-      expect.arrayContaining([
-        'admin@mail.com',
-        'super-admin@mail.com',
-        'user@mail.com',
-        'razvanlomov@gmail.com',
-      ])
+      expect.arrayContaining(['admin@mail.com', 'super-admin@mail.com', 'user@mail.com', 'razvanlomov@gmail.com'])
     );
   });
 });

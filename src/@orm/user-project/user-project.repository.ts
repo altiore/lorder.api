@@ -3,6 +3,7 @@ import { DeepPartial, EntityRepository, MoreThanOrEqual, Repository } from 'type
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Project } from '../project/project.entity';
 import { User } from '../user/user.entity';
+
 import { ACCESS_LEVEL } from './user-project.consts';
 import { UserProject } from './user-project.entity';
 
@@ -23,10 +24,7 @@ export class UserProjectRepository extends Repository<UserProject> {
     return await this.save(entity);
   }
 
-  public async activateInProject(
-    member: User,
-    project: DeepPartial<Project>
-  ): Promise<UserProject> {
+  public async activateInProject(member: User, project: DeepPartial<Project>): Promise<UserProject> {
     const entity = await this.findOneOrFail({
       where: { member, project },
     });

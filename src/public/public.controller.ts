@@ -1,12 +1,5 @@
-import {
-  CacheInterceptor,
-  Controller,
-  Get,
-  NotFoundException,
-  Param,
-  UseInterceptors,
-} from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CacheInterceptor, Controller, Get, NotFoundException, Param, UseInterceptors } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { ProjectPub } from '../@orm/project-pub';
 import { ProjectService } from '../project/project.service';

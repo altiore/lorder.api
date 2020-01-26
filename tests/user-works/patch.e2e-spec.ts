@@ -1,17 +1,9 @@
-import { date, lorem } from 'faker';
+import { lorem } from 'faker';
 import moment = require('moment');
 
 import { TestHelper } from '../@utils/TestHelper';
-import {
-  projectsFixture,
-  tasksFixture,
-  userProjectsFixture,
-  usersFixture,
-  userWorksFixture,
-} from './@fixtures/patch';
 
-import { Task } from '../../src/@orm/task';
-import { UserWork } from '../../src/@orm/user-work';
+import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/patch';
 
 const h = new TestHelper('/user-works/:userWorkId')
   .addFixture(usersFixture)
@@ -30,8 +22,7 @@ describe(`PATCH ${h.url}`, () => {
   beforeAll(async () => {
     await h.before();
     projectId = h.entities.Project[0].id;
-    userWorkId = h.entities.UserWork.find(el => el.description === 'super-admin@mail.com userWork')
-      .id;
+    userWorkId = h.entities.UserWork.find(el => el.description === 'super-admin@mail.com userWork').id;
   });
   afterAll(h.after);
 
@@ -123,117 +114,110 @@ describe(`PATCH ${h.url}`, () => {
       });
   });
 
-  it(
-    'by owner with validation error' +
-      ' (description is number, startAt string but is not date string)',
-    async () => {
-      const { body } = await h
-        .requestBy('super-admin@mail.com')
-        .patch(h.path(userWorkId))
-        .send({
-          description: 1,
-          finishAt: '2019-07-22',
-          projectId,
-          source: 2,
-          startAt: '2019-07-22',
-          taskId: 'asdfasdfasdf',
-          value: 'string',
-        })
-        .expect(422);
-      expect(body).toMatchObject({
-        errors: expect.arrayContaining([
-          expect.objectContaining({
-            constraints: expect.objectContaining({
-              isString: expect.any(String),
-            }),
-            property: 'description',
+  it('by owner with validation error' + ' (description is number, startAt string but is not date string)', async () => {
+    const { body } = await h
+      .requestBy('super-admin@mail.com')
+      .patch(h.path(userWorkId))
+      .send({
+        description: 1,
+        finishAt: '2019-07-22',
+        projectId,
+        source: 2,
+        startAt: '2019-07-22',
+        taskId: 'asdfasdfasdf',
+        value: 'string',
+      })
+      .expect(422);
+    expect(body).toMatchObject({
+      errors: expect.arrayContaining([
+        expect.objectContaining({
+          constraints: expect.objectContaining({
+            isString: expect.any(String),
           }),
-          expect.objectContaining({
-            constraints: expect.objectContaining({
-              isMomentString: expect.any(String),
-            }),
-            property: 'finishAt',
+          property: 'description',
+        }),
+        expect.objectContaining({
+          constraints: expect.objectContaining({
+            isMomentString: expect.any(String),
           }),
-          expect.objectContaining({
-            constraints: expect.objectContaining({
-              isString: expect.any(String),
-            }),
-            property: 'source',
+          property: 'finishAt',
+        }),
+        expect.objectContaining({
+          constraints: expect.objectContaining({
+            isString: expect.any(String),
           }),
-          expect.objectContaining({
-            constraints: expect.objectContaining({
-              isMomentString: expect.any(String),
-            }),
-            property: 'startAt',
+          property: 'source',
+        }),
+        expect.objectContaining({
+          constraints: expect.objectContaining({
+            isMomentString: expect.any(String),
           }),
-          expect.objectContaining({
-            constraints: expect.objectContaining({
-              isNumber: expect.any(String),
-            }),
-            property: 'taskId',
+          property: 'startAt',
+        }),
+        expect.objectContaining({
+          constraints: expect.objectContaining({
+            isNumber: expect.any(String),
           }),
-          expect.objectContaining({
-            constraints: expect.objectContaining({
-              isNumber: expect.any(String),
-            }),
-            property: 'value',
+          property: 'taskId',
+        }),
+        expect.objectContaining({
+          constraints: expect.objectContaining({
+            isNumber: expect.any(String),
           }),
-        ]),
-      });
-    }
-  );
+          property: 'value',
+        }),
+      ]),
+    });
+  });
 
-  it(
-    'by owner with validation error' + ' (description longer then 255, startAt is number)',
-    async () => {
-      const { body } = await h
-        .requestBy('super-admin@mail.com')
-        .patch(h.path(userWorkId))
-        .send({
-          description: lorem.words(255),
-          finishAt: 1550408502,
-          projectId,
-          source: lorem.words(255),
-          startAt: 1550408502,
-          value: {},
-        })
-        .expect(422);
-      expect(body).toMatchObject({
-        errors: expect.arrayContaining([
-          expect.objectContaining({
-            constraints: expect.objectContaining({
-              maxLength: expect.any(String),
-            }),
-            property: 'description',
+  it('by owner with validation error' + ' (description longer then 255, startAt is number)', async () => {
+    const { body } = await h
+      .requestBy('super-admin@mail.com')
+      .patch(h.path(userWorkId))
+      .send({
+        description: lorem.words(255),
+        finishAt: 1550408502,
+        projectId,
+        source: lorem.words(255),
+        startAt: 1550408502,
+        value: {},
+      })
+      .expect(422);
+    expect(body).toMatchObject({
+      errors: expect.arrayContaining([
+        expect.objectContaining({
+          constraints: expect.objectContaining({
+            maxLength: expect.any(String),
           }),
-          expect.objectContaining({
-            constraints: expect.objectContaining({
-              isMomentString: expect.any(String),
-            }),
-            property: 'finishAt',
+          property: 'description',
+        }),
+        expect.objectContaining({
+          constraints: expect.objectContaining({
+            isMomentString: expect.any(String),
           }),
-          expect.objectContaining({
-            constraints: expect.objectContaining({
-              maxLength: expect.any(String),
-            }),
-            property: 'source',
+          property: 'finishAt',
+        }),
+        expect.objectContaining({
+          constraints: expect.objectContaining({
+            maxLength: expect.any(String),
           }),
-          expect.objectContaining({
-            constraints: expect.objectContaining({
-              isMomentString: expect.any(String),
-            }),
-            property: 'startAt',
+          property: 'source',
+        }),
+        expect.objectContaining({
+          constraints: expect.objectContaining({
+            isMomentString: expect.any(String),
           }),
-          expect.objectContaining({
-            constraints: expect.objectContaining({
-              isNumber: expect.any(String),
-            }),
-            property: 'value',
+          property: 'startAt',
+        }),
+        expect.objectContaining({
+          constraints: expect.objectContaining({
+            isNumber: expect.any(String),
           }),
-        ]),
-      });
-    }
-  );
+          property: 'value',
+        }),
+      ]),
+    });
+  });
 
   it('by owner with validation error (future dates)', async () => {
     const { body } = await h
@@ -352,9 +336,7 @@ describe(`PATCH ${h.url}`, () => {
   });
 
   it('by owner with correct data (without dates)', async () => {
-    const userWorkId2 = h.entities.UserWork.find(
-      el => el.description === 'super-admin@mail.com userWork2'
-    ).id;
+    const userWorkId2 = h.entities.UserWork.find(el => el.description === 'super-admin@mail.com userWork2').id;
     const newValue = {
       description: lorem.words(2),
       finishAt: undefined,
@@ -384,9 +366,7 @@ describe(`PATCH ${h.url}`, () => {
   });
 
   it('by member with correct data (without dates)', async () => {
-    const userWorkId3 = h.entities.UserWork.find(
-      el => el.description === 'exist-not-finished@mail.com userWork3'
-    ).id;
+    const userWorkId3 = h.entities.UserWork.find(el => el.description === 'exist-not-finished@mail.com userWork3').id;
     const newValue = {
       description: 'New value description ha-ha',
       finishAt: moment().subtract(1, 'minutes'),

@@ -18,7 +18,7 @@
     "postinstall": "npm run build && npm run migration:up",
     "build": "rm -rf dist && tsc",
     "pretest": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && npm run migration:test:up",
-    "test": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest -i -b --detectOpenHandles",
+    "test": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest --coverage -i -b --detectOpenHandles",
     "pretest:dev": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && npm run migration:test:up",
     "test:dev": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest -i -b --detectOpenHandles --forceExit --watch",
     "test:coverage": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest -i --forceExit --coverage",
@@ -26,7 +26,6 @@
     "test:changed:only": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest -i -b --lastCommit --detectOpenHandles --forceExit",
     "pretest:remote": "node bin/refresh.js && npm run migration:up && echo  \"Please, do NOT run LOCALLY!\"",
     "test:remote": "jest --coverage -i --forceExit && echo -e \"Please, do NOT run LOCALLY!\"",
-    "posttest:remote": "codecov --token=d80eff89-9fdc-4a57-a585-70b6cbcf1abc",
     "webpack": "webpack --config webpack.config.js",
     "prepare:mails": "mjml src/mail/mjml/*.mjml -o mails/",
     "migration:generate": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:generate --name generated",
@@ -35,7 +34,10 @@
     "migration:down": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:revert",
     "migration:test:up": "cross-env TYPEORM_DATABASE=altiore_contrib_test ./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:run",
     "migration:test:down": "cross-env TYPEORM_DATABASE=altiore_contrib_test ./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:revert",
-    "ln:typeorm:fixtures": "rm -rf node_modules/typeorm-fixtures && ln -s $PWD/../../typeorm-fixtures $PWD/node_modules/typeorm-fixtures"
+    "ln:typeorm:fixtures": "rm -rf node_modules/typeorm-fixtures && ln -s $PWD/../../typeorm-fixtures $PWD/node_modules/typeorm-fixtures",
+    "run-prettier": "prettier --write \"{src,tests}/**/*.{ts,tsx}\" --print-width 120 --single-quote --trailing-comma es5",
+    "run-lint": "tslint --fix -p tsconfig.test.json -c tslint.json",
+    "lint": "npm run run-prettier && npm run run-lint"
   },
   "dependencies": {
     "@google-cloud/storage": "3.0.3",
@@ -89,7 +91,6 @@
     "@types/redis": "2.8.13",
     "@types/socket.io": "2.1.4",
     "@types/supertest": "2.0.4",
-    "codecov": "3.0.2",
     "cross-env": "^5.2.1",
     "dotenv": "6.0.0",
     "faker": "^4.1.0",
@@ -125,13 +126,12 @@
   },
   "lint-staged": {
     "*.{js,jsx,json,css,md}": [
-      "prettier --write --print-width 100 --single-quote --trailing-comma es5",
+      "prettier --write --print-width 120 --single-quote --trailing-comma es5",
       "git add"
     ],
     "*.{ts,tsx}": [
-      "prettier --write --print-width 100 --single-quote --trailing-comma es5 --parser typescript",
-      "tslint --fix -t verbose",
-      "prettier --write --print-width 100 --single-quote --trailing-comma es5 --parser typescript",
+      "prettier --write --print-width 120 --single-quote --trailing-comma es5",
+      "tslint --fix -t verbose -p tsconfig.test.json -c tslint.json",
       "git add"
     ],
     "*.{html,mjml}": [

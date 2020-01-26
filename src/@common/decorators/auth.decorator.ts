@@ -1,11 +1,6 @@
 import { applyDecorators, SetMetadata, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import {
-  ApiBearerAuth,
-  ApiResponse,
-  ApiResponseOptions,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiResponseOptions, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 import { ROLES } from '../../@orm/role';
 import { ACCESS_LEVEL } from '../../@orm/user-project';
@@ -47,11 +42,7 @@ export const res = (entity: any, description?: string) => ({
   } as ApiResponseOptions,
 });
 
-export function Auth(
-  apiResponseOpts: ApiResponseOptions,
-  roles: ROLES[] | ROLES,
-  accessLevel?: ACCESS_LEVEL
-) {
+export function Auth(apiResponseOpts: ApiResponseOptions, roles: ROLES[] | ROLES, accessLevel?: ACCESS_LEVEL) {
   if (accessLevel) {
     return applyDecorators(
       ApiResponse(apiResponseOpts),

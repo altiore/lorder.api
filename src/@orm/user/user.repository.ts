@@ -3,6 +3,7 @@ import { DeepPartial, EntityRepository, In, Repository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Role } from '../role/role.entity';
+
 import { User } from './user.entity';
 
 @EntityRepository(User)
@@ -34,10 +35,7 @@ export class UserRepository extends Repository<User> {
     return this.save(user);
   }
 
-  public async createWithRoles(
-    data: DeepPartial<User>,
-    roles: Role[]
-  ): Promise<{ user: User; password?: string }> {
+  public async createWithRoles(data: DeepPartial<User>, roles: Role[]): Promise<{ user: User; password?: string }> {
     const user = this.create(data);
     // создаваемый пользователь всегда неактивен
     user.status = 1;
@@ -78,10 +76,7 @@ export class UserRepository extends Repository<User> {
       .leftJoin('User.memberProjects', 'ProjectsWhereMember')
       .addSelect('COUNT(DISTINCT "ProjectsWhereMember"."projectId")', 'projectsCount')
       .leftJoin('user_roles', 'UserRoles', 'User.id=UserRoles.userId')
-      .addSelect(
-        '(SELECT "name" FROM role where id = COUNT(DISTINCT "UserRoles"."roleId"))',
-        'role'
-      )
+      .addSelect('(SELECT "name" FROM role where id = COUNT(DISTINCT "UserRoles"."roleId"))', 'role')
       .addSelect('(SELECT "url" FROM media where id = "User"."avatarId")', 'avatar')
       .orderBy(`User.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC')
       .groupBy('User.id')

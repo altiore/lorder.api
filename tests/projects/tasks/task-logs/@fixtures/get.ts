@@ -1,5 +1,3 @@
-import moment = require('moment');
-
 import { ROLES } from '../../../../../src/@orm/role';
 import { ACCESS_LEVEL } from '../../../../../src/@orm/user-project';
 import {

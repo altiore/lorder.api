@@ -27,18 +27,9 @@ export class taskClosureTable1578240337153 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {
-    await queryRunner.query(
-      `ALTER TABLE "task_closure" DROP CONSTRAINT "FK_8f5f9490c23d691cdf94a02b1a5"`,
-      undefined
-    );
-    await queryRunner.query(
-      `ALTER TABLE "task_closure" DROP CONSTRAINT "FK_beb11f11d4bf1d65f4d55814c1c"`,
-      undefined
-    );
-    await queryRunner.query(
-      `ALTER TABLE "task" ADD "mpath" character varying DEFAULT ''`,
-      undefined
-    );
+    await queryRunner.query(`ALTER TABLE "task_closure" DROP CONSTRAINT "FK_8f5f9490c23d691cdf94a02b1a5"`, undefined);
+    await queryRunner.query(`ALTER TABLE "task_closure" DROP CONSTRAINT "FK_beb11f11d4bf1d65f4d55814c1c"`, undefined);
+    await queryRunner.query(`ALTER TABLE "task" ADD "mpath" character varying DEFAULT ''`, undefined);
     await queryRunner.query(`DROP INDEX "IDX_8f5f9490c23d691cdf94a02b1a"`, undefined);
     await queryRunner.query(`DROP INDEX "IDX_beb11f11d4bf1d65f4d55814c1"`, undefined);
     await queryRunner.query(`DROP TABLE "task_closure"`, undefined);

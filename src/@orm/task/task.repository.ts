@@ -3,6 +3,7 @@ import { Between, EntityRepository, In, TreeRepository } from 'typeorm';
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Project } from '../project/project.entity';
 import { User } from '../user/user.entity';
+
 import { Task } from './task.entity';
 
 export enum TaskOrderByField {
@@ -30,12 +31,7 @@ export class TaskRepository extends TreeRepository<Task> {
   }
 
   public async findAllWithPagination(
-    {
-      skip = 0,
-      count = 50,
-      orderBy = TaskOrderByField.updatedAt,
-      order = 'desc',
-    }: PaginationDto<TaskOrderByField>,
+    { skip = 0, count = 50, orderBy = TaskOrderByField.updatedAt, order = 'desc' }: PaginationDto<TaskOrderByField>,
     user: User,
     allowedProjectIds: number[] = []
   ): Promise<Task[]> {

@@ -1,14 +1,14 @@
 import { create } from 'cache-manager-redis-store';
 import moment = require('moment');
 
-import { TestHelper } from '../@utils/TestHelper';
-import { projectsFixture } from './@fixtures/projects';
-import { userProjectsFixture } from './@fixtures/userProjects';
-import { usersFixture } from './@fixtures/usersForActivate';
-
 import { User } from '../../src/@orm/user';
 import { ACCESS_LEVEL, UserProject } from '../../src/@orm/user-project';
 import { RedisService } from '../../src/redis/redis.service';
+import { TestHelper } from '../@utils/TestHelper';
+
+import { projectsFixture } from './@fixtures/projects';
+import { userProjectsFixture } from './@fixtures/userProjects';
+import { usersFixture } from './@fixtures/usersForActivate';
 
 const h = new TestHelper('/auth/activate')
   .addFixture(usersFixture)

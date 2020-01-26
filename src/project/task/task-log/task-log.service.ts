@@ -15,12 +15,7 @@ export class TaskLogService {
     private readonly projectTaskService: ProjectTaskService
   ) {}
 
-  public async findAll(
-    project: Project,
-    sequenceNumber: number,
-    listDto: ListDto,
-    user: User
-  ): Promise<TaskLog[]> {
+  public async findAll(project: Project, sequenceNumber: number, listDto: ListDto, user: User): Promise<TaskLog[]> {
     const checkedTask = await this.projectTaskService.checkAccess(sequenceNumber, project, user);
 
     let beforeStartList = [];

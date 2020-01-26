@@ -1,11 +1,5 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotAcceptableException,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-
 import { cloneDeep } from 'lodash';
 
 import { Project } from '../@orm/project';
@@ -14,6 +8,7 @@ import { TASK_CHANGE_TYPE, TaskLogRepository } from '../@orm/task-log';
 import { User } from '../@orm/user';
 import { ACCESS_LEVEL } from '../@orm/user-project';
 import { ProjectService } from '../project/project.service';
+
 import { TaskPagination } from './dto';
 
 @Injectable()
@@ -25,11 +20,7 @@ export class TaskService {
   ) {}
 
   public async findAll(pagesDto: TaskPagination, user: User): Promise<Task[]> {
-    const userProjects = await this.projectService.findAllParticipantByUser(
-      {},
-      user,
-      ACCESS_LEVEL.RED
-    );
+    const userProjects = await this.projectService.findAllParticipantByUser({}, user, ACCESS_LEVEL.RED);
     const projectIds = userProjects.map(el => el.project.id);
     if (!projectIds.length) {
       return [];
@@ -72,12 +63,7 @@ export class TaskService {
       const prevTaskVersion = cloneDeep(task);
       task.isArchived = true;
       await entityManager.save(task);
-      const taskLog = this.taskLogRepo.createTaskLogByType(
-        TASK_CHANGE_TYPE.ARCHIVE,
-        task,
-        user,
-        prevTaskVersion
-      );
+      const taskLog = this.taskLogRepo.createTaskLogByType(TASK_CHANGE_TYPE.ARCHIVE, task, user, prevTaskVersion);
       await entityManager.save(taskLog);
     });
 

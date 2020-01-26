@@ -1,13 +1,8 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotAcceptableException,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Moment } from 'moment';
-
 import moment = require('moment');
+
 import { PaginationDto } from '../@common/dto/pagination.dto';
 import { Project } from '../@orm/project';
 import { User } from '../@orm/user';
@@ -16,13 +11,8 @@ import { UserWork, UserWorkRepository } from '../@orm/user-work';
 import { ProjectService } from '../project/project.service';
 import { TaskService } from '../task/task.service';
 import { UserService } from '../user/user.service';
-import {
-  StartResponse,
-  StopResponse,
-  UserWorkCreateDto,
-  UserWorkEditResultDto,
-  UserWorkPatchDto,
-} from './dto';
+
+import { StartResponse, StopResponse, UserWorkCreateDto, UserWorkEditResultDto, UserWorkPatchDto } from './dto';
 
 @Injectable()
 export class UserWorkService {
@@ -56,9 +46,7 @@ export class UserWorkService {
     }
     const project = await this.projectService.findOneByMember(userWork.projectId, user);
     if (!project || !project.isAccess(accessLevel)) {
-      throw new ForbiddenException(
-        'У вас нет доступа к проекту, к которому принадлежит эта задача'
-      );
+      throw new ForbiddenException('У вас нет доступа к проекту, к которому принадлежит эта задача');
     }
     return userWork;
   }
@@ -68,11 +56,7 @@ export class UserWorkService {
     return await this.userWorkRepo.finishTask(userWorks);
   }
 
-  public async start(
-    project: Project,
-    user: User,
-    userWorkData: UserWorkCreateDto
-  ): Promise<StartResponse> {
+  public async start(project: Project, user: User, userWorkData: UserWorkCreateDto): Promise<StartResponse> {
     // TODO: добавить транзакции на процесс создания всех частей задачи
     // 1. Завершить предыдущие задачи, если есть незавершенные
     const finishedUserWorks = await this.finishNotFinished(user);
@@ -91,9 +75,7 @@ export class UserWorkService {
 
   public async stop(userWork: UserWork, user: User): Promise<StopResponse> {
     if (userWork.finishAt) {
-      throw new NotAcceptableException(
-        'Эта задача уже завершена. Вы не можете завершить одну и ту же задачу дважды'
-      );
+      throw new NotAcceptableException('Эта задача уже завершена. Вы не можете завершить одну и ту же задачу дважды');
     }
     const previous = await this.userWorkRepo.finishTask(userWork);
     let defaultProject;
@@ -122,11 +104,7 @@ export class UserWorkService {
     return this.userWorkRepo.remove(userWork);
   }
 
-  public async update(
-    userWork: UserWork,
-    userWorkDto: UserWorkPatchDto,
-    user: User
-  ): Promise<UserWorkEditResultDto> {
+  public async update(userWork: UserWork, userWorkDto: UserWorkPatchDto, user: User): Promise<UserWorkEditResultDto> {
     // 0. Обернуть выполнение в транзакцию
     let removed = [];
     let touched = [];
@@ -142,12 +120,9 @@ export class UserWorkService {
       // 2. удалить все задачи, полностью включенные в этот промежуток времени
       removed = touchedUserWorks.filter(
         el =>
-          el.startAt.diff(userWorkDto.startAt ? moment(userWorkDto.startAt) : userWork.startAt) >=
-            0 &&
+          el.startAt.diff(userWorkDto.startAt ? moment(userWorkDto.startAt) : userWork.startAt) >= 0 &&
           (el.finishAt
-            ? el.finishAt.diff(
-                userWorkDto.finishAt ? moment(userWorkDto.finishAt) : userWork.finishAt || moment()
-              ) <= 0
+            ? el.finishAt.diff(userWorkDto.finishAt ? moment(userWorkDto.finishAt) : userWork.finishAt || moment()) <= 0
             : !userWorkDto.finishAt)
       );
       if (removed.length) {
@@ -155,15 +130,10 @@ export class UserWorkService {
       }
 
       // 3. изменить все задачи, которые затрагивает этот промежуток времени
-      touched = touchedUserWorks.filter(
-        (tuw: any) => removed.findIndex(el => el.id === tuw.id) === -1
-      );
+      touched = touchedUserWorks.filter((tuw: any) => removed.findIndex(el => el.id === tuw.id) === -1);
       if (touched.length) {
         touched = touched.map(el => {
-          if (
-            el.startAt.diff(userWorkDto.startAt ? moment(userWorkDto.startAt) : userWork.startAt) <
-            0
-          ) {
+          if (el.startAt.diff(userWorkDto.startAt ? moment(userWorkDto.startAt) : userWork.startAt) < 0) {
             el.startAt = moment(userWorkDto.finishAt);
           } else {
             el.finishAt = moment(userWorkDto.startAt);
@@ -199,9 +169,7 @@ export class UserWorkService {
     if (userWorkData.taskId) {
       task = await this.taskService.findOneById(userWorkData.taskId, user);
       if (!task) {
-        throw new NotFoundException(
-          `Указанная задача ${userWorkData.taskId} не найдена в проекте ${project.title}`
-        );
+        throw new NotFoundException(`Указанная задача ${userWorkData.taskId} не найдена в проекте ${project.title}`);
       }
     }
     if (!task) {

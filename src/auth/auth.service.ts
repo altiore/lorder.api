@@ -11,6 +11,7 @@ import { MailAcceptedDto } from '../mail/dto';
 import { MailService } from '../mail/mail.service';
 import { RedisService } from '../redis/redis.service';
 import { UserService } from '../user/user.service';
+
 import { ActivateDto, IdentityDto } from './dto';
 import { JwtPayload } from './interfaces';
 

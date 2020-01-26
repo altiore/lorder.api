@@ -1,17 +1,11 @@
 import moment = require('moment');
 
-import { TestHelper } from '../@utils/TestHelper';
-import {
-  projectsFixture,
-  tasksFixture,
-  userProjectsFixture,
-  usersFixture,
-  userWorksFixture,
-} from './@fixtures/post';
-
 import { Task } from '../../src/@orm/task';
 import { User } from '../../src/@orm/user';
 import { UserWork } from '../../src/@orm/user-work';
+import { TestHelper } from '../@utils/TestHelper';
+
+import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/post';
 
 const h = new TestHelper('/user-works')
   .addFixture(usersFixture)

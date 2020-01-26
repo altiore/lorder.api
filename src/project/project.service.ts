@@ -1,17 +1,13 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotAcceptableException,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { find, get, pick } from 'lodash';
+import { get, pick } from 'lodash';
 
 import { Project, ProjectDto, ProjectRepository } from '../@orm/project';
 import { ProjectPub, ProjectPubRepository } from '../@orm/project-pub';
 import { Task, TaskRepository } from '../@orm/task';
 import { User } from '../@orm/user';
 import { ACCESS_LEVEL, UserProject, UserProjectRepository } from '../@orm/user-project';
+
 import { ProjectPaginationDto } from './@dto';
 
 @Injectable()
@@ -19,8 +15,7 @@ export class ProjectService {
   constructor(
     @InjectRepository(ProjectRepository) private readonly projectRepo: ProjectRepository,
     @InjectRepository(ProjectPubRepository) private readonly projectPubRepo: ProjectPubRepository,
-    @InjectRepository(UserProjectRepository)
-    private readonly userProjectRepo: UserProjectRepository,
+    @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository,
     @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository
   ) {}
 
@@ -75,11 +70,7 @@ export class ProjectService {
     user: User,
     minimumAccessLevel?: ACCESS_LEVEL
   ): Promise<UserProject[]> {
-    return await this.userProjectRepo.findAllParticipantProjects(
-      pagesDto,
-      user,
-      minimumAccessLevel
-    );
+    return await this.userProjectRepo.findAllParticipantProjects(pagesDto, user, minimumAccessLevel);
   }
 
   public async findAllBySuperAdmin(pagesDto: ProjectPaginationDto): Promise<Project[]> {
@@ -108,12 +99,13 @@ export class ProjectService {
         relations: ['members', 'pub'],
         where: { id: project.id },
       });
-      const data: {
-        [key in any]: { value: number; time: number }
-      } = projectWithMembers.members.reduce((res, member: UserProject) => {
-        res[member.member.id] = { time: 0, value: 0 };
-        return res;
-      }, {});
+      const data: { [key in any]: { value: number; time: number } } = projectWithMembers.members.reduce(
+        (res, member: UserProject) => {
+          res[member.member.id] = { time: 0, value: 0 };
+          return res;
+        },
+        {}
+      );
       const step = 2;
       let i = 0;
       let tasksPortion;
@@ -142,8 +134,7 @@ export class ProjectService {
               //  проекта, если у них есть хотя бы одна не нулевая работа
               if (data[taskUser.id]) {
                 // TODO: учитывать так же коэффициент роли пользователя
-                data[taskUser.id].value +=
-                  Math.round((100 * (task.value || 0)) / membersCount) / 100;
+                data[taskUser.id].value += Math.round((100 * (task.value || 0)) / membersCount) / 100;
               }
             });
           }

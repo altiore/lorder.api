@@ -36,17 +36,9 @@ export class projectRoles1577559827834 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {
-    await queryRunner.query(
-      `DELETE FROM "role" WHERE "id" in (11,12,14,15,16,17,18,19,20,21,22,23,24,25,26,27);`
-    );
-    await queryRunner.query(
-      `ALTER TABLE "project_role" DROP CONSTRAINT "FK_e3ce53609728362ae1205f060a7"`,
-      undefined
-    );
-    await queryRunner.query(
-      `ALTER TABLE "project_role" DROP CONSTRAINT "FK_ccacbfebf9617b76351dd93a21c"`,
-      undefined
-    );
+    await queryRunner.query(`DELETE FROM "role" WHERE "id" in (11,12,14,15,16,17,18,19,20,21,22,23,24,25,26,27);`);
+    await queryRunner.query(`ALTER TABLE "project_role" DROP CONSTRAINT "FK_e3ce53609728362ae1205f060a7"`, undefined);
+    await queryRunner.query(`ALTER TABLE "project_role" DROP CONSTRAINT "FK_ccacbfebf9617b76351dd93a21c"`, undefined);
     await queryRunner.query(`DROP TABLE "project_role"`, undefined);
   }
 }

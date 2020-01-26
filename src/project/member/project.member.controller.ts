@@ -14,7 +14,6 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import * as jwt from 'jsonwebtoken';
 import { DeepPartial } from 'typeorm';
 
 import { Roles, UserJWT } from '../../@common/decorators';
@@ -25,7 +24,7 @@ import { EmailDto, User } from '../../@orm/user';
 import { ACCESS_LEVEL, UserProject } from '../../@orm/user-project';
 import { AccessLevel, ProjectParam } from '../@common/decorators';
 import { AccessLevelGuard } from '../@common/guards';
-import { ProjectService } from '../project.service';
+
 import { UserProjectUpdateDto } from './dto/user-project.update.dto';
 import { ProjectMemberService } from './project.member.service';
 
@@ -35,10 +34,7 @@ import { ProjectMemberService } from './project.member.service';
 @Controller('projects/:projectId/members')
 @UseInterceptors(CacheInterceptor)
 export class ProjectMemberController {
-  constructor(
-    private readonly projectService: ProjectService,
-    private readonly projectMemberService: ProjectMemberService
-  ) {}
+  constructor(private readonly projectMemberService: ProjectMemberService) {}
 
   @ApiResponse({
     description: 'Список всех пользователей проекта',

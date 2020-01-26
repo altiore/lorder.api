@@ -9,7 +9,7 @@ export class superAdmin1529922301306 implements MigrationInterface {
     const [{ id: adminRoleId }] = await queryRunner.query(`SELECT id FROM "role" WHERE name='admin';`);
     const [{ id: userRoleId }] = await queryRunner.query(`SELECT id FROM "role" WHERE name='user';`);
     await queryRunner.query(
-      `INSERT INTO "user_roles" ("userId", "roleId") VALUES (${superAdminId}, ${superAdminRoleId}), (${superAdminId}, ${adminRoleId}), (${superAdminId}, ${userRoleId});`,
+      `INSERT INTO "user_roles" ("userId", "roleId") VALUES (${superAdminId}, ${superAdminRoleId}), (${superAdminId}, ${adminRoleId}), (${superAdminId}, ${userRoleId});`
     );
   }
 

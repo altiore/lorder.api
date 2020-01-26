@@ -1,18 +1,6 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { DeepPartial } from 'typeorm';
 
 import { Roles, UserJWT } from '../@common/decorators';
 import { PaginationDto } from '../@common/dto/pagination.dto';
@@ -23,13 +11,8 @@ import { ACCESS_LEVEL } from '../@orm/user-project';
 import { UserWork } from '../@orm/user-work';
 import { AccessLevel, ProjectParam } from '../project/@common/decorators';
 import { AccessLevelGuard } from '../project/@common/guards';
-import {
-  StartResponse,
-  StopResponse,
-  UserWorkCreateDto,
-  UserWorkEditResultDto,
-  UserWorkPatchDto,
-} from './dto';
+
+import { StartResponse, StopResponse, UserWorkCreateDto, UserWorkEditResultDto, UserWorkPatchDto } from './dto';
 import { UserWorkService } from './user-work.service';
 
 @ApiBearerAuth()
@@ -86,10 +69,7 @@ export class UserWorkController {
   @Delete(':userWorkId')
   @Roles('user')
   @ApiResponse({ status: 200, type: UserWork, description: 'ACCESS_LEVEL.RED' })
-  public async delete(
-    @Param('userWorkId', ParseIntPipe) userWorkId: number,
-    @UserJWT() user: User
-  ): Promise<UserWork> {
+  public async delete(@Param('userWorkId', ParseIntPipe) userWorkId: number, @UserJWT() user: User): Promise<UserWork> {
     const userWork = await this.userWorkService.findOneByUserAndCheckAccess(userWorkId, user);
     return await this.userWorkService.remove(userWork);
   }

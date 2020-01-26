@@ -1,15 +1,14 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ListResponseDto, PaginationDto } from '@common/dto';
+import { ValidationException } from '@common/exceptions/validation.exception';
+import { ForbiddenException, Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Project } from '@orm/project';
+import { ProjectTaskTypeRepository } from '@orm/project-task-type';
+import { Task, TaskRepository } from '@orm/task';
+import { User, UserRepository } from '@orm/user';
+import { ACCESS_LEVEL, UserProjectRepository } from '@orm/user-project';
+import { TaskService } from 'task/task.service';
 
-import { ListResponseDto, PaginationDto } from '../../@common/dto';
-import { ValidationException } from '../../@common/exceptions/validation.exception';
-import { Project } from '../../@orm/project';
-import { ProjectTaskTypeRepository } from '../../@orm/project-task-type';
-import { Task, TaskRepository } from '../../@orm/task';
-import { TaskTypeRepository } from '../../@orm/task-type';
-import { User, UserRepository } from '../../@orm/user';
-import { ACCESS_LEVEL, UserProjectRepository } from '../../@orm/user-project';
-import { TaskService } from '../../task/task.service';
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
 import { ProjectTaskGateway } from './project.task.gateway';
 
@@ -19,11 +18,8 @@ export class ProjectTaskService {
     // TODO: remove taskRepo from this file and use taskService instead!!!
     @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository,
     @InjectRepository(UserRepository) private readonly userRepo: UserRepository,
-    @InjectRepository(UserProjectRepository)
-    private readonly userProjectRepo: UserProjectRepository,
-    @InjectRepository(TaskTypeRepository) private readonly taskTypeRepo: TaskTypeRepository,
-    @InjectRepository(ProjectTaskTypeRepository)
-    private readonly projectTaskTypeRepo: ProjectTaskTypeRepository,
+    @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository,
+    @InjectRepository(ProjectTaskTypeRepository) private readonly projectTaskTypeRepo: ProjectTaskTypeRepository,
     private readonly taskGateway: ProjectTaskGateway,
     private readonly taskService: TaskService
   ) {}
@@ -50,22 +46,24 @@ export class ProjectTaskService {
   ): Promise<Task> {
     // 1. Проверить соответсвие проекта задаче и уровень доступа пользователя к проекту
     const checkedTask = await this.checkAccess(sequenceNumber, project, user, ACCESS_LEVEL.YELLOW);
-    // 2. Подготовить данные для обновления задачи
+
+    // 2. Проверить, что задача может быть изменена (Законченная или заархивированная задача не может быть изменена)
+    this.checkCanBeEdit(checkedTask);
+
+    // 3. Подготовить данные для обновления задачи
     const preparedData = await this.parseTaskDtoToTaskObj(taskUpdateDto, project.id);
-    // 3. Обновить задачу
+
+    // 4. Обновить задачу
     const updatedTask = await this.taskService.updateByUser(checkedTask, preparedData, user);
-    // 4. Отправить всем пользователям обновленные данные задачи
+
+    // 5. Отправить всем пользователям обновленные данные задачи
     this.taskGateway.updateTaskForAll(updatedTask);
-    // 5. Вернуть измененную задачу
+
+    // 6. Вернуть измененную задачу
     return updatedTask;
   }
 
-  public async move(
-    sequenceNumber: number,
-    project: Project,
-    user: User,
-    taskMoveDto: TaskMoveDto
-  ): Promise<Task> {
+  public async move(sequenceNumber: number, project: Project, user: User, taskMoveDto: TaskMoveDto): Promise<Task> {
     // 1. Проверить соответсвие проекта задаче и уровень доступа пользователя к проекту
     const checkedTask = await this.checkAccess(sequenceNumber, project, user);
     // 2. TODO: проверить разрешенное перемещение задачи для данного статуса
@@ -163,5 +161,20 @@ export class ProjectTaskService {
       }
     }
     return preparedData;
+  }
+
+  private checkCanBeEdit(task: Task): void {
+    if (task.isArchived) {
+      throw new NotAcceptableException('Заархивированная задача не может быть изменена');
+    }
+    // TODO: проверить так же, была ли задача завершена, в соответсвии с обновленным FLOW задач
+    if (task.status >= 4) {
+      throw new NotAcceptableException(
+        'Завершенная задача не может быть изменена! Это противоречит логике,' +
+          ' ведь задача была оценена, описанная именно этим образом. Если мы изменим задачу после окончания,' +
+          ' это будет означать, что мы должы изменить и ее оценку. Во избежание недоразумений,' +
+          ' мы запрещаем изменять выполненные задачи.'
+      );
+    }
   }
 }

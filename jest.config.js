@@ -6,8 +6,10 @@ module.exports = {
   moduleDirectories: ['node_modules', 'src'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   collectCoverageFrom: [
-    '**/*.{ts,tsx}',
+    'src/**/*.{ts,tsx}',
     '!**/*.d.{ts,tsx}',
+    '!**/*.spec.{ts,tsx}',
+    '!**/*.test.{ts,tsx}',
     '!**/node_modules/**',
     '!**/vendor/**',
     '!**/@migrations/**',

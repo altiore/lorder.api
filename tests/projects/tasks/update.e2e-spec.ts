@@ -1,12 +1,8 @@
 import { TestHelper } from '../../@utils/TestHelper';
-import {
-  projectsFixture,
-  tasksFixture,
-  userProjectsFixture,
-  usersFixture,
-} from './@fixtures/patch';
 
-const h = new TestHelper('/projects/:projectId/tasks/:sequenceNumber/move')
+import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture } from './@fixtures/update';
+
+const h = new TestHelper('/projects/:projectId/tasks/:sequenceNumber')
   .addFixture(usersFixture)
   .addFixture(projectsFixture)
   .addFixture(userProjectsFixture)
@@ -15,7 +11,7 @@ const h = new TestHelper('/projects/:projectId/tasks/:sequenceNumber/move')
 let projectId: number;
 let taskSequenceNumber: number;
 
-describe(`PATCH ${h.url}`, () => {
+describe(`UPDATE ${h.url}`, () => {
   beforeAll(async () => {
     await h.before();
     projectId = h.entities.Project[0].id;
@@ -38,24 +34,33 @@ describe(`PATCH ${h.url}`, () => {
     const { body } = await h
       .requestBy('project-owner@mail.com')
       .patch(h.path(projectId, taskSequenceNumber))
-      .send({ status: 3 })
+      .send({ title: 'Title Changed By Owner' })
       .expect(200);
     expect(body).toEqual(
       expect.objectContaining({
-        status: 3,
+        title: 'Title Changed By Owner',
       })
     );
+  });
+
+  it('by project member with status less then YELLOW', async () => {
+    const taskNumber = h.entities.Task.find(el => el.title === 'performer IS NOT current user').sequenceNumber;
+    await h
+      .requestBy('member@mail.com')
+      .patch(h.path(projectId, taskNumber))
+      .send({ title: 'New Title' })
+      .expect(403);
   });
 
   it('by project member', async () => {
     const { body } = await h
       .requestBy('member@mail.com')
       .patch(h.path(projectId, taskSequenceNumber))
-      .send({ status: 3 })
+      .send({ title: 'New Title' })
       .expect(200);
     expect(body).toEqual(
       expect.objectContaining({
-        status: 3,
+        title: 'New Title',
       })
     );
   });
@@ -77,12 +82,30 @@ describe(`PATCH ${h.url}`, () => {
     const { body } = await h
       .requestBy('access-level-white@mail.com')
       .patch(h.path(projectId, taskSequenceNumber))
-      .send({ status: 3 })
+      .send({ title: 'New Title' })
       .expect(403);
     expect(body).toEqual({
       error: 'Forbidden',
       message: expect.any(String),
       statusCode: 403,
     });
+  });
+
+  it('try to edit archived task by member', async () => {
+    const taskNumber = h.entities.Task.find(el => el.title === 'archived task').sequenceNumber;
+    await h
+      .requestBy('member@mail.com')
+      .patch(h.path(projectId, taskNumber))
+      .send({ title: 'New Title' })
+      .expect(406);
+  });
+
+  it('try to edit finished task by member', async () => {
+    const taskNumber = h.entities.Task.find(el => el.title === 'finished task').sequenceNumber;
+    await h
+      .requestBy('member@mail.com')
+      .patch(h.path(projectId, taskNumber))
+      .send({ title: 'New Title' })
+      .expect(406);
   });
 });

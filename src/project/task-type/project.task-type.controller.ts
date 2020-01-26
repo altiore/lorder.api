@@ -1,17 +1,6 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import * as jwt from 'jsonwebtoken';
 import { DeepPartial, DeleteResult } from 'typeorm';
 
 import { Roles, UserJWT } from '../../@common/decorators';
@@ -23,7 +12,7 @@ import { User } from '../../@orm/user';
 import { ACCESS_LEVEL } from '../../@orm/user-project';
 import { AccessLevel, ProjectParam } from '../@common/decorators';
 import { AccessLevelGuard } from '../@common/guards';
-import { ProjectService } from '../project.service';
+
 import { CreateTaskTypeDto, TaskTypeDto, TaskTypesDto } from './dto';
 import { ProjectTaskTypeService } from './project.task-type.service';
 
@@ -32,10 +21,7 @@ import { ProjectTaskTypeService } from './project.task-type.service';
 @UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
 @Controller('projects/:projectId/task-types')
 export class ProjectTaskTypeController {
-  constructor(
-    private readonly projectService: ProjectService,
-    private readonly projectTaskTypeService: ProjectTaskTypeService
-  ) {}
+  constructor(private readonly projectTaskTypeService: ProjectTaskTypeService) {}
 
   @ApiResponse({
     description: 'All project task types',

@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
 import { ROLES } from '../../@orm/role';
 
 export class IdentityDto {

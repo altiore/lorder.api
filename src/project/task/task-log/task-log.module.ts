@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { TaskLogRepository } from '../../../@orm/task-log';
 import { ProjectModule } from '../../project.module';
+
 import { TaskLogController } from './task-log.controller';
 import { TaskLogService } from './task-log.service';
 

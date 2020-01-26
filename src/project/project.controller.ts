@@ -1,21 +1,11 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Auth, res, UserJWT } from '@common/decorators';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Project, ProjectDto } from '@orm/project';
+import { ROLES } from '@orm/role';
+import { User } from '@orm/user';
+import { ACCESS_LEVEL, UserProject } from '@orm/user-project';
 
-import { Auth, res, UserJWT } from '../@common/decorators';
-import { Project, ProjectDto } from '../@orm/project';
-import { ROLES } from '../@orm/role';
-import { User } from '../@orm/user';
-import { ACCESS_LEVEL, UserProject } from '../@orm/user-project';
 import { ProjectParam } from './@common/decorators';
 import { ProjectPaginationDto } from './@dto';
 import { ProjectService } from './project.service';
@@ -27,19 +17,13 @@ export class ProjectController {
 
   @Get()
   @Auth(res(Project).getMany, ROLES.USER)
-  public async allOwn(
-    @UserJWT() user: User,
-    @Query() pagesDto: ProjectPaginationDto
-  ): Promise<UserProject[]> {
+  public async allOwn(@UserJWT() user: User, @Query() pagesDto: ProjectPaginationDto): Promise<UserProject[]> {
     return this.projectService.findAllParticipantByUser(pagesDto, user);
   }
 
   @Get('all')
   @Auth(res(Project).getMany, ROLES.SUPER_ADMIN)
-  public async all(
-    @UserJWT() user: User,
-    @Query() pagesDto: ProjectPaginationDto
-  ): Promise<Project[]> {
+  public async all(@UserJWT() user: User, @Query() pagesDto: ProjectPaginationDto): Promise<Project[]> {
     return this.projectService.findAllBySuperAdmin(pagesDto);
   }
 

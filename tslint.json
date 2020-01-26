@@ -9,6 +9,39 @@
     "quotemark": [true, "single"],
     "indent": false,
     "member-access": [false],
+    "ordered-imports": [
+      true,
+      {
+        "grouped-imports": true,
+        "groups": [
+          {
+            "name": "@nextjs",
+            "match": "^@nextjs",
+            "order": 10
+          },
+          {
+            "name": "external libraries",
+            "match": "^@google-cloud|@sendgrid|cache-manager|cache-manager-redis-store|class-transformer|class-validator|cookie-parser|crypto|fastify-formbody|fastify-swagger|generate-password|gravatar|helmet|jsonwebtoken|lodash|moment|multer|mustache|passport|passport-http-bearer|passport-jwt|pg|redis|reflect-metadata|rxjs|socket.io-redis|swagger-ui-express|typeorm",
+            "order": 20
+          },
+          {
+            "name": "local common modules",
+            "match": "^@",
+            "order": 30
+          },
+          {
+            "name": "local modules",
+            "match": "^\\w",
+            "order": 40
+          },
+          {
+            "name": "relative modules",
+            "match": "^\\.",
+            "order": 50
+          }
+        ]
+      }
+    ],
     "max-line-length": [true, 120],
     "no-unused-variable": true,
     "curly": false,

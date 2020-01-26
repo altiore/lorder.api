@@ -1,16 +1,10 @@
 import * as moment from 'moment';
 
-import { TestHelper } from '../../@utils/TestHelper';
-import {
-  projectsFixture,
-  tasksFixture,
-  userProjectsFixture,
-  usersFixture,
-  userWorksFixture,
-} from './@fixtures/patch';
-
 import { Task } from '../../../src/@orm/task';
 import { UserWork } from '../../../src/@orm/user-work';
+import { TestHelper } from '../../@utils/TestHelper';
+
+import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/patch';
 
 const h = new TestHelper('/user-works/:userTaskId/stop')
   .addFixture(usersFixture)
@@ -20,13 +14,11 @@ const h = new TestHelper('/user-works/:userTaskId/stop')
   .addFixture(userWorksFixture);
 
 describe(`PATCH ${h.url}`, () => {
-  let projectId: number;
   let notFinishedUserWorkId: number;
   let finishedUserWorkId: number;
 
   beforeAll(async () => {
     await h.before();
-    projectId = h.entities.Project[0].id;
     notFinishedUserWorkId = h.entities.UserWork.find(el => el.task.title === 'NotFinished').id;
     finishedUserWorkId = h.entities.UserWork.find(el => el.task.title === 'Finished').id;
   });

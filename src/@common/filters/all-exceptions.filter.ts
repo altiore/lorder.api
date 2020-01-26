@@ -16,10 +16,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         case 'EntityNotFound': {
           const status = HttpStatus.NOT_FOUND;
           response.status(status).send({
-            message:
-              process.env.NODE_ENV === 'development'
-                ? exception.message
-                : 'Requested Entity not found',
+            message: process.env.NODE_ENV === 'development' ? exception.message : 'Requested Entity not found',
             statusCode: status,
           });
           break;
@@ -53,10 +50,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
           } else {
             const status = HttpStatus.INTERNAL_SERVER_ERROR;
             response.status(status).send({
-              message:
-                (exception && exception.message) || exception.toString
-                  ? exception.toString()
-                  : 'NO',
+              message: (exception && exception.message) || exception.toString ? exception.toString() : 'NO',
               statusCode: status,
             });
           }

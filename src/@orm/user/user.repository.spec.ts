@@ -1,4 +1,5 @@
 import { TypeormTestHelper } from '../typeorm.test.helper';
+
 import { UserRepository } from './user.repository';
 
 const tth = new TypeormTestHelper();
@@ -14,7 +15,7 @@ describe('The UserRepository', () => {
   });
 
   it('createEntity', async () => {
-    const { user, password } = await userRepository.createWithRoles(
+    const { user } = await userRepository.createWithRoles(
       {
         email: 'test',
       },

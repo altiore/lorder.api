@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Project, ProjectRepository } from '../@orm/project';
-import { ProjectPub, ProjectPubRepository } from '../@orm/project-pub';
+import { ProjectRepository } from '../@orm/project';
+import { ProjectPubRepository } from '../@orm/project-pub';
 import { User, UserRepository } from '../@orm/user';
+
 import { StatisticsResponse } from './dto';
 
 function randomInteger(min, max) {

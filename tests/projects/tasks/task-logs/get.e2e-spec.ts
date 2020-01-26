@@ -1,4 +1,5 @@
 import { TestHelper } from '../../../@utils/TestHelper';
+
 import {
   projectsFixture,
   taskLogsFixture,
@@ -39,9 +40,7 @@ describe(`GET ${h.url}`, () => {
   });
 
   it('try to get task-logs from forbidden project', async () => {
-    const forbiddenProjectId = h.entities.Project.find(
-      el => el.owner.email === 'unknown-other-user@mail.com'
-    ).id;
+    const forbiddenProjectId = h.entities.Project.find(el => el.owner.email === 'unknown-other-user@mail.com').id;
     await h
       .requestBy('user@mail.com')
       .get(h.path(forbiddenProjectId, taskSequenceNumber))
@@ -52,8 +51,7 @@ describe(`GET ${h.url}`, () => {
    * This test does not make sense any more, because we use task sequenceNumber instead of taskId
    */
   it('try to get task-logs from wrong task', async () => {
-    const wrongTaskSequenceNumber = h.entities.Task.find(el => el.title === 'Fourth Task')
-      .sequenceNumber;
+    const wrongTaskSequenceNumber = h.entities.Task.find(el => el.title === 'Fourth Task').sequenceNumber;
     await h
       .requestBy('user@mail.com')
       .get(h.path(projectId, wrongTaskSequenceNumber))

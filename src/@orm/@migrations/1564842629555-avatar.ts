@@ -5,9 +5,7 @@ export class avatar1564842629555 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE "user" RENAME COLUMN "avatar" TO "avatarId"`);
     await queryRunner.query(`ALTER TABLE "user" DROP COLUMN "avatarId"`);
     await queryRunner.query(`ALTER TABLE "user" ADD "avatarId" integer`);
-    await queryRunner.query(
-      `ALTER TABLE "user" ADD CONSTRAINT "UQ_58f5c71eaab331645112cf8cfa5" UNIQUE ("avatarId")`
-    );
+    await queryRunner.query(`ALTER TABLE "user" ADD CONSTRAINT "UQ_58f5c71eaab331645112cf8cfa5" UNIQUE ("avatarId")`);
     await queryRunner.query(
       `ALTER TABLE "user" ADD CONSTRAINT "FK_58f5c71eaab331645112cf8cfa5" FOREIGN KEY ("avatarId") REFERENCES "media"("id")`
     );

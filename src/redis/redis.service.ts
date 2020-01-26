@@ -1,5 +1,4 @@
-import { CacheModuleOptions, Inject, Injectable } from '@nestjs/common';
-import { RedisClient } from 'redis';
+import { Inject, Injectable } from '@nestjs/common';
 import * as guid from 'uuid/v4';
 
 import { UserDataDto } from './dto/user.data.dto';

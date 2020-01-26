@@ -3,6 +3,7 @@ import { EntityRepository, TreeRepository } from 'typeorm';
 
 import { Task } from '../task/task.entity';
 import { User } from '../user/user.entity';
+
 import { TASK_CHANGE_TYPE, TaskLog } from './task-log.entity';
 
 @EntityRepository(TaskLog)
@@ -16,13 +17,7 @@ export class TaskLogRepository extends TreeRepository<TaskLog> {
     return this.create({
       changeType: taskChangeType,
       createdBy: performer,
-      prevVersion: omit(prevVersion || task, [
-        'performer',
-        'userWorks',
-        'users',
-        'project',
-        'children',
-      ]),
+      prevVersion: omit(prevVersion || task, ['performer', 'userWorks', 'users', 'project', 'children']),
       task,
     });
   }

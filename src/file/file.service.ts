@@ -81,11 +81,9 @@ export class FileService {
   }
 
   private getMediaUrl(uploadResponse: UploadResponse) {
-    return [
-      'https:/',
-      `${uploadResponse[0].metadata.bucket}.${BASE_GOOGLE_URL}`,
-      uploadResponse[0].metadata.name,
-    ].join('/');
+    return ['https:/', `${uploadResponse[0].metadata.bucket}.${BASE_GOOGLE_URL}`, uploadResponse[0].metadata.name].join(
+      '/'
+    );
   }
 
   private getObjectName(media: Media): string {
