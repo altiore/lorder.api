@@ -17,30 +17,20 @@ pipelines:
   branches:
     staging:
       - step:
-          name: Staging build
-          caches:
-            - node
-          script:
-            - npm ci
-            - npm run build
-          services:
-            - postgres
-            - redis
-      - step:
           name: Staging tests
           caches:
             - node
           script:
-            - ls -l
+            - npm ci
             - npm run test:remote
           services:
             - postgres
             - redis
       - step:
           name: Staging DEPLOY
-          deployment: staging
           caches:
             - node
+          deployment: staging
           script:
             - npm run build
             - cd heroku
@@ -55,20 +45,11 @@ pipelines:
             - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$STAGING_APP_NAME.git -f HEAD:master
     master:
       - step:
-          name: Production build
-          caches:
-            - node
-          script:
-            - npm ci
-            - npm run build
-          services:
-            - postgres
-            - redis
-      - step:
           name: Production tests
           caches:
             - node
           script:
+            - npm ci
             - npm run test:remote
           services:
             - postgres

@@ -1,11 +1,11 @@
 import { Storage, UploadResponse } from '@google-cloud/storage';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CLOUD_TYPE, Media, MEDIA_TYPE, MediaRepository } from '@orm/media';
 import * as fs from 'fs';
 import { get } from 'lodash';
 
 import { parseGoogleObjName } from '../@common/helpers/parseGoogleObjName';
-import { CLOUD_TYPE, Media, MEDIA_TYPE, MediaRepository } from '../@orm/media';
 
 const BASE_GOOGLE_URL = 'storage.googleapis.com';
 

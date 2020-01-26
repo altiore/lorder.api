@@ -1,9 +1,9 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { TaskOrderByField } from '@orm/task';
 import { IsIn, IsOptional, IsString } from 'class-validator';
 import { toArray } from 'lodash';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
-import { TaskOrderByField } from '../../@orm/task';
 
 export class TaskPagination extends PaginationDto {
   @ApiPropertyOptional({ type: String })

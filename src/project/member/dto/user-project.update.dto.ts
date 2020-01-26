@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsNotEmpty, IsNumber, Max, Min } from 'class-validator';
 
-import { ACCESS_LEVEL } from '../../../@orm/user-project';
+import { ACCESS_LEVEL } from '@orm/user-project';
 
 export class UserProjectUpdateDto {
   @ApiProperty()

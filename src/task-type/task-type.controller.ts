@@ -1,10 +1,10 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { TaskType, TaskTypeCreateDto } from '@orm/task-type';
 
 import { Roles } from '../@common/decorators';
 import { RolesGuard } from '../@common/guards';
-import { TaskType, TaskTypeCreateDto } from '../@orm/task-type';
 
 import { TaskTypeService } from './task-type.service';
 

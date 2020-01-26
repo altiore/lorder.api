@@ -1,15 +1,15 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Project } from '@orm/project';
+import { ProjectTaskType } from '@orm/project-task-type';
+import { TaskType } from '@orm/task-type';
+import { User } from '@orm/user';
+import { ACCESS_LEVEL } from '@orm/user-project';
 import { DeepPartial, DeleteResult } from 'typeorm';
 
 import { Roles, UserJWT } from '../../@common/decorators';
 import { RolesGuard } from '../../@common/guards';
-import { Project } from '../../@orm/project';
-import { ProjectTaskType } from '../../@orm/project-task-type';
-import { TaskType } from '../../@orm/task-type';
-import { User } from '../../@orm/user';
-import { ACCESS_LEVEL } from '../../@orm/user-project';
 import { AccessLevel, ProjectParam } from '../@common/decorators';
 import { AccessLevelGuard } from '../@common/guards';
 

@@ -1,9 +1,9 @@
 import { applyDecorators, SetMetadata, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiResponseOptions, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ROLES } from '@orm/role';
+import { ACCESS_LEVEL } from '@orm/user-project';
 
-import { ROLES } from '../../@orm/role';
-import { ACCESS_LEVEL } from '../../@orm/user-project';
 import { AccessLevelGuard } from '../../project/@common/guards';
 import { RolesGuard } from '../guards';
 

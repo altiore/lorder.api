@@ -10,7 +10,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-import { Task } from '../../@orm/task';
+import { Task } from '@orm/task';
 
 const PROJECT_ROOM_PREFIX = 'ProjectRoom';
 

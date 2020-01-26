@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { MediaRepository } from '../@orm/media';
+import { MediaRepository } from '@orm/media';
 
 import { FileController } from './file.controller';
 import { FileService } from './file.service';

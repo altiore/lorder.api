@@ -15,14 +15,14 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Media } from '@orm/media';
+import { User } from '@orm/user';
 
 import { Roles } from '../@common/decorators/roles.decorator';
 import { UserJWT } from '../@common/decorators/user-jwt.decorator';
 import { FileUploadDto } from '../@common/dto';
 import { RolesGuard } from '../@common/guards/roles.guard';
 import { MyFileInterceptor } from '../@common/interceptors';
-import { Media } from '../@orm/media';
-import { User } from '../@orm/user';
 
 import { UserDto, UserPaginationDto } from './dto';
 import { UserService } from './user.service';

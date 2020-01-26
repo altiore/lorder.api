@@ -1,11 +1,11 @@
 import { Controller, Get, NotFoundException, Param, ParseIntPipe, Patch, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Task } from '@orm/task';
+import { User } from '@orm/user';
 
 import { Roles, UserJWT } from '../@common/decorators';
 import { RolesGuard } from '../@common/guards';
-import { Task } from '../@orm/task';
-import { User } from '../@orm/user';
 
 import { TaskPagination } from './dto';
 import { TaskService } from './task.service';

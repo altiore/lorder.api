@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ProjectRoleRepository } from '@orm/project-role';
 
-import { ProjectRoleRepository } from '../../@orm/project-role';
 import { ProjectModule } from '../project.module';
 
 import { ProjectRoleController } from './project-role.controller';

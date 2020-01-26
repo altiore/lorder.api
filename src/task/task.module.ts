@@ -1,9 +1,9 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TaskRepository } from '@orm/task';
+import { TaskLogRepository } from '@orm/task-log';
+import { AuthModule } from 'auth/auth.module';
 
-import { TaskRepository } from '../@orm/task';
-import { TaskLogRepository } from '../@orm/task-log';
-import { AuthModule } from '../auth/auth.module';
 import { ProjectModule } from '../project/project.module';
 
 import { TaskController } from './task.controller';

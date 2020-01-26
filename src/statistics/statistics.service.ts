@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { ProjectRepository } from '../@orm/project';
-import { ProjectPubRepository } from '../@orm/project-pub';
-import { User, UserRepository } from '../@orm/user';
+import { ProjectRepository } from '@orm/project';
+import { ProjectPubRepository } from '@orm/project-pub';
+import { User, UserRepository } from '@orm/user';
 
 import { StatisticsResponse } from './dto';
 

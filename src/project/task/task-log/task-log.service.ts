@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Project } from '@orm/project';
+import { TaskLog, TaskLogRepository } from '@orm/task-log';
+import { User } from '@orm/user';
 import { LessThan, MoreThan } from 'typeorm';
 
 import { ListDto } from '../../../@common/dto';
-import { Project } from '../../../@orm/project';
-import { TaskLog, TaskLogRepository } from '../../../@orm/task-log';
-import { User } from '../../../@orm/user';
 import { ProjectTaskService } from '../project.task.service';
 
 @Injectable()

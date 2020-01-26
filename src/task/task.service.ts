@@ -1,12 +1,12 @@
 import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Project } from '@orm/project';
+import { Task, TaskRepository } from '@orm/task';
+import { TASK_CHANGE_TYPE, TaskLogRepository } from '@orm/task-log';
+import { User } from '@orm/user';
+import { ACCESS_LEVEL } from '@orm/user-project';
 import { cloneDeep } from 'lodash';
 
-import { Project } from '../@orm/project';
-import { Task, TaskRepository } from '../@orm/task';
-import { TASK_CHANGE_TYPE, TaskLogRepository } from '../@orm/task-log';
-import { User } from '../@orm/user';
-import { ACCESS_LEVEL } from '../@orm/user-project';
 import { ProjectService } from '../project/project.service';
 
 import { TaskPagination } from './dto';

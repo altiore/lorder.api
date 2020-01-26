@@ -1,12 +1,12 @@
 import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Project } from '@orm/project';
+import { EmailDto, User, UserRepository } from '@orm/user';
+import { UserProject, UserProjectRepository } from '@orm/user-project';
+import { AuthService } from 'auth/auth.service';
 import { DeepPartial } from 'typeorm';
 
 import { IdDto } from '../../@common/dto';
-import { Project } from '../../@orm/project';
-import { EmailDto, User, UserRepository } from '../../@orm/user';
-import { UserProject, UserProjectRepository } from '../../@orm/user-project';
-import { AuthService } from '../../auth/auth.service';
 
 @Injectable()
 export class ProjectMemberService {

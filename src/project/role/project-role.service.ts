@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Project } from '@orm/project';
+import { ProjectRole, ProjectRoleRepository } from '@orm/project-role';
+import { Role } from '@orm/role';
+import { User } from '@orm/user';
 
 import { ListDto } from '../../@common/dto';
-import { Project } from '../../@orm/project';
-import { ProjectRole, ProjectRoleRepository } from '../../@orm/project-role';
-import { Role } from '../../@orm/role';
-import { User } from '../../@orm/user';
 import { ProjectTaskService } from '../task/project.task.service';
 
 import { ProjectRoleCreateDto } from './dto';

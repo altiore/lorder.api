@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Feedback } from '@orm/feedback';
 
 import { Roles } from '../@common/decorators';
 import { PaginationDto } from '../@common/dto/pagination.dto';
 import { RolesGuard } from '../@common/guards';
-import { Feedback } from '../@orm/feedback';
 
 import { FeedbackCreateDto } from './dto';
 import { FeedbackService } from './feedback.service';
