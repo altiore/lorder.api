@@ -7,9 +7,7 @@ pipelines:
         deployment: test
         caches:
           - node
-          - buildfolder
         script:
-          - rm -rf dist
           - npm ci
           - npm run build
           - npm run test:remote
@@ -22,7 +20,6 @@ pipelines:
           name: Staging build
           caches:
             - node
-            - buildfolder
           script:
             - npm ci
             - npm run build
@@ -33,7 +30,6 @@ pipelines:
           name: Staging tests
           caches:
             - node
-            - buildfolder
           script:
             - ls -l
             - npm run test:remote
@@ -44,8 +40,9 @@ pipelines:
           name: Staging DEPLOY
           deployment: staging
           caches:
-            - buildfolder
+            - node
           script:
+            - npm run build
             - cd heroku
             - rm -rf bin dist public .git mails package.json package-lock.json
             - cp -r ../bin ../dist ../public ../mails ../ormconfig.js ../package.json ../package-lock.json ./
@@ -61,9 +58,7 @@ pipelines:
           name: Production build
           caches:
             - node
-            - buildfolder
           script:
-            - rm -rf dist
             - npm ci
             - npm run build
           services:
@@ -73,7 +68,6 @@ pipelines:
           name: Production tests
           caches:
             - node
-            - buildfolder
           script:
             - npm run test:remote
           services:
@@ -83,8 +77,9 @@ pipelines:
           name: Production DEPLOY
           deployment: production
           caches:
-            - buildfolder
+            - node
           script:
+            - npm run build
             - cd heroku
             - rm -rf bin dist public .git mails package.json package-lock.json
             - cp -r ../bin ../dist ../public ../mails ../ormconfig.js ../package.json ../package-lock.json ./
@@ -97,8 +92,6 @@ pipelines:
             - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$PRODUCTION_APP_NAME.git -f HEAD:master
 
 definitions:
-  caches:
-    buildfolder: dist
   services:
     postgres:
       image: postgres:11.5
