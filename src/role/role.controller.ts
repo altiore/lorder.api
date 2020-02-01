@@ -1,10 +1,12 @@
 import { Auth, res } from '@common/decorators';
-import { Controller } from '@nestjs/common';
+import { Body, Controller, Delete } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Crud } from '@nestjsx/crud';
+import { DeleteResult } from 'typeorm';
 
 import { Role, ROLES } from '@orm/role';
 
+import { BulkDeleteRoleDto } from './dto';
 import { RoleService } from './role.service';
 
 @ApiTags('roles (roles: USER)')
@@ -27,6 +29,11 @@ import { RoleService } from './role.service';
 })
 @Controller('roles')
 export class RoleController {
-  // tslint:disable-next-line
   constructor(private readonly service: RoleService) {}
+
+  @Auth(res(Role).deleteOne, ROLES.SUPER_ADMIN)
+  @Delete('bulk')
+  public async deleteMany(@Body() data: BulkDeleteRoleDto): Promise<DeleteResult> {
+    return this.service.deleteMany(data.ids);
+  }
 }
