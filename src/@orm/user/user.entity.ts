@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { includes } from 'lodash';
 import { Moment } from 'moment';
 import {
   Column,
@@ -113,8 +114,16 @@ export class User {
   @OneToMany(type => UserWork, userWork => userWork.user)
   works: UserWork[];
 
-  get role() {
-    return { 1: ROLES.USER, 2: ROLES.ADMIN, 3: ROLES.SUPER_ADMIN }[this.roles.length];
+  get role(): ROLES {
+    const stringRoles = this.roles.map(role => role.name);
+    if (includes(stringRoles, ROLES.SUPER_ADMIN)) {
+      return ROLES.SUPER_ADMIN;
+    }
+    if (includes(stringRoles, ROLES.ADMIN)) {
+      return ROLES.ADMIN;
+    }
+
+    return ROLES.USER;
   }
 
   get isSuperAdmin() {
