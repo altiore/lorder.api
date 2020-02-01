@@ -15,11 +15,11 @@ export class TaskType {
 
   @ApiProperty()
   @Column({ nullable: true })
-  icon: string;
+  icon: string | null;
 
   @ApiProperty()
   @Column({ default: '#D5D5D5', nullable: true })
-  color: string;
+  color: string | null;
 
   @ApiProperty()
   @Column({ default: false, nullable: false })

@@ -13,6 +13,7 @@ import { MeModule } from './me/me.module';
 import { ProjectModule } from './project/project.module';
 import { PublicModule } from './public/public.module';
 import { RedisModule } from './redis/redis.module';
+import { RoleModule } from './role/role.module';
 import { StatisticsModule } from './statistics/statistics.module';
 import { TaskTypeModule } from './task-type/task-type.module';
 import { TaskModule } from './task/task.module';
@@ -28,6 +29,7 @@ import { UserModule } from './user/user.module';
     ProjectModule,
     PublicModule,
     RedisModule,
+    RoleModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),

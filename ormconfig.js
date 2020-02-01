@@ -14,7 +14,7 @@ module.exports = {
   password: process.env.TYPEORM_PASSWORD,
   database: process.env.TYPEORM_DATABASE,
 
-  entities: [`${baseDir}/@orm/**/**.entity.${scriptExt}`],
+  entities: [`${baseDir}/**/**.entity.${scriptExt}`],
   migrations: [`${baseDir}/@orm/@migrations/*.${scriptExt}`],
 
   synchronize: process.env.TYPEORM_SYNCHRONIZE === 'true',

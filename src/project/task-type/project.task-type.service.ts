@@ -1,10 +1,11 @@
 import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, DeleteResult } from 'typeorm';
-
 import { Project } from '@orm/project';
 import { ProjectTaskTypeRepository } from '@orm/project-task-type';
-import { TaskType, TaskTypeRepository } from '@orm/task-type';
+import { DeepPartial, DeleteResult } from 'typeorm';
+
+import { TaskType } from '../../@orm/task-type/task-type.entity';
+import { TaskTypeRepository } from '../../@orm/task-type/task-type.repository';
 
 import { CreateTaskTypeDto } from './dto';
 

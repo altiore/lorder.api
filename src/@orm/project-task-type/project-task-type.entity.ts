@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne } from 'typeorm';
 
+import { TaskType } from '../../@orm/task-type/task-type.entity';
 import { Project } from '../project/project.entity';
-import { TaskType } from '../task-type/task-type.entity';
 
 @Entity()
 export class ProjectTaskType {

@@ -1,17 +1,15 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
 import { ProjectRepository } from '@orm/project';
 import { ProjectPubRepository } from '@orm/project-pub';
 import { ProjectTaskTypeRepository } from '@orm/project-task-type';
 import { TaskRepository } from '@orm/task';
-import { TaskTypeRepository } from '@orm/task-type';
 import { UserRepository } from '@orm/user';
 import { UserProjectRepository } from '@orm/user-project';
 import { UserWorkRepository } from '@orm/user-work';
-
 import { AuthModule } from 'auth/auth.module';
 
+import { TaskTypeRepository } from '../@orm/task-type/task-type.repository';
 import { RedisModule } from '../redis/redis.module';
 import { TaskModule } from '../task/task.module';
 

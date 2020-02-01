@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { includes } from 'lodash';
+import { intersection } from 'lodash';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -11,9 +11,16 @@ export class RolesGuard implements CanActivate {
     if (!roles) {
       return true;
     }
+    const preparedRoles = typeof roles === 'string' ? [roles] : roles;
+    if (!Array.isArray(preparedRoles)) {
+      return false;
+    }
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    const hasRole = () => user.roles.map(r => r.name).some(r => includes(roles, r));
-    return user && user.roles && hasRole();
+    if (!user || !user.roles) {
+      return false;
+    }
+    const isHasRole = intersection(user.roles.map(r => r.name), preparedRoles).length;
+    return Boolean(isHasRole);
   }
 }

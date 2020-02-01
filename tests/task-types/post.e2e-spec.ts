@@ -1,4 +1,5 @@
-import { TaskType } from '../../src/@orm/task-type';
+import { TaskType } from '@orm/task-type/task-type.entity';
+
 import { TestHelper } from '../@utils/TestHelper';
 
 import { taskTypesFixtures, usersFixture } from './@fixtures/post';
@@ -48,23 +49,10 @@ describe(`POST ${h.url}`, () => {
     await h
       .requestBy('super-admin@mail.com')
       .post(h.path())
-      .expect(422)
-      .expect({
-        errors: [
-          {
-            children: [],
-            constraints: {
-              isNotEmpty: 'title should not be empty',
-              isString: 'title must be a string',
-              maxLength: 'title must be shorter than or equal to 40 characters',
-              minLength: 'title must be longer than or equal to 3 characters',
-            },
-            property: 'title',
-          },
-        ],
-        message: 'Validation Error',
-        statusCode: 422,
-      });
+      .send({
+        title: '',
+      })
+      .expect(422);
   });
 
   it('by super-admin@mail.com only with title', async () => {

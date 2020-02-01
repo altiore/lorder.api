@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -11,11 +12,12 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { TaskType } from '../../@orm/task-type/task-type.entity';
+
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { ProjectPub } from '../project-pub/project-pub.entity';
 import { ProjectRole } from '../project-role/project-role.entity';
 import { ProjectTaskType } from '../project-task-type/project-task-type.entity';
-import { TaskType } from '../task-type/task-type.entity';
 import { Task } from '../task/task.entity';
 import { ACCESS_LEVEL } from '../user-project';
 import { UserProject } from '../user-project/user-project.entity';
@@ -66,6 +68,11 @@ export class Project {
   @ApiProperty({ type: Task, isArray: true })
   @OneToMany(() => Task, task => task.project)
   tasks: Task[];
+
+  @ApiPropertyOptional({ type: ProjectTaskType })
+  @OneToOne(() => ProjectTaskType, { onDelete: 'SET NULL', onUpdate: 'CASCADE' })
+  @JoinColumn()
+  defaultTaskType: ProjectTaskType;
 
   @OneToMany(() => ProjectTaskType, projectTaskType => projectTaskType.project)
   projectTaskTypes: ProjectTaskType[];

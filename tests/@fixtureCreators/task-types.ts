@@ -1,7 +1,7 @@
 import { internet, random } from 'faker';
 import { fixtureCreator } from 'typeorm-fixtures';
 
-import { TaskType } from '../../src/@orm/task-type';
+import { TaskType } from '@orm/task-type/task-type.entity';
 
 export const createTaskTypes = fixtureCreator<TaskType>(TaskType, (entity, index) => {
   return {

@@ -1,50 +1,60 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { DeepPartial, DeleteResult } from 'typeorm';
+
+import { Auth, res, UserJWT } from '@common/decorators';
 import { Project } from '@orm/project';
 import { ProjectRole } from '@orm/project-role';
-import { TaskLog } from '@orm/task-log';
+import { ROLES } from '@orm/role';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
 
-import { Roles, UserJWT } from '../../@common/decorators';
-import { ListDto } from '../../@common/dto';
-import { RolesGuard } from '../../@common/guards';
-import { AccessLevel, ProjectParam } from '../@common/decorators';
-import { AccessLevelGuard } from '../@common/guards';
+import { ProjectParam } from '../@common/decorators';
 
 import { ProjectRoleCreateDto } from './dto';
 import { ProjectRoleService } from './project-role.service';
 
-@ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
-@ApiTags('projects -> project-role (role: user)')
+@ApiTags('projects -> roles (role: user)')
 @Controller('projects/:projectId/roles')
 export class ProjectRoleController {
   constructor(private readonly projectRoleService: ProjectRoleService) {}
 
   @Get()
-  @Roles('user')
-  @AccessLevel(ACCESS_LEVEL.RED)
-  @ApiResponse({ status: 200, type: TaskLog, isArray: true })
+  @Auth(res(ProjectRole).getMany, ROLES.USER, ACCESS_LEVEL.RED)
   public all(
-    @Param('taskId') taskId: number,
     @ProjectParam() project: Project,
-    @Query() pagesDto: ListDto,
+    @Param('projectId', ParseIntPipe) projectId: number,
     @UserJWT() user: User
-  ) {
-    return this.projectRoleService.findAll(project, taskId, pagesDto, user);
+  ): Promise<ProjectRole[]> {
+    return this.projectRoleService.findAll(project);
   }
 
   @Post()
-  @Roles('user')
-  @AccessLevel(ACCESS_LEVEL.INDIGO)
-  @ApiResponse({ status: 201, type: ProjectRole })
-  public createOne(
+  @Auth(res(ProjectRole).createOne, ROLES.USER, ACCESS_LEVEL.VIOLET)
+  public async createOne(
     @ProjectParam() project: Project,
+    @Param('projectId', ParseIntPipe) projectId: number,
     @Body() projectRoleDto: ProjectRoleCreateDto,
     @UserJWT() user: User
-  ): Promise<ProjectRole> {
-    return this.projectRoleService.createOne(projectRoleDto, project, user);
+  ): Promise<DeepPartial<ProjectRole>> {
+    const projectRole = await this.projectRoleService.createOne(projectRoleDto, project, user);
+    return {
+      workFlow: projectRole.workFlow,
+      project: {
+        id: projectRole.project.id,
+      },
+      role: projectRole.role,
+    };
+  }
+
+  @Delete(':roleId')
+  @Auth(res(ProjectRole).deleteOne, ROLES.USER, ACCESS_LEVEL.VIOLET)
+  public deleteOne(
+    @ProjectParam() project: Project,
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @UserJWT() user: User,
+    @Param('roleId', ParseIntPipe) roleId: number
+  ): Promise<DeleteResult> {
+    return this.projectRoleService.deleteOne(project, user, roleId);
   }
 }
