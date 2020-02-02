@@ -70,7 +70,8 @@ pipelines:
             - git config user.name "Razzwan-CI"
             - git add .
             - git commit -m 'dynamic version'
-            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$PRODUCTION_APP_NAME.git -f master:master
+            - git checkout -f
+            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$PRODUCTION_APP_NAME.git master -f
 
 definitions:
   services:
