@@ -139,7 +139,7 @@
       "tslint --fix -t verbose -p tsconfig.test.json -c tslint.json",
       "git add"
     ],
-    "*.{html,mjml}": [
+    "*.{mjml}": [
       "npm run prepare:mails",
       "git add"
     ]

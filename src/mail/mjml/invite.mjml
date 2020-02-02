@@ -12,19 +12,19 @@
         <mj-text font-size="16px" color="#1E1E2A" font-family="helvetica" align="center">
           Нажми на кнопку ниже, чтобы принять приглашение:
         </mj-text>
-        <mj-button background-color="#22C395" cursor="pointer" href="{{LINK}}">
+        <mj-button background-color="#22C395" href="{{LINK}}">
           Принять приглашение
         </mj-button>
         <mj-text font-size="14px" color="#1E1E2A" font-family="helvetica" align="center">
           Или скопируй эту ссылку и вставь в браузер:
         </mj-text>
-        <mj-section border-radius="5px" border="1px solid #C8C8C8" background-color="#D8D8D8" background-size="50%">
-          <mj-column>
-            <mj-text font-size="12px" color="#1E1E2A" font-family="helvetica" align="center">
-              {{LINK}}
-            </mj-text>
-          </mj-column>
-        </mj-section>
+      </mj-column>
+    </mj-section>
+    <mj-section border-radius="5px" border="1px solid #C8C8C8" background-color="#D8D8D8" background-size="50%">
+      <mj-column>
+        <mj-text font-size="12px" color="#1E1E2A" font-family="helvetica" align="center">
+          {{LINK}}
+        </mj-text>
       </mj-column>
     </mj-section>
   </mj-body>
