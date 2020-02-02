@@ -23,7 +23,12 @@ export class TestHelper {
     public readonly metadata: ModuleMetadata = { imports: [AppModule] },
     public readonly debug: boolean = process.env.TYPEORM_LOGGING === 'true'
   ) {
-    this.fixtureHelper = new TypeormFixtures(debug).findEntities({ name: In(['user', 'admin', 'super-admin']) }, Role);
+    const findCondition = {
+      where: {
+        name: In(['user', 'admin', 'super-admin']),
+      },
+    };
+    this.fixtureHelper = new TypeormFixtures(debug).findEntities(findCondition, Role);
   }
 
   public readonly before = async (): Promise<void> => {

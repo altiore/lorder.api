@@ -3,6 +3,7 @@ import { DeepPartial, EntityRepository, In, Repository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Role } from '../role/role.entity';
+import { UserRole } from '../user-role/user-role.entity';
 
 import { User } from './user.entity';
 
@@ -14,7 +15,7 @@ export class UserRepository extends Repository<User> {
       try {
         return await this.findOne({
           loadEagerRelations: false,
-          relations: ['avatar', 'roles'],
+          relations: ['avatar', 'userRoles', 'userRoles.role'],
           select: ['id', 'email', 'status', 'defaultProjectId', 'displayName', 'password'],
           where: { email },
         });
@@ -22,12 +23,12 @@ export class UserRepository extends Repository<User> {
         throw e;
       }
     }
-    return await this.findOne({ where: { email } });
+    return await this.findOne({ where: { email }, relations: ['userRoles', 'userRoles.role'] });
   }
 
   // Используется при валидации JWT ключа
   public findOneActiveByEmail(email: string): Promise<User> {
-    return this.findOneOrFail({ where: { email, status: 10 } });
+    return this.findOneOrFail({ where: { email, status: 10 }, relations: ['userRoles', 'userRoles.role'] });
   }
 
   public updateOne(user: User, data: DeepPartial<User>): Promise<User> {
@@ -39,7 +40,11 @@ export class UserRepository extends Repository<User> {
     const user = this.create(data);
     // создаваемый пользователь всегда неактивен
     user.status = 1;
-    user.roles = roles;
+    user.userRoles = roles.map(el => {
+      const m = new UserRole();
+      m.role = el;
+      return m;
+    });
     let password;
     if (user.password) {
       password = this.hashPassword(user.password);

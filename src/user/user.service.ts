@@ -6,6 +6,7 @@ import { RoleRepository } from '@orm/role';
 import { UpdateUserDto, User, UserRepository } from '@orm/user';
 import { DeepPartial } from 'typeorm';
 
+import { UserRole } from '../@orm/user-role/user-role.entity';
 import { FileService } from '../file/file.service';
 import { ProjectService } from '../project/project.service';
 
@@ -47,7 +48,12 @@ export class UserService {
     if (!user) {
       throw new NotFoundException(`Пользователь с id: ${userId} не найден`);
     }
-    user.roles = await this.roleRepo.findRolesByName(data.role);
+    const roles = await this.roleRepo.findRolesByName(data.role);
+    user.userRoles = roles.map(el => {
+      const m = new UserRole();
+      m.role = el;
+      return m;
+    });
     return await this.userRepo.save(user);
   }
 

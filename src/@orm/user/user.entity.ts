@@ -20,6 +20,7 @@ import { Project } from '../project/project.entity';
 import { Role, ROLES } from '../role/role.entity';
 import { Task } from '../task/task.entity';
 import { UserProject } from '../user-project/user-project.entity';
+import { UserRole } from '../user-role/user-role.entity';
 import { UserWork } from '../user-work/user-work.entity';
 
 @Entity()
@@ -82,14 +83,14 @@ export class User {
   @UpdateDateColumn(momentDateTransformer)
   updatedAt: Moment;
 
-  @ApiProperty({ type: Role, isArray: true })
-  @ManyToMany(() => Role, undefined, {
-    eager: true,
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinTable({ name: 'user_roles' })
-  roles: Role[];
+  @ApiProperty({ type: UserRole, isArray: true })
+  @OneToMany(() => UserRole, m => m.user, { eager: true, cascade: ['insert', 'update', 'remove'] })
+  @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
+  userRoles: UserRole[];
+
+  get roles(): Role[] {
+    return this.userRoles ? this.userRoles.map(el => el.role) : [];
+  }
 
   @ApiPropertyOptional()
   @Column({ nullable: true })
@@ -115,7 +116,7 @@ export class User {
   works: UserWork[];
 
   get role(): ROLES {
-    const stringRoles = this.roles.map(role => role.name);
+    const stringRoles = this.roles.map(uRole => uRole.name);
     if (includes(stringRoles, ROLES.SUPER_ADMIN)) {
       return ROLES.SUPER_ADMIN;
     }
