@@ -12,7 +12,7 @@ export class ProjectRoleService {
   constructor(@InjectRepository(ProjectRoleRepository) private readonly repo: ProjectRoleRepository) {}
 
   public async findAll(project: Project): Promise<ProjectRole[]> {
-    return await this.repo.find({ where: { project } });
+    return await this.repo.find({ where: { project }, loadRelationIds: true });
   }
 
   public async createOne(projectRoleDto: ProjectRoleCreateDto, project: Project, user: User): Promise<ProjectRole> {
