@@ -71,7 +71,7 @@ pipelines:
             - git add .
             - git commit -m 'dynamic version'
             - git status
-            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$PRODUCTION_APP_NAME.git HEAD:master --force
+            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$PRODUCTION_APP_NAME.git -f HEAD:master
 
 definitions:
   services:
