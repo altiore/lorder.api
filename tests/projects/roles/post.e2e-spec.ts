@@ -1,16 +1,15 @@
 import { ProjectRole } from '../../../src/@orm/project-role';
 import { TestHelper } from '../../@utils/TestHelper';
 
-import { projectsFixture, userProjectFixture, usersFixture } from './@fixtures/post';
+import { projectsFixture, rolesFixture, userProjectFixture, usersFixture } from './@fixtures/post';
 
 const h = new TestHelper('/projects/:projectId/roles')
+  .addFixture(rolesFixture)
   .addFixture(usersFixture)
   .addFixture(projectsFixture)
   .addFixture(userProjectFixture);
 
 let projectId: number;
-
-const correctWorkflow = { test: 1 };
 
 describe(`GET ${h.url}`, () => {
   beforeAll(async () => {
@@ -24,8 +23,7 @@ describe(`GET ${h.url}`, () => {
       .requestBy()
       .post(h.path(projectId))
       .send({
-        roleId: 11,
-        workFlow: correctWorkflow,
+        roleId: '11',
       })
       .expect(401)
       .expect({
@@ -40,8 +38,7 @@ describe(`GET ${h.url}`, () => {
       .requestBy('test@mail.com')
       .post(h.path(alienProjectId))
       .send({
-        roleId: 11,
-        workFlow: correctWorkflow,
+        roleId: 'creator',
       })
       .expect(403)
       .expect({
@@ -56,8 +53,7 @@ describe(`GET ${h.url}`, () => {
       .requestBy('test@mail.com')
       .post(h.path(projectId))
       .send({
-        roleId: 'string',
-        workFlow: correctWorkflow,
+        roleId: 1,
       })
       .expect(422);
   });
@@ -67,8 +63,7 @@ describe(`GET ${h.url}`, () => {
       .requestBy('test@mail.com')
       .post(h.path(projectId))
       .send({
-        roleId: 'string',
-        workFlow: {},
+        roleId: 2,
       })
       .expect(422);
   });
@@ -78,8 +73,7 @@ describe(`GET ${h.url}`, () => {
       .requestBy('test@mail.com')
       .post(h.path(projectId))
       .send({
-        roleId: 11,
-        workFlow: correctWorkflow,
+        roleId: 'creator',
       })
       .expect(201);
 

@@ -1,6 +1,9 @@
 import { ROLES } from '../../../../src/@orm/role';
 import { ACCESS_LEVEL } from '../../../../src/@orm/user-project';
 import { createProjects, createUserProjects, createUsers } from '../../../@fixtureCreators';
+import { createRoleFlows } from '../../../@fixtureCreators/rolw-flow';
+
+export const rolesFixture = createRoleFlows([{ id: 'dev-full' }, { id: 'creator' }, { id: 'qa' }]);
 
 export const usersFixture = createUsers([
   {

@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { get } from 'lodash';
 import { DeepPartial, DeleteResult } from 'typeorm';
 
 import { Auth, res, UserJWT } from '@common/decorators';
@@ -40,10 +41,8 @@ export class ProjectRoleController {
     const projectRole = await this.projectRoleService.createOne(projectRoleDto, project, user);
     return {
       workFlow: projectRole.workFlow,
-      project: {
-        id: projectRole.project.id,
-      },
-      role: projectRole.role,
+      project: get(projectRole, ['project', 'id']),
+      role: get(projectRole, ['role', 'id']),
     };
   }
 
@@ -53,7 +52,7 @@ export class ProjectRoleController {
     @ProjectParam() project: Project,
     @Param('projectId', ParseIntPipe) projectId: number,
     @UserJWT() user: User,
-    @Param('roleId', ParseIntPipe) roleId: number
+    @Param('roleId') roleId: string
   ): Promise<DeleteResult> {
     return this.projectRoleService.deleteOne(project, user, roleId);
   }

@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, ManyToOne } from 'typeorm';
 
 import { Project } from '../project/project.entity';
-import { Role } from '../role/role.entity';
+import { RoleFlow } from '../role-flow';
 
 const WORK_FLOW_EXAMPLE = {
   todo: {
@@ -21,9 +21,9 @@ const WORK_FLOW_EXAMPLE = {
 
 @Entity()
 export class ProjectRole {
-  @ApiProperty({ type: Number })
-  @ManyToOne(type => Role, { eager: true, primary: true })
-  role: Role;
+  @ApiProperty({ type: String })
+  @ManyToOne(type => RoleFlow, { eager: true, primary: true })
+  role: RoleFlow | string;
 
   @ApiProperty({ type: Number })
   @ManyToOne(type => Project, project => project.roles, {
@@ -31,7 +31,7 @@ export class ProjectRole {
     onUpdate: 'CASCADE',
     primary: true,
   })
-  project: Project;
+  project: Project | number;
 
   @ApiProperty({ type: Object, example: WORK_FLOW_EXAMPLE })
   @Column('simple-json', { nullable: false })

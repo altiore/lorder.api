@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsLowercase, IsNotEmpty, IsNumber, IsString, Length, Matches } from 'class-validator';
 
 export class WorkFlow {
   @ApiProperty()
@@ -11,10 +11,9 @@ export class WorkFlow {
 export class ProjectRoleCreateDto {
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
-  roleId: number;
-
-  @ApiProperty({ type: WorkFlow })
-  @IsNotEmpty()
-  workFlow: WorkFlow;
+  @IsString()
+  @IsLowercase()
+  @Matches(/^[a-z][a-z0-9\-_]{3,19}$/)
+  @Length(3, 20)
+  roleId: string;
 }
