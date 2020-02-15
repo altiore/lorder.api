@@ -40,7 +40,6 @@ export class ProjectRoleController {
   ): Promise<DeepPartial<ProjectRole>> {
     const projectRole = await this.projectRoleService.createOne(projectRoleDto, project, user);
     return {
-      workFlow: projectRole.workFlow,
       project: get(projectRole, ['project', 'id']),
       role: get(projectRole, ['role', 'id']),
     };

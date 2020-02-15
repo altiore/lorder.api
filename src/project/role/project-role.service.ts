@@ -28,8 +28,6 @@ export class ProjectRoleService {
     const projectRoleData: Partial<ProjectRole> = {
       project,
       role,
-      // TODO: привязать workFlow к роли глобально. Это будет проще
-      workFlow: {},
     };
     const entity = this.repo.create(projectRoleData);
     return await this.repo.save(entity);
