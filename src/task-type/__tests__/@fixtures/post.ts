@@ -1,5 +1,5 @@
-import { createTaskTypes, createUsers } from '../../../../tests/@fixtureCreators';
 import { ROLES } from '../../../@orm/role';
+import { createTaskTypes, createUsers } from '../../../@test-helper/@fixtureCreators';
 
 export const usersFixture = createUsers([
   {

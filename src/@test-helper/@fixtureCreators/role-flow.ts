@@ -1,7 +1,7 @@
 import { random } from 'faker';
 import { fixtureCreator } from 'typeorm-fixtures';
 
-import { RoleFlow } from '../../src/@orm/role-flow';
+import { RoleFlow } from '../../@orm/role-flow';
 
 export const createRoleFlows = fixtureCreator<RoleFlow>(RoleFlow, function(entity, index) {
   return {

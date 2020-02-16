@@ -1,9 +1,9 @@
 import { company, random } from 'faker';
 import { fixtureCreator, many, one } from 'typeorm-fixtures';
 
-import { Project } from '../../src/@orm/project';
-import { Task } from '../../src/@orm/task';
-import { User } from '../../src/@orm/user';
+import { Project } from '../../@orm/project';
+import { Task } from '../../@orm/task';
+import { User } from '../../@orm/user';
 
 export const createTasks = fixtureCreator<Task>(Task, function(entity, index) {
   return {

@@ -1,4 +1,4 @@
-import { createProjects, createUserProjects, createUsers } from '../../../../../tests/@fixtureCreators';
+import { createProjects, createUserProjects, createUsers } from '../../../../@test-helper/@fixtureCreators';
 
 import { ROLES } from '../../../../@orm/role';
 import { ACCESS_LEVEL } from '../../../../@orm/user-project';

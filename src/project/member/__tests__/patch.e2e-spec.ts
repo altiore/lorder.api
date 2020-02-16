@@ -1,5 +1,5 @@
-import { TestHelper } from '../../../../tests/@utils/TestHelper';
 import { ACCESS_LEVEL, UserProject } from '../../../@orm/user-project';
+import { TestHelper } from '../../../@test-helper/@utils/TestHelper';
 
 import { projectsFixture, userProjectsFixture, usersFixture } from './@fixtures/patch';
 

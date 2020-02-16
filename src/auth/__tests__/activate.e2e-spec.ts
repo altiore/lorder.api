@@ -1,9 +1,9 @@
 import { create } from 'cache-manager-redis-store';
 import moment = require('moment');
 
-import { TestHelper } from '../../../tests/@utils/TestHelper';
 import { User } from '../../@orm/user';
 import { ACCESS_LEVEL, UserProject } from '../../@orm/user-project';
+import { TestHelper } from '../../@test-helper/@utils/TestHelper';
 import { RedisService } from '../../redis/redis.service';
 
 import { projectsFixture } from './@fixtures/projects';

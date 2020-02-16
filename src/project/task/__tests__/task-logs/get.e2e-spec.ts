@@ -1,4 +1,4 @@
-import { TestHelper } from '../../../../../tests/@utils/TestHelper';
+import { TestHelper } from '../../../../@test-helper/@utils/TestHelper';
 
 import {
   projectsFixture,

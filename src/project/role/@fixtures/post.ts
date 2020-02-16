@@ -1,6 +1,11 @@
-import { createProjects, createRoleFlows, createUserProjects, createUsers } from '../../../../tests/@fixtureCreators';
 import { ROLES } from '../../../@orm/role';
 import { ACCESS_LEVEL } from '../../../@orm/user-project';
+import {
+  createProjects,
+  createRoleFlows,
+  createUserProjects,
+  createUsers,
+} from '../../../@test-helper/@fixtureCreators';
 
 export const rolesFixture = createRoleFlows([{ id: 'dev-full' }, { id: 'creator' }, { id: 'qa' }]);
 

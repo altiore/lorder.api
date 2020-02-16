@@ -7,11 +7,11 @@ import * as supertest from 'supertest';
 const defaults = require('superagent-defaults');
 import * as jwt from 'jsonwebtoken';
 
-import { AppModule } from '../../src/app.module';
-import { RedisService } from '../../src/redis/redis.service';
-import { Role } from '../../src/@orm/role';
-import { MailService } from '../../src/mail/mail.service';
-import { MailAcceptedDto } from '../../src/mail/dto';
+import { AppModule } from '../../app.module';
+import { RedisService } from '../../redis/redis.service';
+import { Role } from '../../@orm/role';
+import { MailService } from '../../mail/mail.service';
+import { MailAcceptedDto } from '../../mail/dto';
 
 export class TestHelper {
   private testingModule: TestingModule;

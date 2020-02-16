@@ -1,7 +1,7 @@
 import { lorem } from 'faker';
 import moment = require('moment');
 
-import { TestHelper } from '../../../tests/@utils/TestHelper';
+import { TestHelper } from '../../@test-helper/@utils/TestHelper';
 
 import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/patch';
 

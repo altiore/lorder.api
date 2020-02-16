@@ -4,7 +4,7 @@ import {
   createUserProjects,
   createUsers,
   createUserWorks,
-} from '../../../../tests/@fixtureCreators';
+} from '../../../@test-helper/@fixtureCreators';
 
 import { ROLES } from '../../../@orm/role';
 import { ACCESS_LEVEL } from '../../../@orm/user-project';

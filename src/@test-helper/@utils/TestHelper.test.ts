@@ -1,4 +1,4 @@
-import { TestHelper } from '../@utils/TestHelper';
+import { TestHelper } from './TestHelper';
 
 describe(`TestHelper`, () => {
   let h: TestHelper;

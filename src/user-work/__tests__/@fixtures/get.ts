@@ -1,5 +1,5 @@
-import { createProjects, createUsers } from '../../../../tests/@fixtureCreators';
 import { ROLES } from '../../../@orm/role';
+import { createProjects, createUsers } from '../../../@test-helper/@fixtureCreators';
 
 export const usersFixture = createUsers([
   {

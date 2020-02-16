@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
 
-import { createUsers } from '../../../../tests/@fixtureCreators';
 import { ROLES } from '../../../@orm/role';
+import { createUsers } from '../../../@test-helper/@fixtureCreators';
 
 export const usersFixture = createUsers([
   {

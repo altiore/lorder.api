@@ -8,7 +8,7 @@
     "heroku",
     "mails",
     "node_modules",
-    "tests",
+    "src/@test-helper",
     "uploads",
     "**/*.spec.ts",
     "**/*.e2e-spec.ts"

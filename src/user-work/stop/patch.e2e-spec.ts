@@ -1,8 +1,8 @@
 import * as moment from 'moment';
 
-import { TestHelper } from '../../../tests/@utils/TestHelper';
 import { Task } from '../../@orm/task';
 import { UserWork } from '../../@orm/user-work';
+import { TestHelper } from '../../@test-helper/@utils/TestHelper';
 
 import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/patch';
 
