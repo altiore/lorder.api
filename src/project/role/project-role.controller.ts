@@ -1,17 +1,16 @@
+import { Auth, res, UserJWT } from '@common/decorators';
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { DeepPartial, DeleteResult } from 'typeorm';
-
-import { Auth, res, UserJWT } from '@common/decorators';
 import { Project } from '@orm/project';
 import { ROLES } from '@orm/role';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
+import { DeepPartial, DeleteResult } from 'typeorm';
 
+import { ProjectRole } from '../../@orm/project-role/project-role.entity';
 import { ProjectParam } from '../@common/decorators';
 
 import { ProjectRoleCreateDto } from './dto';
-import { ProjectRole } from './project-role.entity';
 import { ProjectRoleService } from './project-role.service';
 
 @ApiTags('projects -> roles (role: user)')

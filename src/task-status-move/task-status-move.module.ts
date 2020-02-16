@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { TaskStatusMove } from './task-status-move.entity';
+import { TaskStatusMove } from '../@orm/task-status-move/task-status-move.entity';
 
 import { TaskStatusMoveController } from './task-status-move.controller';
 import { TaskStatusMoveService } from './task-status-move.service';

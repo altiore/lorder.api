@@ -3,10 +3,10 @@ import { Exclude } from 'class-transformer';
 import { IsOptional, IsString } from 'class-validator';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
-import { Project } from '../../@orm/project/project.entity';
-import { RoleFlow } from '../../@orm/role-flow/role-flow.entity';
+import { Project } from '../project/project.entity';
+import { RoleFlow } from '../role-flow/role-flow.entity';
 
-import { ProjectRoleAllowedMove } from './project-role-allowed-move/project-role-allowed-move.entity';
+import { ProjectRoleAllowedMove } from '../project-role-allowed-move/project-role-allowed-move.entity';
 
 @Unique(['role', 'projectId'])
 @Entity()

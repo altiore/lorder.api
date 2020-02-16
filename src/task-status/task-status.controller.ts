@@ -5,7 +5,7 @@ import { Crud } from '@nestjsx/crud';
 
 import { ROLES } from '@orm/role';
 
-import { TaskStatus } from './task-status.entity';
+import { TaskStatus } from '../@orm/task-status/task-status.entity';
 
 import { TaskStatusService } from './task-status.service';
 

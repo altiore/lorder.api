@@ -14,12 +14,12 @@ import {
 
 import { TaskType } from '../../@orm/task-type/task-type.entity';
 
-import { ProjectRole } from '../../project/role/project-role.entity';
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { ProjectPub } from '../project-pub/project-pub.entity';
+import { ProjectRole } from '../project-role/project-role.entity';
 import { ProjectTaskType } from '../project-task-type/project-task-type.entity';
 import { Task } from '../task/task.entity';
-import { ACCESS_LEVEL } from '../user-project';
+import { ACCESS_LEVEL } from '../user-project/user-project.consts';
 import { UserProject } from '../user-project/user-project.entity';
 import { User } from '../user/user.entity';
 
@@ -58,7 +58,7 @@ export class Project {
   ownerId: number;
 
   @ApiProperty({ type: User })
-  @ManyToOne(() => User, user => user.ownProjects, {
+  @ManyToOne(() => User, m => m.ownProjects, {
     nullable: false,
     onDelete: 'CASCADE',
     onUpdate: 'NO ACTION',
@@ -66,7 +66,7 @@ export class Project {
   owner: User;
 
   @ApiProperty({ type: Task, isArray: true })
-  @OneToMany(() => Task, task => task.project)
+  @OneToMany(() => Task, m => m.project)
   tasks: Task[];
 
   @ApiPropertyOptional({ type: ProjectTaskType })
@@ -74,10 +74,10 @@ export class Project {
   @JoinColumn()
   defaultTaskType: ProjectTaskType;
 
-  @OneToMany(() => ProjectTaskType, projectTaskType => projectTaskType.project)
+  @OneToMany(() => ProjectTaskType, m => m.project)
   projectTaskTypes: ProjectTaskType[];
 
-  @OneToOne(() => ProjectPub, pub => pub.project)
+  @OneToOne(() => ProjectPub, m => m.project)
   pub: ProjectPub;
 
   @ApiPropertyOptional({ type: TaskType, isArray: true })
@@ -91,11 +91,11 @@ export class Project {
   }
 
   @ApiPropertyOptional({ type: UserProject, isArray: true })
-  @OneToMany(() => UserProject, userProject => userProject.project)
+  @OneToMany(() => UserProject, m => m.project)
   members: UserProject[];
 
-  @ApiPropertyOptional({ type: ProjectRole, isArray: true })
-  @OneToMany(() => ProjectRole, projectRole => projectRole.project)
+  @ApiPropertyOptional({ type: () => ProjectRole, isArray: true })
+  @OneToMany(() => ProjectRole, m => m.project)
   roles: ProjectRole[];
 
   @ApiPropertyOptional({

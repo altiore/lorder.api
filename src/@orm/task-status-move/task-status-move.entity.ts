@@ -4,9 +4,9 @@ import { IsInt, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import * as moment from 'moment';
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-import { momentDateTransformer } from '../@orm/@columns/moment.date.transformer';
+import { momentDateTransformer } from '../@columns/moment.date.transformer';
 
-import { ProjectRoleAllowedMove } from '../project/role/project-role-allowed-move/project-role-allowed-move.entity';
+import { ProjectRoleAllowedMove } from '../project-role-allowed-move/project-role-allowed-move.entity';
 import { TaskStatus } from '../task-status/task-status.entity';
 
 @Entity()
