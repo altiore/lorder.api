@@ -27,6 +27,13 @@ import { RoleService } from './role.service';
       decorators: [Auth(res(RoleFlow).deleteOne, ROLES.SUPER_ADMIN)],
     },
   },
+  params: {
+    id: {
+      field: 'id',
+      type: 'string',
+      primary: true,
+    },
+  },
 })
 @Controller('roles')
 export class RoleController {
