@@ -21,7 +21,7 @@ export class TaskService {
 
   public async findAll(pagesDto: TaskPagination, user: User): Promise<Task[]> {
     const userProjects = await this.projectService.findAllParticipantByUser({}, user, ACCESS_LEVEL.RED);
-    const projectIds = userProjects.map(el => el.project.id);
+    const projectIds = userProjects.map(el => el.project.id).filter(id => id !== user.defaultProjectId);
     if (!projectIds.length) {
       return [];
     }
