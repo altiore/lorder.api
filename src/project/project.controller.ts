@@ -40,6 +40,17 @@ export class ProjectController {
     return this.projectService.create(data, user);
   }
 
+  @Patch(':projectId')
+  @Auth(res(Project).updateOne, ROLES.USER, ACCESS_LEVEL.VIOLET)
+  public update(
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @ProjectParam() project: Project,
+    @UserJWT() user: User,
+    @Body() data: ProjectDto
+  ): Promise<Project> {
+    return this.projectService.update(project, data, user);
+  }
+
   @Delete(':projectId')
   @Auth(res(Project).deleteOne, ROLES.USER, ACCESS_LEVEL.VIOLET)
   public delete(

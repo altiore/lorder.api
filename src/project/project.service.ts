@@ -58,6 +58,23 @@ export class ProjectService {
     return project;
   }
 
+  public async update(project: Project, data: ProjectDto, user: User): Promise<Project> {
+    if (data.title) {
+      project.title = data.title;
+    }
+    if (typeof data.monthlyBudget === 'number') {
+      project.monthlyBudget = data.monthlyBudget;
+    }
+    await this.projectRepo.update(
+      { id: project.id },
+      {
+        title: project.title,
+        monthlyBudget: project.monthlyBudget,
+      }
+    );
+    return project;
+  }
+
   public async remove(id: number, force: boolean = false): Promise<number> {
     if (force) {
       await this.taskRepo.delete({ projectId: id });
