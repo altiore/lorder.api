@@ -12,10 +12,10 @@ export class TaskStatusMove {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => TaskStatus, m => m.fromMoves)
+  @ManyToOne(() => TaskStatus, m => m.fromMoves, { onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
   from: TaskStatus;
 
-  @ManyToOne(() => TaskStatus, m => m.toMoves)
+  @ManyToOne(() => TaskStatus, m => m.toMoves, { onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
   to: TaskStatus;
 
   @ApiProperty({ example: '2018-05-26T09:05:39.378Z' })

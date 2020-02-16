@@ -2,12 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { Project } from '@orm/project';
-import { ProjectRole, ProjectRoleRepository } from '@orm/project-role';
 import { User } from '@orm/user';
 
 import { RoleService } from '../../role/role.service';
 
 import { ProjectRoleCreateDto } from './dto';
+import { ProjectRole } from './project-role.entity';
+import { ProjectRoleRepository } from './project-role.repository';
 
 @Injectable()
 export class ProjectRoleService {

@@ -26,6 +26,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
           if (exception.detail) {
             const status = HttpStatus.UNPROCESSABLE_ENTITY;
             parsedDetail = parseDetail(exception.detail);
+            console.log(exception);
+            console.log('parsedDetail', parsedDetail);
             if (!parsedDetail) {
               response.status(status).send({
                 message: exception.detail,

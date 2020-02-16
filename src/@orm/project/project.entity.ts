@@ -14,9 +14,9 @@ import {
 
 import { TaskType } from '../../@orm/task-type/task-type.entity';
 
+import { ProjectRole } from '../../project/role/project-role.entity';
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { ProjectPub } from '../project-pub/project-pub.entity';
-import { ProjectRole } from '../project-role/project-role.entity';
 import { ProjectTaskType } from '../project-task-type/project-task-type.entity';
 import { Task } from '../task/task.entity';
 import { ACCESS_LEVEL } from '../user-project';

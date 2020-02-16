@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-import { ProjectRole } from '../project-role/project-role.entity';
+import { ProjectRole } from '../../project/role/project-role.entity';
 import { TaskStatusMove } from '../task-status-move/task-status-move.entity';
 
 export enum TASK_STATUS_MOVE_TYPE {

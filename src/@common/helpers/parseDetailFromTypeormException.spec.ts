@@ -2,8 +2,20 @@ import { parseDetail } from './parseDetailFromTypeormException';
 
 describe('parseDetailFromTypeormException', () => {
   it('parseDetail', () => {
-    expect(parseDetail('Key (email)=(razvanlomov@gmail.com) already exists.')[1]).toBe('email');
-    expect(parseDetail('Key (email)=(razvanlomov@gmail.com) already exists.')[2]).toBe('razvanlomov@gmail.com');
-    expect(parseDetail('Key (email)=(razvanlomov@gmail.com) already exists.')[3]).toBe('already exists');
+    const res = parseDetail('Key (email)=(razvanlomov@gmail.com) already exists.');
+    expect(res.property).toBe('email');
+    expect(res.value).toBe('razvanlomov@gmail.com');
+    expect(res.constraints).toEqual({
+      isUnique: 'already exists',
+    });
+  });
+
+  it('parseDetail Key (name)=(just-created) already exists.', () => {
+    const res = parseDetail('Key (name)=(just-created) already exists.');
+    expect(res.property).toBe('name');
+    expect(res.value).toBe('just-created');
+    expect(res.constraints).toEqual({
+      isUnique: 'already exists',
+    });
   });
 });
