@@ -1,7 +1,6 @@
 import { TestHelper } from '../../../tests/@utils/TestHelper';
 
 import { projectsFixture, rolesFixture, userProjectFixture, usersFixture } from './@fixtures/post';
-import { ProjectRole } from './project-role.entity';
 
 const h = new TestHelper('/projects/:projectId/roles')
   .addFixture(rolesFixture)
@@ -11,7 +10,7 @@ const h = new TestHelper('/projects/:projectId/roles')
 
 let projectId: number;
 
-describe(`GET ${h.url}`, () => {
+describe(`POST ${h.url}`, () => {
   beforeAll(async () => {
     await h.before();
     projectId = h.entities.Project.find(el => el.title === 'Test User is Owner').id;
@@ -68,15 +67,15 @@ describe(`GET ${h.url}`, () => {
       .expect(422);
   });
 
-  it('by test@mail.com to own project', async () => {
-    const { body } = await h
-      .requestBy('test@mail.com')
-      .post(h.path(projectId))
-      .send({
-        roleId: 'creator',
-      })
-      .expect(201);
-
-    await h.removeCreated(ProjectRole, { role: body.role, project: body.project });
-  });
+  // it('by test@mail.com to own project', async () => {
+  //   const { body } = await h
+  //     .requestBy('test@mail.com')
+  //     .post(h.path(projectId))
+  //     .send({
+  //       roleId: 'creator',
+  //     })
+  //     .expect(201);
+  //
+  //   await h.removeCreated(ProjectRole, { role: body.role, project: body.project });
+  // });
 });

@@ -1,39 +1,42 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Entity, ManyToOne, OneToMany } from 'typeorm';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
+import { IsOptional, IsString } from 'class-validator';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
-import { ProjectRoleAllowedMove } from '../../@orm/project-role-allowed-move/project-role-allowed-move.entity';
 import { Project } from '../../@orm/project/project.entity';
 import { RoleFlow } from '../../@orm/role-flow';
 
-// const WORK_FLOW_EXAMPLE = {
-//   todo: {
-//     stages: [[1000, 2000]],
-//     forward: {
-//       1000: 2001,
-//     },
-//     back: {
-//       1000: 998,
-//     },
-//   },
-//   inProgress: {},
-//   inCheck: {},
-//   done: {},
-// };
+import { ProjectRoleAllowedMove } from './project-role-allowed-move/project-role-allowed-move.entity';
 
+@Unique(['role', 'projectId'])
 @Entity()
 export class ProjectRole {
-  @ApiProperty({ type: String })
-  @ManyToOne(type => RoleFlow, { eager: true, primary: true })
-  role: RoleFlow | string;
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-  @ApiProperty({ type: Number })
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional()
+  @Column({ nullable: true })
+  name: string;
+
+  @ApiProperty({ type: RoleFlow })
+  @ManyToOne(type => RoleFlow, { nullable: false })
+  role!: RoleFlow;
+
+  @ApiProperty()
+  @Column()
+  projectId!: number;
+
+  @Exclude()
   @ManyToOne(type => Project, project => project.roles, {
+    nullable: false,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
-    primary: true,
   })
-  project: Project | number;
+  project!: Project;
 
+  @ApiProperty({ isArray: true, type: ProjectRoleAllowedMove })
   @OneToMany(() => ProjectRoleAllowedMove, m => m.projectRole)
   allowedMoves: ProjectRoleAllowedMove[];
 }

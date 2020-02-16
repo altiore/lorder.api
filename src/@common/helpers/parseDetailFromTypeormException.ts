@@ -7,7 +7,7 @@ export const parseDetail = (
       property: res[1],
       value: res[2],
       constraints: {
-        isUnique: res[3],
+        isDatabaseConstraints: res[3],
       },
     };
   }

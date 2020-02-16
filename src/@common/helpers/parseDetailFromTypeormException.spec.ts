@@ -6,7 +6,7 @@ describe('parseDetailFromTypeormException', () => {
     expect(res.property).toBe('email');
     expect(res.value).toBe('razvanlomov@gmail.com');
     expect(res.constraints).toEqual({
-      isUnique: 'already exists',
+      isDatabaseConstraints: 'already exists',
     });
   });
 
@@ -15,7 +15,7 @@ describe('parseDetailFromTypeormException', () => {
     expect(res.property).toBe('name');
     expect(res.value).toBe('just-created');
     expect(res.constraints).toEqual({
-      isUnique: 'already exists',
+      isDatabaseConstraints: 'already exists',
     });
   });
 });

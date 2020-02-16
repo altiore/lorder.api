@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-import { ProjectRole } from '../../project/role/project-role.entity';
-import { TaskStatusMove } from '../task-status-move/task-status-move.entity';
+import { TaskStatusMove } from '../../../task-status-move/task-status-move.entity';
+import { ProjectRole } from '../project-role.entity';
 
 export enum TASK_STATUS_MOVE_TYPE {
   PREPARING = 'preparing',
@@ -19,13 +19,19 @@ export class ProjectRoleAllowedMove {
   @Column()
   public projectRoleId!: number;
 
-  @ManyToOne(type => ProjectRole, m => m.allowedMoves)
+  @ManyToOne(type => ProjectRole, m => m.allowedMoves, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   public projectRole!: ProjectRole;
 
   @Column()
   public taskStatusMoveId!: number;
 
-  @ManyToOne(type => TaskStatusMove, m => m.allowedMoves)
+  @ManyToOne(type => TaskStatusMove, m => m.allowedMoves, {
+    onDelete: 'RESTRICT',
+    onUpdate: 'CASCADE',
+  })
   public taskStatusMove!: TaskStatusMove;
 
   // Тип задачи в контексте текущей роли
