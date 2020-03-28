@@ -20,12 +20,13 @@ export class ProjectService {
     @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository
   ) {}
 
-  public async findOne(id: number): Promise<Project> {
-    try {
-      return await this.projectRepo.findOneBySuperAdmin(id);
-    } catch (e) {
+  public async findOneBySuperAdmin(id: number): Promise<Project> {
+    const project = await this.projectRepo.findOneByProjectId(id);
+    if (!project) {
       throw new NotFoundException('Проект не найден');
     }
+
+    return project;
   }
 
   public async findOneByMember(projectId: number, user: User): Promise<Project> {
@@ -72,6 +73,17 @@ export class ProjectService {
         monthlyBudget: project.monthlyBudget,
       }
     );
+    // TODO: разобраться, нужны ли разные названия для публичного и не публичного проектов?
+    if (project.pub) {
+      await this.projectPubRepo.update(
+        {
+          uuid: project.pub.uuid,
+        },
+        {
+          title: project.title,
+        }
+      );
+    }
     return project;
   }
 

@@ -29,7 +29,7 @@ export class AccessLevelGuard implements CanActivate {
       request.accessLevel = request.project.accessLevel;
     } catch (e) {
       if (user && user.isSuperAdmin) {
-        request.project = await this.projectService.findOne(projectId);
+        request.project = await this.projectService.findOneBySuperAdmin(projectId);
         request.accessLevel = {
           accessLevel: -1,
           timeSum: null,
