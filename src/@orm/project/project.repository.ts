@@ -10,7 +10,7 @@ import { Project } from './project.entity';
 export class ProjectRepository extends Repository<Project> {
   public async findOneByProjectId(projectId: number): Promise<Project> {
     return await this.findOne({
-      relations: ['projectTaskTypes', 'members', 'pub'],
+      relations: ['pub'],
       where: { id: projectId },
     });
   }

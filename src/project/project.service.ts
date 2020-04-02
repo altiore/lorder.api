@@ -194,4 +194,13 @@ export class ProjectService {
     }
     return statistic;
   }
+
+  async findProjectDetails(project: Project): Promise<Project> {
+    const p = await this.projectRepo.findOne({
+      relations: ['defaultTaskType', 'members', 'projectTaskTypes', 'pub', 'roles'],
+      where: { id: project.id },
+    });
+    p.accessLevel = project.accessLevel;
+    return p;
+  }
 }

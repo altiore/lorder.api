@@ -30,8 +30,8 @@ export class ProjectController {
 
   @Get(':projectId')
   @Auth(res(Project).getOne, ROLES.USER, ACCESS_LEVEL.RED)
-  public one(@ProjectParam() project: Project): Partial<Project> {
-    return project;
+  public one(@ProjectParam() project: Project): Promise<Project> {
+    return this.projectService.findProjectDetails(project);
   }
 
   @Post()
