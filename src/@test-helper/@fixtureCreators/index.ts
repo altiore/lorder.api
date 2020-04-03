@@ -1,4 +1,5 @@
 export * from './project';
+export * from './project-role';
 export * from './role-flow';
 export * from './task';
 export * from './task-logs';

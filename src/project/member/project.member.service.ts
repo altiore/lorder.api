@@ -7,13 +7,17 @@ import { AuthService } from 'auth/auth.service';
 import { DeepPartial } from 'typeorm';
 
 import { IdDto } from '../../@common/dto';
+import { ProjectRoleService } from '../role/project-role.service';
+
+import { UserProjectUpdateDto } from './dto/user-project.update.dto';
 
 @Injectable()
 export class ProjectMemberService {
   constructor(
     @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository,
     @InjectRepository(UserRepository) private readonly userRepo: UserRepository,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly projectRoleService: ProjectRoleService
   ) {}
 
   public async findMember(id: number, project: Project): Promise<UserProject> {
@@ -21,22 +25,24 @@ export class ProjectMemberService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return this.userProjectRepo.findOne({ member: user, project });
+    return this.userProjectRepo.findOne({
+      relations: ['project', 'member'],
+      where: { member: user, project },
+    });
   }
 
-  public async updateMember(memberId: number, project: Project, data: DeepPartial<UserProject>): Promise<UserProject> {
+  public async updateMember(memberId: number, project: Project, data: UserProjectUpdateDto): Promise<UserProject> {
     const member = await this.findMember(memberId, project);
     if (!member) {
       throw new NotFoundException('Member not found in this project');
     }
-    member.accessLevel = data.accessLevel;
-    await this.userProjectRepo.update(
-      { member: member.member, project },
-      {
-        accessLevel: data.accessLevel,
-      }
-    );
-    return member;
+    if (typeof data.accessLevel !== 'undefined') {
+      member.accessLevel = data.accessLevel;
+    }
+    if (typeof data.roles !== 'undefined' && data.roles.length) {
+      member.roles = await this.projectRoleService.findByRoles(data.roles, project);
+    }
+    return await this.userProjectRepo.save(member);
   }
 
   public async invite(

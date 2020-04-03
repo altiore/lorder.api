@@ -1,4 +1,10 @@
-import { createProjects, createUserProjects, createUsers } from '../../../../@test-helper/@fixtureCreators';
+import {
+  createProjectRoles,
+  createProjects,
+  createRoleFlows,
+  createUserProjects,
+  createUsers,
+} from '../../../../@test-helper/@fixtureCreators';
 
 import { ROLES } from '../../../../@orm/role';
 import { ACCESS_LEVEL } from '../../../../@orm/user-project';
@@ -20,6 +26,7 @@ export const usersFixture = createUsers([
 
 export const projectsFixture = createProjects([
   {
+    title: 'Test1',
     owner: { email: 'project-owner@mail.com' },
   },
 ]);
@@ -42,5 +49,31 @@ export const userProjectsFixture = createUserProjects([
     inviter: { email: 'project-owner@mail.com' },
     member: { email: 'member@mail.com' },
     project: { owner: { email: 'project-owner@mail.com' } },
+  },
+]);
+
+export const roleFlows = createRoleFlows([
+  {
+    id: 'architect',
+    name: 'Архитектор',
+  },
+  {
+    id: 'dev-full',
+    name: 'Фулл Стек Разработчик',
+  },
+  {
+    id: 'not-in-project',
+    name: 'Роли нет в проекте',
+  },
+]);
+
+export const projectRoles = createProjectRoles([
+  {
+    role: { id: 'architect' },
+    project: { title: 'Test1' },
+  },
+  {
+    role: { id: 'dev-full' },
+    project: { title: 'Test1' },
   },
 ]);

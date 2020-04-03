@@ -1,12 +1,14 @@
 import { ACCESS_LEVEL, UserProject } from '../../../@orm/user-project';
 import { TestHelper } from '../../../@test-helper/@utils/TestHelper';
 
-import { projectsFixture, userProjectsFixture, usersFixture } from './@fixtures/patch';
+import { projectRoles, projectsFixture, roleFlows, userProjectsFixture, usersFixture } from './@fixtures/patch';
 
 const h = new TestHelper('/projects/:projectId/members/:memberId')
   .addFixture(usersFixture)
   .addFixture(projectsFixture)
-  .addFixture(userProjectsFixture);
+  .addFixture(userProjectsFixture)
+  .addFixture(roleFlows)
+  .addFixture(projectRoles);
 
 let projectId: number;
 let memberId: number;
@@ -30,7 +32,20 @@ describe(`PATCH ${h.url}`, () => {
       });
   });
 
-  it('by project owner', async () => {
+  it('by NOT project owner', async () => {
+    const { body } = await h
+      .requestBy('not-owner@mail.com')
+      .patch(h.path(projectId, memberId))
+      .send({ accessLevel: 3 })
+      .expect(403);
+    expect(body).toEqual({
+      error: 'Forbidden',
+      message: expect.any(String),
+      statusCode: 403,
+    });
+  });
+
+  it('by project owner accessLevel only', async () => {
     const { body } = await h
       .requestBy('project-owner@mail.com')
       .patch(h.path(projectId, memberId))
@@ -48,16 +63,113 @@ describe(`PATCH ${h.url}`, () => {
     expect(up.accessLevel).toBe(ACCESS_LEVEL.YELLOW);
   });
 
-  it('by NOT project owner', async () => {
+  it('by project owner roles only', async () => {
     const { body } = await h
-      .requestBy('not-owner@mail.com')
+      .requestBy('project-owner@mail.com')
       .patch(h.path(projectId, memberId))
-      .send({ accessLevel: 3 })
-      .expect(403);
-    expect(body).toEqual({
-      error: 'Forbidden',
-      message: expect.any(String),
-      statusCode: 403,
+      .send({ roles: ['architect'] })
+      .expect(200);
+    expect(body).toEqual(
+      expect.objectContaining({
+        roles: expect.arrayContaining([
+          expect.objectContaining({
+            role: expect.objectContaining({
+              id: 'architect',
+            }),
+          }),
+        ]),
+      })
+    );
+
+    const up = await h.findOne(UserProject, {
+      relations: ['roles', 'roles.role'],
+      where: {
+        member: { id: memberId },
+        project: { id: projectId },
+      },
     });
+    expect(up.roles).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          role: expect.objectContaining({
+            id: 'architect',
+          }),
+        }),
+      ])
+    );
+  });
+
+  it('by project owner replace roles', async () => {
+    const { body } = await h
+      .requestBy('project-owner@mail.com')
+      .patch(h.path(projectId, memberId))
+      .send({ roles: ['dev-full'] })
+      .expect(200);
+    expect(body).toEqual(
+      expect.objectContaining({
+        roles: expect.arrayContaining([
+          expect.objectContaining({
+            role: expect.objectContaining({
+              id: 'dev-full',
+            }),
+          }),
+        ]),
+      })
+    );
+
+    const up = await h.findOne(UserProject, {
+      relations: ['roles', 'roles.role'],
+      where: {
+        member: { id: memberId },
+        project: { id: projectId },
+      },
+    });
+    expect(up.roles.length).toBe(1);
+    expect(up.roles).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          role: expect.objectContaining({
+            id: 'dev-full',
+          }),
+        }),
+      ])
+    );
+  });
+
+  it('by project owner not existing in project role', async () => {
+    const { body } = await h
+      .requestBy('project-owner@mail.com')
+      .patch(h.path(projectId, memberId))
+      .send({ roles: ['dev-full', 'not-in-project'] })
+      .expect(200);
+    expect(body).toEqual(
+      expect.objectContaining({
+        roles: expect.arrayContaining([
+          expect.objectContaining({
+            role: expect.objectContaining({
+              id: 'dev-full',
+            }),
+          }),
+        ]),
+      })
+    );
+
+    const up = await h.findOne(UserProject, {
+      relations: ['roles', 'roles.role'],
+      where: {
+        member: { id: memberId },
+        project: { id: projectId },
+      },
+    });
+    expect(up.roles.length).toBe(1);
+    expect(up.roles).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          role: expect.objectContaining({
+            id: 'dev-full',
+          }),
+        }),
+      ])
+    );
   });
 });

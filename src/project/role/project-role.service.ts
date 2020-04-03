@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from '@orm/project';
 import { User } from '@orm/user';
 import { classToClass } from 'class-transformer';
+import { In } from 'typeorm';
 
 import { ProjectRoleAllowedMove } from '../../@orm/project-role-allowed-move/project-role-allowed-move.entity';
 import { ProjectRole } from '../../@orm/project-role/project-role.entity';
@@ -46,6 +47,16 @@ export class ProjectRoleService {
     return this.repo.delete({
       project,
       role: { id: roleId },
+    });
+  }
+
+  public async findByRoles(roles: string[], project: Project): Promise<ProjectRole[]> {
+    return await this.repo.find({
+      where: { project: { id: project.id }, role: { id: In(roles) } },
+      relations: ['role'],
+      loadRelationIds: {
+        relations: ['project'],
+      },
     });
   }
 }

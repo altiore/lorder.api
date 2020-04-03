@@ -18,4 +18,10 @@ export class RoleService extends TypeOrmCrudService<RoleFlow> {
   public getOneById(id: string): Promise<RoleFlow> {
     return this.repo.findOne(id);
   }
+
+  public getAllowedByProject(roles: string[]) {
+    return this.repo.find({
+      where: { id: roles },
+    });
+  }
 }

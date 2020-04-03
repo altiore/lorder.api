@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsNumber, Max, Min } from 'class-validator';
+import { IsInt, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 
 import { ACCESS_LEVEL } from '@orm/user-project';
 
@@ -9,6 +9,11 @@ export class UserProjectUpdateDto {
   @Min(ACCESS_LEVEL.RED)
   @IsInt()
   @IsNumber()
-  @IsNotEmpty()
-  public readonly accessLevel: number;
+  @IsOptional()
+  public readonly accessLevel?: number;
+
+  @ApiProperty({ isArray: true, type: String })
+  @IsString({ each: true })
+  @IsOptional()
+  public readonly roles?: string[];
 }
