@@ -6,7 +6,7 @@ import { ACCESS_LEVEL } from '@orm/user-project';
 export class UserProjectUpdateDto {
   @ApiProperty()
   @Max(ACCESS_LEVEL.INDIGO)
-  @Min(ACCESS_LEVEL.RED)
+  @Min(ACCESS_LEVEL.WHITE)
   @IsInt()
   @IsNumber()
   @IsOptional()

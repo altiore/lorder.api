@@ -197,7 +197,7 @@ export class ProjectService {
 
   async findProjectDetails(project: Project): Promise<Project> {
     const p = await this.projectRepo.findOne({
-      relations: ['defaultTaskType', 'members', 'projectTaskTypes', 'pub', 'roles'],
+      relations: ['defaultTaskType', 'members', 'members.roles', 'projectTaskTypes', 'pub', 'roles'],
       where: { id: project.id },
     });
     p.accessLevel = project.accessLevel;

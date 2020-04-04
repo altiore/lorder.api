@@ -28,11 +28,11 @@ export class UserProjectRepository extends Repository<UserProject> {
     const entity = await this.findOneOrFail({
       where: { member, project },
     });
+    entity.project = project as Project;
     if (entity.accessLevel >= ACCESS_LEVEL.RED) {
       return entity;
     }
     entity.accessLevel = ACCESS_LEVEL.RED;
-    entity.project = project as Project;
     return await this.save(entity);
   }
 
