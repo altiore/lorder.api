@@ -102,6 +102,7 @@ describe(`PATCH ${h.url}`, () => {
       email,
       id: expect.any(Number),
       role: 'user',
+      tel: expect.any(String),
     });
   });
 
@@ -142,6 +143,7 @@ describe(`PATCH ${h.url}`, () => {
       email,
       id: expect.any(Number),
       role: 'admin',
+      tel: expect.any(String),
     });
   });
 
@@ -182,6 +184,7 @@ describe(`PATCH ${h.url}`, () => {
       email,
       id: expect.any(Number),
       role: 'super-admin',
+      tel: expect.any(String),
     });
   });
 

@@ -78,6 +78,7 @@ describe(`GET ${h.url}`, () => {
       email,
       id: expect.any(Number),
       role: 'user',
+      tel: expect.any(String),
     });
     const addedUser = await h.findOne(User, { email });
     expect(addedUser).toEqual(
@@ -115,6 +116,7 @@ describe(`GET ${h.url}`, () => {
       email,
       id: expect.any(Number),
       role: 'user',
+      tel: expect.any(String),
     });
     const addedUser = await h.findOne(User, { email });
     expect(addedUser).toEqual(
@@ -153,6 +155,7 @@ describe(`GET ${h.url}`, () => {
       email,
       id: expect.any(Number),
       role: 'user',
+      tel: expect.any(String),
     });
     const addedUser = await h.findOne(User, { email });
     expect(addedUser).toEqual(

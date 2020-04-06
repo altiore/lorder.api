@@ -142,6 +142,7 @@ export class User {
     email: string;
     id: number;
     role: ROLES;
+    tel: string;
   } {
     return {
       avatar: this.avatarUrl,
@@ -150,6 +151,7 @@ export class User {
       email: this.email,
       id: this.id,
       role: this.role,
+      tel: this.tel || '',
     };
   }
 }
