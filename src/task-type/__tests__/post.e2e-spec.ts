@@ -50,14 +50,14 @@ describe(`POST ${h.url}`, () => {
       .requestBy('super-admin@mail.com')
       .post(h.path())
       .send({
-        title: '',
+        name: '',
       })
       .expect(422);
   });
 
   it('by super-admin@mail.com only with title', async () => {
     const taskType = {
-      title: 'Test type',
+      name: 'Test type',
     };
 
     const { body } = await h
@@ -68,10 +68,7 @@ describe(`POST ${h.url}`, () => {
 
     expect(body).toEqual({
       ...taskType,
-      color: '#D5D5D5',
-      icon: null,
       id: expect.any(Number),
-      isPublic: expect.any(Boolean),
     });
 
     await h.removeCreated(TaskType, { id: body.id });
@@ -79,9 +76,7 @@ describe(`POST ${h.url}`, () => {
 
   it('by super-admin@mail.com with correct data', async () => {
     const taskType = {
-      color: '#F8A377',
-      icon: 'bug',
-      title: 'Test type',
+      name: 'Test type',
     };
 
     const { body } = await h
@@ -93,7 +88,6 @@ describe(`POST ${h.url}`, () => {
     expect(body).toEqual({
       ...taskType,
       id: expect.any(Number),
-      isPublic: expect.any(Boolean),
     });
 
     await h.removeCreated(TaskType, { id: body.id });

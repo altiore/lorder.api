@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsHexColor, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class CreateTaskTypeDto {
   @ApiProperty()
@@ -7,17 +7,5 @@ export class CreateTaskTypeDto {
   @MaxLength(40)
   @MinLength(3)
   @IsNotEmpty()
-  title: string;
-
-  @ApiProperty()
-  @MaxLength(12)
-  @MinLength(3)
-  @IsString()
-  @IsOptional()
-  icon: string;
-
-  @ApiProperty()
-  @IsHexColor()
-  @IsOptional()
-  color: string;
+  name: string;
 }

@@ -18,6 +18,6 @@ export const usersFixture = createUsers([
 
 export const taskTypesFixtures = createTaskTypes([
   {
-    title: 'Already exists',
+    name: 'Already exists',
   },
 ]);

@@ -18,12 +18,12 @@ export const usersFixture = createUsers([
 
 export const taskTypesFixtures = createTaskTypes([
   {
-    title: 'First type',
+    name: 'First type',
   },
   {
-    title: 'Second type',
+    name: 'Second type',
   },
   {
-    title: 'Third type',
+    name: 'Third type',
   },
 ]);

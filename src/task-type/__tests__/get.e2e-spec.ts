@@ -25,7 +25,7 @@ describe(`GET ${h.url}`, () => {
       .get(h.path())
       .expect(200);
 
-    expect(body).toEqual(h.entities.TaskType);
+    expect(body).toEqual(expect.arrayContaining(h.entities.TaskType));
   });
 
   it('by admin@mail.com', async () => {
@@ -34,7 +34,7 @@ describe(`GET ${h.url}`, () => {
       .get(h.path())
       .expect(200);
 
-    expect(body).toEqual(h.entities.TaskType);
+    expect(body).toEqual(expect.arrayContaining(h.entities.TaskType));
   });
 
   it('by owner', async () => {
@@ -43,6 +43,6 @@ describe(`GET ${h.url}`, () => {
       .get(h.path())
       .expect(200);
 
-    expect(body).toEqual(h.entities.TaskType);
+    expect(body).toEqual(expect.arrayContaining(h.entities.TaskType));
   });
 });

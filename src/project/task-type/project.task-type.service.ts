@@ -54,7 +54,7 @@ export class ProjectTaskTypeService {
   public async createTaskType(project: DeepPartial<Project>, taskInfo: CreateTaskTypeDto): Promise<TaskType> {
     let taskType = await this.taskTypeRepo.findOne({
       where: {
-        title: taskInfo.title,
+        name: taskInfo.name,
       },
     });
     if (!taskType) {

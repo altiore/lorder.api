@@ -10,20 +10,8 @@ export class TaskType {
   id: number;
 
   @ApiProperty()
-  @Column({ nullable: false })
-  title: string;
-
-  @ApiProperty()
-  @Column({ nullable: true })
-  icon: string | null;
-
-  @ApiProperty()
-  @Column({ default: '#D5D5D5', nullable: true })
-  color: string | null;
-
-  @ApiProperty()
-  @Column({ default: false, nullable: false })
-  isPublic: boolean;
+  @Column({ nullable: false, unique: true })
+  name: string;
 
   @OneToMany(type => ProjectTaskType, projectTaskType => projectTaskType.taskType)
   projectTaskTypes: ProjectTaskType[];
