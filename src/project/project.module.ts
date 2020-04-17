@@ -33,7 +33,7 @@ import { TaskLogModule } from './task/task-log/task-log.module';
     forwardRef(() => AuthModule),
     forwardRef(() => TaskLogModule),
     forwardRef(() => TaskModule),
-    ProjectRoleModule,
+    forwardRef(() => ProjectRoleModule),
     RedisModule.registerCache(),
     TypeOrmModule.forFeature([
       ProjectPubRepository,

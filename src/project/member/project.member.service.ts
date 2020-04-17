@@ -4,9 +4,11 @@ import { Project } from '@orm/project';
 import { EmailDto, User, UserRepository } from '@orm/user';
 import { UserProject, UserProjectRepository } from '@orm/user-project';
 import { AuthService } from 'auth/auth.service';
-import { DeepPartial } from 'typeorm';
+import * as moment from 'moment';
+import { DeepPartial, EntityManager } from 'typeorm';
 
 import { IdDto } from '../../@common/dto';
+import { UserWork } from '../../@orm/user-work';
 import { ProjectRoleService } from '../role/project-role.service';
 
 import { UserProjectUpdateDto } from './dto/user-project.update.dto';
@@ -76,5 +78,32 @@ export class ProjectMemberService {
 
   public getAllByProject(project: Project, user: User): Promise<UserProject[]> {
     return this.userProjectRepo.findWithStatistic(project);
+  }
+
+  public async addTime(userWork: UserWork, entityManager?: EntityManager): Promise<UserProject> {
+    const manager = entityManager || this.userProjectRepo.manager;
+    if (typeof userWork.projectId !== 'number') {
+      throw new NotAcceptableException(
+        'Можно добавить время только в работу пользователя, привязанную к задаче проекта'
+      );
+    }
+    const userProject = await manager.findOne(UserProject, {
+      member: { id: userWork.userId } as User,
+      project: { id: userWork.projectId } as Project,
+    });
+
+    if (!userProject) {
+      throw new NotFoundException('Проект пользователя не был найден!');
+    }
+
+    if (!userWork.finishAt || !userWork.startAt) {
+      throw new NotAcceptableException('Начало или конец не заданны');
+    }
+
+    const addedTimeSum = moment(userWork.finishAt).diff(moment(userWork.startAt));
+    userProject.timeSum += addedTimeSum;
+    userProject.valueSum =
+      userWork.task.value && userWork.task.users.length ? userWork.task.value / userWork.task.users.length : 0;
+    return await manager.save(userProject);
   }
 }

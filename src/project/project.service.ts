@@ -1,13 +1,17 @@
 import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { EntityManager } from 'typeorm';
 
 import { get, pick } from 'lodash';
+import * as moment from 'moment';
 
 import { Project, ProjectDto, ProjectRepository } from '@orm/project';
 import { ProjectPub, ProjectPubRepository } from '@orm/project-pub';
-import { Task, TaskRepository } from '@orm/task';
+import { TaskRepository } from '@orm/task';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL, UserProject, UserProjectRepository } from '@orm/user-project';
+
+import { UserWork } from '../@orm/user-work';
 
 import { ProjectPaginationDto } from './@dto';
 
@@ -120,59 +124,100 @@ export class ProjectService {
   }
 
   /**
+   * считаем как для всех проектов (если projectId = 0), так и для одного проекта.
+   * Для всех проектов нужно пересчитать, если работа пользователя изменилась. В этом случае могут быть затронуты
+   * другие проекты и пересчитать нужно все.
+   * Один проект считаем, когда нужно обновить информацию для проекта
+   */
+  public async calculateUserStatistic(
+    user: User,
+    projectId: number = 0,
+    entityManager?: EntityManager
+  ): Promise<{ [key: number]: { timeSum: number; valueSum: number } }> {
+    const manager = entityManager || this.projectRepo.manager;
+
+    const step = 10;
+    let i = 0;
+    let userWorkPortion;
+    const projectTimeSums: { [key: number]: { timeSum: number; valueSum: number } } = {};
+
+    do {
+      // TODO: userProject должен хранить последний зафиксированный элемент, чтоб можно было пересчитывать только
+      // последнюю измененную часть
+      const where: any = { member: user };
+      if (projectId) {
+        where.project = { id: projectId };
+      }
+      userWorkPortion = await manager.find(UserWork, {
+        relations: ['task', 'task.users'],
+        skip: i * step,
+        take: step,
+        where,
+      });
+      if (!userWorkPortion || !userWorkPortion.length) {
+        break;
+      }
+
+      userWorkPortion.map((uw: UserWork) => {
+        projectTimeSums[uw.task.projectId] = {
+          timeSum:
+            (get(projectTimeSums, [uw.task.projectId, 'timeSum'], 0) || 0) +
+            moment(uw.finishAt).diff(moment(uw.startAt)),
+          valueSum: Math.round((100 * (uw.task.value || 0)) / uw.task.users.length) / 100,
+        };
+      });
+      i++;
+    } while (userWorkPortion.length === step);
+
+    await Promise.all(
+      Object.keys(projectTimeSums).map(async prId => {
+        await manager.update(
+          UserProject,
+          { projectId: prId, memberId: user.id },
+          {
+            timeSum: projectTimeSums[prId].timeSum > 0 ? projectTimeSums[prId].timeSum : 0,
+            valueSum: projectTimeSums[prId].valueSum > 0 ? projectTimeSums[prId].valueSum : 0,
+          }
+        );
+      })
+    );
+
+    return projectTimeSums;
+  }
+
+  /**
    * TODO: logic must be more complicated because of can be huge amount of data
    */
-  public async updateStatistic(project: Project): Promise<any> {
-    let statistic = {};
+  public async updateStatistic(
+    project: Project
+  ): Promise<{
+    data: { [key: number]: { value: number; time: number } };
+    members: Array<{
+      accessLevel: ACCESS_LEVEL;
+      avatar?: string;
+      email: string;
+      id: number;
+    }>;
+  }> {
     try {
       const projectWithMembers = await this.projectRepo.findOne({
         relations: ['members', 'pub'],
         where: { id: project.id },
       });
-      const data: { [key in any]: { value: number; time: number } } = projectWithMembers.members.reduce(
-        (res, member: UserProject) => {
-          res[member.member.id] = { time: 0, value: 0 };
-          return res;
-        },
-        {}
-      );
-      const step = 2;
-      let i = 0;
-      let tasksPortion;
-      do {
-        tasksPortion = await this.taskRepo.find({
-          relations: ['userWorks', 'users'],
-          skip: step * i,
-          take: step,
-          where: { project },
-        });
-        if (!tasksPortion || !tasksPortion.length) {
-          break;
-        }
-        tasksPortion.map((task: Task) => {
-          task.userWorks.map(work => {
-            if (work.finishAt) {
-              if (data[work.userId]) {
-                data[work.userId].time += work.finishAt.clone().diff(work.startAt.clone());
-              }
-            }
-          });
-          const membersCount = get(task, ['users', 'length']);
-          if (membersCount && task.value) {
-            task.users.map(taskUser => {
-              // TODO: нужно избавиться здесь от проверки и запретить удалять пользователей из
-              //  проекта, если у них есть хотя бы одна не нулевая работа
-              if (data[taskUser.id]) {
-                // TODO: учитывать так же коэффициент роли пользователя
-                data[taskUser.id].value += Math.round((100 * (task.value || 0)) / membersCount) / 100;
-              }
-            });
-          }
-        });
-        i++;
-      } while (tasksPortion.length === step);
 
-      statistic = {
+      const data: { [key: number]: { value: number; time: number } } = {};
+      await Promise.all(
+        projectWithMembers.members.map(async member => {
+          const stats = await this.calculateUserStatistic(member.member, project.id);
+          data[member.member.id] = {
+            time: get(stats, [project.id, 'timeSum'], 0),
+            value: get(stats, [project.id, 'valueSum'], 0),
+          };
+          return stats;
+        })
+      );
+
+      const statistic = {
         data,
         members: projectWithMembers.members.map(member => ({
           accessLevel: member.accessLevel,
@@ -189,10 +234,11 @@ export class ProjectService {
           }
         );
       }
+
+      return statistic;
     } catch (e) {
       throw e;
     }
-    return statistic;
   }
 
   async findProjectDetails(project: Project): Promise<Project> {

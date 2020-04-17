@@ -1,13 +1,15 @@
 import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+
+import * as moment from 'moment';
+
 import { Project } from '@orm/project';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
 import { UserWork, UserWorkRepository } from '@orm/user-work';
-import { Moment } from 'moment';
-import moment = require('moment');
 
 import { PaginationDto } from '../@common/dto/pagination.dto';
+import { ProjectMemberService } from '../project/member/project.member.service';
 import { ProjectService } from '../project/project.service';
 import { TaskService } from '../task/task.service';
 import { UserService } from '../user/user.service';
@@ -20,7 +22,8 @@ export class UserWorkService {
     @InjectRepository(UserWorkRepository) private readonly userWorkRepo: UserWorkRepository,
     private readonly projectService: ProjectService,
     private readonly userService: UserService,
-    private readonly taskService: TaskService
+    private readonly taskService: TaskService,
+    private readonly projectMemberService: ProjectMemberService
   ) {}
 
   public findAll(pagesDto: PaginationDto, user: User): Promise<UserWork[]> {
@@ -51,9 +54,47 @@ export class UserWorkService {
     return userWork;
   }
 
+  public async updateTime(userWork: UserWork, user: User, recalculate: boolean = false): Promise<UserWork> {
+    let res = userWork;
+    if (!userWork.projectId || !userWork.task.users) {
+      userWork.task = await this.taskService.findOneByIdWithUsers(userWork.taskId);
+    }
+    await this.userWorkRepo.manager.transaction(async entityManager => {
+      res = await entityManager.save(UserWork, userWork);
+      if (recalculate) {
+        await this.projectService.calculateUserStatistic(user, 0, entityManager);
+      } else {
+        await this.projectMemberService.addTime(userWork, entityManager);
+      }
+    });
+    return res;
+  }
+
+  public async remove(userWork: UserWork): Promise<UserWork> {
+    // TODO: пересчитать статистику
+    return await this.userWorkRepo.remove(userWork);
+  }
+
+  public async finishTask(userWork: UserWork, user: User): Promise<UserWork> {
+    userWork.finishAt = moment();
+    if (!userWork.projectId || !userWork.task.users) {
+      userWork.task = await this.taskService.findOneByIdWithUsers(userWork.taskId);
+    }
+    if (userWork.task.users.findIndex(el => el.id === user.id) === -1) {
+      userWork.task.users.push(user);
+      await this.userWorkRepo.manager.save(userWork.task);
+    }
+    return await this.updateTime(userWork, user, false);
+  }
+
   public async finishNotFinished(user: User): Promise<UserWork[]> {
     const userWorks = await this.userWorkRepo.findNotFinishedByUser(user);
-    return await this.userWorkRepo.finishTask(userWorks);
+
+    return await Promise.all(
+      userWorks.map(async userWork => {
+        return await this.finishTask(userWork, user);
+      })
+    );
   }
 
   public async start(project: Project, user: User, userWorkData: UserWorkCreateDto): Promise<StartResponse> {
@@ -77,7 +118,7 @@ export class UserWorkService {
     if (userWork.finishAt) {
       throw new NotAcceptableException('Эта задача уже завершена. Вы не можете завершить одну и ту же задачу дважды');
     }
-    const previous = await this.userWorkRepo.finishTask(userWork);
+    const previous = await this.finishTask(userWork, user);
     let defaultProject;
     if (user.defaultProjectId) {
       defaultProject = await this.projectService.findOneByMember(user.defaultProjectId, user);
@@ -98,10 +139,6 @@ export class UserWorkService {
       next,
       previous,
     };
-  }
-
-  public remove(userWork: UserWork): Promise<UserWork> {
-    return this.userWorkRepo.remove(userWork);
   }
 
   public async update(userWork: UserWork, userWorkDto: UserWorkPatchDto, user: User): Promise<UserWorkEditResultDto> {
@@ -126,7 +163,11 @@ export class UserWorkService {
             : !userWorkDto.finishAt)
       );
       if (removed.length) {
-        await this.userWorkRepo.remove(removed);
+        await Promise.all(
+          touched.map(async uw => {
+            return await this.remove(uw);
+          })
+        );
       }
 
       // 3. изменить все задачи, которые затрагивает этот промежуток времени
@@ -140,13 +181,17 @@ export class UserWorkService {
           }
           return el;
         });
-        await this.userWorkRepo.save(touched);
+        await Promise.all(
+          touched.map(async uw => {
+            return await this.updateTime(uw, user, true);
+          })
+        );
       }
     }
 
     // 4. изменить изменяемую задачу
     const updateUserWork = this.userWorkRepo.merge(userWork, userWorkDto);
-    const edited = await this.userWorkRepo.save(updateUserWork);
+    const edited = await this.updateTime(updateUserWork, user, true);
 
     return {
       edited,
@@ -163,7 +208,7 @@ export class UserWorkService {
     project: Project,
     user: User,
     userWorkData: UserWorkCreateDto,
-    startAt: Moment
+    startAt: moment.Moment
   ): Promise<UserWork> {
     let task;
     if (userWorkData.taskId) {

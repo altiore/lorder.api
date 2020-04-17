@@ -10,9 +10,16 @@ import { ACCESS_LEVEL } from './user-project.consts';
 @Entity()
 export class UserProject {
   static simpleFields = ['accessLevel', 'timeSum', 'valueSum'];
+
+  @Column({ primary: true })
+  memberId: number;
+
   @ApiProperty({ type: () => User })
   @ManyToOne(t => User, m => m.memberProjects, { eager: true, primary: true })
   member: User;
+
+  @Column({ primary: true })
+  projectId: number;
 
   @ManyToOne(t => Project, m => m.members, {
     onDelete: 'CASCADE',
