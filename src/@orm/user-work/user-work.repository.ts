@@ -1,6 +1,6 @@
 import moment = require('moment');
 import { Moment } from 'moment';
-import { EntityRepository, IsNull, Repository } from 'typeorm';
+import { EntityRepository, IsNull, Repository, SelectQueryBuilder } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Task } from '../task/task.entity';
@@ -57,7 +57,7 @@ export class UserWorkRepository extends Repository<UserWork> {
 
   public async findNotFinishedByUser(user: User): Promise<UserWork[]> {
     const entities = await this.find({
-      relations: ['task', 'task.users'],
+      relations: ['task', 'task.userTasks'],
       where: { finishAt: IsNull(), user },
     });
     return entities.map(this.prepare);
@@ -69,7 +69,7 @@ export class UserWorkRepository extends Repository<UserWork> {
     startAt: moment.Moment,
     finishAt?: moment.Moment
   ): Promise<UserWork[]> {
-    let query;
+    let query: SelectQueryBuilder<UserWork>;
     if (finishAt) {
       query = this.createQueryBuilder().orWhere(
         `UserWork.id != :id AND UserWork.userId = :userId AND UserWork.startAt BETWEEN :start AND :finish`,

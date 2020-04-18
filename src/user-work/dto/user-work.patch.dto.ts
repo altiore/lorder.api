@@ -39,7 +39,7 @@ export class UserWorkPatchDto {
   @IsOptional()
   taskId?: number;
 
-  // validated during check access
+  // MUST BE HERE, because of validated during check access
   @ApiProperty()
   @IsNotEmpty()
   projectId: number;

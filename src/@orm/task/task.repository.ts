@@ -23,7 +23,7 @@ export class TaskRepository extends TreeRepository<Task> {
   ): Promise<[Task[], number]> {
     return this.findAndCount({
       order: { [orderBy]: order.toUpperCase() },
-      relations: ['users'],
+      relations: ['userTasks'],
       skip,
       take: count,
       where: { project: { id: projectId }, isArchived: false },
@@ -39,7 +39,7 @@ export class TaskRepository extends TreeRepository<Task> {
       order: {
         [orderBy]: order.toUpperCase(),
       },
-      relations: ['users'],
+      relations: ['userTasks'],
       skip,
       take: count,
       where: {

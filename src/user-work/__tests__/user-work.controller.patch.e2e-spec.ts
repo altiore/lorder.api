@@ -302,6 +302,27 @@ describe(`PATCH ${h.url}`, () => {
     });
   });
 
+  it('by owner with not existing taskId', async () => {
+    const newValue = {
+      description: lorem.words(2),
+      finishAt: moment()
+        .subtract(2, 'minutes')
+        .toISOString(),
+      projectId,
+      source: lorem.words(2),
+      startAt: moment()
+        .subtract(20, 'minutes')
+        .toISOString(),
+      taskId: 444,
+      value: 10,
+    };
+    await h
+      .requestBy('super-admin@mail.com')
+      .patch(h.path(userWorkId))
+      .send(newValue)
+      .expect(422);
+  });
+
   it('by owner with correct data', async () => {
     const newValue = {
       description: lorem.words(2),
@@ -313,7 +334,7 @@ describe(`PATCH ${h.url}`, () => {
       startAt: moment()
         .subtract(20, 'minutes')
         .toISOString(),
-      taskId: 4,
+      taskId: h.entities.Task[1].id,
       value: 10,
     };
     const { body } = await h
@@ -343,7 +364,7 @@ describe(`PATCH ${h.url}`, () => {
       projectId,
       source: lorem.words(2),
       startAt: undefined,
-      taskId: 4,
+      taskId: h.entities.Task[1].id,
       value: 10,
     };
     const { body } = await h
@@ -373,7 +394,7 @@ describe(`PATCH ${h.url}`, () => {
       projectId,
       source: lorem.words(2),
       startAt: moment().subtract(40, 'minutes'),
-      taskId: 4,
+      taskId: h.entities.Task[1].id,
       value: 10,
     };
     const { body } = await h

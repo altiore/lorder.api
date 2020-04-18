@@ -5,9 +5,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from '@orm/project';
 import { ProjectTaskTypeRepository } from '@orm/project-task-type';
 import { Task, TaskRepository } from '@orm/task';
-import { User, UserRepository } from '@orm/user';
+import { User } from '@orm/user';
 import { ACCESS_LEVEL, UserProjectRepository } from '@orm/user-project';
 import { TaskService } from 'task/task.service';
+
+import { TaskType } from '../../@orm/task-type/task-type.entity';
 
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
 import { ProjectTaskGateway } from './project.task.gateway';
@@ -17,7 +19,6 @@ export class ProjectTaskService {
   constructor(
     // TODO: remove taskRepo from this file and use taskService instead!!!
     @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository,
-    @InjectRepository(UserRepository) private readonly userRepo: UserRepository,
     @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository,
     @InjectRepository(ProjectTaskTypeRepository) private readonly projectTaskTypeRepo: ProjectTaskTypeRepository,
     private readonly taskGateway: ProjectTaskGateway,
@@ -132,7 +133,7 @@ export class ProjectTaskService {
         if (!projectTaskType) {
           throw new ValidationException(undefined, 'Тип задачи не был найдет в текущем проекте');
         }
-        preparedData.type = projectTaskType.taskType;
+        preparedData.type = { id: projectTaskType.taskType.id } as TaskType;
       }
       preparedData.typeId = taskDto.typeId;
     }
@@ -150,16 +151,10 @@ export class ProjectTaskService {
         if (!performer) {
           throw new ValidationException(undefined, 'Исполнитель не был найдет в текущем проекте');
         }
-        preparedData.performer = performer.member;
+        preparedData.performer = { id: performer.member.id } as User;
       }
     }
 
-    if (taskDto.users && taskDto.users.length) {
-      preparedData.users = await this.userRepo.findAllByIds(taskDto.users);
-      if (taskDto.users.length !== preparedData.users.length) {
-        throw new ValidationException(undefined, 'Не все пльзователи были найдены');
-      }
-    }
     return preparedData;
   }
 

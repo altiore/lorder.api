@@ -58,21 +58,21 @@ export const tasksFixture = createTasks([
     project: { owner: { email: 'super-admin@mail.com' } },
     status: 2,
     title: 'First Task',
-    users: [{ email: 'user@mail.com' }],
+    userTasks: [{ user: { email: 'user@mail.com' } }],
   },
   {
     performer: { email: 'removed@mail.com' },
     project: { owner: { email: 'super-admin@mail.com' } },
     status: 2,
     title: 'Second Task',
-    users: [{ email: 'removed@mail.com' }],
+    userTasks: [{ user: { email: 'removed@mail.com' } }],
   },
   {
     performer: { email: 'white-status@mail.com' },
     project: { owner: { email: 'super-admin@mail.com' } },
     status: 2,
     title: 'Third Task',
-    users: [{ email: 'white-status@mail.com' }],
+    userTasks: [{ user: { email: 'white-status@mail.com' } }],
   },
 ]);
 

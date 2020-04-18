@@ -37,7 +37,7 @@ export class TaskService {
     withoutRelations = false
   ): Promise<Task> {
     const task = await this.taskRepo.findOne({
-      relations: withoutRelations ? [] : ['performer', 'userWorks', 'users'],
+      relations: withoutRelations ? [] : ['performer', 'userWorks', 'userTasks'],
       where: {
         id: taskId,
         ...where,
@@ -52,20 +52,21 @@ export class TaskService {
     if (!task.project || !task.project.isAccess(accessLevel)) {
       throw new ForbiddenException('Доступ к этой задаче запрещен');
     }
-    task.children = await this.taskRepo.findDescendants(task);
     return task;
   }
 
   public async archive(taskId: number, user: User): Promise<Task> {
     const task = await this.findOneById(taskId, user, ACCESS_LEVEL.YELLOW, { isArchived: false });
 
-    await this.taskRepo.manager.transaction(async entityManager => {
-      const prevTaskVersion = cloneDeep(task);
-      task.isArchived = true;
-      await entityManager.save(task);
-      const taskLog = this.taskLogRepo.createTaskLogByType(TASK_CHANGE_TYPE.ARCHIVE, task, user, prevTaskVersion);
-      await entityManager.save(taskLog);
-    });
+    if (task) {
+      await this.taskRepo.manager.transaction(async entityManager => {
+        const prevTaskVersion = cloneDeep(task);
+        task.isArchived = true;
+        await entityManager.save(task);
+        const taskLog = this.taskLogRepo.createTaskLogByType(TASK_CHANGE_TYPE.ARCHIVE, task, user, prevTaskVersion);
+        await entityManager.save(taskLog);
+      });
+    }
 
     return task;
   }
@@ -76,7 +77,7 @@ export class TaskService {
 
   public async findOne(sequenceNumber: number, project: Project, user: User): Promise<Task> {
     const task = await this.taskRepo.findOne({
-      relations: ['performer', 'userWorks', 'users'],
+      relations: ['performer', 'userWorks', 'userTasks'],
       where: {
         project,
         sequenceNumber,
@@ -85,19 +86,17 @@ export class TaskService {
     if (!task) {
       throw new NotFoundException('Задача не была найдена');
     }
-    task.children = await this.taskRepo.findDescendants(task);
     return task;
   }
 
   public async findOneByIdWithUsers(id: number): Promise<Task> {
     const task = await this.taskRepo.findOne({
-      relations: ['performer', 'users'],
+      relations: ['performer', 'userTasks'],
       where: { id },
     });
     if (!task) {
       throw new NotFoundException('Задача не была найдена');
     }
-    task.children = await this.taskRepo.findDescendants(task);
     return task;
   }
 
@@ -106,7 +105,6 @@ export class TaskService {
     await this.taskRepo.manager.transaction(async entityManager => {
       task = await this.taskRepo.createByProject(taskData, project);
       task.performerId = taskData.performerId || user.id;
-      task.users = [user];
       task = await entityManager.save(task);
 
       const taskLog = this.taskLogRepo.createTaskLogByType(TASK_CHANGE_TYPE.CREATE, task, user, {});
@@ -116,8 +114,7 @@ export class TaskService {
   }
 
   async updateByUser(task: Task, newTaskData: Partial<Task>, user: User): Promise<Task> {
-    let updatedTask: Task;
-
+    let updatedTask: Task = task;
     try {
       await this.taskRepo.manager.transaction(async entityManager => {
         const changeType =
@@ -126,12 +123,12 @@ export class TaskService {
             : TASK_CHANGE_TYPE.UPDATE;
         const taskLog = this.taskLogRepo.createTaskLogByType(changeType, task, user);
         await entityManager.save(taskLog);
+        await entityManager.update(Task, { id: task.id }, newTaskData);
         updatedTask = this.taskRepo.merge(task, newTaskData);
-        updatedTask = await entityManager.save(updatedTask);
       });
       return updatedTask;
     } catch (e) {
-      throw new NotAcceptableException('Не удается переместить задачу...');
+      throw new NotAcceptableException('Не удается изменить задачу...');
     }
   }
 }

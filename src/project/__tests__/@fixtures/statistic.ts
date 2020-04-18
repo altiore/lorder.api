@@ -65,33 +65,33 @@ export const tasksFixture = createTasks([
   {
     project: { title: 'First' },
     title: 'First Project, task 1',
-    users: [{ email: 'user@mail.com' }],
+    userTasks: [{ user: { email: 'user@mail.com' } }],
     value: 10,
   },
   {
     project: { title: 'First' },
     title: 'First Project, task 2',
-    users: [{ email: 'user@mail.com' }],
+    userTasks: [{ user: { email: 'user@mail.com' } }],
     value: 14,
   },
   {
     project: { title: 'First' },
     title: 'First Project, task 3',
-    users: [{ email: 'user@mail.com' }],
+    userTasks: [{ user: { email: 'user@mail.com' } }],
     value: 20,
   },
 
   {
     project: { title: 'Third' },
     title: 'Third Project, task 1',
-    users: [{ email: 'user@mail.com' }],
+    userTasks: [{ user: { email: 'user@mail.com' } }],
     value: 1,
   },
 
   {
     project: { title: 'Fourth' },
     title: 'Fourth Project, task 1',
-    users: [{ email: 'user@mail.com' }],
+    userTasks: [{ user: { email: 'user@mail.com' } }],
     value: null,
   },
 ]);

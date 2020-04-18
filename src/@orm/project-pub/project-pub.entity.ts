@@ -1,6 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
+import { get } from 'lodash';
+
 import { Project } from '../project/project.entity';
 
 @Entity()
@@ -29,6 +31,10 @@ export class ProjectPub {
   @ApiProperty()
   @Column({ default: true })
   isOpen: boolean;
+
+  get members() {
+    return get(this.project, ['members']);
+  }
 
   @ApiPropertyOptional()
   @Column({ type: 'json', default: {} })

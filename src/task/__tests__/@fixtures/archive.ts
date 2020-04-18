@@ -33,12 +33,12 @@ export const tasksFixture = createTasks([
   {
     project: { owner: { email: 'task-owner@mail.com' } },
     title: 'task1',
-    users: [{ email: 'task-owner@mail.com' }],
+    userTasks: [{ user: { email: 'task-owner@mail.com' } }],
   },
   {
     isArchived: true,
     project: { owner: { email: 'task-owner@mail.com' } },
     title: 'already-archived',
-    users: [{ email: 'task-owner@mail.com' }],
+    userTasks: [{ user: { email: 'task-owner@mail.com' } }],
   },
 ]);

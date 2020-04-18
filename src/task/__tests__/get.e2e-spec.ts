@@ -45,7 +45,7 @@ describe(`GET ${h.url}`, () => {
           title: expect.any(String),
           typeId: null,
           updatedAt: expect.any(String),
-          users: expect.any(Array),
+          userTasks: expect.any(Array),
           value: expect.any(Number),
         },
       ])

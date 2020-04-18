@@ -68,6 +68,6 @@ export const tasksFixture = createTasks([
   {
     project: { owner: { email: 'project-owner@mail.com' } },
     title: 'task1',
-    users: [{ email: 'member@mail.com' }],
+    userTasks: [{ user: { email: 'member@mail.com' } }],
   },
 ]);

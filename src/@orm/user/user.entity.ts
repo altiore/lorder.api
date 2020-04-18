@@ -6,8 +6,6 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  JoinTable,
-  ManyToMany,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -18,7 +16,6 @@ import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { Media } from '../media/media.entity';
 import { Project } from '../project/project.entity';
 import { Role, ROLES } from '../role/role.entity';
-import { Task } from '../task/task.entity';
 import { UserProject } from '../user-project/user-project.entity';
 import { UserRole } from '../user-role/user-role.entity';
 import { UserWork } from '../user-work/user-work.entity';
@@ -104,13 +101,6 @@ export class User {
 
   @OneToMany(type => UserProject, userProject => userProject.member)
   invitedMembers: UserProject[];
-
-  @ManyToMany(type => Task, task => task.users, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinTable({ name: 'user_tasks' })
-  tasks: Task[];
 
   @OneToMany(type => UserWork, userWork => userWork.user)
   works: UserWork[];

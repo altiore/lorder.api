@@ -17,7 +17,7 @@ export class TaskLogRepository extends TreeRepository<TaskLog> {
     return this.create({
       changeType: taskChangeType,
       createdBy: performer,
-      prevVersion: omit(prevVersion || task, ['performer', 'userWorks', 'users', 'project', 'children']),
+      prevVersion: omit(prevVersion || task, ['performer', 'userWorks', 'userTasks', 'project', 'children']),
       task,
     });
   }

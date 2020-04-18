@@ -4,7 +4,7 @@ import { Task } from '../../@orm/task';
 import { UserWork } from '../../@orm/user-work';
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
 
-import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/patch';
+import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/stop';
 
 const h = new TestHelper('/user-works/:userTaskId/stop')
   .addFixture(usersFixture)
@@ -78,6 +78,10 @@ describe(`PATCH ${h.url}`, () => {
       .requestBy(email)
       .patch(h.path(notFinishedUserWorkId))
       .expect(200);
+    expect(body).toEqual({
+      next: expect.any(Object),
+      previous: expect.any(Object),
+    });
     const currentUser = h.entities.User[0];
     expect(currentUser.email).toBe(email);
     // it was not finished before

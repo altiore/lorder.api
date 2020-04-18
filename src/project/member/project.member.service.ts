@@ -101,9 +101,11 @@ export class ProjectMemberService {
     }
 
     const addedTimeSum = moment(userWork.finishAt).diff(moment(userWork.startAt));
-    userProject.timeSum += addedTimeSum;
+    userProject.timeSum = userProject.timeSum + addedTimeSum;
     userProject.valueSum =
-      userWork.task.value && userWork.task.users.length ? userWork.task.value / userWork.task.users.length : 0;
+      userWork.task.value && userWork.task.userTasks.length
+        ? userWork.task.value / userWork.task.userTasks.length + userProject.valueSum
+        : userProject.valueSum;
     return await manager.save(userProject);
   }
 }

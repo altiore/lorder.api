@@ -5,13 +5,9 @@ import {
   CreateDateColumn,
   Entity,
   Index,
-  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  Tree,
-  TreeChildren,
-  TreeParent,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
@@ -19,11 +15,11 @@ import {
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { Project } from '../project/project.entity';
 import { TaskType } from '../task-type/task-type.entity';
+import { UserTask } from '../user-task/user-task.entity';
 import { UserWork } from '../user-work/user-work.entity';
 import { User } from '../user/user.entity';
 
 @Entity()
-@Tree('closure-table')
 @Index(['projectId', 'sequenceNumber'])
 @Unique(['projectId', 'sequenceNumber'])
 export class Task {
@@ -48,11 +44,11 @@ export class Task {
   project: Project;
 
   // ApiModel does not work here due to circular dependency
-  @TreeParent()
+  @ManyToOne(type => Task, m => m.children)
   parentTask?: Task;
 
   // ApiModel does not work here due to circular dependency
-  @TreeChildren({ cascade: ['update', 'remove'] })
+  @OneToMany(type => Task, m => m.parentTask)
   children?: Task[];
 
   @ApiProperty()
@@ -107,8 +103,8 @@ export class Task {
   @OneToMany(type => UserWork, userWork => userWork.task, { eager: false })
   userWorks: UserWork[];
 
-  @ManyToMany(type => User, user => user.tasks)
-  users: User[];
+  @OneToMany(type => UserTask, m => m.task)
+  userTasks: UserTask[];
 
   // TODO: can be removed. Redundant and exists in task-log table
   @ApiProperty({ example: '2018-05-26T09:05:39.378Z' })

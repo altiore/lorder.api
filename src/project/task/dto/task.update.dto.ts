@@ -39,9 +39,4 @@ export class TaskUpdateDto {
   @IsNumber()
   @IsOptional()
   typeId?: number;
-
-  @ApiPropertyOptional({ isArray: true, type: Number, example: [1, 2, 3] })
-  @IsNumber(undefined, { each: true })
-  @IsOptional()
-  users?: number[];
 }

@@ -78,7 +78,7 @@ export class ProjectController {
 
   @Patch(':projectId/statistic')
   @Auth(res(Project, 'Обновить статистику проекта').c, ROLES.USER, ACCESS_LEVEL.VIOLET)
-  public async statistic(@ProjectParam() project: Project): Promise<any> {
+  public async statistic(@ProjectParam() project: Project): Promise<UserProject[]> {
     return this.projectService.updateStatistic(project);
   }
 }

@@ -1,14 +1,16 @@
 import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-
-import * as moment from 'moment';
-
 import { Project } from '@orm/project';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
-import { UserWork, UserWorkRepository } from '@orm/user-work';
+import { ValidationError } from 'class-validator';
+import * as moment from 'moment';
 
 import { PaginationDto } from '../@common/dto/pagination.dto';
+import { ValidationException } from '../@common/exceptions/validation.exception';
+import { Task } from '../@orm/task';
+import { UserTask } from '../@orm/user-task';
+import { UserWork, UserWorkRepository } from '../@orm/user-work';
 import { ProjectMemberService } from '../project/member/project.member.service';
 import { ProjectService } from '../project/project.service';
 import { TaskService } from '../task/task.service';
@@ -56,7 +58,7 @@ export class UserWorkService {
 
   public async updateTime(userWork: UserWork, user: User, recalculate: boolean = false): Promise<UserWork> {
     let res = userWork;
-    if (!userWork.projectId || !userWork.task.users) {
+    if (!userWork.projectId || !userWork.task.userTasks) {
       userWork.task = await this.taskService.findOneByIdWithUsers(userWork.taskId);
     }
     await this.userWorkRepo.manager.transaction(async entityManager => {
@@ -75,15 +77,36 @@ export class UserWorkService {
     return await this.userWorkRepo.remove(userWork);
   }
 
+  public async updateBenefitParts(userTasks: UserTask[]): Promise<void> {
+    const usersCount = userTasks.length;
+    userTasks.map(ut => {
+      const accuracy = 1000000;
+      ut.benefitPart = Math.round(accuracy / usersCount) / accuracy;
+    });
+    await this.userWorkRepo.manager.save(userTasks);
+  }
+
   public async finishTask(userWork: UserWork, user: User): Promise<UserWork> {
     userWork.finishAt = moment();
-    if (!userWork.projectId || !userWork.task.users) {
+    if (!userWork.projectId || !userWork.task.userTasks) {
       userWork.task = await this.taskService.findOneByIdWithUsers(userWork.taskId);
     }
-    if (userWork.task.users.findIndex(el => el.id === user.id) === -1) {
-      userWork.task.users.push(user);
-      await this.userWorkRepo.manager.save(userWork.task);
+    const curUserTask = userWork.task.userTasks.find(el => el.userId === user.id);
+    if (!curUserTask) {
+      // 1. create new userTask
+      let userTask = new UserTask();
+      userTask.task = { id: userWork.taskId } as Task;
+      userTask.user = { id: user.id } as User;
+      userTask = await this.userWorkRepo.manager.save(userTask);
+      userWork.task.userTasks.push(userTask);
+
+      // 2. update all benefitParts
+      await this.updateBenefitParts(userWork.task.userTasks);
+    } else if (!curUserTask.benefitPart) {
+      // 2. update all benefitParts
+      await this.updateBenefitParts(userWork.task.userTasks);
     }
+
     return await this.updateTime(userWork, user, false);
   }
 
@@ -163,11 +186,9 @@ export class UserWorkService {
             : !userWorkDto.finishAt)
       );
       if (removed.length) {
-        await Promise.all(
-          touched.map(async uw => {
-            return await this.remove(uw);
-          })
-        );
+        for (const uw of removed) {
+          await this.remove(uw);
+        }
       }
 
       // 3. изменить все задачи, которые затрагивает этот промежуток времени
@@ -181,15 +202,32 @@ export class UserWorkService {
           }
           return el;
         });
-        await Promise.all(
-          touched.map(async uw => {
-            return await this.updateTime(uw, user, true);
-          })
-        );
+        for (const uw of touched) {
+          await this.updateTime(uw, user, true);
+        }
       }
     }
 
     // 4. изменить изменяемую задачу
+    if (userWork.taskId !== userWorkDto.taskId) {
+      try {
+        // try to find task and check user access to this task
+        userWork.task = await this.taskService.findOneById(userWorkDto.taskId, user);
+      } catch (e) {
+        throw new ValidationException(
+          [
+            Object.assign(new ValidationError(), {
+              constraints: {
+                isNotFound: 'Задача, соответствующая этому taskId не была найдена',
+              },
+              property: 'taskId',
+              value: userWorkDto.taskId,
+            }),
+          ],
+          'Задача не найдена'
+        );
+      }
+    }
     const updateUserWork = this.userWorkRepo.merge(userWork, userWorkDto);
     const edited = await this.updateTime(updateUserWork, user, true);
 

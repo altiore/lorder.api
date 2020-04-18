@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { EntityRepository, Repository } from 'typeorm';
 
 import { Project } from '../project/project.entity';
@@ -6,10 +7,16 @@ import { ProjectPub } from './project-pub.entity';
 
 @EntityRepository(ProjectPub)
 export class ProjectPubRepository extends Repository<ProjectPub> {
-  public findPublishedByUuid(uuid: string): Promise<ProjectPub> {
-    return this.findOneOrFail({
+  public async findPublishedByUuid(uuid: string): Promise<ProjectPub> {
+    const pubProject = await this.findOneOrFail({
+      relations: ['project', 'project.members'],
       where: { uuid },
     });
+    if (pubProject.members) {
+      return pubProject;
+    }
+
+    throw new NotFoundException('Public project doesn\'t contain members!');
   }
 
   public findPublishedByProject(project: Project): Promise<ProjectPub | undefined> {

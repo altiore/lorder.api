@@ -11,8 +11,6 @@ import { TaskRepository } from '@orm/task';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL, UserProject, UserProjectRepository } from '@orm/user-project';
 
-import { UserWork } from '../@orm/user-work';
-
 import { ProjectPaginationDto } from './@dto';
 
 @Injectable()
@@ -136,51 +134,70 @@ export class ProjectService {
   ): Promise<{ [key: number]: { timeSum: number; valueSum: number } }> {
     const manager = entityManager || this.projectRepo.manager;
 
-    const step = 10;
+    const step = 4;
     let i = 0;
-    let userWorkPortion;
+    let userTasksPortion;
     const projectTimeSums: { [key: number]: { timeSum: number; valueSum: number } } = {};
 
     do {
-      // TODO: userProject должен хранить последний зафиксированный элемент, чтоб можно было пересчитывать только
-      // последнюю измененную часть
-      const where: any = { member: user };
+      // TODO: userProject должен хранить последний зафиксированный элемент,
+      //  чтоб можно было пересчитывать только последнюю измененную часть
+      const where: any = { user };
       if (projectId) {
-        where.project = { id: projectId };
+        where.task = { projectId };
       }
-      userWorkPortion = await manager.find(UserWork, {
-        relations: ['task', 'task.users'],
-        skip: i * step,
-        take: step,
-        where,
-      });
-      if (!userWorkPortion || !userWorkPortion.length) {
+
+      userTasksPortion = await manager
+        .createQueryBuilder()
+        .select('user_tasks.userId')
+        .addSelect('user_tasks.taskId')
+        .addSelect('user_tasks.benefitPart')
+        .from('user_tasks', 'user_tasks')
+        .leftJoinAndMapOne('user_tasks.task', 'task', 'task', 'user_tasks.taskId=task.id')
+        .leftJoinAndMapMany(
+          'task.userWorks',
+          'user_work',
+          'userWorks',
+          '"user_tasks"."taskId"="userWorks"."taskId" AND "user_tasks"."userId"="userWorks"."userId"'
+        )
+        .where('"user_tasks"."userId" = :userId', { userId: user.id })
+        .andWhere('"task"."projectId" = :projectId', { projectId })
+        .take(step)
+        .skip(i * step)
+        .getMany();
+
+      if (!userTasksPortion || !userTasksPortion.length) {
         break;
       }
 
-      userWorkPortion.map((uw: UserWork) => {
-        projectTimeSums[uw.task.projectId] = {
-          timeSum:
-            (get(projectTimeSums, [uw.task.projectId, 'timeSum'], 0) || 0) +
-            moment(uw.finishAt).diff(moment(uw.startAt)),
-          valueSum: Math.round((100 * (uw.task.value || 0)) / uw.task.users.length) / 100,
+      userTasksPortion.map(userT => {
+        projectTimeSums[userT.task.projectId] = {
+          timeSum: get(projectTimeSums, [userT.task.projectId, 'timeSum'], 0) || 0,
+          valueSum:
+            (get(projectTimeSums, [userT.task.projectId, 'valueSum'], 0) || 0) + userT.benefitPart * userT.task.value,
         };
+        userT.task.userWorks.map(uw => {
+          projectTimeSums[userT.task.projectId] = {
+            timeSum:
+              (get(projectTimeSums, [userT.task.projectId, 'timeSum'], 0) || 0) +
+              moment(uw.finishAt).diff(moment(uw.startAt)),
+            valueSum: get(projectTimeSums, [userT.task.projectId, 'valueSum'], 0),
+          };
+        });
       });
       i++;
-    } while (userWorkPortion.length === step);
+    } while (userTasksPortion.length === step);
 
-    await Promise.all(
-      Object.keys(projectTimeSums).map(async prId => {
-        await manager.update(
-          UserProject,
-          { projectId: prId, memberId: user.id },
-          {
-            timeSum: projectTimeSums[prId].timeSum > 0 ? projectTimeSums[prId].timeSum : 0,
-            valueSum: projectTimeSums[prId].valueSum > 0 ? projectTimeSums[prId].valueSum : 0,
-          }
-        );
-      })
-    );
+    for (const prId of Object.keys(projectTimeSums)) {
+      await manager.update(
+        UserProject,
+        { projectId: prId, memberId: user.id },
+        {
+          timeSum: projectTimeSums[prId].timeSum,
+          valueSum: projectTimeSums[prId].valueSum,
+        }
+      );
+    }
 
     return projectTimeSums;
   }
@@ -188,17 +205,7 @@ export class ProjectService {
   /**
    * TODO: logic must be more complicated because of can be huge amount of data
    */
-  public async updateStatistic(
-    project: Project
-  ): Promise<{
-    data: { [key: number]: { value: number; time: number } };
-    members: Array<{
-      accessLevel: ACCESS_LEVEL;
-      avatar?: string;
-      email: string;
-      id: number;
-    }>;
-  }> {
+  public async updateStatistic(project: Project): Promise<UserProject[]> {
     try {
       const projectWithMembers = await this.projectRepo.findOne({
         relations: ['members', 'pub'],
@@ -206,36 +213,15 @@ export class ProjectService {
       });
 
       const data: { [key: number]: { value: number; time: number } } = {};
-      await Promise.all(
-        projectWithMembers.members.map(async member => {
-          const stats = await this.calculateUserStatistic(member.member, project.id);
-          data[member.member.id] = {
-            time: get(stats, [project.id, 'timeSum'], 0),
-            value: get(stats, [project.id, 'valueSum'], 0),
-          };
-          return stats;
-        })
-      );
-
-      const statistic = {
-        data,
-        members: projectWithMembers.members.map(member => ({
-          accessLevel: member.accessLevel,
-          avatar: member.member.avatarUrl,
-          email: member.member.displayName || member.member.email,
-          id: member.member.id,
-        })),
-      };
-      if (projectWithMembers.pub) {
-        await this.projectPubRepo.update(
-          { project: projectWithMembers },
-          {
-            statistic,
-          }
-        );
+      for (const member of projectWithMembers.members) {
+        const stats = await this.calculateUserStatistic(member.member, project.id);
+        data[member.member.id] = {
+          time: get(stats, [project.id, 'timeSum'], 0) || 0,
+          value: get(stats, [project.id, 'valueSum'], 0) || 0,
+        };
       }
 
-      return statistic;
+      return await this.userProjectRepo.find({ where: { project } });
     } catch (e) {
       throw e;
     }

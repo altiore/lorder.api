@@ -4,6 +4,7 @@ import { fixtureCreator, many, one } from 'typeorm-fixtures';
 import { Project } from '../../@orm/project';
 import { Task } from '../../@orm/task';
 import { User } from '../../@orm/user';
+import { UserTask } from '../../@orm/user-task';
 
 export const createTasks = fixtureCreator<Task>(Task, function(entity, index) {
   return {
@@ -15,6 +16,6 @@ export const createTasks = fixtureCreator<Task>(Task, function(entity, index) {
     ...entity,
     performer: entity.performer ? one(this, User, entity.performer) : undefined,
     project: one(this, Project, entity.project),
-    users: many(this, User, entity.users),
+    userTasks: many(this, UserTask, entity.userTasks),
   };
 });
