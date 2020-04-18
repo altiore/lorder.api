@@ -126,6 +126,22 @@ export class ProjectService {
    * Для всех проектов нужно пересчитать, если работа пользователя изменилась. В этом случае могут быть затронуты
    * другие проекты и пересчитать нужно все.
    * Один проект считаем, когда нужно обновить информацию для проекта
+   *
+   * SELECT
+   *   SUM("task"."value"*"user_tasks"."benefitPart") as "benefitPart"
+   * FROM
+   *   "user_tasks"
+   * LEFT JOIN
+   *   "task" ON "task"."id"="user_tasks"."taskId"
+   * WHERE
+   *  "userId"=1
+   *   AND "task"."projectId" = 53;
+   *
+   * SELECT
+   *   SUM("task"."value") as "projectBenefit"
+   * FROM
+   *   "task"
+   * WHERE "task"."projectId" = 53;
    */
   public async calculateUserStatistic(
     user: User,
