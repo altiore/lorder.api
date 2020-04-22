@@ -71,7 +71,8 @@ export class UserWorkController {
   @ApiResponse({ status: 200, type: UserWork, description: 'ACCESS_LEVEL.RED' })
   public async delete(@Param('userWorkId', ParseIntPipe) userWorkId: number, @UserJWT() user: User): Promise<UserWork> {
     const userWork = await this.userWorkService.findOneByUserAndCheckAccess(userWorkId, user);
-    return await this.userWorkService.remove(userWork);
+    await this.userWorkService.remove(userWork, user);
+    return userWork;
   }
 
   @Get('recent')

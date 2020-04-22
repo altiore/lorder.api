@@ -5,6 +5,7 @@ import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
 import { ValidationError } from 'class-validator';
 import * as moment from 'moment';
+import { DeleteResult } from 'typeorm';
 
 import { PaginationDto } from '../@common/dto/pagination.dto';
 import { ValidationException } from '../@common/exceptions/validation.exception';
@@ -75,9 +76,13 @@ export class UserWorkService {
     return res;
   }
 
-  public async remove(userWork: UserWork): Promise<UserWork> {
-    // TODO: пересчитать статистику
-    return await this.userWorkRepo.remove(userWork);
+  public async remove(userWork: UserWork, user): Promise<DeleteResult | undefined> {
+    let result: DeleteResult;
+    await this.userWorkRepo.manager.transaction(async entityManager => {
+      result = await entityManager.delete(UserWork, { id: userWork.id });
+      await this.projectService.calculateUserStatistic(user, 0, entityManager);
+    });
+    return result;
   }
 
   public async updateBenefitParts(userTasks: UserTask[]): Promise<void> {
@@ -190,7 +195,7 @@ export class UserWorkService {
       );
       if (removed.length) {
         for (const uw of removed) {
-          await this.remove(uw);
+          await this.remove(uw, user);
         }
       }
 
@@ -198,12 +203,21 @@ export class UserWorkService {
       touched = touchedUserWorks.filter((tuw: any) => removed.findIndex(el => el.id === tuw.id) === -1);
       if (touched.length) {
         touched = touched.map(el => {
-          if (userWorkDto.startAt && el.finishAt && el.finishAt.diff(moment(userWorkDto.startAt)) >= 0) {
+          if (
+            el.startAt &&
+            userWorkDto.finishAt &&
+            el.startAt.diff(moment(userWorkDto.finishAt)) < 0 &&
+            el.startAt.diff(moment(userWorkDto.startAt)) >= 0
+          ) {
+            el.startAt = moment(userWorkDto.finishAt);
+          }
+
+          if (
+            el.finishAt &&
+            el.finishAt.diff(moment(userWorkDto.startAt)) > 0 &&
+            (!userWorkDto.finishAt || el.finishAt.diff(moment(userWorkDto.finishAt)) <= 0)
+          ) {
             el.finishAt = moment(userWorkDto.startAt);
-          } else {
-            if (userWorkDto.finishAt && el.startAt && el.startAt.diff(moment(userWorkDto.finishAt)) < 0) {
-              el.startAt = moment(userWorkDto.finishAt);
-            }
           }
 
           return el;
