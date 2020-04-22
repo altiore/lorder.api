@@ -61,6 +61,9 @@ export class UserWorkService {
     if (!userWork.projectId || !userWork.task.userTasks) {
       userWork.task = await this.taskService.findOneByIdWithUsers(userWork.taskId);
     }
+    if (userWork.finishAt && moment(userWork.startAt).diff(moment(userWork.finishAt)) > 0) {
+      throw new NotAcceptableException('startAt не может быть позже, чем finishAt');
+    }
     await this.userWorkRepo.manager.transaction(async entityManager => {
       res = await entityManager.save(UserWork, userWork);
       if (recalculate) {
@@ -195,11 +198,14 @@ export class UserWorkService {
       touched = touchedUserWorks.filter((tuw: any) => removed.findIndex(el => el.id === tuw.id) === -1);
       if (touched.length) {
         touched = touched.map(el => {
-          if (el.startAt.diff(userWorkDto.startAt ? moment(userWorkDto.startAt) : userWork.startAt) < 0) {
-            el.startAt = moment(userWorkDto.finishAt);
-          } else {
+          if (userWorkDto.startAt && el.finishAt && el.finishAt.diff(moment(userWorkDto.startAt)) >= 0) {
             el.finishAt = moment(userWorkDto.startAt);
+          } else {
+            if (userWorkDto.finishAt && el.startAt && el.startAt.diff(moment(userWorkDto.finishAt)) < 0) {
+              el.startAt = moment(userWorkDto.finishAt);
+            }
           }
+
           return el;
         });
         for (const uw of touched) {

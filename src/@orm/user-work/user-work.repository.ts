@@ -99,10 +99,15 @@ export class UserWorkRepository extends Repository<UserWork> {
           userId: user.id,
         }
       );
-      query.orWhere(`UserWork.id != :id AND UserWork.userId = :userId AND UserWork.finishAt IS NULL`, {
-        id: changedUserWork.id,
-        userId: user.id,
-      });
+      query.orWhere(
+        `UserWork.id != :id AND UserWork.userId = :userId AND UserWork.finishAt BETWEEN :start AND :finish`,
+        {
+          finish: moment().format('YYYY-MM-DD HH:mm:ss'),
+          id: changedUserWork.id,
+          start: startAt.format('YYYY-MM-DD HH:mm:ss'),
+          userId: user.id,
+        }
+      );
     }
 
     return query.getMany();
