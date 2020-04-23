@@ -105,12 +105,18 @@ export class UserWorkService {
       let userTask = new UserTask();
       userTask.task = { id: userWork.taskId } as Task;
       userTask.user = { id: user.id } as User;
+      userTask.time = userWork.finishAt.diff(userWork.startAt);
       userTask = await this.userWorkRepo.manager.save(userTask);
       userWork.task.userTasks.push(userTask);
 
       // 2. update all benefitParts
       await this.updateBenefitParts(userWork.task.userTasks);
-    } else if (!curUserTask.benefitPart) {
+    } else {
+      curUserTask.time += userWork.finishAt.diff(userWork.startAt);
+      await this.userWorkRepo.manager.save(curUserTask);
+    }
+
+    if (curUserTask && !curUserTask.benefitPart) {
       // 2. update all benefitParts
       await this.updateBenefitParts(userWork.task.userTasks);
     }

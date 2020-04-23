@@ -47,7 +47,7 @@ export class UserWorkRepository extends Repository<UserWork> {
   ): Promise<UserWork[]> {
     const entities = await this.find({
       order: { [orderBy]: order.toUpperCase() },
-      relations: ['task'],
+      relations: ['task', 'task.userTasks'],
       skip,
       take: count,
       where: { user },

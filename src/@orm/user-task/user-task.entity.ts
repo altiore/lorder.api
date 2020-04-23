@@ -24,4 +24,7 @@ export class UserTask {
 
   @Column('float', { default: 0 })
   benefitPart: number;
+
+  @Column('float', { default: 0 })
+  time: number;
 }

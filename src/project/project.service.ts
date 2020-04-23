@@ -155,6 +155,25 @@ export class ProjectService {
     let userTasksPortion;
     const projectTimeSums: { [key: number]: { timeSum: number; valueSum: number } } = {};
 
+    await manager.query(
+      `DELETE FROM "user_tasks"
+             WHERE "user_tasks"."userId"=${user.id}
+              AND (
+                SELECT SUM(EXTRACT('epoch' from "user_work"."finishAt") - EXTRACT('epoch' from "user_work"."startAt"))
+                  FROM "user_work"
+                WHERE "userId"="user_tasks"."userId"
+                  AND "taskId"="user_tasks"."taskId") IS NULL`
+    );
+
+    await manager.query(
+      `UPDATE "user_tasks"
+              SET "time"=((
+                SELECT SUM(EXTRACT('epoch' from "user_work"."finishAt") - EXTRACT('epoch' from "user_work"."startAt"))
+                  FROM "user_work"
+                WHERE "userId"="user_tasks"."userId"
+                  AND "taskId"="user_tasks"."taskId")*1000) WHERE "user_tasks"."userId"=${user.id}`
+    );
+
     do {
       // TODO: userProject должен хранить последний зафиксированный элемент,
       //  чтоб можно было пересчитывать только последнюю измененную часть
