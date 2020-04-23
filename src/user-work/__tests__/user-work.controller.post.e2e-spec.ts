@@ -29,7 +29,7 @@ describe(`POST ${h.url}`, () => {
       .post(h.path())
       .expect(401)
       .expect({
-        error: 'Unauthorized',
+        message: 'Unauthorized',
         statusCode: 401,
       });
   });

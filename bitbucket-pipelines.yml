@@ -34,7 +34,7 @@ pipelines:
           script:
             - npm run build
             - cd heroku
-            - rm -rf bin dist public .git mails package.json package-lock.json
+            - rm -rf bin dist public .git mails ormconfig.js package.json package-lock.json
             - cp -r ../bin ../dist ../public ../mails ../ormconfig.js ../package.json ../package-lock.json ./
             - sed "s/rm -rf dist && nest build/echo NO NEED BUILD PREFERATION/" -i package.json
             - git init
@@ -62,7 +62,7 @@ pipelines:
           script:
             - npm run build
             - cd heroku
-            - rm -rf bin dist public .git mails package.json package-lock.json
+            - rm -rf bin dist public .git mails ormconfig.js package.json package-lock.json
             - cp -r ../bin ../dist ../public ../mails ../ormconfig.js ../package.json ../package-lock.json ./
             - sed "s/rm -rf dist && nest build/echo NO NEED BUILD PREFERATION/" -i package.json
             - git init

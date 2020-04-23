@@ -22,7 +22,7 @@ describe(`GET ${h.url}`, () => {
       .get(h.path())
       .expect(401)
       .expect({
-        error: 'Unauthorized',
+        message: 'Unauthorized',
         statusCode: 401,
       });
   });

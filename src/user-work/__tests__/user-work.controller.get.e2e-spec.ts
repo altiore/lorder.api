@@ -16,7 +16,7 @@ describe(`GET ${h.url} user-work.controller`, () => {
       .get(h.path())
       .expect(401)
       .expect({
-        error: 'Unauthorized',
+        message: 'Unauthorized',
         statusCode: 401,
       });
   });

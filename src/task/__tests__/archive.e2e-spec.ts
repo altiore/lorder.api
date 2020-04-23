@@ -25,7 +25,7 @@ describe(`PATCH ${h.url}`, () => {
       .patch(h.path(taskId))
       .expect(401)
       .expect({
-        error: 'Unauthorized',
+        message: 'Unauthorized',
         statusCode: 401,
       });
   });
