@@ -257,7 +257,7 @@ export class UserWorkService {
     const updateUserWork = this.userWorkRepo.merge(userWork, userWorkDto);
     const edited = await this.updateTime(updateUserWork, user, true);
 
-    // prepare correct userTasks before returning
+    // prepare correct userTasks before returning response
     for (const rem of removed) {
       rem.task = await this.taskService.findOneByIdWithUserTasks(rem.taskId);
     }
