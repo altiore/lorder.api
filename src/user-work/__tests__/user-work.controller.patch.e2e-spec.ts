@@ -267,7 +267,6 @@ describe(`PATCH ${h.url}`, () => {
             whitelistValidation: 'property extraData should not exist',
           },
           property: 'extraData',
-          target: expect.any(Object),
           value: 'extra data',
         },
       ],

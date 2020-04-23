@@ -117,12 +117,6 @@ describe(`POST ${h.url}`, () => {
             whitelistValidation: 'property extraData should not exist',
           },
           property: 'extraData',
-          target: {
-            description: 'создана автоматически',
-            extraData: 'extra data',
-            projectId,
-            title: 'Новая задача',
-          },
           value: 'extra data',
         },
       ],
