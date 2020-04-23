@@ -106,6 +106,11 @@ export class ProjectMemberService {
       userWork.task.value && userWork.task.userTasks.length
         ? userWork.task.value / userWork.task.userTasks.length + userProject.valueSum
         : userProject.valueSum;
+    const curUserTask = userWork.task.userTasks.find(el => el.userId === userWork.projectId);
+    if (curUserTask) {
+      curUserTask.time += addedTimeSum;
+      await manager.save(curUserTask);
+    }
     return await manager.save(userProject);
   }
 }

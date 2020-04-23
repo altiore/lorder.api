@@ -257,6 +257,15 @@ export class UserWorkService {
     const updateUserWork = this.userWorkRepo.merge(userWork, userWorkDto);
     const edited = await this.updateTime(updateUserWork, user, true);
 
+    // prepare correct userTasks before return
+    for (const rem of removed) {
+      rem.task = await this.taskService.findOneByIdWithUserTasks(rem.taskId);
+    }
+    for (const touch of touched) {
+      touch.task = await this.taskService.findOneByIdWithUserTasks(touch.taskId);
+    }
+    edited.task = await this.taskService.findOneByIdWithUserTasks(edited.taskId);
+
     return {
       edited,
       removed,

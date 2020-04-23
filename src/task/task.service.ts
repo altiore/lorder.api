@@ -100,6 +100,17 @@ export class TaskService {
     return task;
   }
 
+  public async findOneByIdWithUserTasks(id: number): Promise<Task> {
+    const task = await this.taskRepo.findOne({
+      relations: ['userTasks'],
+      where: { id },
+    });
+    if (!task) {
+      throw new NotFoundException('Задача не была найдена');
+    }
+    return task;
+  }
+
   async createByProject(taskData: Partial<Task>, project: Project, user: User): Promise<Task> {
     let task: Task;
     await this.taskRepo.manager.transaction(async entityManager => {
