@@ -6,7 +6,8 @@
   "license": "UNLICENSED",
   "main": "dist/main.js",
   "engines": {
-    "node": ">=8.11.3"
+    "node": "12.16.x",
+    "npm": "6.x"
   },
   "scripts": {
     "start:dev": "sh bin/start.sh && cross-env NODE_ENV=development nodemon",
