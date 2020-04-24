@@ -19,8 +19,8 @@ if [ -z `docker ps -q --no-trunc | grep $(docker-compose ps -q postgres)` ]; the
   sleep 10
 
   echo "\n \033[0;32m   run migrations...\033[0;30m"
-  yarn migration:up
-  yarn migration:test:up
+  npm run migration:up
+  npm run migration:test:up
 
   echo "\n \033[0;32m   Приложение полностью готово к работе! Запусти команду \033[0;31mnpm start\033[0;32m, чтобы начать работу\033[0;30m"
 else

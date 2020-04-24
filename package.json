@@ -14,17 +14,17 @@
     "stop": "sh bin/stop.sh",
     "start:hmr": "node dist/server",
     "preinstall": "node bin/gcpSetup.js",
-    "postinstall": "yarn build && yarn migration:up:prod",
+    "postinstall": "npm run build && npm run migration:up:prod",
     "build": "rm -rf dist && nest build",
-    "pretest": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && yarn migration:test:up",
+    "pretest": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && npm run migration:test:up",
     "test": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest --coverage -i -b --detectOpenHandles",
     "test:watch": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest --watch --coverage -i -b --detectOpenHandles",
-    "pretest:dev": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && yarn migration:test:up",
+    "pretest:dev": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && npm run migration:test:up",
     "test:dev": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest -i -b --detectOpenHandles --forceExit --watch",
     "test:coverage": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest -i --forceExit --coverage",
-    "pretest:changed:only": "yarn pretest",
+    "pretest:changed:only": "npm run pretest",
     "test:changed:only": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest -i -b --lastCommit --detectOpenHandles --forceExit",
-    "pretest:remote": "node bin/refresh.js && yarn migration:up && echo  \"Please, do NOT run LOCALLY!\"",
+    "pretest:remote": "node bin/refresh.js && npm run migration:up && echo  \"Please, do NOT run LOCALLY!\"",
     "test:remote": "jest --coverage -i --forceExit && echo -e \"Please, do NOT run LOCALLY!\"",
     "webpack": "webpack --config webpack.config.js",
     "prepare:mails": "mjml src/mail/mjml/*.mjml -o mails/",
@@ -39,7 +39,7 @@
     "ln:typeorm:fixtures": "rm -rf node_modules/typeorm-fixtures && ln -s $PWD/../../typeorm-fixtures $PWD/node_modules/typeorm-fixtures",
     "run-prettier": "prettier --write \"{src,tests}/**/*.{ts,tsx}\" --print-width 120 --single-quote --trailing-comma es5",
     "run-lint": "tslint --fix -p tsconfig.test.json -c tslint.json",
-    "lint": "yarn run-prettier && yarn run-lint"
+    "lint": "npm run run-prettier && npm run run-lint"
   },
   "dependencies": {
     "@google-cloud/storage": "3.0.3",
@@ -123,7 +123,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn build && yarn test:changed:only && lint-staged"
+      "pre-commit": "npm run build && npm run test:changed:only && lint-staged"
     }
   },
   "lint-staged": {
@@ -137,7 +137,7 @@
       "git add"
     ],
     "*.{mjml}": [
-      "yarn prepare:mails",
+      "npm run prepare:mails",
       "git add"
     ]
   }

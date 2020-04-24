@@ -8,9 +8,9 @@ pipelines:
         caches:
           - node
         script:
-          - yarn
-          - yarn build
-          - yarn test:remote
+          - npm ci
+          - npm run build
+          - npm run test:remote
         services:
           - postgres
           - redis
@@ -21,8 +21,8 @@ pipelines:
           caches:
             - node
           script:
-            - yarn
-            - yarn test:remote
+            - npm ci
+            - npm run test:remote
           services:
             - postgres
             - redis
@@ -32,7 +32,7 @@ pipelines:
             - node
           deployment: staging
           script:
-            - yarn build
+            - npm run build
             - cd heroku
             - rm -rf bin dist public .git mails ormconfig.js package.json package-lock.json
             - cp -r ../bin ../dist ../public ../mails ../ormconfig.js ../package.json ../package-lock.json ./
@@ -49,8 +49,8 @@ pipelines:
           caches:
             - node
           script:
-            - yarn
-            - yarn test:remote
+            - npm ci
+            - npm run test:remote
           services:
             - postgres
             - redis
@@ -60,7 +60,7 @@ pipelines:
           caches:
             - node
           script:
-            - yarn build
+            - npm run build
             - cd heroku
             - rm -rf bin dist public .git mails ormconfig.js package.json package-lock.json
             - cp -r ../bin ../dist ../public ../mails ../ormconfig.js ../package.json ../package-lock.json ./
