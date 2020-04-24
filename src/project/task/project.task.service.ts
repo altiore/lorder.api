@@ -92,7 +92,7 @@ export class ProjectTaskService {
     if (project.accessLevel.accessLevel < statusLevel) {
       if (checkedTask.performerId !== user.id) {
         throw new ForbiddenException({
-          message: 'У вас нет доступа к редактированию этой задачи',
+          message: 'У вас нет доступа к этой задаче',
           task: checkedTask,
         });
       }

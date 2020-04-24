@@ -1,13 +1,15 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+
 import { Project } from '@orm/project';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
 import { UserWork } from '@orm/user-work';
 
+import { PaginationDto } from '@common/dto';
+
 import { Roles, UserJWT } from '../@common/decorators';
-import { PaginationDto } from '../@common/dto/pagination.dto';
 import { RolesGuard } from '../@common/guards';
 import { AccessLevel, ProjectParam } from '../project/@common/decorators';
 import { AccessLevelGuard } from '../project/@common/guards';
@@ -80,5 +82,18 @@ export class UserWorkController {
   @ApiResponse({ status: 200, type: UserWork, isArray: true })
   public recent(@Query() pagesDto: PaginationDto, @UserJWT() user: User): Promise<UserWork[]> {
     return this.userWorkService.recent(user, pagesDto);
+  }
+
+  @Get('project/:projectId/task/:sequenceNumber')
+  @Roles('user')
+  @AccessLevel(ACCESS_LEVEL.RED)
+  @ApiResponse({ status: 200, type: UserWork, isArray: true })
+  public taskUserWorks(
+    @Param('sequenceNumber') sequenceNumber: number,
+    @ProjectParam() project: Project,
+    @Query() pagesDto: PaginationDto,
+    @UserJWT() user: User
+  ): Promise<UserWork[]> {
+    return this.userWorkService.findAllByTaskSequenceNumber(project, user, sequenceNumber, pagesDto);
   }
 }

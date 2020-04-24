@@ -1,19 +1,22 @@
 import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Project } from '@orm/project';
-import { User } from '@orm/user';
-import { ACCESS_LEVEL } from '@orm/user-project';
 import { ValidationError } from 'class-validator';
 import * as moment from 'moment';
 import { DeleteResult } from 'typeorm';
 
-import { PaginationDto } from '../@common/dto/pagination.dto';
+import { Project } from '@orm/project';
+import { User } from '@orm/user';
+import { ACCESS_LEVEL } from '@orm/user-project';
+
+import { PaginationDto } from '@common/dto';
+
 import { ValidationException } from '../@common/exceptions/validation.exception';
 import { Task } from '../@orm/task';
 import { UserTask } from '../@orm/user-task';
 import { UserWork, UserWorkRepository } from '../@orm/user-work';
 import { ProjectMemberService } from '../project/member/project.member.service';
 import { ProjectService } from '../project/project.service';
+import { ProjectTaskService } from '../project/task/project.task.service';
 import { TaskService } from '../task/task.service';
 import { UserService } from '../user/user.service';
 
@@ -24,6 +27,7 @@ export class UserWorkService {
   constructor(
     @InjectRepository(UserWorkRepository) private readonly userWorkRepo: UserWorkRepository,
     private readonly projectService: ProjectService,
+    private readonly projectTaskService: ProjectTaskService,
     private readonly userService: UserService,
     private readonly taskService: TaskService,
     private readonly projectMemberService: ProjectMemberService
@@ -275,6 +279,25 @@ export class UserWorkService {
 
   public recent(user: User, pagesDto: PaginationDto): Promise<UserWork[]> {
     return this.userWorkRepo.findWithPaginationByUser(user, pagesDto);
+  }
+
+  public async findAllByTaskSequenceNumber(
+    project: Project,
+    user: User,
+    sequenceNumber: number,
+    { skip = 0, count = 20, orderBy = 'startAt', order = 'desc' }: PaginationDto
+  ): Promise<UserWork[]> {
+    const checkedTask = await this.projectTaskService.checkAccess(sequenceNumber, project, user);
+
+    return await this.userWorkRepo.find({
+      order: { [orderBy]: order.toUpperCase() },
+      relations: ['task'],
+      skip,
+      take: count,
+      where: {
+        taskId: checkedTask.id,
+      },
+    });
   }
 
   private async startNew(
