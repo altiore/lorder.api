@@ -34,3 +34,4 @@ Dockerfile
 /heroku/package.json
 /heroku/package-lock.json
 /heroku/ormconfig.js
+/heroku/public

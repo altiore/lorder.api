@@ -1,8 +1,13 @@
 {
   "name": "Altiore Contribution API",
   "description": "Staging and production versions",
-  "repository": "https://github.com/heroku/altiore-api",
+  "repository": "https://git.heroku.com/staging-altiore-api.git",
   "logo": "https://cdn.rawgit.com/heroku/node-js-getting-started/master/public/node.svg",
   "keywords": ["node", "express", "heroku"],
-  "image": "heroku/nodejs"
+  "image": "heroku/nodejs",
+  "buildpacks": [
+    {
+      "url": "https://github.com/carloluis/heroku-buildpack-vim"
+    }
+  ]
 }

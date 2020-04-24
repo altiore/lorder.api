@@ -65,6 +65,7 @@ pipelines:
             - rm -rf bin dist public .git mails ormconfig.js package.json package-lock.json
             - cp -r ../bin ../dist ../public ../mails ../ormconfig.js ../package.json ../package-lock.json ./
             - sed "s/rm -rf dist && nest build/echo NO NEED BUILD PREFERATION/" -i package.json
+            - sed "s/staging-altiore-api/altiore-api/" -i app.json
             - git init
             - git config user.email "razvanlomov@gmail.com"
             - git config user.name "Razzwan-CI"
