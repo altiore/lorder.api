@@ -12,7 +12,7 @@ import { TaskService } from 'task/task.service';
 import { TaskType } from '../../@orm/task-type/task-type.entity';
 
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
-// import { ProjectTaskGateway } from './project.task.gateway';
+import { ProjectTaskGateway } from './project.task.gateway';
 
 @Injectable()
 export class ProjectTaskService {
@@ -21,7 +21,7 @@ export class ProjectTaskService {
     @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository,
     @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository,
     @InjectRepository(ProjectTaskTypeRepository) private readonly projectTaskTypeRepo: ProjectTaskTypeRepository,
-    // private readonly taskGateway: ProjectTaskGateway,
+    private readonly taskGateway: ProjectTaskGateway,
     private readonly taskService: TaskService
   ) {}
 
@@ -58,7 +58,7 @@ export class ProjectTaskService {
     const updatedTask = await this.taskService.updateByUser(checkedTask, preparedData, user);
 
     // 5. Отправить всем пользователям обновленные данные задачи
-    // this.taskGateway.updateTaskForAll(updatedTask);
+    this.taskGateway.updateTaskForAll(updatedTask);
 
     // 6. Вернуть измененную задачу
     return updatedTask;
