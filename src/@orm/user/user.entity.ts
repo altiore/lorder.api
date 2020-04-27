@@ -37,6 +37,7 @@ export class User {
       from: d => d,
       to: d => (d ? d.toLowerCase() : undefined),
     },
+    // select: false,
     unique: true,
   })
   email: string;
@@ -49,6 +50,7 @@ export class User {
       from: d => d,
       to: d => (d ? d.replace(/[\D]/gi, '') : undefined),
     },
+    select: false,
     unique: true,
   })
   tel: string;
@@ -125,7 +127,7 @@ export class User {
     return this.avatar ? this.avatar.url : null;
   }
 
-  get publicData(): {
+  get profileData(): {
     avatar?: string;
     defaultProjectId: number;
     displayName: string;
