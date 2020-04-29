@@ -68,6 +68,17 @@ export class UserWorkController {
     return this.userWorkService.stop(userWork, user);
   }
 
+  @Patch(':userWorkId/pause')
+  @Roles('user')
+  @ApiResponse({ status: 200, type: UserWork, description: 'ACCESS_LEVEL.RED' })
+  public async pause(
+    @Param('userWorkId', ParseIntPipe) userWorkId: number,
+    @UserJWT() user: User
+  ): Promise<StopResponse> {
+    const userWork = await this.userWorkService.findOneByUserAndCheckAccess(userWorkId, user);
+    return this.userWorkService.pause(userWork, user);
+  }
+
   @Delete(':userWorkId')
   @Roles('user')
   @ApiResponse({ status: 200, type: UserWork, description: 'ACCESS_LEVEL.RED' })

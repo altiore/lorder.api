@@ -182,6 +182,35 @@ export class UserWorkService {
     };
   }
 
+  public async pause(userWork: UserWork, user: User): Promise<StopResponse> {
+    if (userWork.finishAt) {
+      throw new NotAcceptableException('Эта задача уже завершена. Вы не можете завершить одну и ту же задачу дважды');
+    }
+    const previous = await this.finishTask(userWork, user);
+    let defaultProject;
+    if (user.defaultProjectId) {
+      defaultProject = await this.projectService.findOneByMember(user.defaultProjectId, user);
+    } else {
+      defaultProject = await this.userService.createDefaultProject(user);
+    }
+    const next = await this.startNew(
+      defaultProject,
+      user,
+      {
+        description: `После "${previous.task.title}"`,
+        projectId: defaultProject.id,
+        title: 'Перерыв/Отдых',
+        prevTaskId: userWork.taskId,
+      },
+      previous.finishAt
+    );
+    next.prevTask = userWork.task;
+    return {
+      next,
+      previous,
+    };
+  }
+
   public async update(userWork: UserWork, userWorkDto: UserWorkPatchDto, user: User): Promise<UserWorkEditResultDto> {
     // 0. Обернуть выполнение в транзакцию
     let removed = [];
@@ -327,6 +356,7 @@ export class UserWorkService {
       user,
       {
         description: userWorkData.description,
+        prevTaskId: userWorkData.prevTaskId,
       },
       startAt
     );

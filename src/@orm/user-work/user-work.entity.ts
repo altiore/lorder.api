@@ -64,6 +64,18 @@ export class UserWork {
 
   @ApiProperty()
   @Column({ nullable: true })
+  prevTaskId: number;
+
+  @ApiProperty({ type: () => Task })
+  @ManyToOne(() => Task, {
+    nullable: true,
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
+  })
+  prevTask: Task;
+
+  @ApiProperty()
+  @Column({ nullable: true })
   taskTypeId: number;
 
   @ApiProperty({ type: TaskType })
@@ -71,7 +83,12 @@ export class UserWork {
   taskType: TaskType;
 
   @ApiProperty({ type: Number })
-  get projectId() {
+  get projectId(): number | null {
     return this.task ? this.task.projectId : null;
+  }
+
+  @ApiProperty({ type: Number })
+  get prevProjectId(): number | null {
+    return this.prevTask ? this.prevTask.projectId : null;
   }
 }

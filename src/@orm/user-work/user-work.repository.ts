@@ -47,7 +47,7 @@ export class UserWorkRepository extends Repository<UserWork> {
   ): Promise<UserWork[]> {
     const entities = await this.find({
       order: { [orderBy]: order.toUpperCase() },
-      relations: ['task', 'task.userTasks'],
+      relations: ['task', 'task.userTasks', 'prevTask'],
       skip,
       take: count,
       where: { user },
@@ -115,7 +115,8 @@ export class UserWorkRepository extends Repository<UserWork> {
 
   private prepare(userWork: UserWork): UserWork {
     const projectId = userWork.projectId;
+    const prevProjectId = userWork.prevProjectId;
     // delete userWork.task;
-    return { ...userWork, projectId };
+    return { ...userWork, prevProjectId, projectId };
   }
 }

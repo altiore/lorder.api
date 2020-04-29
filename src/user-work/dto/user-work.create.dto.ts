@@ -29,4 +29,9 @@ export class UserWorkCreateDto {
   @IsNumber()
   @IsOptional()
   taskId?: number;
+
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  prevTaskId?: number;
 }
