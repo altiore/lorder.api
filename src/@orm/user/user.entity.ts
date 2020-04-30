@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -70,6 +71,9 @@ export class User {
   @OneToOne(() => Media, { eager: true, nullable: true })
   @JoinColumn()
   avatar?: Media;
+
+  @ManyToOne(t => Project, { nullable: true, onDelete: 'SET NULL', onUpdate: 'CASCADE' })
+  defaultProject: Project;
 
   @Column({ nullable: true })
   defaultProjectId: number;

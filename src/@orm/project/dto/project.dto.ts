@@ -1,5 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+
+import { PROJECT_TYPE } from '../project.entity';
 
 export class ProjectDto {
   @ApiProperty()
@@ -13,4 +15,9 @@ export class ProjectDto {
   @IsNumber()
   @IsOptional()
   monthlyBudget?: number;
+
+  @ApiPropertyOptional()
+  @IsIn(Object.values(PROJECT_TYPE))
+  @IsOptional()
+  type?: PROJECT_TYPE;
 }

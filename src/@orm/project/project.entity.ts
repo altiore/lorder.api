@@ -23,6 +23,11 @@ import { ACCESS_LEVEL } from '../user-project/user-project.consts';
 import { UserProject } from '../user-project/user-project.entity';
 import { User } from '../user/user.entity';
 
+export enum PROJECT_TYPE {
+  SOCIALLY_USEFUL = 'socially_useful',
+  PERSONALLY_USEFUL = 'personally_useful',
+}
+
 @Entity()
 export class Project {
   @ApiProperty()
@@ -45,19 +50,23 @@ export class Project {
   @UpdateDateColumn(momentDateTransformer)
   updatedAt: Moment;
 
-  @ApiProperty({ type: User })
+  @ApiProperty({ type: () => User })
   @ManyToOne(() => User)
   creator: User;
 
-  @ApiProperty({ type: User })
+  @ApiProperty({ type: () => User })
   @ManyToOne(() => User)
   updator: User;
+
+  @ApiProperty({ enum: PROJECT_TYPE })
+  @Column('enum', { enum: PROJECT_TYPE, nullable: false, default: PROJECT_TYPE.SOCIALLY_USEFUL })
+  type: PROJECT_TYPE;
 
   @ApiProperty()
   @Column({ nullable: false })
   ownerId: number;
 
-  @ApiProperty({ type: User })
+  @ApiProperty({ type: () => User })
   @ManyToOne(() => User, m => m.ownProjects, {
     nullable: false,
     onDelete: 'CASCADE',

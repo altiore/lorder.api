@@ -4,7 +4,7 @@ import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { User } from '../user/user.entity';
 
 import { ProjectDto } from './dto';
-import { Project } from './project.entity';
+import { Project, PROJECT_TYPE } from './project.entity';
 
 @EntityRepository(Project)
 export class ProjectRepository extends Repository<Project> {
@@ -20,6 +20,7 @@ export class ProjectRepository extends Repository<Project> {
     project.creator = creator;
     project.updator = creator;
     project.owner = creator;
+    project.type = data.type || PROJECT_TYPE.SOCIALLY_USEFUL;
     return this.save(project);
   }
 

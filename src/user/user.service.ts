@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Media, MEDIA_TYPE } from '@orm/media';
-import { Project } from '@orm/project';
+import { Project, PROJECT_TYPE } from '@orm/project';
 import { RoleRepository } from '@orm/role';
 import { UpdateUserDto, User, UserRepository } from '@orm/user';
 import { DeepPartial } from 'typeorm';
@@ -79,10 +79,11 @@ export class UserService {
       {
         monthlyBudget: 0,
         title: 'Без проекта',
+        type: PROJECT_TYPE.PERSONALLY_USEFUL,
       },
       user
     );
-    await this.userRepo.updateOne(user, { defaultProjectId: project.id });
+    await this.userRepo.update({ id: user.id }, { defaultProjectId: project.id });
     return project;
   }
 
