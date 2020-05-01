@@ -1,21 +1,34 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { IsIn, IsInt, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { ProjectRole } from '../project-role/project-role.entity';
-import { TaskStatusMove } from '../task-status-move/task-status-move.entity';
+import { TaskStatus } from '../task-status/task-status.entity';
 
 export enum TASK_STATUS_MOVE_TYPE {
-  PREPARING = 'preparing',
-  TO_DO = 'todo',
-  IN_PROGRESS = 'in-progress',
-  IN_REVIEW = 'in-review',
-  DONE = 'done',
+  PREPARE = 'prepare',
+  ASK_IMPROVE = 'ask_improve',
+
+  START = 'start',
+  ASK_PREPARE = 'ask_prepare',
+
+  COMPLETE = 'complete',
+  ASK_RESTART = 'ask_restart',
+
+  ESTIMATE = 'estimate',
+  ASK_RECHECK = 'ask_recheck',
 }
 
 @Entity()
 export class ProjectRoleAllowedMove {
+  @ApiProperty()
   @PrimaryGeneratedColumn()
   public id!: number;
 
+  @IsNotEmpty()
+  @IsNumber()
+  @IsInt()
+  @ApiProperty()
   @Column()
   public projectRoleId!: number;
 
@@ -25,16 +38,30 @@ export class ProjectRoleAllowedMove {
   })
   public projectRole!: ProjectRole;
 
-  @Column()
-  public taskStatusMoveId!: number;
-
-  @ManyToOne(type => TaskStatusMove, m => m.allowedMoves, {
-    onDelete: 'RESTRICT',
-    onUpdate: 'CASCADE',
-  })
-  public taskStatusMove!: TaskStatusMove;
-
-  // Тип задачи в контексте текущей роли
+  @IsNotEmpty()
+  @IsString()
+  @IsIn(Object.values(TASK_STATUS_MOVE_TYPE))
+  @ApiProperty({ enum: TASK_STATUS_MOVE_TYPE })
   @Column('enum', { enum: TASK_STATUS_MOVE_TYPE })
   public type!: TASK_STATUS_MOVE_TYPE;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @IsInt()
+  @ApiProperty()
+  @Column({ nullable: false })
+  fromId!: number;
+
+  @ManyToOne(t => TaskStatus, { nullable: false, onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
+  from!: TaskStatus;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @IsInt()
+  @ApiProperty()
+  @Column({ nullable: false })
+  toId!: number;
+
+  @ManyToOne(t => TaskStatus, { nullable: false, onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
+  to!: TaskStatus;
 }

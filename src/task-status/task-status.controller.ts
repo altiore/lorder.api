@@ -17,7 +17,7 @@ import { TaskStatusService } from './task-status.service';
   routes: {
     only: ['getManyBase', 'createOneBase', 'updateOneBase', 'deleteOneBase'],
     getManyBase: {
-      decorators: [Auth(res(TaskStatus).getMany, ROLES.SUPER_ADMIN)],
+      decorators: [Auth(res(TaskStatus).getMany, ROLES.USER)],
     },
     createOneBase: {
       decorators: [Auth(res(TaskStatus).createOne, ROLES.SUPER_ADMIN)],

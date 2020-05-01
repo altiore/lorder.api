@@ -1,8 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-
-import { TaskStatusMove } from '../task-status-move/task-status-move.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class TaskStatus {
@@ -27,10 +25,4 @@ export class TaskStatus {
   @ApiProperty()
   @Column({ unique: true })
   statusTo!: number;
-
-  @OneToMany(() => TaskStatusMove, m => m.from)
-  fromMoves: TaskStatusMove[];
-
-  @OneToMany(() => TaskStatusMove, m => m.to)
-  toMoves: TaskStatusMove[];
 }
