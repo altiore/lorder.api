@@ -28,6 +28,11 @@ export enum PROJECT_TYPE {
   PERSONALLY_USEFUL = 'personally_useful',
 }
 
+export enum PROJECT_STRATEGY {
+  SIMPLE = 'SIMPLE',
+  DOUBLE_CHECK = 'DOUBLE_CHECK',
+}
+
 @Entity()
 export class Project {
   @ApiProperty()
@@ -61,6 +66,10 @@ export class Project {
   @ApiProperty({ enum: PROJECT_TYPE })
   @Column('enum', { enum: PROJECT_TYPE, nullable: false, default: PROJECT_TYPE.SOCIALLY_USEFUL })
   type: PROJECT_TYPE;
+
+  @ApiProperty({ enum: PROJECT_STRATEGY })
+  @Column('enum', { enum: PROJECT_STRATEGY, nullable: false, default: PROJECT_STRATEGY.SIMPLE })
+  strategy: PROJECT_STRATEGY;
 
   @ApiProperty()
   @Column({ nullable: false })
