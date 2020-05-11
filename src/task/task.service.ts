@@ -1,11 +1,12 @@
 import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from '@orm/project';
-import { Task, TaskRepository } from '@orm/task';
+import { Task, TASK_SIMPLE_STATUS, TaskRepository } from '@orm/task';
 import { TASK_CHANGE_TYPE, TaskLogRepository } from '@orm/task-log';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
 import { cloneDeep } from 'lodash';
+import { EntityManager } from 'typeorm';
 
 import { ProjectService } from '../project/project.service';
 
@@ -34,9 +35,11 @@ export class TaskService {
     user: User,
     accessLevel: ACCESS_LEVEL = ACCESS_LEVEL.RED,
     where = {},
-    withoutRelations = false
+    withoutRelations = false,
+    manager?: EntityManager
   ): Promise<Task> {
-    const task = await this.taskRepo.findOne({
+    const curManager = manager || this.taskRepo.manager;
+    const task = await curManager.findOne(Task, {
       relations: withoutRelations ? [] : ['performer', 'userWorks', 'userTasks'],
       where: {
         id: taskId,
@@ -46,7 +49,7 @@ export class TaskService {
     if (!task) {
       throw new NotFoundException('Задача не была найдена');
     }
-    task.project = await this.projectService.findOneByMember(task.projectId, user);
+    task.project = await this.projectService.findOneByMember(task.projectId, user, curManager);
     // Эта проверка ДОЛЖНА быть здесь. Если ее убрать, то можно будет в url написать проект, к которому есть доступ
     // и отредактировать произвольную задачу из произвольного проекта
     if (!task.project || !task.project.isAccess(accessLevel)) {
@@ -91,7 +94,7 @@ export class TaskService {
 
   public async findOneByIdWithUsers(id: number): Promise<Task> {
     const task = await this.taskRepo.findOne({
-      relations: ['performer', 'userTasks'],
+      relations: ['performer', 'userTasks', 'project'],
       where: { id },
     });
     if (!task) {
@@ -111,16 +114,15 @@ export class TaskService {
     return task;
   }
 
-  async createByProject(taskData: Partial<Task>, project: Project, user: User): Promise<Task> {
-    let task: Task;
-    await this.taskRepo.manager.transaction(async entityManager => {
-      task = await this.taskRepo.createByProject(taskData, project);
-      task.performerId = taskData.performerId || user.id;
-      task = await entityManager.save(task);
+  async createByProject(taskData: Partial<Task>, project: Project, user: User, manager?: EntityManager): Promise<Task> {
+    const curManager = manager || this.taskRepo.manager;
+    let task = await this.taskRepo.createByProject(taskData, project);
+    task.performerId = taskData.performerId || user.id;
+    task = await curManager.save(task);
+    task.status = typeof taskData.status === 'number' ? taskData.status : TASK_SIMPLE_STATUS.JUST_CREATED;
 
-      const taskLog = this.taskLogRepo.createTaskLogByType(TASK_CHANGE_TYPE.CREATE, task, user, {});
-      await entityManager.save(taskLog);
-    });
+    const taskLog = this.taskLogRepo.createTaskLogByType(TASK_CHANGE_TYPE.CREATE, task, user, {});
+    await curManager.save(taskLog);
     return task;
   }
 

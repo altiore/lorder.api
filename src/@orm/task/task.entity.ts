@@ -19,10 +19,26 @@ import { UserTask } from '../user-task/user-task.entity';
 import { UserWork } from '../user-work/user-work.entity';
 import { User } from '../user/user.entity';
 
+export enum TASK_SIMPLE_STATUS {
+  JUST_CREATED = 0,
+  TO_DO = 1,
+  IN_PROGRESS = 2,
+  IN_TESTING = 3,
+  DONE = 4,
+}
+
 @Entity()
 @Index(['projectId', 'sequenceNumber'])
 @Unique(['projectId', 'sequenceNumber'])
 export class Task {
+  static statuses: { [key in keyof typeof TASK_SIMPLE_STATUS]: TASK_SIMPLE_STATUS } = {
+    JUST_CREATED: 0,
+    TO_DO: 1,
+    IN_PROGRESS: 2,
+    IN_TESTING: 3,
+    DONE: 4,
+  };
+
   @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;

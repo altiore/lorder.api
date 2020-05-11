@@ -1,3 +1,4 @@
+import { TASK_SIMPLE_STATUS } from '../../../@orm/task';
 import { TestHelper } from '../../../@test-helper/@utils/TestHelper';
 
 import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture } from './@fixtures/move';
@@ -34,11 +35,11 @@ describe(`PATCH (MOVE) ${h.url}`, () => {
     const { body } = await h
       .requestBy('project-owner@mail.com')
       .patch(h.path(projectId, taskSequenceNumber))
-      .send({ status: 3 })
+      .send({ status: TASK_SIMPLE_STATUS.IN_TESTING })
       .expect(200);
     expect(body).toEqual(
       expect.objectContaining({
-        status: 3,
+        status: TASK_SIMPLE_STATUS.IN_TESTING,
       })
     );
   });
@@ -47,11 +48,11 @@ describe(`PATCH (MOVE) ${h.url}`, () => {
     const { body } = await h
       .requestBy('member@mail.com')
       .patch(h.path(projectId, taskSequenceNumber))
-      .send({ status: 3 })
+      .send({ status: TASK_SIMPLE_STATUS.IN_TESTING })
       .expect(200);
     expect(body).toEqual(
       expect.objectContaining({
-        status: 3,
+        status: TASK_SIMPLE_STATUS.IN_TESTING,
       })
     );
   });
@@ -73,7 +74,7 @@ describe(`PATCH (MOVE) ${h.url}`, () => {
     const { body } = await h
       .requestBy('access-level-white@mail.com')
       .patch(h.path(projectId, taskSequenceNumber))
-      .send({ status: 3 })
+      .send({ status: TASK_SIMPLE_STATUS.IN_TESTING })
       .expect(403);
     expect(body).toEqual({
       error: 'Forbidden',

@@ -1,6 +1,6 @@
 import moment = require('moment');
 import { Moment } from 'moment';
-import { EntityRepository, IsNull, Repository, SelectQueryBuilder } from 'typeorm';
+import { EntityManager, EntityRepository, IsNull, Repository, SelectQueryBuilder } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Task } from '../task/task.entity';
@@ -31,14 +31,21 @@ export class UserWorkRepository extends Repository<UserWork> {
     return entities.map(this.prepare);
   }
 
-  public async startTask(task: Task, user: User, userWorkData: Partial<UserWork>, startAt: Moment): Promise<UserWork> {
-    const userWork = this.create({
+  public async startTask(
+    task: Task,
+    user: User,
+    userWorkData: Partial<UserWork>,
+    startAt: Moment,
+    manager?: EntityManager
+  ): Promise<UserWork> {
+    const curManager = manager || this.manager;
+    const userWork = curManager.create(UserWork, {
       ...userWorkData,
       startAt: startAt || moment(),
       task,
       user,
     });
-    return this.prepare(await this.save(userWork));
+    return this.prepare(await curManager.save(userWork));
   }
 
   public async findWithPaginationByUser(

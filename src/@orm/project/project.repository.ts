@@ -1,4 +1,4 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityManager, EntityRepository, Repository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { User } from '../user/user.entity';
@@ -15,13 +15,14 @@ export class ProjectRepository extends Repository<Project> {
     });
   }
 
-  public createByUser(data: ProjectDto, creator: User): Promise<Project> {
-    const project = this.create(data);
+  public createByUser(data: ProjectDto, creator: User, manager?: EntityManager): Promise<Project> {
+    const curManager = manager || this.manager;
+    const project = curManager.create(Project, data);
     project.creator = creator;
     project.updator = creator;
     project.owner = creator;
     project.type = data.type || PROJECT_TYPE.SOCIALLY_USEFUL;
-    return this.save(project);
+    return curManager.save(project);
   }
 
   public async findAllWithPagination(paginationDto: PaginationDto): Promise<Project[]> {

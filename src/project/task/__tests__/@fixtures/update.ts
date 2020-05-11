@@ -6,6 +6,7 @@ import {
 } from '../../../../@test-helper/@fixtureCreators';
 
 import { ROLES } from '../../../../@orm/role';
+import { TASK_SIMPLE_STATUS } from '../../../../@orm/task';
 import { ACCESS_LEVEL } from '../../../../@orm/user-project';
 
 export const usersFixture = createUsers([
@@ -87,7 +88,7 @@ export const tasksFixture = createTasks([
   {
     performer: { email: 'member@mail.com' },
     project: { owner: { email: 'project-owner@mail.com' } },
-    status: 4,
+    status: TASK_SIMPLE_STATUS.DONE,
     title: 'finished task',
     userTasks: [{ user: { email: 'member@mail.com' } }],
   },

@@ -31,10 +31,11 @@ export class ProjectService {
     return project;
   }
 
-  public async findOneByMember(projectId: number, user: User): Promise<Project> {
+  public async findOneByMember(projectId: number, user: User, manager?: EntityManager): Promise<Project> {
+    const curManager = manager || this.taskRepo.manager;
     try {
       // 1. check user access
-      const access = await this.userProjectRepo.findOne({
+      const access = await curManager.findOne(UserProject, {
         where: {
           member: { id: user.id },
           project: { id: projectId },
@@ -47,7 +48,10 @@ export class ProjectService {
         );
       }
       // 2. load project if has correct access to it
-      const project = await this.projectRepo.findOneByProjectId(projectId);
+      const project = await curManager.findOne(Project, {
+        relations: ['pub'],
+        where: { id: projectId },
+      });
       project.accessLevel = pick(access, UserProject.simpleFields);
       return project;
     } catch (e) {
@@ -55,9 +59,10 @@ export class ProjectService {
     }
   }
 
-  public async create(data: ProjectDto, user: User): Promise<Project> {
-    const project = await this.projectRepo.createByUser(data, user);
-    await this.userProjectRepo.addToProject(project, user, user, ACCESS_LEVEL.VIOLET);
+  public async create(data: ProjectDto, user: User, manager?: EntityManager): Promise<Project> {
+    const curManager = manager || this.projectRepo.manager;
+    const project = await this.projectRepo.createByUser(data, user, curManager);
+    await this.userProjectRepo.addToProject(project, user, user, ACCESS_LEVEL.VIOLET, curManager);
     return project;
   }
 

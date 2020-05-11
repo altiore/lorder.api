@@ -1,4 +1,4 @@
-import { DeepPartial, EntityRepository, MoreThanOrEqual, Repository } from 'typeorm';
+import { DeepPartial, EntityManager, EntityRepository, MoreThanOrEqual, Repository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Project } from '../project/project.entity';
@@ -13,15 +13,17 @@ export class UserProjectRepository extends Repository<UserProject> {
     project: DeepPartial<Project>,
     member: User,
     inviter: User,
-    accessLevel: number = ACCESS_LEVEL.WHITE
+    accessLevel: number = ACCESS_LEVEL.WHITE,
+    manager?: EntityManager
   ): Promise<UserProject> {
-    const entity = this.create({
+    const curManager = manager || this.manager;
+    const entity = curManager.create(UserProject, {
       accessLevel,
       inviter,
       member,
       project,
     });
-    return await this.save(entity);
+    return await curManager.save(entity);
   }
 
   public async activateInProject(member: User, project: DeepPartial<Project>): Promise<UserProject> {

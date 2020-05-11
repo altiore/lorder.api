@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable, NotAcceptableException, NotFoundExcepti
 import { InjectRepository } from '@nestjs/typeorm';
 import { ValidationError } from 'class-validator';
 import * as moment from 'moment';
-import { DeleteResult } from 'typeorm';
+import { DeleteResult, EntityManager, IsNull } from 'typeorm';
 
 import { Project } from '@orm/project';
 import { User } from '@orm/user';
@@ -11,7 +11,7 @@ import { ACCESS_LEVEL } from '@orm/user-project';
 import { PaginationDto } from '@common/dto';
 
 import { ValidationException } from '../@common/exceptions/validation.exception';
-import { Task } from '../@orm/task';
+import { Task, TASK_SIMPLE_STATUS } from '../@orm/task';
 import { UserTask } from '../@orm/user-task';
 import { UserWork, UserWorkRepository } from '../@orm/user-work';
 import { ProjectMemberService } from '../project/member/project.member.service';
@@ -61,22 +61,29 @@ export class UserWorkService {
     return userWork;
   }
 
-  public async updateTime(userWork: UserWork, user: User, recalculate: boolean = false): Promise<UserWork> {
+  public async updateTime(
+    userWork: UserWork,
+    user: User,
+    recalculate: boolean = false,
+    manager?: EntityManager
+  ): Promise<UserWork> {
+    const curManager = manager || this.userWorkRepo.manager;
     let res = userWork;
     if (!userWork.projectId || !userWork.task.userTasks) {
-      userWork.task = await this.taskService.findOneByIdWithUsers(userWork.taskId);
+      userWork.task = await curManager.findOne(Task, {
+        relations: ['performer', 'userTasks', 'project'],
+        where: { id: userWork.taskId },
+      });
     }
     if (userWork.finishAt && moment(userWork.startAt).diff(moment(userWork.finishAt)) > 0) {
       throw new NotAcceptableException('startAt не может быть позже, чем finishAt');
     }
-    await this.userWorkRepo.manager.transaction(async entityManager => {
-      res = await entityManager.save(UserWork, userWork);
-      if (recalculate) {
-        await this.projectService.calculateUserStatistic(user, 0, entityManager);
-      } else {
-        await this.projectMemberService.addTime(userWork, entityManager);
-      }
-    });
+    res = await curManager.save(UserWork, userWork);
+    if (recalculate) {
+      await this.projectService.calculateUserStatistic(user, 0, curManager);
+    } else {
+      await this.projectMemberService.addTime(userWork, curManager);
+    }
     return res;
   }
 
@@ -89,97 +96,117 @@ export class UserWorkService {
     return result;
   }
 
-  public async updateBenefitParts(userTasks: UserTask[]): Promise<void> {
+  public async updateBenefitParts(userTasks: UserTask[], manager?: EntityManager): Promise<void> {
+    const curManager = manager || this.userWorkRepo.manager;
     const usersCount = userTasks.length;
     userTasks.map(ut => {
       const accuracy = 1000000;
       ut.benefitPart = Math.round(accuracy / usersCount) / accuracy;
     });
-    await this.userWorkRepo.manager.save(userTasks);
+    await curManager.save(userTasks);
   }
 
-  public async finishTask(userWork: UserWork, user: User): Promise<UserWork> {
+  public async finishTask(userWork: UserWork, user: User, manager?: EntityManager): Promise<UserWork> {
+    const curManager = manager || this.userWorkRepo.manager;
     userWork.finishAt = moment();
     if (!userWork.projectId || !userWork.task.userTasks) {
-      userWork.task = await this.taskService.findOneByIdWithUsers(userWork.taskId);
+      userWork.task = await curManager.findOne(Task, {
+        relations: ['performer', 'userTasks', 'project'],
+        where: { id: userWork.taskId },
+      });
     }
     const curUserTask = userWork.task.userTasks.find(el => el.userId === user.id);
+
+    // TODO: проверить стратегию проекта
+
     if (!curUserTask) {
       // 1. create new userTask
       let userTask = new UserTask();
       userTask.task = { id: userWork.taskId } as Task;
       userTask.user = { id: user.id } as User;
       userTask.time = userWork.finishAt.diff(userWork.startAt);
-      userTask = await this.userWorkRepo.manager.save(userTask);
+      userTask = await curManager.save(userTask);
       userWork.task.userTasks.push(userTask);
 
       // 2. update all benefitParts
-      await this.updateBenefitParts(userWork.task.userTasks);
+      await this.updateBenefitParts(userWork.task.userTasks, curManager);
     } else {
       curUserTask.time += userWork.finishAt.diff(userWork.startAt);
-      await this.userWorkRepo.manager.save(curUserTask);
+      await curManager.save(curUserTask);
     }
 
     if (curUserTask && !curUserTask.benefitPart) {
       // 2. update all benefitParts
-      await this.updateBenefitParts(userWork.task.userTasks);
+      await this.updateBenefitParts(userWork.task.userTasks, curManager);
     }
 
-    return await this.updateTime(userWork, user, false);
+    return await this.updateTime(userWork, user, false, curManager);
   }
 
-  public async finishNotFinished(user: User): Promise<UserWork[]> {
-    const userWorks = await this.userWorkRepo.findNotFinishedByUser(user);
+  public async finishNotFinished(user: User, manager?: EntityManager): Promise<UserWork[]> {
+    const curManager = manager || this.userWorkRepo.manager;
+    const userWorks = await curManager.find(UserWork, {
+      relations: ['task', 'task.userTasks'],
+      where: { finishAt: IsNull(), user },
+    });
 
     return await Promise.all(
       userWorks.map(async userWork => {
-        return await this.finishTask(userWork, user);
+        return await this.finishTask(userWork, user, manager);
       })
     );
   }
 
   public async start(project: Project, user: User, userWorkData: UserWorkCreateDto): Promise<StartResponse> {
-    // TODO: добавить транзакции на процесс создания всех частей задачи
-    // 1. Завершить предыдущие задачи, если есть незавершенные
-    const finishedUserWorks = await this.finishNotFinished(user);
-
-    // 2. Создать новую задачу
-    let startAt;
-    if (finishedUserWorks && finishedUserWorks.length) {
-      startAt = finishedUserWorks[0].finishAt;
-    }
-    const startedUserWork = await this.startNew(project, user, userWorkData, startAt);
-    return {
-      finished: finishedUserWorks,
-      started: startedUserWork,
+    const result: StartResponse = {
+      finished: [],
+      started: null,
     };
+    await this.userWorkRepo.manager.transaction(async entityManager => {
+      // TODO: добавить транзакции на процесс создания всех частей задачи
+      // 1. Завершить предыдущие задачи, если есть незавершенные
+      result.finished = await this.finishNotFinished(user, entityManager);
+
+      // 2. Создать новую задачу
+      let startAt;
+      if (result.finished && result.finished.length) {
+        startAt = result.finished[0].finishAt;
+      }
+      result.started = await this.startNew(project, user, userWorkData, startAt, entityManager);
+    });
+
+    return result;
   }
 
   public async stop(userWork: UserWork, user: User): Promise<StopResponse> {
     if (userWork.finishAt) {
       throw new NotAcceptableException('Эта задача уже завершена. Вы не можете завершить одну и ту же задачу дважды');
     }
-    const previous = await this.finishTask(userWork, user);
-    let defaultProject;
-    if (user.defaultProjectId) {
-      defaultProject = await this.projectService.findOneByMember(user.defaultProjectId, user);
-    } else {
-      defaultProject = await this.userService.createDefaultProject(user);
-    }
-    const next = await this.startNew(
-      defaultProject,
-      user,
-      {
-        description: `После "${previous.task.title}"`,
-        projectId: defaultProject.id,
-        title: 'Перерыв/Отдых',
-      },
-      previous.finishAt
-    );
-    return {
-      next,
-      previous,
+    const result: StopResponse = {
+      next: null,
+      previous: null,
     };
+    await this.userWorkRepo.manager.transaction(async entityManager => {
+      result.previous = await this.finishTask(userWork, user, entityManager);
+      let defaultProject;
+      if (user.defaultProjectId) {
+        defaultProject = await this.projectService.findOneByMember(user.defaultProjectId, user, entityManager);
+      } else {
+        defaultProject = await this.userService.createDefaultProject(user, entityManager);
+      }
+      result.next = await this.startNew(
+        defaultProject,
+        user,
+        {
+          description: `После "${result.previous.task.title}"`,
+          projectId: defaultProject.id,
+          title: 'Перерыв/Отдых',
+        },
+        result.previous.finishAt,
+        entityManager
+      );
+    });
+    return result;
   }
 
   public async pause(userWork: UserWork, user: User): Promise<StopResponse> {
@@ -333,11 +360,13 @@ export class UserWorkService {
     project: Project,
     user: User,
     userWorkData: UserWorkCreateDto,
-    startAt: moment.Moment
+    startAt: moment.Moment,
+    manager?: EntityManager
   ): Promise<UserWork> {
+    const curManager = manager || this.userWorkRepo.manager;
     let task;
     if (userWorkData.taskId) {
-      task = await this.taskService.findOneById(userWorkData.taskId, user);
+      task = await this.taskService.findOneById(userWorkData.taskId, user, undefined, undefined, undefined, curManager);
       if (!task) {
         throw new NotFoundException(`Указанная задача ${userWorkData.taskId} не найдена в проекте ${project.title}`);
       }
@@ -346,10 +375,10 @@ export class UserWorkService {
       const taskData = {
         description: userWorkData.description || '',
         performerId: userWorkData.performerId || user.id,
-        status: 2,
+        status: TASK_SIMPLE_STATUS.IN_PROGRESS,
         title: userWorkData.title,
       };
-      task = await this.taskService.createByProject(taskData, project, user);
+      task = await this.taskService.createByProject(taskData, project, user, curManager);
     }
     return await this.userWorkRepo.startTask(
       task,
@@ -358,7 +387,8 @@ export class UserWorkService {
         description: userWorkData.description,
         prevTaskId: userWorkData.prevTaskId,
       },
-      startAt
+      startAt,
+      curManager
     );
   }
 }

@@ -4,7 +4,7 @@ import { Media, MEDIA_TYPE } from '@orm/media';
 import { Project, PROJECT_TYPE } from '@orm/project';
 import { RoleRepository } from '@orm/role';
 import { UpdateUserDto, User, UserRepository } from '@orm/user';
-import { DeepPartial } from 'typeorm';
+import { DeepPartial, EntityManager } from 'typeorm';
 
 import { UserRole } from '../@orm/user-role/user-role.entity';
 import { FileService } from '../file/file.service';
@@ -74,16 +74,18 @@ export class UserService {
     return res;
   }
 
-  public async createDefaultProject(user: User): Promise<Project> {
+  public async createDefaultProject(user: User, manager?: EntityManager): Promise<Project> {
+    const curManager = manager || this.userRepo.manager;
     const project = await this.projectService.create(
       {
         monthlyBudget: 0,
         title: 'Без проекта',
         type: PROJECT_TYPE.PERSONALLY_USEFUL,
       },
-      user
+      user,
+      curManager
     );
-    await this.userRepo.update({ id: user.id }, { defaultProjectId: project.id });
+    await curManager.update(User, { id: user.id }, { defaultProjectId: project.id });
     return project;
   }
 
