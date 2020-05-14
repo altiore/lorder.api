@@ -13,6 +13,7 @@ import {
 } from 'typeorm';
 
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
+import { ProjectPart } from '../project-part/project-part.entity';
 import { Project } from '../project/project.entity';
 import { TaskType } from '../task-type/task-type.entity';
 import { UserTask } from '../user-task/user-task.entity';
@@ -58,6 +59,18 @@ export class Task {
     onUpdate: 'CASCADE',
   })
   project: Project;
+
+  @ApiPropertyOptional()
+  @Column({ nullable: true })
+  projectPartId?: number;
+
+  @ApiProperty({ type: () => ProjectPart })
+  @ManyToOne(() => ProjectPart, {
+    nullable: true,
+    onDelete: 'RESTRICT',
+    onUpdate: 'CASCADE',
+  })
+  projectPart?: ProjectPart;
 
   // ApiModel does not work here due to circular dependency
   @ManyToOne(type => Task, m => m.children)

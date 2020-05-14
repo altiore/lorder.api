@@ -1,3 +1,4 @@
+import { NotAcceptableException } from '@nestjs/common';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Moment } from 'moment';
 import {
@@ -13,8 +14,8 @@ import {
 } from 'typeorm';
 
 import { TaskType } from '../../@orm/task-type/task-type.entity';
-
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
+import { ProjectPart } from '../project-part/project-part.entity';
 import { ProjectPub } from '../project-pub/project-pub.entity';
 import { ProjectRole } from '../project-role/project-role.entity';
 import { ProjectTaskType } from '../project-task-type/project-task-type.entity';
@@ -128,7 +129,14 @@ export class Project {
   @ApiPropertyOptional({ description: 'Сумма всех оцененных задач в проекте' })
   valueSum?: number;
 
+  @ApiPropertyOptional({ type: () => ProjectPart, isArray: true })
+  @OneToMany(() => ProjectPart, m => m.project)
+  parts: ProjectPart[];
+
   isAccess(accessLevel: ACCESS_LEVEL) {
-    return this.accessLevel && this.accessLevel.accessLevel >= accessLevel;
+    if (!this.accessLevel) {
+      throw new NotAcceptableException('AccessLevel MUST be found for checked project for check!');
+    }
+    return this.accessLevel.accessLevel >= accessLevel;
   }
 }

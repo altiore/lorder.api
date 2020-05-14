@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { FileModule } from './file/file.module';
 import { MeModule } from './me/me.module';
+import { ProjectPartModule } from './project-part/project-part.module';
 import { ProjectStatusMoveModule } from './project-status-move/project.status-move.module';
 import { ProjectModule } from './project/project.module';
 import { PublicModule } from './public/public.module';
@@ -29,6 +30,7 @@ import { UserModule } from './user/user.module';
     FileModule,
     MeModule,
     ProjectModule,
+    ProjectPartModule,
     ProjectStatusMoveModule,
     PublicModule,
     RedisModule,

@@ -31,7 +31,7 @@ describe(`GET ${h.url}`, () => {
       .expect(200);
     expect(body).toEqual(
       expect.arrayContaining([
-        {
+        expect.objectContaining({
           createdAt: expect.any(String),
           createdById: null,
           description: expect.any(String),
@@ -47,7 +47,7 @@ describe(`GET ${h.url}`, () => {
           updatedAt: expect.any(String),
           userTasks: expect.any(Array),
           value: expect.any(Number),
-        },
+        }),
       ])
     );
   });
