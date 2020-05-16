@@ -122,6 +122,7 @@ export class UserWorkService {
     }
     if (typeof status === 'number') {
       await curManager.update(Task, { id: userWork.taskId }, { status });
+      userWork.task.status = status;
     }
     const curUserTask = userWork.task.userTasks.find(el => el.userId === user.id);
 
@@ -386,6 +387,7 @@ export class UserWorkService {
       }
     }
     if (task) {
+      task.status = TASK_SIMPLE_STATUS.IN_PROGRESS;
       await curManager.update(Task, { id: task.id }, { status: TASK_SIMPLE_STATUS.IN_PROGRESS });
     } else {
       const taskData = {

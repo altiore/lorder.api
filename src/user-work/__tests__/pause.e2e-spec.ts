@@ -1,6 +1,6 @@
 import * as moment from 'moment';
 
-import { Task } from '../../@orm/task';
+import { Task, TASK_SIMPLE_STATUS } from '../../@orm/task';
 import { UserWork } from '../../@orm/user-work';
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
 
@@ -94,6 +94,7 @@ describe(`PATCH ${h.url}`, () => {
     });
     expect(body.next.startAt).toBe(currentUserWork.finishAt.toJSON());
     expect(body.next.prevTaskId).toBe(currentUserWork.taskId);
+    expect(body.previous.task.status).toBe(TASK_SIMPLE_STATUS.TO_DO);
     await h.removeCreated(Task, body.next.task.id);
     await h.removeCreated(UserWork, body.next.id);
   });
