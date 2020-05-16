@@ -5,20 +5,31 @@ import { Task, TASK_SIMPLE_STATUS, TaskRepository } from '@orm/task';
 import { TASK_CHANGE_TYPE, TaskLogRepository } from '@orm/task-log';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
-import { cloneDeep } from 'lodash';
-import { EntityManager } from 'typeorm';
+import { DeleteResult, EntityManager } from 'typeorm';
 
+import { ListResponseDto, PaginationDto } from '../@common/dto';
 import { ProjectService } from '../project/project.service';
 
 import { TaskPagination } from './dto';
+import { TaskGateway } from './task.gateway';
 
 @Injectable()
 export class TaskService {
   constructor(
     private projectService: ProjectService,
     @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository,
-    @InjectRepository(TaskLogRepository) private readonly taskLogRepo: TaskLogRepository
+    @InjectRepository(TaskLogRepository) private readonly taskLogRepo: TaskLogRepository,
+    private readonly taskGateway: TaskGateway
   ) {}
+
+  public async findAllByProject(pagesDto: PaginationDto, projectId: number): Promise<ListResponseDto<Task>> {
+    const [list, total] = await this.taskRepo.findAllByProjectId(pagesDto, projectId);
+    return { list, total };
+  }
+
+  public findOneBySequenceNumber(sequenceNumber: number, projectId: number): Promise<Task> {
+    return this.taskRepo.findOneByProjectId(sequenceNumber, projectId);
+  }
 
   public async findAll(pagesDto: TaskPagination, user: User): Promise<Task[]> {
     const userProjects = await this.projectService.findAllParticipantByUser({}, user, ACCESS_LEVEL.RED);
@@ -28,6 +39,10 @@ export class TaskService {
     }
 
     return await this.taskRepo.findAllWithPagination(pagesDto, user, projectIds);
+  }
+
+  public async deleteBySequenceNumber(sequenceNumber: number, projectId: number): Promise<DeleteResult> {
+    return await this.taskRepo.delete({ sequenceNumber, project: { id: projectId } });
   }
 
   public async findOneById(
@@ -59,23 +74,15 @@ export class TaskService {
   }
 
   public async archive(taskId: number, user: User): Promise<Task> {
-    const task = await this.findOneById(taskId, user, ACCESS_LEVEL.YELLOW, { isArchived: false });
+    let task = await this.findOneById(taskId, user, ACCESS_LEVEL.YELLOW, { isArchived: false });
 
     if (task) {
       await this.taskRepo.manager.transaction(async entityManager => {
-        const prevTaskVersion = cloneDeep(task);
-        task.isArchived = true;
-        await entityManager.save(task);
-        const taskLog = this.taskLogRepo.createTaskLogByType(TASK_CHANGE_TYPE.ARCHIVE, task, user, prevTaskVersion);
-        await entityManager.save(taskLog);
+        task = await this.updateByUser(task, { isArchived: true }, user, entityManager);
       });
     }
 
     return task;
-  }
-
-  public async findOneByProjectId(sequenceNumber: number, projectId: number): Promise<Task> {
-    return this.taskRepo.findOneByProjectId(sequenceNumber, projectId);
   }
 
   public async findOne(sequenceNumber: number, project: Project, user: User): Promise<Task> {
@@ -85,17 +92,6 @@ export class TaskService {
         project,
         sequenceNumber,
       },
-    });
-    if (!task) {
-      throw new NotFoundException('Задача не была найдена');
-    }
-    return task;
-  }
-
-  public async findOneByIdWithUsers(id: number): Promise<Task> {
-    const task = await this.taskRepo.findOne({
-      relations: ['performer', 'userTasks', 'project'],
-      where: { id },
     });
     if (!task) {
       throw new NotFoundException('Задача не была найдена');
@@ -114,34 +110,47 @@ export class TaskService {
     return task;
   }
 
+  /**
+   * TODO: send currently created task using sockets
+   */
   async createByProject(taskData: Partial<Task>, project: Project, user: User, manager?: EntityManager): Promise<Task> {
     const curManager = manager || this.taskRepo.manager;
-    let task = await this.taskRepo.createByProject(taskData, project);
-    task.performerId = taskData.performerId || user.id;
-    task = await curManager.save(task);
-    task.status = typeof taskData.status === 'number' ? taskData.status : TASK_SIMPLE_STATUS.JUST_CREATED;
+    const prepareTaskData = {
+      ...taskData,
+      performerId: taskData.performerId || user.id,
+      status: typeof taskData.status === 'number' ? taskData.status : TASK_SIMPLE_STATUS.JUST_CREATED,
+    };
+    const task = await this.taskRepo.createByProject(prepareTaskData, project, curManager);
 
     const taskLog = this.taskLogRepo.createTaskLogByType(TASK_CHANGE_TYPE.CREATE, task, user, {});
     await curManager.save(taskLog);
     return task;
   }
 
-  async updateByUser(task: Task, newTaskData: Partial<Task>, user: User): Promise<Task> {
+  async updateByUser(task: Task, newTaskData: Partial<Task>, user: User, manager?: EntityManager): Promise<Task> {
     let updatedTask: Task = task;
+    const entityManager = manager || this.taskRepo.manager;
     try {
-      await this.taskRepo.manager.transaction(async entityManager => {
-        const changeType =
-          typeof newTaskData.status !== 'undefined' && task.status !== newTaskData.status
-            ? TASK_CHANGE_TYPE.MOVE
-            : TASK_CHANGE_TYPE.UPDATE;
-        const taskLog = this.taskLogRepo.createTaskLogByType(changeType, task, user);
-        await entityManager.save(taskLog);
-        await entityManager.update(Task, { id: task.id }, newTaskData);
-        updatedTask = this.taskRepo.merge(task, newTaskData);
-      });
+      if (!task.id) {
+        throw new NotAcceptableException('Task должен быть вилидной сохраненной задачей');
+      }
+      const changeType =
+        typeof newTaskData.status !== 'undefined' && task.status !== newTaskData.status
+          ? TASK_CHANGE_TYPE.MOVE
+          : TASK_CHANGE_TYPE.UPDATE;
+      await entityManager.save(this.taskLogRepo.createTaskLogByType(changeType, task, user));
+      updatedTask = await this.updateTask(task.id, newTaskData, entityManager);
       return updatedTask;
     } catch (e) {
       throw new NotAcceptableException('Не удается изменить задачу...');
     }
+  }
+
+  private async updateTask(task: Task | number, taskData: Partial<Task>, manager?: EntityManager): Promise<Task> {
+    const curManager = manager || this.taskRepo.manager;
+    await curManager.update(Task, { id: typeof task === 'number' ? task : task.id }, taskData);
+    const updatedTask = this.taskRepo.merge(typeof task === 'number' ? ({ id: task } as Task) : task, taskData);
+    this.taskGateway.updateTaskForAll(updatedTask);
+    return updatedTask;
   }
 }

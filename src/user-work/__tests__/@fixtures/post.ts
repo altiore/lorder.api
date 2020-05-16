@@ -7,6 +7,7 @@ import {
 } from '../../../@test-helper/@fixtureCreators';
 
 import { ROLES } from '../../../@orm/role';
+import { TASK_SIMPLE_STATUS } from '../../../@orm/task';
 import { ACCESS_LEVEL } from '../../../@orm/user-project';
 
 export const usersFixture = createUsers([
@@ -53,6 +54,11 @@ export const tasksFixture = createTasks([
   {
     project: { owner: { email: 'super-admin@mail.com' } },
     title: 'NotFinished',
+  },
+  {
+    project: { owner: { email: 'super-admin@mail.com' } },
+    status: TASK_SIMPLE_STATUS.IN_TESTING,
+    title: 'IN_TESTING',
   },
 ]);
 

@@ -96,23 +96,12 @@ export class UserWorkService {
     return result;
   }
 
-  public async updateBenefitParts(userTasks: UserTask[], manager?: EntityManager): Promise<void> {
-    const curManager = manager || this.userWorkRepo.manager;
-    const usersCount = userTasks.length;
-    userTasks.map(ut => {
-      const accuracy = 1000000;
-      ut.benefitPart = Math.round(accuracy / usersCount) / accuracy;
-    });
-    await curManager.save(userTasks);
-  }
-
   public async finishTask(
+    curManager: EntityManager,
     userWork: UserWork,
     user: User,
-    status?: TASK_SIMPLE_STATUS,
-    manager?: EntityManager
+    status?: TASK_SIMPLE_STATUS
   ): Promise<UserWork> {
-    const curManager = manager || this.userWorkRepo.manager;
     userWork.finishAt = moment();
     if (!userWork.projectId || !userWork.task.userTasks) {
       userWork.task = await curManager.findOne(Task, {
@@ -121,8 +110,8 @@ export class UserWorkService {
       });
     }
     if (typeof status === 'number') {
-      await curManager.update(Task, { id: userWork.taskId }, { status });
       userWork.task.status = status;
+      await this.taskService.updateByUser(userWork.task, { status }, user, curManager);
     }
     const curUserTask = userWork.task.userTasks.find(el => el.userId === user.id);
 
@@ -152,6 +141,16 @@ export class UserWorkService {
     return await this.updateTime(userWork, user, false, curManager);
   }
 
+  public async updateBenefitParts(userTasks: UserTask[], manager?: EntityManager): Promise<void> {
+    const curManager = manager || this.userWorkRepo.manager;
+    const usersCount = userTasks.length;
+    userTasks.map(ut => {
+      const accuracy = 1000000;
+      ut.benefitPart = Math.round(accuracy / usersCount) / accuracy;
+    });
+    await curManager.save(userTasks);
+  }
+
   public async finishNotFinished(user: User, manager?: EntityManager): Promise<UserWork[]> {
     const curManager = manager || this.userWorkRepo.manager;
     const userWorks = await curManager.find(UserWork, {
@@ -161,7 +160,7 @@ export class UserWorkService {
 
     return await Promise.all(
       userWorks.map(async userWork => {
-        return await this.finishTask(userWork, user, TASK_SIMPLE_STATUS.IN_TESTING, manager);
+        return await this.finishTask(manager, userWork, user, TASK_SIMPLE_STATUS.IN_TESTING);
       })
     );
   }
@@ -196,24 +195,16 @@ export class UserWorkService {
       previous: null,
     };
     await this.userWorkRepo.manager.transaction(async entityManager => {
-      result.previous = await this.finishTask(userWork, user, TASK_SIMPLE_STATUS.IN_TESTING, entityManager);
-      let defaultProject;
-      if (user.defaultProjectId) {
-        defaultProject = await this.projectService.findOneByMember(user.defaultProjectId, user, entityManager);
-      } else {
-        defaultProject = await this.userService.createDefaultProject(user, entityManager);
-      }
-      result.next = await this.startNew(
-        defaultProject,
-        user,
-        {
-          description: `После "${result.previous.task.title}"`,
-          projectId: defaultProject.id,
-          title: 'Перерыв/Отдых',
-        },
-        result.previous.finishAt,
-        entityManager
-      );
+      result.previous = await this.finishTask(entityManager, userWork, user, TASK_SIMPLE_STATUS.IN_TESTING);
+
+      const project = await this.userService.getDefaultProject(user, entityManager);
+
+      const userWorkData = {
+        description: `После "${result.previous.task.title}"`,
+        projectId: project.id,
+        title: 'Перерыв/Отдых',
+      };
+      result.next = await this.startNew(project, user, userWorkData, result.previous.finishAt, entityManager);
     });
     return result;
   }
@@ -228,25 +219,17 @@ export class UserWorkService {
       previous: null,
     };
     await this.userWorkRepo.manager.transaction(async manager => {
-      stopResponse.previous = await this.finishTask(userWork, user, TASK_SIMPLE_STATUS.TO_DO, manager);
-      let defaultProject;
-      if (user.defaultProjectId) {
-        defaultProject = await this.projectService.findOneByMember(user.defaultProjectId, user, manager);
-      } else {
-        defaultProject = await this.userService.createDefaultProject(user, manager);
-      }
-      stopResponse.next = await this.startNew(
-        defaultProject,
-        user,
-        {
-          description: `После "${stopResponse.previous.task.title}"`,
-          projectId: defaultProject.id,
-          title: 'Перерыв/Отдых',
-          prevTaskId: userWork.taskId,
-        },
-        stopResponse.previous.finishAt,
-        manager
-      );
+      stopResponse.previous = await this.finishTask(manager, userWork, user, TASK_SIMPLE_STATUS.TO_DO);
+
+      const project = await this.userService.getDefaultProject(user, manager);
+
+      const userWorkData = {
+        description: `После "${stopResponse.previous.task.title}"`,
+        projectId: project.id,
+        title: 'Перерыв/Отдых',
+        prevTaskId: userWork.taskId,
+      };
+      stopResponse.next = await this.startNew(project, user, userWorkData, stopResponse.previous.finishAt, manager);
       stopResponse.next.prevTask = userWork.task;
     });
 
@@ -379,16 +362,29 @@ export class UserWorkService {
     manager?: EntityManager
   ): Promise<UserWork> {
     const curManager = manager || this.userWorkRepo.manager;
-    let task;
+    let startedTask;
     if (userWorkData.taskId) {
-      task = await this.taskService.findOneById(userWorkData.taskId, user, undefined, undefined, undefined, curManager);
-      if (!task) {
+      startedTask = await this.taskService.findOneById(
+        userWorkData.taskId,
+        user,
+        undefined,
+        undefined,
+        undefined,
+        curManager
+      );
+      if (!startedTask) {
         throw new NotFoundException(`Указанная задача ${userWorkData.taskId} не найдена в проекте ${project.title}`);
       }
     }
-    if (task) {
-      task.status = TASK_SIMPLE_STATUS.IN_PROGRESS;
-      await curManager.update(Task, { id: task.id }, { status: TASK_SIMPLE_STATUS.IN_PROGRESS });
+    if (startedTask) {
+      if (startedTask.status !== TASK_SIMPLE_STATUS.IN_PROGRESS) {
+        startedTask = await this.taskService.updateByUser(
+          startedTask,
+          { status: TASK_SIMPLE_STATUS.IN_PROGRESS },
+          user,
+          curManager
+        );
+      }
     } else {
       const taskData = {
         description: userWorkData.description || '',
@@ -396,10 +392,10 @@ export class UserWorkService {
         status: TASK_SIMPLE_STATUS.IN_PROGRESS,
         title: userWorkData.title,
       };
-      task = await this.taskService.createByProject(taskData, project, user, curManager);
+      startedTask = await this.taskService.createByProject(taskData, project, user, curManager);
     }
     return await this.userWorkRepo.startTask(
-      task,
+      startedTask,
       user,
       {
         description: userWorkData.description,

@@ -15,7 +15,7 @@ import { Task } from '@orm/task';
 const PROJECT_ROOM_PREFIX = 'ProjectRoom';
 
 @WebSocketGateway({ namespace: '/v1/projects/tasks', cookie: false })
-export class ProjectTaskGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
+export class TaskGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
   @WebSocketServer()
   wss: Server;
 

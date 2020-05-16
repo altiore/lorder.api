@@ -15,7 +15,7 @@ import { FileService } from './file.service';
 @Controller('file')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class FileController {
-  constructor(private readonly taskService: FileService) {}
+  constructor(private readonly fileService: FileService) {}
 
   @Roles('user')
   @ApiResponse({ status: 200, type: Media })
@@ -27,6 +27,6 @@ export class FileController {
   @Post('upload')
   @UseInterceptors(MyFileInterceptor)
   public uploadFile(@UploadedFile() file) {
-    return this.taskService.saveToGoogleCloudStorage(file);
+    return this.fileService.saveToGoogleCloudStorage(file);
   }
 }

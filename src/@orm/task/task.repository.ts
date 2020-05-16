@@ -1,4 +1,4 @@
-import { Between, EntityRepository, In, TreeRepository } from 'typeorm';
+import { Between, EntityManager, EntityRepository, In, TreeRepository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Project } from '../project/project.entity';
@@ -59,16 +59,18 @@ export class TaskRepository extends TreeRepository<Task> {
     return this.findOne({ where: { sequenceNumber, project: { id: projectId } } });
   }
 
-  public async createByProject(data: Partial<Task>, project: Project): Promise<Task> {
-    const { max } = await this.createQueryBuilder()
+  public async createByProject(data: Partial<Task>, project: Project, manager: EntityManager): Promise<Task> {
+    const { max } = await manager
+      .getRepository(Task)
+      .createQueryBuilder()
       .select('MAX("sequenceNumber")', 'max')
       .where({
         project,
       })
       .getRawOne();
-    const entity = this.create(data);
+    const entity = manager.create(Task, data);
     entity.project = project;
     entity.sequenceNumber = (max || 0) + 1;
-    return entity;
+    return await manager.save(entity);
   }
 }

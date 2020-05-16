@@ -7,6 +7,7 @@ import { AuthModule } from 'auth/auth.module';
 import { ProjectModule } from '../project/project.module';
 
 import { TaskController } from './task.controller';
+import { TaskGateway } from './task.gateway';
 import { TaskService } from './task.service';
 
 @Module({
@@ -17,6 +18,6 @@ import { TaskService } from './task.service';
     forwardRef(() => ProjectModule),
     TypeOrmModule.forFeature([TaskRepository, TaskLogRepository]),
   ],
-  providers: [TaskService],
+  providers: [TaskGateway, TaskService],
 })
 export class TaskModule {}

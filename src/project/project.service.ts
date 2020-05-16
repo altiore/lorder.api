@@ -7,7 +7,7 @@ import * as moment from 'moment';
 
 import { Project, ProjectDto, ProjectRepository } from '@orm/project';
 import { ProjectPub, ProjectPubRepository } from '@orm/project-pub';
-import { TaskRepository } from '@orm/task';
+import { Task } from '@orm/task';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL, UserProject, UserProjectRepository } from '@orm/user-project';
 
@@ -18,8 +18,7 @@ export class ProjectService {
   constructor(
     @InjectRepository(ProjectRepository) private readonly projectRepo: ProjectRepository,
     @InjectRepository(ProjectPubRepository) private readonly projectPubRepo: ProjectPubRepository,
-    @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository,
-    @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository
+    @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository
   ) {}
 
   public async findOneBySuperAdmin(id: number): Promise<Project> {
@@ -32,7 +31,7 @@ export class ProjectService {
   }
 
   public async findOneByMember(projectId: number, user: User, manager?: EntityManager): Promise<Project> {
-    const curManager = manager || this.taskRepo.manager;
+    const curManager = manager || this.projectRepo.manager;
     try {
       // 1. check user access
       const access = await curManager.findOne(UserProject, {
@@ -96,7 +95,7 @@ export class ProjectService {
 
   public async remove(id: number, force: boolean = false): Promise<number> {
     if (force) {
-      await this.taskRepo.delete({ projectId: id });
+      await this.projectRepo.manager.delete(Task, { projectId: id });
     }
     await this.projectRepo.delete(id);
     return id;

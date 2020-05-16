@@ -1,6 +1,6 @@
 import moment = require('moment');
 
-import { Task } from '../../@orm/task';
+import { Task, TASK_SIMPLE_STATUS } from '../../@orm/task';
 import { User } from '../../@orm/user';
 import { UserWork } from '../../@orm/user-work';
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
@@ -208,6 +208,27 @@ describe(`POST ${h.url}`, () => {
       })
     );
     expect(body.finished[0].finishAt).toBe(body.started.startAt);
+    await h.removeCreated(UserWork, { id: body.started.id });
+    await h.removeCreated(Task, { id: body.started.taskId });
+  });
+
+  it('by owner with correct data existing task with IN_TESTING status', async () => {
+    const taskInTesting = await h.findOne(Task, { title: 'IN_TESTING' });
+    const { body } = await h
+      .requestBy('exist-not-finished@mail.com')
+      .post(h.path())
+      .send({
+        description: 'Описание новой задачи',
+        projectId,
+        title: 'Задача Altiore',
+        taskId: taskInTesting.id,
+      })
+      .expect(201);
+    expect(body.started.task).toEqual(
+      expect.objectContaining({
+        status: TASK_SIMPLE_STATUS.IN_PROGRESS,
+      })
+    );
     await h.removeCreated(UserWork, { id: body.started.id });
     await h.removeCreated(Task, { id: body.started.taskId });
   });

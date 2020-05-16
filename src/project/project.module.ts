@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProjectRepository } from '@orm/project';
 import { ProjectPubRepository } from '@orm/project-pub';
 import { ProjectTaskTypeRepository } from '@orm/project-task-type';
-import { TaskRepository } from '@orm/task';
 import { UserRepository } from '@orm/user';
 import { UserProjectRepository } from '@orm/user-project';
 import { UserWorkRepository } from '@orm/user-work';
@@ -22,13 +21,12 @@ import { ProjectRoleModule } from './role/project-role.module';
 import { ProjectTaskTypeController } from './task-type/project.task-type.controller';
 import { ProjectTaskTypeService } from './task-type/project.task-type.service';
 import { ProjectTaskController } from './task/project.task.controller';
-import { ProjectTaskGateway } from './task/project.task.gateway';
 import { ProjectTaskService } from './task/project.task.service';
 import { TaskLogModule } from './task/task-log/task-log.module';
 
 @Module({
   controllers: [ProjectController, ProjectMemberController, ProjectTaskController, ProjectTaskTypeController],
-  exports: [AccessLevelGuard, ProjectService /*, ProjectTaskGateway*/, ProjectTaskService, ProjectMemberService],
+  exports: [AccessLevelGuard, ProjectService, ProjectTaskService, ProjectMemberService],
   imports: [
     forwardRef(() => AuthModule),
     forwardRef(() => TaskLogModule),
@@ -39,20 +37,12 @@ import { TaskLogModule } from './task/task-log/task-log.module';
       ProjectPubRepository,
       ProjectRepository,
       ProjectTaskTypeRepository,
-      TaskRepository,
       TaskTypeRepository,
       UserRepository,
       UserProjectRepository,
       UserWorkRepository,
     ]),
   ],
-  providers: [
-    AccessLevelGuard,
-    ProjectService,
-    ProjectMemberService,
-    ProjectTaskGateway,
-    ProjectTaskService,
-    ProjectTaskTypeService,
-  ],
+  providers: [AccessLevelGuard, ProjectService, ProjectMemberService, ProjectTaskService, ProjectTaskTypeService],
 })
 export class ProjectModule {}

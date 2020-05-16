@@ -105,6 +105,14 @@ export class UserService {
     return this.fileService.updateOrCreateObjInGoogleCloudStorage(file, user.avatar);
   }
 
+  public async getDefaultProject(user: User, entityManager: EntityManager): Promise<Project> {
+    if (user.defaultProjectId) {
+      return await this.projectService.findOneByMember(user.defaultProjectId, user, entityManager);
+    } else {
+      return await this.createDefaultProject(user, entityManager);
+    }
+  }
+
   private async addAvatar(user: User): Promise<User> {
     user.avatar = await this.fileService.createOne({
       title: `User avatar ${user.email}`,

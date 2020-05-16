@@ -4,7 +4,7 @@ import { ForbiddenException, Injectable, NotAcceptableException } from '@nestjs/
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from '@orm/project';
 import { ProjectTaskTypeRepository } from '@orm/project-task-type';
-import { Task, TaskRepository } from '@orm/task';
+import { Task } from '@orm/task';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL, UserProjectRepository } from '@orm/user-project';
 import { TaskService } from 'task/task.service';
@@ -12,26 +12,21 @@ import { TaskService } from 'task/task.service';
 import { TaskType } from '../../@orm/task-type/task-type.entity';
 
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
-import { ProjectTaskGateway } from './project.task.gateway';
 
 @Injectable()
 export class ProjectTaskService {
   constructor(
-    // TODO: remove taskRepo from this file and use taskService instead!!!
-    @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository,
     @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository,
     @InjectRepository(ProjectTaskTypeRepository) private readonly projectTaskTypeRepo: ProjectTaskTypeRepository,
-    private readonly taskGateway: ProjectTaskGateway,
     private readonly taskService: TaskService
   ) {}
 
   public async findAll(pagesDto: PaginationDto, projectId: number): Promise<ListResponseDto<Task>> {
-    const [list, total] = await this.taskRepo.findAllByProjectId(pagesDto, projectId);
-    return { list, total };
+    return await this.taskService.findAllByProject(pagesDto, projectId);
   }
 
   public findOne(sequenceNumber: number, projectId: number): Promise<Task> {
-    return this.taskRepo.findOneByProjectId(sequenceNumber, projectId);
+    return this.taskService.findOneBySequenceNumber(sequenceNumber, projectId);
   }
 
   public async create(taskCreateDto: TaskCreateDto, project: Project, user: User): Promise<Task> {
@@ -55,13 +50,7 @@ export class ProjectTaskService {
     const preparedData = await this.parseTaskDtoToTaskObj(taskUpdateDto, project.id);
 
     // 4. Обновить задачу
-    const updatedTask = await this.taskService.updateByUser(checkedTask, preparedData, user);
-
-    // 5. Отправить всем пользователям обновленные данные задачи
-    this.taskGateway.updateTaskForAll(updatedTask);
-
-    // 6. Вернуть измененную задачу
-    return updatedTask;
+    return await this.taskService.updateByUser(checkedTask, preparedData, user);
   }
 
   public async move(sequenceNumber: number, project: Project, user: User, taskMoveDto: TaskMoveDto): Promise<Task> {
@@ -78,7 +67,7 @@ export class ProjectTaskService {
     if (!task) {
       return false;
     }
-    await this.taskRepo.delete({ sequenceNumber, project: { id: projectId } });
+    await this.taskService.deleteBySequenceNumber(sequenceNumber, projectId);
     return task;
   }
 
