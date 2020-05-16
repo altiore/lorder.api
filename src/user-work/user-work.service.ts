@@ -106,7 +106,12 @@ export class UserWorkService {
     await curManager.save(userTasks);
   }
 
-  public async finishTask(userWork: UserWork, user: User, manager?: EntityManager): Promise<UserWork> {
+  public async finishTask(
+    userWork: UserWork,
+    user: User,
+    status?: TASK_SIMPLE_STATUS,
+    manager?: EntityManager
+  ): Promise<UserWork> {
     const curManager = manager || this.userWorkRepo.manager;
     userWork.finishAt = moment();
     if (!userWork.projectId || !userWork.task.userTasks) {
@@ -114,6 +119,9 @@ export class UserWorkService {
         relations: ['performer', 'userTasks', 'project'],
         where: { id: userWork.taskId },
       });
+    }
+    if (typeof status === 'number') {
+      await curManager.update(Task, { id: userWork.taskId }, { status });
     }
     const curUserTask = userWork.task.userTasks.find(el => el.userId === user.id);
 
@@ -152,7 +160,7 @@ export class UserWorkService {
 
     return await Promise.all(
       userWorks.map(async userWork => {
-        return await this.finishTask(userWork, user, manager);
+        return await this.finishTask(userWork, user, TASK_SIMPLE_STATUS.IN_TESTING, manager);
       })
     );
   }
@@ -187,7 +195,7 @@ export class UserWorkService {
       previous: null,
     };
     await this.userWorkRepo.manager.transaction(async entityManager => {
-      result.previous = await this.finishTask(userWork, user, entityManager);
+      result.previous = await this.finishTask(userWork, user, TASK_SIMPLE_STATUS.IN_TESTING, entityManager);
       let defaultProject;
       if (user.defaultProjectId) {
         defaultProject = await this.projectService.findOneByMember(user.defaultProjectId, user, entityManager);
@@ -213,29 +221,35 @@ export class UserWorkService {
     if (userWork.finishAt) {
       throw new NotAcceptableException('Эта задача уже завершена. Вы не можете завершить одну и ту же задачу дважды');
     }
-    const previous = await this.finishTask(userWork, user);
-    let defaultProject;
-    if (user.defaultProjectId) {
-      defaultProject = await this.projectService.findOneByMember(user.defaultProjectId, user);
-    } else {
-      defaultProject = await this.userService.createDefaultProject(user);
-    }
-    const next = await this.startNew(
-      defaultProject,
-      user,
-      {
-        description: `После "${previous.task.title}"`,
-        projectId: defaultProject.id,
-        title: 'Перерыв/Отдых',
-        prevTaskId: userWork.taskId,
-      },
-      previous.finishAt
-    );
-    next.prevTask = userWork.task;
-    return {
-      next,
-      previous,
+
+    const stopResponse: StopResponse = {
+      next: null,
+      previous: null,
     };
+    await this.userWorkRepo.manager.transaction(async manager => {
+      stopResponse.previous = await this.finishTask(userWork, user, TASK_SIMPLE_STATUS.TO_DO, manager);
+      let defaultProject;
+      if (user.defaultProjectId) {
+        defaultProject = await this.projectService.findOneByMember(user.defaultProjectId, user, manager);
+      } else {
+        defaultProject = await this.userService.createDefaultProject(user, manager);
+      }
+      stopResponse.next = await this.startNew(
+        defaultProject,
+        user,
+        {
+          description: `После "${stopResponse.previous.task.title}"`,
+          projectId: defaultProject.id,
+          title: 'Перерыв/Отдых',
+          prevTaskId: userWork.taskId,
+        },
+        stopResponse.previous.finishAt,
+        manager
+      );
+      stopResponse.next.prevTask = userWork.task;
+    });
+
+    return stopResponse;
   }
 
   public async update(userWork: UserWork, userWorkDto: UserWorkPatchDto, user: User): Promise<UserWorkEditResultDto> {
@@ -371,7 +385,9 @@ export class UserWorkService {
         throw new NotFoundException(`Указанная задача ${userWorkData.taskId} не найдена в проекте ${project.title}`);
       }
     }
-    if (!task) {
+    if (task) {
+      await curManager.update(Task, { id: task.id }, { status: TASK_SIMPLE_STATUS.IN_PROGRESS });
+    } else {
       const taskData = {
         description: userWorkData.description || '',
         performerId: userWorkData.performerId || user.id,
