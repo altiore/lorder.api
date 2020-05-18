@@ -62,9 +62,9 @@ export class TaskCommentController implements CrudController<TaskComment> {
   public async createOne(
     @ParsedRequest() req: CrudRequest,
     @ParsedBody() dto: TaskCommentCreateDto,
-    @UserJWT() user: User,
     @Param('projectId', ParseIntPipe) projectId: number,
-    @Param('taskId', ParseIntPipe) taskId: number
+    @Param('taskId', ParseIntPipe) taskId: number,
+    @UserJWT() user: User
   ): Promise<TaskComment> {
     const task = await this.service.findTaskByIdAndCheckAccess(taskId, projectId, user, ACCESS_LEVEL.ORANGE);
     return this.base.createOneBase(req, { ...dto, taskId: task.id, userId: user.id } as TaskComment);
