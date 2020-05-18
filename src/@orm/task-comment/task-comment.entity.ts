@@ -41,7 +41,7 @@ export class TaskComment {
   })
   user!: User;
 
-  @ApiProperty({ type: Task })
+  @ApiProperty({ type: () => Task })
   @ManyToOne(t => Task, t => t.comments, {
     nullable: false,
     onDelete: 'CASCADE',
