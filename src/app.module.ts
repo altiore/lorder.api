@@ -17,6 +17,7 @@ import { PublicModule } from './public/public.module';
 import { RedisModule } from './redis/redis.module';
 import { RoleModule } from './role/role.module';
 import { StatisticsModule } from './statistics/statistics.module';
+import { TaskCommentModule } from './task-comment/task-comment.module';
 import { TaskStatusModule } from './task-status/task-status.module';
 import { TaskTypeModule } from './task-type/task-type.module';
 import { TaskModule } from './task/task.module';
@@ -40,6 +41,7 @@ import { UserModule } from './user/user.module';
     }),
     StatisticsModule,
     TaskModule,
+    TaskCommentModule,
     TaskStatusModule,
     TaskTypeModule,
     TypeOrmModule.forRoot(),

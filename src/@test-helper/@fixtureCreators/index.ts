@@ -3,6 +3,7 @@ export * from './project-part';
 export * from './project-role';
 export * from './role-flow';
 export * from './task';
+export * from './task-comment';
 export * from './task-logs';
 export * from './user';
 export * from './user-project';

@@ -15,6 +15,7 @@ import {
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { ProjectPart } from '../project-part/project-part.entity';
 import { Project } from '../project/project.entity';
+import { TaskComment } from '../task-comment/task-comment.entity';
 import { TaskType } from '../task-type/task-type.entity';
 import { UserTask } from '../user-task/user-task.entity';
 import { UserWork } from '../user-work/user-work.entity';
@@ -144,4 +145,7 @@ export class Task {
   @ApiProperty({ example: '2018-05-26T09:05:39.378Z' })
   @UpdateDateColumn(momentDateTransformer)
   updatedAt: Moment;
+
+  @OneToMany(type => TaskComment, m => m.task)
+  comments: TaskComment[];
 }
