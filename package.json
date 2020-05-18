@@ -18,7 +18,7 @@
     "postinstall": "npm run build && npm run migration:up:prod",
     "build": "rm -rf dist && nest build",
     "pretest": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && npm run migration:test:up",
-    "test": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest --coverage --lastCommit -i -b --detectOpenHandles",
+    "test": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest --coverage -o -i -b --detectOpenHandles",
     "test:watch": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest --watch --coverage -i -b --detectOpenHandles",
     "pretest:dev": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && npm run migration:test:up",
     "test:dev": "cross-env TYPEORM_DATABASE=altiore_contrib_test jest -i -b --detectOpenHandles --forceExit --watch",
