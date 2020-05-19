@@ -3,15 +3,17 @@ import { ValidationException } from '@common/exceptions/validation.exception';
 import { ForbiddenException, Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from '@orm/project';
-import { ProjectTaskTypeRepository } from '@orm/project-task-type';
+import { ProjectTaskType, ProjectTaskTypeRepository } from '@orm/project-task-type';
 import { Task } from '@orm/task';
 import { User } from '@orm/user';
-import { ACCESS_LEVEL, UserProjectRepository } from '@orm/user-project';
+import { ACCESS_LEVEL, UserProject, UserProjectRepository } from '@orm/user-project';
 import { TaskService } from 'task/task.service';
 
 import { TaskType } from '../../@orm/task-type/task-type.entity';
 
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
+import { ValidationError } from 'class-validator';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class ProjectTaskService {
@@ -91,9 +93,25 @@ export class ProjectTaskService {
 
   private async parseTaskDtoToTaskObj(
     taskDto: TaskCreateDto | TaskUpdateDto,
-    projectId: number
+    projectId: number,
+    manager?: EntityManager
   ): Promise<Partial<Task>> {
+    const curManager = manager || this.projectTaskTypeRepo.manager;
     const preparedData: Partial<Task> = {};
+    if (taskDto.projectParts) {
+      const foundParts = await this.taskService.findProjectParts(taskDto.projectParts, projectId, curManager);
+      if (foundParts.length !== taskDto.projectParts.length) {
+        throw new ValidationException([
+          Object.assign(new ValidationError(), {
+          constraints: {
+            isInvalid: 'Указаны неверные части проекта',
+          },
+          property: 'projectParts',
+          value: taskDto.projectParts,
+        }),]);
+      }
+      preparedData.projectParts = foundParts;
+    }
     if (taskDto.description !== undefined) {
       preparedData.description = taskDto.description;
     }
@@ -113,7 +131,7 @@ export class ProjectTaskService {
       if (!taskDto.typeId) {
         preparedData.typeId = null;
       } else {
-        const projectTaskType = await this.projectTaskTypeRepo.findOne({
+        const projectTaskType = await curManager.findOne(ProjectTaskType, {
           where: {
             project: { id: projectId },
             taskType: { id: taskDto.typeId },
@@ -130,7 +148,7 @@ export class ProjectTaskService {
       if (!taskDto.performerId) {
         preparedData.performer = null;
       } else {
-        const performer = await this.userProjectRepo.findOne({
+        const performer = await curManager.findOne(UserProject, {
           relations: ['member'],
           where: {
             member: { id: taskDto.performerId },

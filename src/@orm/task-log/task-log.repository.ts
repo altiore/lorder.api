@@ -1,5 +1,5 @@
 import { omit } from 'lodash';
-import { EntityRepository, TreeRepository } from 'typeorm';
+import { EntityRepository, Repository } from 'typeorm';
 
 import { Task } from '../task/task.entity';
 import { User } from '../user/user.entity';
@@ -7,7 +7,7 @@ import { User } from '../user/user.entity';
 import { TASK_CHANGE_TYPE, TaskLog } from './task-log.entity';
 
 @EntityRepository(TaskLog)
-export class TaskLogRepository extends TreeRepository<TaskLog> {
+export class TaskLogRepository extends Repository<TaskLog> {
   public createTaskLogByType(
     taskChangeType: TASK_CHANGE_TYPE,
     task: Task,

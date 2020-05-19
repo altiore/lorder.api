@@ -1,8 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Project } from '../project/project.entity';
+import { Task } from '../task/task.entity';
 
 @Entity()
 export class ProjectPart {
@@ -34,4 +35,7 @@ export class ProjectPart {
   @ApiProperty({ type: ProjectPart, isArray: true })
   @OneToMany(t => ProjectPart, m => m.parent)
   children: ProjectPart[];
+
+  @ManyToMany(t => Task, t => t.projectParts)
+  tasks: Task;
 }

@@ -39,4 +39,9 @@ export class TaskUpdateDto {
   @IsNumber()
   @IsOptional()
   typeId?: number;
+
+  @ApiPropertyOptional({ isArray: true })
+  @IsNumber(undefined, { each: true })
+  @IsOptional()
+  projectParts?: number[];
 }

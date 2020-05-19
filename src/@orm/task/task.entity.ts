@@ -5,6 +5,8 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -60,18 +62,6 @@ export class Task {
     onUpdate: 'CASCADE',
   })
   project: Project;
-
-  @ApiPropertyOptional()
-  @Column({ nullable: true })
-  projectPartId?: number;
-
-  @ApiProperty({ type: () => ProjectPart })
-  @ManyToOne(() => ProjectPart, {
-    nullable: true,
-    onDelete: 'RESTRICT',
-    onUpdate: 'CASCADE',
-  })
-  projectPart?: ProjectPart;
 
   // ApiModel does not work here due to circular dependency
   @ManyToOne(type => Task, m => m.children)
@@ -148,4 +138,8 @@ export class Task {
 
   @OneToMany(type => TaskComment, m => m.task)
   comments: TaskComment[];
+
+  @ManyToMany(t => ProjectPart, p => p.tasks)
+  @JoinTable()
+  projectParts: ProjectPart[];
 }

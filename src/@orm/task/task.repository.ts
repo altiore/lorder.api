@@ -1,4 +1,4 @@
-import { Between, EntityManager, EntityRepository, In, TreeRepository } from 'typeorm';
+import { Between, EntityManager, EntityRepository, In, Repository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Project } from '../project/project.entity';
@@ -16,7 +16,7 @@ export enum TaskOrderByField {
 }
 
 @EntityRepository(Task)
-export class TaskRepository extends TreeRepository<Task> {
+export class TaskRepository extends Repository<Task> {
   public findAllByProjectId(
     { skip = 0, count = 20, orderBy = 'id', order = 'desc' }: PaginationDto,
     projectId: number
@@ -53,10 +53,6 @@ export class TaskRepository extends TreeRepository<Task> {
         },
       },
     });
-  }
-
-  public findOneByProjectId(sequenceNumber: number, projectId: number): Promise<Task | undefined> {
-    return this.findOne({ where: { sequenceNumber, project: { id: projectId } } });
   }
 
   public async createByProject(data: Partial<Task>, project: Project, manager: EntityManager): Promise<Task> {

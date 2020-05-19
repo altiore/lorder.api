@@ -1,13 +1,16 @@
 import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DeleteResult, EntityManager } from 'typeorm';
+
 import { Project } from '@orm/project';
+import { ProjectPart } from '@orm/project-part/project-part.entity';
 import { Task, TASK_SIMPLE_STATUS, TaskRepository } from '@orm/task';
 import { TASK_CHANGE_TYPE, TaskLogRepository } from '@orm/task-log';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
-import { DeleteResult, EntityManager } from 'typeorm';
 
 import { ListResponseDto, PaginationDto } from '../@common/dto';
+import { ProjectPartService } from '../project-part/project-part.service';
 import { ProjectService } from '../project/project.service';
 
 import { TaskPagination } from './dto';
@@ -19,7 +22,8 @@ export class TaskService {
     private projectService: ProjectService,
     @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository,
     @InjectRepository(TaskLogRepository) private readonly taskLogRepo: TaskLogRepository,
-    private readonly taskGateway: TaskGateway
+    private readonly taskGateway: TaskGateway,
+    private readonly projectPartService: ProjectPartService,
   ) {}
 
   public async findAllByProject(pagesDto: PaginationDto, projectId: number): Promise<ListResponseDto<Task>> {
@@ -28,7 +32,7 @@ export class TaskService {
   }
 
   public findOneBySequenceNumber(sequenceNumber: number, projectId: number): Promise<Task> {
-    return this.taskRepo.findOneByProjectId(sequenceNumber, projectId);
+    return this.taskRepo.findOne({ where: { sequenceNumber, project: { id: projectId } }, relations: ['projectParts'] });
   }
 
   public async findAll(pagesDto: TaskPagination, user: User): Promise<Task[]> {
@@ -146,10 +150,30 @@ export class TaskService {
     }
   }
 
+  async findProjectParts(ids: number[], projectId: number, manager: EntityManager): Promise<ProjectPart[]> {
+    return this.projectPartService.findManyByIds(ids, projectId, manager);
+  }
+
   private async updateTask(task: Task | number, taskData: Partial<Task>, manager?: EntityManager): Promise<Task> {
+    const curTask = typeof task === 'number' ? ({ id: task } as Task) : task;
     const curManager = manager || this.taskRepo.manager;
-    await curManager.update(Task, { id: typeof task === 'number' ? task : task.id }, taskData);
-    const updatedTask = this.taskRepo.merge(typeof task === 'number' ? ({ id: task } as Task) : task, taskData);
+    const preparedData = {...taskData};
+    let projectParts: ProjectPart[] = [];
+    if (taskData.projectParts && taskData.projectParts.length) {
+      projectParts = taskData.projectParts;
+      delete preparedData.projectParts;
+    }
+    await curManager.update(Task, { id: curTask.id }, preparedData);
+    // TODO: fix when will be fixed bug with relations saving inside Typeorm
+    if (projectParts.length) {
+      await curManager.query(`DELETE from "task_project_parts_project_part" WHERE "taskId"=${curTask.id}`);
+      await Promise.all(projectParts.map(async pp => {
+        await curManager.query(
+          `INSERT INTO "task_project_parts_project_part" ("taskId", "projectPartId") VALUES (${curTask.id},${pp.id})`
+        );
+      }))
+    }
+    const updatedTask = this.taskRepo.merge(curTask, taskData);
     this.taskGateway.updateTaskForAll(updatedTask);
     return updatedTask;
   }
