@@ -23,7 +23,7 @@ export class TaskService {
     @InjectRepository(TaskRepository) private readonly taskRepo: TaskRepository,
     @InjectRepository(TaskLogRepository) private readonly taskLogRepo: TaskLogRepository,
     private readonly taskGateway: TaskGateway,
-    private readonly projectPartService: ProjectPartService,
+    private readonly projectPartService: ProjectPartService
   ) {}
 
   public async findAllByProject(pagesDto: PaginationDto, projectId: number): Promise<ListResponseDto<Task>> {
@@ -32,7 +32,10 @@ export class TaskService {
   }
 
   public findOneBySequenceNumber(sequenceNumber: number, projectId: number): Promise<Task> {
-    return this.taskRepo.findOne({ where: { sequenceNumber, project: { id: projectId } }, relations: ['projectParts'] });
+    return this.taskRepo.findOne({
+      where: { sequenceNumber, project: { id: projectId } },
+      relations: ['projectParts'],
+    });
   }
 
   public async findAll(pagesDto: TaskPagination, user: User): Promise<Task[]> {
@@ -157,21 +160,23 @@ export class TaskService {
   private async updateTask(task: Task | number, taskData: Partial<Task>, manager?: EntityManager): Promise<Task> {
     const curTask = typeof task === 'number' ? ({ id: task } as Task) : task;
     const curManager = manager || this.taskRepo.manager;
-    const preparedData = {...taskData};
-    let projectParts: ProjectPart[] = [];
-    if (taskData.projectParts && taskData.projectParts.length) {
-      projectParts = taskData.projectParts;
+    const preparedData = { ...taskData };
+    let projectParts: ProjectPart[];
+    if (taskData.projectParts) {
+      projectParts = taskData.projectParts.slice(0);
       delete preparedData.projectParts;
     }
     await curManager.update(Task, { id: curTask.id }, preparedData);
     // TODO: fix when will be fixed bug with relations saving inside Typeorm
-    if (projectParts.length) {
+    if (projectParts) {
       await curManager.query(`DELETE from "task_project_parts_project_part" WHERE "taskId"=${curTask.id}`);
-      await Promise.all(projectParts.map(async pp => {
+      if (projectParts.length) {
         await curManager.query(
-          `INSERT INTO "task_project_parts_project_part" ("taskId", "projectPartId") VALUES (${curTask.id},${pp.id})`
+          `INSERT INTO "task_project_parts_project_part" ("taskId", "projectPartId") VALUES ${projectParts
+            .map(({ id }) => `(${curTask.id}, ${id})`)
+            .join(',')}`
         );
-      }))
+      }
     }
     const updatedTask = this.taskRepo.merge(curTask, taskData);
     this.taskGateway.updateTaskForAll(updatedTask);

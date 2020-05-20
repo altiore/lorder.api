@@ -6,19 +6,18 @@ import { Project } from '@orm/project';
 import { ProjectTaskType, ProjectTaskTypeRepository } from '@orm/project-task-type';
 import { Task } from '@orm/task';
 import { User } from '@orm/user';
-import { ACCESS_LEVEL, UserProject, UserProjectRepository } from '@orm/user-project';
+import { ACCESS_LEVEL, UserProject } from '@orm/user-project';
+import { ValidationError } from 'class-validator';
 import { TaskService } from 'task/task.service';
+import { EntityManager } from 'typeorm';
 
 import { TaskType } from '../../@orm/task-type/task-type.entity';
 
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
-import { ValidationError } from 'class-validator';
-import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class ProjectTaskService {
   constructor(
-    @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository,
     @InjectRepository(ProjectTaskTypeRepository) private readonly projectTaskTypeRepo: ProjectTaskTypeRepository,
     private readonly taskService: TaskService
   ) {}
@@ -99,16 +98,19 @@ export class ProjectTaskService {
     const curManager = manager || this.projectTaskTypeRepo.manager;
     const preparedData: Partial<Task> = {};
     if (taskDto.projectParts) {
-      const foundParts = await this.taskService.findProjectParts(taskDto.projectParts, projectId, curManager);
+      const foundParts = taskDto.projectParts.length
+        ? await this.taskService.findProjectParts(taskDto.projectParts, projectId, curManager)
+        : [];
       if (foundParts.length !== taskDto.projectParts.length) {
         throw new ValidationException([
           Object.assign(new ValidationError(), {
-          constraints: {
-            isInvalid: 'Указаны неверные части проекта',
-          },
-          property: 'projectParts',
-          value: taskDto.projectParts,
-        }),]);
+            constraints: {
+              isInvalid: 'Указаны неверные части проекта',
+            },
+            property: 'projectParts',
+            value: taskDto.projectParts,
+          }),
+        ]);
       }
       preparedData.projectParts = foundParts;
     }

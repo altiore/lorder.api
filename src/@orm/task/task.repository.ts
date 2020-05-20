@@ -39,7 +39,7 @@ export class TaskRepository extends Repository<Task> {
       order: {
         [orderBy]: order.toUpperCase(),
       },
-      relations: ['userTasks'],
+      relations: ['userTasks', 'projectParts'],
       skip,
       take: count,
       where: {

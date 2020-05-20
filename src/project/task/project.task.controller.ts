@@ -3,7 +3,6 @@ import { ListResponseDto, PaginationDto } from '@common/dto';
 import { RolesGuard } from '@common/guards';
 import {
   Body,
-  CacheInterceptor,
   Controller,
   Delete,
   Get,
@@ -14,7 +13,6 @@ import {
   Post,
   Query,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -33,7 +31,6 @@ import { ProjectTaskService } from './project.task.service';
 @ApiTags('projects -> tasks (role: user)')
 @Controller('projects/:projectId/tasks')
 @UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
-@UseInterceptors(CacheInterceptor)
 export class ProjectTaskController {
   constructor(private readonly taskService: ProjectTaskService) {}
 
