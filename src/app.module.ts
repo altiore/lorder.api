@@ -23,6 +23,7 @@ import { TaskTypeModule } from './task-type/task-type.module';
 import { TaskModule } from './task/task.module';
 import { UserWorkModule } from './user-work/user-work.module';
 import { UserModule } from './user/user.module';
+import { WebHooksModule } from './webhooks/webhooks.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { UserModule } from './user/user.module';
     TypeOrmModule.forRoot(),
     UserModule,
     UserWorkModule,
+    WebHooksModule,
   ],
   providers: [
     {
