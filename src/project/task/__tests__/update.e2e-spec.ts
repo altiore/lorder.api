@@ -32,7 +32,7 @@ describe(`UPDATE ${h.url}`, () => {
 
   it('by project owner', async () => {
     const { body } = await h
-      .requestBy('project-owner@mail.com')
+      .requestBy(await h.getUser('project-owner@mail.com'))
       .patch(h.path(projectId, taskSequenceNumber))
       .send({ title: 'Title Changed By Owner' })
       .expect(200);
@@ -46,7 +46,7 @@ describe(`UPDATE ${h.url}`, () => {
   it('by project member with status less then YELLOW', async () => {
     const taskNumber = h.entities.Task.find(el => el.title === 'performer IS NOT current user').sequenceNumber;
     await h
-      .requestBy('member@mail.com')
+      .requestBy(await h.getUser('member@mail.com'))
       .patch(h.path(projectId, taskNumber))
       .send({ title: 'New Title' })
       .expect(403);
@@ -54,7 +54,7 @@ describe(`UPDATE ${h.url}`, () => {
 
   it('by project member', async () => {
     const { body } = await h
-      .requestBy('member@mail.com')
+      .requestBy(await h.getUser('member@mail.com'))
       .patch(h.path(projectId, taskSequenceNumber))
       .send({ title: 'New Title' })
       .expect(200);
@@ -67,7 +67,7 @@ describe(`UPDATE ${h.url}`, () => {
 
   it('by NOT project member', async () => {
     const { body } = await h
-      .requestBy('not-member@mail.com')
+      .requestBy(await h.getUser('not-member@mail.com'))
       .patch(h.path(projectId, taskSequenceNumber))
       .send({ accessLevel: 3 })
       .expect(403);
@@ -80,7 +80,7 @@ describe(`UPDATE ${h.url}`, () => {
 
   it('by member with WHITE access level', async () => {
     const { body } = await h
-      .requestBy('access-level-white@mail.com')
+      .requestBy(await h.getUser('access-level-white@mail.com'))
       .patch(h.path(projectId, taskSequenceNumber))
       .send({ title: 'New Title' })
       .expect(403);
@@ -94,7 +94,7 @@ describe(`UPDATE ${h.url}`, () => {
   it('try to edit archived task by member', async () => {
     const taskNumber = h.entities.Task.find(el => el.title === 'archived task').sequenceNumber;
     await h
-      .requestBy('member@mail.com')
+      .requestBy(await h.getUser('member@mail.com'))
       .patch(h.path(projectId, taskNumber))
       .send({ title: 'New Title' })
       .expect(406);
@@ -103,7 +103,7 @@ describe(`UPDATE ${h.url}`, () => {
   it('try to edit finished task by member', async () => {
     const taskNumber = h.entities.Task.find(el => el.title === 'finished task').sequenceNumber;
     await h
-      .requestBy('member@mail.com')
+      .requestBy(await h.getUser('member@mail.com'))
       .patch(h.path(projectId, taskNumber))
       .send({ title: 'New Title' })
       .expect(406);

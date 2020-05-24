@@ -1,7 +1,8 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Feedback } from '@orm/feedback';
+
+import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 
 import { Roles } from '../@common/decorators';
 import { PaginationDto } from '../@common/dto/pagination.dto';
@@ -13,7 +14,7 @@ import { FeedbackService } from './feedback.service';
 @ApiBearerAuth()
 @ApiTags('feedback')
 @Controller('feedback')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class FeedbackController {
   constructor(private readonly feedbackService: FeedbackService) {}
 

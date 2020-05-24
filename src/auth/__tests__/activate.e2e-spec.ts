@@ -25,16 +25,24 @@ describe(`GET ${h.url}`, () => {
       .get(h.url)
       .expect(422);
     expect(body).toEqual({
-      errors: [
-        {
+      errors: expect.arrayContaining([
+        expect.objectContaining({
           children: [],
           constraints: {
             isNotEmpty: expect.any(String),
             isString: expect.any(String),
           },
           property: 'oneTimeToken',
-        },
-      ],
+        }),
+        expect.objectContaining({
+          children: [],
+          constraints: {
+            isNotEmpty: expect.any(String),
+            isString: expect.any(String),
+          },
+          property: 'device',
+        }),
+      ]),
       message: 'Validation Error',
       statusCode: 422,
     });
@@ -42,18 +50,13 @@ describe(`GET ${h.url}`, () => {
 
   it('correct data but token not exists', async () => {
     const oneTimeToken = 'asdf';
-    const { body } = await h
+    await h
       .requestBy()
       .get(h.url)
       .query({
         oneTimeToken,
       })
-      .expect(404);
-    expect(body).toEqual({
-      error: 'Not Found',
-      message: expect.any(String),
-      statusCode: 404,
-    });
+      .expect(422);
   });
 
   it('no-password - correct data with correct token', async () => {
@@ -67,19 +70,23 @@ describe(`GET ${h.url}`, () => {
       .requestBy()
       .get(h.url)
       .query({
+        device: 'common',
         oneTimeToken,
       })
       .expect(200);
-    expect(body).toEqual({
-      avatar: null,
-      bearerKey: expect.any(String),
-      defaultProjectId: null,
-      displayName: expect.any(String),
-      email,
-      id: expect.any(Number),
-      role: 'user',
-      tel: expect.any(String),
-    });
+    expect(body).toEqual(
+      expect.objectContaining({
+        avatar: null,
+        bearerKey: expect.any(String),
+        defaultProjectId: null,
+        displayName: expect.any(String),
+        email,
+        expiresIn: expect.any(Number),
+        id: expect.any(Number),
+        role: 'user',
+        tel: expect.any(String),
+      })
+    );
     const addedUser = await h.findOne(User, { email });
     expect(addedUser).toEqual(
       expect.objectContaining({
@@ -105,6 +112,7 @@ describe(`GET ${h.url}`, () => {
       .requestBy()
       .get(h.url)
       .query({
+        device: 'common',
         oneTimeToken,
       })
       .expect(200);
@@ -114,7 +122,9 @@ describe(`GET ${h.url}`, () => {
       defaultProjectId: null,
       displayName: expect.any(String),
       email,
+      expiresIn: expect.any(Number),
       id: expect.any(Number),
+      refreshToken: expect.any(String),
       role: 'user',
       tel: expect.any(String),
     });
@@ -143,6 +153,7 @@ describe(`GET ${h.url}`, () => {
       .requestBy()
       .get(h.url)
       .query({
+        device: 'common',
         oneTimeToken,
         project: project.id,
       })
@@ -153,7 +164,9 @@ describe(`GET ${h.url}`, () => {
       defaultProjectId: null,
       displayName: expect.any(String),
       email,
+      expiresIn: expect.any(Number),
       id: expect.any(Number),
+      refreshToken: expect.any(String),
       role: 'user',
       tel: expect.any(String),
     });

@@ -33,7 +33,7 @@ describe(`PATCH (MOVE) ${h.url}`, () => {
 
   it('by project owner', async () => {
     const { body } = await h
-      .requestBy('project-owner@mail.com')
+      .requestBy(await h.getUser('project-owner@mail.com'))
       .patch(h.path(projectId, taskSequenceNumber))
       .send({ status: TASK_SIMPLE_STATUS.IN_TESTING })
       .expect(200);
@@ -46,7 +46,7 @@ describe(`PATCH (MOVE) ${h.url}`, () => {
 
   it('by project member', async () => {
     const { body } = await h
-      .requestBy('member@mail.com')
+      .requestBy(await h.getUser('member@mail.com'))
       .patch(h.path(projectId, taskSequenceNumber))
       .send({ status: TASK_SIMPLE_STATUS.IN_TESTING })
       .expect(200);
@@ -59,7 +59,7 @@ describe(`PATCH (MOVE) ${h.url}`, () => {
 
   it('by NOT project member', async () => {
     const { body } = await h
-      .requestBy('not-member@mail.com')
+      .requestBy(await h.getUser('not-member@mail.com'))
       .patch(h.path(projectId, taskSequenceNumber))
       .send({ accessLevel: 3 })
       .expect(403);
@@ -72,7 +72,7 @@ describe(`PATCH (MOVE) ${h.url}`, () => {
 
   it('by member with WHITE access level', async () => {
     const { body } = await h
-      .requestBy('access-level-white@mail.com')
+      .requestBy(await h.getUser('access-level-white@mail.com'))
       .patch(h.path(projectId, taskSequenceNumber))
       .send({ status: TASK_SIMPLE_STATUS.IN_TESTING })
       .expect(403);

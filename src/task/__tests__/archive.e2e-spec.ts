@@ -32,21 +32,21 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by non task owner - an authentication error', async () => {
     await h
-      .requestBy('non-task-owner@mail.com')
+      .requestBy(await h.getUser('non-task-owner@mail.com'))
       .patch(h.path(taskId))
       .expect(404);
   });
 
   it('archive already archived task - not found error', async () => {
     await h
-      .requestBy('task-owner@mail.com')
+      .requestBy(await h.getUser('task-owner@mail.com'))
       .patch(h.path(alreadyArchivedTaskId))
       .expect(404);
   });
 
   it('by task owner', async () => {
     const { body } = await h
-      .requestBy('task-owner@mail.com')
+      .requestBy(await h.getUser('task-owner@mail.com'))
       .patch(h.path(taskId))
       .expect(200);
     expect(body).toEqual(

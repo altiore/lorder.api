@@ -26,7 +26,7 @@ describe(`GET ${h.url}`, () => {
 
   it('by user@mail.com', async () => {
     const { body } = await h
-      .requestBy('user@mail.com')
+      .requestBy(await h.getUser('user@mail.com'))
       .get(h.path())
       .expect(200);
     expect(body).toEqual(
@@ -54,7 +54,7 @@ describe(`GET ${h.url}`, () => {
 
   it('by removed@mail.com', async () => {
     const { body } = await h
-      .requestBy('removed@mail.com')
+      .requestBy(await h.getUser('removed@mail.com'))
       .get(h.path())
       .expect(200);
     expect(body).toEqual([]);
@@ -62,7 +62,7 @@ describe(`GET ${h.url}`, () => {
 
   it('by white-status@mail.com', async () => {
     const { body } = await h
-      .requestBy('white-status@mail.com')
+      .requestBy(await h.getUser('white-status@mail.com'))
       .get(h.path())
       .expect(200);
     expect(body).toEqual([]);
@@ -70,7 +70,7 @@ describe(`GET ${h.url}`, () => {
 
   it('by admin@mail.com', async () => {
     await h
-      .requestBy('admin@mail.com')
+      .requestBy(await h.getUser('admin@mail.com'))
       .get(h.path())
       .expect(200)
       .expect([]);
@@ -78,7 +78,7 @@ describe(`GET ${h.url}`, () => {
 
   it('by owner', async () => {
     await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .get(h.path())
       .expect(200)
       .expect([]);

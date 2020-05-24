@@ -1,10 +1,11 @@
 import { Body, Controller, Delete, Get, Headers, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Project } from '@orm/project';
 import { EmailDto, User } from '@orm/user';
 import { ACCESS_LEVEL, UserProject } from '@orm/user-project';
 import { DeepPartial } from 'typeorm';
+
+import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 
 import { Roles, UserJWT } from '../../@common/decorators';
 import { IdDto } from '../../@common/dto';
@@ -17,7 +18,7 @@ import { ProjectMemberService } from './project.member.service';
 
 @ApiBearerAuth()
 @ApiTags('projects -> members (role: user)')
-@UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, AccessLevelGuard)
 @Controller('projects/:projectId/members')
 export class ProjectMemberController {
   constructor(private readonly projectMemberService: ProjectMemberService) {}

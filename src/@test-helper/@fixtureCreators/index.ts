@@ -2,6 +2,7 @@ export * from './project';
 export * from './project-part';
 export * from './project-role';
 export * from './role-flow';
+export * from './session';
 export * from './task';
 export * from './task-comment';
 export * from './task-logs';

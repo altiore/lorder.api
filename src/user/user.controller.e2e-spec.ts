@@ -21,7 +21,7 @@ describe(`GET ${h.url}`, () => {
 
   it('by user', async () => {
     await h
-      .requestBy('user@mail.com')
+      .requestBy(await h.getUser('user@mail.com'))
       .get(h.url)
       .expect(403)
       .expect({
@@ -33,7 +33,7 @@ describe(`GET ${h.url}`, () => {
 
   it('by admin', async () => {
     await h
-      .requestBy('admin@mail.com')
+      .requestBy(await h.getUser('admin@mail.com'))
       .get(h.url)
       .expect(403)
       .expect({
@@ -45,7 +45,7 @@ describe(`GET ${h.url}`, () => {
 
   it('by super-admin', async () => {
     const { body } = await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .get(h.url)
       .expect(200);
     expect(body.map(el => el.email)).toEqual(

@@ -7,9 +7,6 @@ export class IdentityDto {
   public readonly avatar?: string;
 
   @ApiProperty()
-  public readonly bearerKey: string;
-
-  @ApiProperty()
   public readonly defaultProjectId: number;
 
   @ApiProperty()
@@ -17,4 +14,13 @@ export class IdentityDto {
 
   @ApiProperty()
   public readonly email: string;
+
+  @ApiProperty()
+  public readonly bearerKey: string;
+
+  @ApiProperty()
+  public readonly refreshToken: string;
+
+  @ApiProperty()
+  public readonly expiresIn: number;
 }

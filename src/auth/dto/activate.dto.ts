@@ -11,4 +11,9 @@ export class ActivateDto {
   @IsNumberString()
   @IsOptional()
   public readonly project?: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  public readonly device: string;
 }

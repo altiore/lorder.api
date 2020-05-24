@@ -13,8 +13,10 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
+
 import { Media } from '@orm/media';
 import { User } from '@orm/user';
 
@@ -30,7 +32,7 @@ import { UserService } from './user.service';
 @ApiBearerAuth()
 @ApiTags('users (super-admin)')
 @Controller('users')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class UserController {
   constructor(private readonly usersService: UserService) {}
 

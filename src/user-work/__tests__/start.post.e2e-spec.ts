@@ -36,7 +36,7 @@ describe(`POST ${h.url}`, () => {
 
   it('by user@mail.com without projectId', async () => {
     const { body } = await h
-      .requestBy('user@mail.com')
+      .requestBy(await h.getUser('user@mail.com'))
       .post(h.path())
       .expect(406);
     expect(body).toEqual({
@@ -48,7 +48,7 @@ describe(`POST ${h.url}`, () => {
 
   it('by user@mail.com', async () => {
     const { body } = await h
-      .requestBy('user@mail.com')
+      .requestBy(await h.getUser('user@mail.com'))
       .post(h.path())
       .send({ projectId })
       .expect(403);
@@ -61,7 +61,7 @@ describe(`POST ${h.url}`, () => {
 
   it('by admin@mail.com', async () => {
     await h
-      .requestBy('admin@mail.com')
+      .requestBy(await h.getUser('admin@mail.com'))
       .post(h.path())
       .send({ projectId })
       .expect(403)
@@ -74,7 +74,7 @@ describe(`POST ${h.url}`, () => {
 
   it('by owner with validation error (title not set)', async () => {
     await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .post(h.path())
       .send({
         description: 'создана автоматически',
@@ -101,7 +101,7 @@ describe(`POST ${h.url}`, () => {
 
   it('by owner with extra data', async () => {
     const { body } = await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .post(h.path())
       .send({
         description: 'создана автоматически',
@@ -127,7 +127,7 @@ describe(`POST ${h.url}`, () => {
 
   it('by owner with correct data', async () => {
     const { body } = await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .post(h.path())
       .send({
         description: 'Описание новой задачи',
@@ -167,7 +167,7 @@ describe(`POST ${h.url}`, () => {
 
   it('by owner with correct data, when exists not finished user work', async () => {
     const { body } = await h
-      .requestBy('exist-not-finished@mail.com')
+      .requestBy(await h.getUser('exist-not-finished@mail.com'))
       .post(h.path())
       .send({
         description: 'Описание новой задачи',
@@ -215,7 +215,7 @@ describe(`POST ${h.url}`, () => {
   it('by owner with correct data existing task with IN_TESTING status', async () => {
     const taskInTesting = await h.findOne(Task, { title: 'IN_TESTING' });
     const { body } = await h
-      .requestBy('exist-not-finished@mail.com')
+      .requestBy(await h.getUser('exist-not-finished@mail.com'))
       .post(h.path())
       .send({
         description: 'Описание новой задачи',

@@ -34,7 +34,7 @@ describe(`POST ${h.url}`, () => {
   it('by test@mail.com to alien project', async () => {
     const alienProjectId = h.entities.Project.find(el => el.title === 'Admin is Owner').id;
     await h
-      .requestBy('test@mail.com')
+      .requestBy(await h.getUser('test@mail.com'))
       .post(h.path(alienProjectId))
       .send({
         roleId: 'creator',
@@ -49,7 +49,7 @@ describe(`POST ${h.url}`, () => {
 
   it('by test@mail.com to own project with roleId validation error', async () => {
     await h
-      .requestBy('test@mail.com')
+      .requestBy(await h.getUser('test@mail.com'))
       .post(h.path(projectId))
       .send({
         roleId: 1,
@@ -59,7 +59,7 @@ describe(`POST ${h.url}`, () => {
 
   it('by test@mail.com to own project with workFlow validation error', async () => {
     await h
-      .requestBy('test@mail.com')
+      .requestBy(await h.getUser('test@mail.com'))
       .post(h.path(projectId))
       .send({
         roleId: 2,
@@ -69,7 +69,7 @@ describe(`POST ${h.url}`, () => {
 
   // it('by test@mail.com to own project', async () => {
   //   const { body } = await h
-  //     .requestBy('test@mail.com')
+  //     .requestBy(await h.getUser('test@mail.com'))
   //     .post(h.path(projectId))
   //     .send({
   //       roleId: 'creator',

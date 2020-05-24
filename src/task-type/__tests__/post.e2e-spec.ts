@@ -23,7 +23,7 @@ describe(`POST ${h.url}`, () => {
 
   it('by user@mail.com', async () => {
     await h
-      .requestBy('user@mail.com')
+      .requestBy(await h.getUser('user@mail.com'))
       .post(h.path())
       .expect(403)
       .expect({
@@ -35,7 +35,7 @@ describe(`POST ${h.url}`, () => {
 
   it('by admin@mail.com', async () => {
     await h
-      .requestBy('admin@mail.com')
+      .requestBy(await h.getUser('admin@mail.com'))
       .post(h.path())
       .expect(403)
       .expect({
@@ -47,7 +47,7 @@ describe(`POST ${h.url}`, () => {
 
   it('by super-admin@mail.com with empty data', async () => {
     await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .post(h.path())
       .send({
         name: '',
@@ -61,7 +61,7 @@ describe(`POST ${h.url}`, () => {
     };
 
     const { body } = await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .post(h.path())
       .send(taskType)
       .expect(201);
@@ -80,7 +80,7 @@ describe(`POST ${h.url}`, () => {
     };
 
     const { body } = await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .post(h.path())
       .send(taskType)
       .expect(201);

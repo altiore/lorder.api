@@ -1,6 +1,7 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 
 import { Roles } from '../@common/decorators/roles.decorator';
 import { RolesGuard } from '../@common/guards/roles.guard';
@@ -10,7 +11,7 @@ import { RedisService } from './redis.service';
 @ApiBearerAuth()
 @ApiTags('cache (super-admin)')
 @Controller('cache')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class RedisController {
   constructor(private readonly redisService: RedisService) {}
 

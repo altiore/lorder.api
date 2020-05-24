@@ -1,6 +1,8 @@
 import { Controller, Get, NotFoundException, Param, ParseIntPipe, Patch, Query, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
+
 import { Task } from '@orm/task';
 import { User } from '@orm/user';
 
@@ -13,7 +15,7 @@ import { TaskService } from './task.service';
 @ApiBearerAuth()
 @ApiTags('tasks (role: user)')
 @Controller('tasks')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 

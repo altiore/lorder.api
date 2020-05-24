@@ -5,6 +5,7 @@ import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Role } from '../role/role.entity';
 import { UserRole } from '../user-role/user-role.entity';
 
+import { requiredUserRelations } from './dto/required.relations';
 import { User } from './user.entity';
 
 @EntityRepository(User)
@@ -15,7 +16,7 @@ export class UserRepository extends Repository<User> {
       try {
         return await this.findOne({
           loadEagerRelations: false,
-          relations: ['avatar', 'userRoles', 'userRoles.role'],
+          relations: ['avatar', ...requiredUserRelations],
           select: ['id', 'email', 'status', 'defaultProjectId', 'displayName', 'password', 'tel'],
           where: { email },
         });
@@ -23,12 +24,17 @@ export class UserRepository extends Repository<User> {
         throw e;
       }
     }
-    return await this.findOne({ where: { email }, relations: ['userRoles', 'userRoles.role'] });
+    return await this.findOne({ where: { email }, relations: requiredUserRelations });
   }
 
   // Используется при валидации JWT ключа
   public findOneActiveByEmail(email: string): Promise<User> {
-    return this.findOneOrFail({ where: { email, status: 10 }, relations: ['userRoles', 'userRoles.role'] });
+    return this.findOneOrFail({ where: { email, status: 10 }, relations: requiredUserRelations });
+  }
+
+  // Используется при валидации JWT ключа
+  public findOneActiveById(id: number): Promise<User> {
+    return this.findOneOrFail({ where: { id, status: 10 }, relations: requiredUserRelations });
   }
 
   public updateOne(user: User, data: DeepPartial<User>): Promise<User> {

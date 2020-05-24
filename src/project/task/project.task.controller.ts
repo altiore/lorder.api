@@ -14,15 +14,17 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { DeepPartial } from 'typeorm';
+
+import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
+
 import { Project } from '@orm/project';
 import { Task } from '@orm/task';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
 import { AccessLevel, ProjectParam } from 'project/@common/decorators';
 import { AccessLevelGuard } from 'project/@common/guards';
-import { DeepPartial } from 'typeorm';
 
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
 import { ProjectTaskService } from './project.task.service';
@@ -30,7 +32,7 @@ import { ProjectTaskService } from './project.task.service';
 @ApiBearerAuth()
 @ApiTags('projects -> tasks (role: user)')
 @Controller('projects/:projectId/tasks')
-@UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, AccessLevelGuard)
 export class ProjectTaskController {
   constructor(private readonly taskService: ProjectTaskService) {}
 

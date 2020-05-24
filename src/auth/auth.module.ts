@@ -1,25 +1,29 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { forwardRef, Global, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { UserRepository } from '@orm/user';
 import { UserProjectRepository } from '@orm/user-project';
 
 import { MailModule } from '../mail/mail.module';
 import { RedisModule } from '../redis/redis.module';
+import { SessionsModule } from '../sessions/sessions.module';
 import { UserModule } from '../user/user.module';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { JwtStrategy } from './jwt.strategy';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
+@Global()
 @Module({
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthService, JwtAuthGuard],
   imports: [
     MailModule,
     RedisModule,
+    SessionsModule,
     forwardRef(() => UserModule),
     TypeOrmModule.forFeature([UserProjectRepository, UserRepository]),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtAuthGuard],
 })
 export class AuthModule {}

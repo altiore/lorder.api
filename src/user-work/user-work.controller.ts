@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 
 import { Project } from '@orm/project';
 import { User } from '@orm/user';
@@ -20,7 +21,7 @@ import { UserWorkService } from './user-work.service';
 @ApiBearerAuth()
 @ApiTags('user-works (role: user)')
 @Controller('user-works')
-@UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, AccessLevelGuard)
 export class UserWorkController {
   constructor(private readonly userWorkService: UserWorkService) {}
 

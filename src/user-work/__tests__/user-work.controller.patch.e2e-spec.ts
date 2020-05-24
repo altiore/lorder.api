@@ -39,7 +39,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by user@mail.com without projectId', async () => {
     const { body } = await h
-      .requestBy('user@mail.com')
+      .requestBy(await h.getUser('user@mail.com'))
       .patch(h.path(userWorkId))
       .expect(406);
     expect(body).toEqual({
@@ -51,7 +51,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by super-admin@mail.com with wrong projectId type', async () => {
     const { body } = await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .patch(h.path(userWorkId))
       .send({ projectId: 'asdfasdf' })
       .expect(406);
@@ -64,7 +64,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by super-admin@mail.com with wrong projectId value', async () => {
     const { body } = await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .patch(h.path(userWorkId))
       .send({ projectId: 999 })
       .expect(404);
@@ -77,7 +77,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by exist-not-finished@mail.com with wrong projectId value', async () => {
     const { body } = await h
-      .requestBy('exist-not-finished@mail.com')
+      .requestBy(await h.getUser('exist-not-finished@mail.com'))
       .patch(h.path(userWorkId))
       .send({ projectId: 999 })
       .expect(403);
@@ -90,7 +90,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by user@mail.com', async () => {
     const { body } = await h
-      .requestBy('user@mail.com')
+      .requestBy(await h.getUser('user@mail.com'))
       .patch(h.path(userWorkId))
       .send({ projectId })
       .expect(403);
@@ -103,7 +103,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by admin@mail.com', async () => {
     await h
-      .requestBy('admin@mail.com')
+      .requestBy(await h.getUser('admin@mail.com'))
       .patch(h.path(userWorkId))
       .send({ projectId })
       .expect(403)
@@ -116,7 +116,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by owner with validation error' + ' (description is number, startAt string but is not date string)', async () => {
     const { body } = await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .patch(h.path(userWorkId))
       .send({
         description: 1,
@@ -172,7 +172,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by owner with validation error' + ' (description longer then 255, startAt is number)', async () => {
     const { body } = await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .patch(h.path(userWorkId))
       .send({
         description: lorem.words(255),
@@ -221,7 +221,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by owner with validation error (future dates)', async () => {
     const { body } = await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .patch(h.path(userWorkId))
       .send({
         finishAt: moment()
@@ -253,7 +253,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by owner with extra data', async () => {
     const { body } = await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .patch(h.path(userWorkId))
       .send({
         extraData: 'extra data',
@@ -277,7 +277,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by owner with finish before start', async () => {
     const { body } = await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .patch(h.path(userWorkId))
       .send({
         finishAt: moment()
@@ -316,7 +316,7 @@ describe(`PATCH ${h.url}`, () => {
       value: 10,
     };
     await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .patch(h.path(userWorkId))
       .send(newValue)
       .expect(422);
@@ -337,7 +337,7 @@ describe(`PATCH ${h.url}`, () => {
       value: 10,
     };
     const { body } = await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .patch(h.path(userWorkId))
       .send(newValue)
       .expect(200);
@@ -367,7 +367,7 @@ describe(`PATCH ${h.url}`, () => {
       value: 10,
     };
     const { body } = await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .patch(h.path(userWorkId2))
       .send(newValue)
       .expect(200);
@@ -397,7 +397,7 @@ describe(`PATCH ${h.url}`, () => {
       value: 10,
     };
     const { body } = await h
-      .requestBy('exist-not-finished@mail.com')
+      .requestBy(await h.getUser('exist-not-finished@mail.com'))
       .patch(h.path(userWorkId3))
       .send(newValue)
       .expect(200);

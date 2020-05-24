@@ -40,28 +40,28 @@ describe(`POST ${h.url}`, () => {
 
   it('by white-level@mail.com', async () => {
     await h
-      .requestBy('white-level@mail.com')
+      .requestBy(await h.getUser('white-level@mail.com'))
       .post(h.path(projectId, taskId))
       .expect(403);
   });
 
   it('by member@mail.com RED level', async () => {
     await h
-      .requestBy('member@mail.com')
+      .requestBy(await h.getUser('member@mail.com'))
       .post(h.path(projectId, taskId))
       .expect(403);
   });
 
   it('by yellow@mail.com YELLOW level', async () => {
     await h
-      .requestBy('yellow@mail.com')
+      .requestBy(await h.getUser('yellow@mail.com'))
       .post(h.path(projectId, taskId))
       .expect(422);
   });
 
   it('by project-owner@mail.com Empty data', async () => {
     await h
-      .requestBy('project-owner@mail.com')
+      .requestBy(await h.getUser('project-owner@mail.com'))
       .post(h.path(projectId, taskId))
       .expect(422);
   });
@@ -69,7 +69,7 @@ describe(`POST ${h.url}`, () => {
   it('by project-owner@mail.com correct data', async () => {
     const text = 'New Title';
     const { body } = await h
-      .requestBy('project-owner@mail.com')
+      .requestBy(await h.getUser('project-owner@mail.com'))
       .post(h.path(projectId, taskId))
       .send({ text })
       .expect(201);
@@ -87,7 +87,7 @@ describe(`POST ${h.url}`, () => {
   it('by yellow@mail.com with correct data', async () => {
     const text = 'New Title';
     const { body } = await h
-      .requestBy('yellow@mail.com')
+      .requestBy(await h.getUser('yellow@mail.com'))
       .post(h.path(projectId, taskId))
       .send({ text })
       .expect(201);

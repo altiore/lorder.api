@@ -37,7 +37,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by white-accessLevel@mail.com', async () => {
     const { body } = await h
-      .requestBy('white-accessLevel@mail.com')
+      .requestBy(await h.getUser('white-accessLevel@mail.com'))
       .patch(h.path(notFinishedUserWorkId))
       .expect(403);
     expect(body).toEqual({
@@ -49,7 +49,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by not-invited@mail.com', async () => {
     const { body } = await h
-      .requestBy('not-invited@mail.com')
+      .requestBy(await h.getUser('not-invited@mail.com'))
       .patch(h.path(notFinishedUserWorkId))
       .expect(403);
     expect(body).toEqual({
@@ -62,7 +62,7 @@ describe(`PATCH ${h.url}`, () => {
   it('by user@mail.com (try finish finished userTask)', async () => {
     const email = 'user@mail.com';
     const { body } = await h
-      .requestBy(email)
+      .requestBy(await h.getUser(email))
       .patch(h.path(finishedUserWorkId))
       .expect(406);
     expect(body).toEqual({
@@ -75,7 +75,7 @@ describe(`PATCH ${h.url}`, () => {
   it('by user@mail.com (finishing not finished userTask)', async () => {
     const email = 'user@mail.com';
     const { body } = await h
-      .requestBy(email)
+      .requestBy(await h.getUser(email))
       .patch(h.path(notFinishedUserWorkId))
       .expect(200);
     expect(body).toEqual({

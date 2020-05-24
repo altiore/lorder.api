@@ -1,14 +1,19 @@
-import { Body, Controller, Get, Headers, HttpCode, Patch, Post, Query } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { User } from '@orm/user';
+import { Body, Controller, Get, Headers, HttpCode, Patch, Post, Query, Request, Response } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { RefreshUserDto, User } from '@orm/user';
 import { EmailDto, LoginUserDto } from '@orm/user/dto';
+import { Request as Req, Response as Res } from 'express';
 
+import { ValidationException } from '@common/exceptions/validation.exception';
+
+import { Auth, res, UserJWT } from '../@common/decorators';
+import { ROLES } from '../@orm/role';
+import { RegisterUserDto } from '../@orm/user/dto/register.user.dto';
 import { MailAcceptedDto } from '../mail/dto';
 
 import { AuthService } from './auth.service';
 import { ActivateDto, IdentityDto } from './dto';
 
-@ApiBearerAuth()
 @ApiTags('auth (guest)')
 @Controller('auth')
 export class AuthController {
@@ -23,17 +28,38 @@ export class AuthController {
 
   @ApiResponse({ status: 200, description: 'Возвращает Bearer ключ', type: IdentityDto })
   @Get('activate')
-  public activate(@Query() activateDto: ActivateDto): Promise<IdentityDto> {
-    return this.authService.activate(activateDto);
+  public activate(@Query() activateDto: ActivateDto, @Request() req: Req): Promise<IdentityDto> {
+    return this.authService.activate(activateDto, req);
   }
 
-  @ApiResponse({ status: 200, type: MailAcceptedDto })
-  @ApiResponse({ status: 200, type: User })
+  @ApiResponse({ status: 200, type: IdentityDto })
+  @ApiResponse({ status: 422, type: ValidationException })
   @Patch('login')
   public async login(
     @Body() data: LoginUserDto,
-    @Headers('origin') origin: string
-  ): Promise<IdentityDto | MailAcceptedDto> {
-    return this.authService.login(data, origin);
+    @Headers('origin') origin: string,
+    @Request() req: Req
+  ): Promise<IdentityDto> {
+    return await this.authService.login(data, origin, req);
+  }
+
+  @ApiResponse({ status: 202, type: MailAcceptedDto })
+  @ApiResponse({ status: 422, type: ValidationException })
+  @Post('register')
+  public async register(
+    @Body() data: RegisterUserDto,
+    @Headers('origin') origin: string,
+    @Request() req: Req,
+    @Response() response: Res
+  ): Promise<MailAcceptedDto> {
+    return response.status(202).send(await this.authService.registration(data, origin));
+  }
+
+  @ApiResponse({ status: 200, type: IdentityDto })
+  @ApiResponse({ status: 422, type: ValidationException })
+  @Auth(res(IdentityDto).getOne, ROLES.USER)
+  @Patch('refresh')
+  public async refresh(@Body() data: RefreshUserDto, @Request() req: Req, @UserJWT() user: User): Promise<IdentityDto> {
+    return await this.authService.refresh(data, req, user);
   }
 }

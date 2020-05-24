@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
 
 import { ROLES } from '../../../@orm/role';
-import { createUsers } from '../../../@test-helper/@fixtureCreators';
+import { createSessionFixture, createUsers } from '../../../@test-helper/@fixtureCreators';
 
 export const usersFixture = createUsers([
   {
@@ -36,5 +36,11 @@ export const usersFixture = createUsers([
   {
     email: 'super-admin@mail.com',
     roles: [{ name: ROLES.USER }, { name: ROLES.ADMIN }, { name: ROLES.SUPER_ADMIN }],
+  },
+]);
+
+export const sessionsFixture = createSessionFixture([
+  {
+    user: { email: 'super-admin+password@mail.com' },
   },
 ]);

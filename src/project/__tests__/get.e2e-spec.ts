@@ -29,7 +29,7 @@ describe(`GET ${h.url}`, () => {
 
   it('by user@mail.com', async () => {
     const { body } = await h
-      .requestBy('user@mail.com')
+      .requestBy(await h.getUser('user@mail.com'))
       .get(h.path())
       .expect(200);
     expect(body).toEqual(

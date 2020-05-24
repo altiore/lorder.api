@@ -1,15 +1,27 @@
-import { HttpException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EmailDto, LoginUserDto, User, UserRepository } from '@orm/user';
-import { UserProjectRepository } from '@orm/user-project';
 import { ValidationError } from 'class-validator';
+import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
+import * as moment from 'moment';
 import { DeepPartial } from 'typeorm';
 
+import { EmailDto, LoginUserDto, RefreshUserDto, User, UserRepository } from '@orm/user';
+import { UserProjectRepository } from '@orm/user-project';
+
 import { ValidationException } from '../@common/exceptions/validation.exception';
+import { Session } from '../@orm/session/session.entity';
+import { RegisterUserDto } from '../@orm/user/dto/register.user.dto';
 import { MailAcceptedDto } from '../mail/dto';
 import { MailService } from '../mail/mail.service';
 import { RedisService } from '../redis/redis.service';
+import { SessionsService } from '../sessions/sessions.service';
 import { UserService } from '../user/user.service';
 
 import { ActivateDto, IdentityDto } from './dto';
@@ -22,7 +34,8 @@ export class AuthService {
     @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository,
     private readonly mailService: MailService,
     private readonly redisService: RedisService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly sessionService: SessionsService
   ) {}
 
   public async sendMagicLink(
@@ -45,7 +58,7 @@ export class AuthService {
     return sendMagicLinkResult;
   }
 
-  public async activate(activateDto: ActivateDto): Promise<IdentityDto> {
+  public async activate(activateDto: ActivateDto, req: Request): Promise<IdentityDto> {
     let userData;
     try {
       userData = await this.redisService.findUserDataByOneTimeToken(activateDto.oneTimeToken);
@@ -73,41 +86,106 @@ export class AuthService {
     if (activateDto.project) {
       await this.userProjectRepo.activateInProject(user, { id: parseInt(activateDto.project, 0) });
     }
+
+    const session = await this.sessionService.startSession(user, activateDto.device, req);
     return {
       ...user.profileData,
-      bearerKey: this.createBearerKey({ email: user.email }),
+      refreshToken: session.refreshToken,
+      ...this.createBearerKey({ uid: user.id }),
     };
   }
 
-  public async login(data: LoginUserDto, hostWithProtocol: string): Promise<IdentityDto> {
+  public async login(data: LoginUserDto, hostWithProtocol: string, req: Request): Promise<IdentityDto> {
     const user = await this.userService.findUserByEmail(data.email, true);
     const exception = this.findException(user, data);
+
     if (exception) {
-      if (!user) {
-        await this.userService.createUser({ email: data.email });
+      if (user && !user.password) {
+        const link = await this.createMagicLink(
+          {
+            email: data.email,
+            password: this.userRepo.hashPassword(data.password),
+          },
+          hostWithProtocol
+        );
+        await this.mailService.sendMagicLink(data.email, link);
       }
-      const link = await this.createMagicLink(
-        {
-          email: data.email,
-          password: this.userRepo.hashPassword(data.password),
-        },
-        hostWithProtocol
-      );
-      await this.mailService.sendMagicLink(data.email, link);
+
       throw exception;
     }
 
+    const session = await this.sessionService.startSession(user, data.device, req);
     return {
       ...user.profileData,
-      bearerKey: this.createBearerKey({ email: user.email }),
+      refreshToken: session.refreshToken,
+      ...this.createBearerKey({ uid: user.id }),
     };
+  }
+
+  public async refresh(data: RefreshUserDto, req: Request, user: User): Promise<IdentityDto> {
+    let session: Session = null;
+    try {
+      session = await this.sessionService.findUserByRefresh(data, user, req);
+    } catch (e) {
+      throw new UnauthorizedException();
+    }
+
+    if (!session || !session.user || session.userId !== user.id) {
+      throw new UnauthorizedException();
+    }
+
+    return {
+      ...session.user.profileData,
+      refreshToken: session.refreshToken,
+      ...this.createBearerKey({ uid: session.userId }),
+    };
+  }
+
+  public async registration(data: RegisterUserDto, hostWithProtocol: string): Promise<MailAcceptedDto> {
+    const existingUser = await this.userService.findUserByEmail(data.email, true);
+
+    if (existingUser) {
+      throw new ValidationException([
+        Object.assign(new ValidationError(), {
+          constraints: {
+            isExists: 'Пользователь с таким email-ом уже существует',
+          },
+          property: 'email',
+          value: data.email,
+        }),
+      ]);
+    }
+
+    await this.userService.createUser({ email: data.email });
+    const link = await this.createMagicLink(
+      {
+        email: data.email,
+        password: this.userRepo.hashPassword(data.password),
+      },
+      hostWithProtocol
+    );
+    return await this.mailService.sendMagicLink(data.email, link);
   }
 
   /**
    * Используется для валидации JWT ключа при каждом получении запроса с ключем
    */
   public async validateUser(payload: JwtPayload): Promise<User> {
-    return await this.userService.findActiveUserByEmail(payload.email);
+    return await this.userService.findActiveUserByEmail(payload);
+  }
+
+  /**
+   * Используется при создании ключа валидации
+   */
+  public createBearerKey(userInfo: JwtPayload): { bearerKey: string; expiresIn: number } {
+    const configExpiresIn = process.env.JWT_EXPIRES_IN || 3600;
+    const expiresIn = moment()
+      .add(configExpiresIn)
+      .unix();
+    return {
+      bearerKey: jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: configExpiresIn }),
+      expiresIn,
+    };
   }
 
   private async createMagicLink(userData: LoginUserDto | EmailDto, host: string, query: string = ''): Promise<string> {
@@ -127,7 +205,7 @@ export class AuthService {
             value: data.email,
           }),
         ],
-        'Поьзователь не был найдет. Мы успешно создали нового пользователя и отправили ссылку для активации'
+        'Поьзователь не был найден'
       );
     }
     if (!user.password) {
@@ -157,12 +235,5 @@ export class AuthService {
       );
     }
     return null;
-  }
-
-  /**
-   * Используется при создании ключа валидации
-   */
-  private createBearerKey(userInfo: JwtPayload): string {
-    return jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: parseInt(process.env.JWT_EXPIRES_IN, 0) || 3600 });
   }
 }

@@ -2,7 +2,16 @@
 import { INestApplication, ModuleMetadata } from '@nestjs/common/interfaces';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeormFixtures } from 'typeorm-fixtures';
-import { DeleteResult, FindConditions, getConnection, In, ObjectID, ObjectType } from 'typeorm';
+import {
+  Connection,
+  DeleteResult,
+  EntityManager,
+  FindConditions,
+  getConnection,
+  In,
+  ObjectID,
+  ObjectType,
+} from 'typeorm';
 import * as supertest from 'supertest';
 const defaults = require('superagent-defaults');
 import * as jwt from 'jsonwebtoken';
@@ -12,6 +21,7 @@ import { RedisService } from '../../redis/redis.service';
 import { Role } from '../../@orm/role';
 import { MailService } from '../../mail/mail.service';
 import { MailAcceptedDto } from '../../mail/dto';
+import { User } from '../../@orm/user';
 
 export class TestHelper {
   private testingModule: TestingModule;
@@ -29,6 +39,10 @@ export class TestHelper {
       },
     };
     this.fixtureHelper = new TypeormFixtures(debug).findEntities(findCondition, Role);
+  }
+
+  public get manager(): EntityManager {
+    return this.fixtureHelper.connection.manager;
   }
 
   public readonly before = async (): Promise<void> => {
@@ -56,13 +70,18 @@ export class TestHelper {
     await this.app.close();
   };
 
-  public readonly requestBy = (email?: string): supertest.SuperTest<supertest.Test> => {
+  public async getUser(email?: string): Promise<number | undefined> {
+    const user = await this.findOne(User, { email });
+    return user ? user.id : undefined;
+  }
+
+  public readonly requestBy = (uid?: number): supertest.SuperTest<supertest.Test> => {
     const request = defaults(supertest(this.app.getHttpServer()));
     const headers = {
       'Content-Type': 'application/json',
     } as any;
-    if (email) {
-      const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: 3600 });
+    if (uid) {
+      const token = jwt.sign({ uid }, process.env.JWT_SECRET, { expiresIn: 3600 });
       headers.Authorization = `Bearer ${token}`;
     }
     request.set(headers);

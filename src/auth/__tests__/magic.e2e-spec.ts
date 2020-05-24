@@ -66,7 +66,7 @@ describe(`POST ${h.url}`, () => {
   it('by user (own email)', async () => {
     const email = 'no-password@mail.com';
     await h
-      .requestBy(email)
+      .requestBy(await h.getUser(email))
       .post(h.url)
       .send({
         email,
@@ -80,7 +80,7 @@ describe(`POST ${h.url}`, () => {
 
   it('by admin (own email)', async () => {
     await h
-      .requestBy('admin@mail.com')
+      .requestBy(await h.getUser('admin@mail.com'))
       .post(h.url)
       .send({
         email: 'admin@mail.com',
@@ -94,7 +94,7 @@ describe(`POST ${h.url}`, () => {
 
   it('by super-admin (own email)', async () => {
     await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .post(h.url)
       .send({
         email: 'super-admin@mail.com',

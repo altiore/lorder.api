@@ -7,6 +7,7 @@ import { UpdateUserDto, User, UserRepository } from '@orm/user';
 import { DeepPartial, EntityManager } from 'typeorm';
 
 import { UserRole } from '../@orm/user-role/user-role.entity';
+import { JwtPayload } from '../auth/interfaces';
 import { FileService } from '../file/file.service';
 import { ProjectService } from '../project/project.service';
 
@@ -39,8 +40,8 @@ export class UserService {
     return this.userRepo.findOneByEmail(email, withPassword);
   }
 
-  public findActiveUserByEmail(email: string) {
-    return this.userRepo.findOneActiveByEmail(email);
+  public findActiveUserByEmail(payload: JwtPayload) {
+    return this.userRepo.findOneActiveById(payload.uid);
   }
 
   public async updateUserById(userId: number, data: UserDto): Promise<User> {

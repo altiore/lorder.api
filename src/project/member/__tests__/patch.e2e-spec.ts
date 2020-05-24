@@ -34,7 +34,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by NOT project owner', async () => {
     const { body } = await h
-      .requestBy('not-owner@mail.com')
+      .requestBy(await h.getUser('not-owner@mail.com'))
       .patch(h.path(projectId, memberId))
       .send({ accessLevel: 3 })
       .expect(403);
@@ -47,7 +47,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by project owner accessLevel only', async () => {
     const { body } = await h
-      .requestBy('project-owner@mail.com')
+      .requestBy(await h.getUser('project-owner@mail.com'))
       .patch(h.path(projectId, memberId))
       .send({ accessLevel: ACCESS_LEVEL.YELLOW })
       .expect(200);
@@ -65,7 +65,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by project owner roles only', async () => {
     const { body } = await h
-      .requestBy('project-owner@mail.com')
+      .requestBy(await h.getUser('project-owner@mail.com'))
       .patch(h.path(projectId, memberId))
       .send({ roles: ['architect'] })
       .expect(200);
@@ -101,7 +101,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by project owner replace roles', async () => {
     const { body } = await h
-      .requestBy('project-owner@mail.com')
+      .requestBy(await h.getUser('project-owner@mail.com'))
       .patch(h.path(projectId, memberId))
       .send({ roles: ['dev-full'] })
       .expect(200);
@@ -138,7 +138,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by project owner not existing in project role', async () => {
     const { body } = await h
-      .requestBy('project-owner@mail.com')
+      .requestBy(await h.getUser('project-owner@mail.com'))
       .patch(h.path(projectId, memberId))
       .send({ roles: ['dev-full', 'not-in-project'] })
       .expect(200);

@@ -42,7 +42,7 @@ describe(`GET ${h.url}`, () => {
   it('try to get task-logs from forbidden project', async () => {
     const forbiddenProjectId = h.entities.Project.find(el => el.owner.email === 'unknown-other-user@mail.com').id;
     await h
-      .requestBy('user@mail.com')
+      .requestBy(await h.getUser('user@mail.com'))
       .get(h.path(forbiddenProjectId, taskSequenceNumber))
       .expect(403);
   });
@@ -53,14 +53,14 @@ describe(`GET ${h.url}`, () => {
   it('try to get task-logs from wrong task', async () => {
     const wrongTaskSequenceNumber = h.entities.Task.find(el => el.title === 'Fourth Task').sequenceNumber;
     await h
-      .requestBy('user@mail.com')
+      .requestBy(await h.getUser('user@mail.com'))
       .get(h.path(projectId, wrongTaskSequenceNumber))
       .expect(404);
   });
 
   it('last 1 item by correct user', async () => {
     const { body } = await h
-      .requestBy('user@mail.com')
+      .requestBy(await h.getUser('user@mail.com'))
       .get(h.path(projectId, taskSequenceNumber))
       .query({
         count: 1,
@@ -75,7 +75,7 @@ describe(`GET ${h.url}`, () => {
     const startId = h.entities.TaskLog.find(el => el.description === '2').id;
     const endId = h.entities.TaskLog.find(el => el.description === '3').id;
     const { body } = await h
-      .requestBy('user@mail.com')
+      .requestBy(await h.getUser('user@mail.com'))
       .get(h.path(projectId, taskSequenceNumber))
       .query({
         count: 2,

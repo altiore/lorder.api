@@ -1,9 +1,10 @@
 import { applyDecorators, SetMetadata, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiResponseOptions, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { ROLES } from '@orm/role';
 import { ACCESS_LEVEL } from '@orm/user-project';
 import { get } from 'lodash';
+
+import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 
 import { AccessLevelGuard } from '../../project/@common/guards';
 import { RolesGuard } from '../guards';
@@ -52,7 +53,7 @@ export function Auth(apiResponseOpts: ApiResponseOptions, roles: ROLES[] | ROLES
       ApiResponse(apiResponseOpts),
       SetMetadata('roles', roles),
       SetMetadata('accessLevel', accessLevel),
-      UseGuards(AuthGuard('jwt'), RolesGuard, AccessLevelGuard),
+      UseGuards(JwtAuthGuard, RolesGuard, AccessLevelGuard),
       ApiBearerAuth(),
       ApiUnauthorizedResponse({ description: 'Unauthorized"' })
     );
@@ -60,7 +61,7 @@ export function Auth(apiResponseOpts: ApiResponseOptions, roles: ROLES[] | ROLES
   return applyDecorators(
     ApiResponse(apiResponseOpts),
     SetMetadata('roles', roles),
-    UseGuards(AuthGuard('jwt'), RolesGuard),
+    UseGuards(JwtAuthGuard, RolesGuard),
     ApiBearerAuth(),
     ApiUnauthorizedResponse({ description: 'Unauthorized"' })
   );

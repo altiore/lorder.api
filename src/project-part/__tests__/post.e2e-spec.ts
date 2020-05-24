@@ -31,28 +31,28 @@ describe(`POST ${h.url}`, () => {
 
   it('by white-level@mail.com', async () => {
     await h
-      .requestBy('white-level@mail.com')
+      .requestBy(await h.getUser('white-level@mail.com'))
       .post(h.path(projectId))
       .expect(403);
   });
 
   it('by member@mail.com RED level', async () => {
     await h
-      .requestBy('member@mail.com')
+      .requestBy(await h.getUser('member@mail.com'))
       .post(h.path(projectId))
       .expect(403);
   });
 
   it('by not-owner@mail.com INDIGO level', async () => {
     await h
-      .requestBy('not-owner@mail.com')
+      .requestBy(await h.getUser('not-owner@mail.com'))
       .post(h.path(projectId))
       .expect(403);
   });
 
   it('by project-owner@mail.com Empty data', async () => {
     await h
-      .requestBy('project-owner@mail.com')
+      .requestBy(await h.getUser('project-owner@mail.com'))
       .post(h.path(projectId))
       .expect(422);
   });
@@ -60,7 +60,7 @@ describe(`POST ${h.url}`, () => {
   it('by project-owner@mail.com correct data', async () => {
     const title = 'New Title';
     const { body } = await h
-      .requestBy('project-owner@mail.com')
+      .requestBy(await h.getUser('project-owner@mail.com'))
       .post(h.path(projectId))
       .send({ title })
       .expect(201);

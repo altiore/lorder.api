@@ -16,6 +16,7 @@ import { ProjectModule } from './project/project.module';
 import { PublicModule } from './public/public.module';
 import { RedisModule } from './redis/redis.module';
 import { RoleModule } from './role/role.module';
+import { SessionsModule } from './sessions/sessions.module';
 import { StatisticsModule } from './statistics/statistics.module';
 import { TaskCommentModule } from './task-comment/task-comment.module';
 import { TaskStatusModule } from './task-status/task-status.module';
@@ -40,6 +41,7 @@ import { WebHooksModule } from './webhooks/webhooks.module';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
+    SessionsModule,
     StatisticsModule,
     TaskModule,
     TaskCommentModule,

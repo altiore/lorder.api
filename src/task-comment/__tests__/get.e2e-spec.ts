@@ -33,7 +33,7 @@ describe(`GET ${h.url}`, () => {
 
   it('by member@mail.com RED level', async () => {
     const { body } = await h
-      .requestBy('member@mail.com')
+      .requestBy(await h.getUser('member@mail.com'))
       .get(h.path(projectId, taskId))
       .expect(200);
 
@@ -50,7 +50,7 @@ describe(`GET ${h.url}`, () => {
 
   it('by not-owner@mail.com ORANGE level', async () => {
     const { body } = await h
-      .requestBy('not-owner@mail.com')
+      .requestBy(await h.getUser('not-owner@mail.com'))
       .get(h.path(projectId, taskId))
       .expect(200);
 
@@ -67,7 +67,7 @@ describe(`GET ${h.url}`, () => {
 
   it('by project-owner@mail.com', async () => {
     const { body } = await h
-      .requestBy('project-owner@mail.com')
+      .requestBy(await h.getUser('project-owner@mail.com'))
       .get(h.path(projectId, taskId))
       .expect(200);
 
@@ -84,7 +84,7 @@ describe(`GET ${h.url}`, () => {
 
   it('by white-level@mail.com', async () => {
     await h
-      .requestBy('white-level@mail.com')
+      .requestBy(await h.getUser('white-level@mail.com'))
       .get(h.path(projectId, taskId))
       .expect(403);
   });

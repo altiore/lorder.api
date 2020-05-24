@@ -31,7 +31,7 @@ describe(`PATCH ${h.url}`, () => {
 
   it('by owner', async () => {
     await h
-      .requestBy('super-admin@mail.com')
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .patch(h.path(projectId))
       .expect(200);
   });
