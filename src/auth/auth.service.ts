@@ -178,9 +178,9 @@ export class AuthService {
    * Используется при создании ключа валидации
    */
   public createBearerKey(userInfo: JwtPayload): { bearerKey: string; expiresIn: number } {
-    const configExpiresIn = process.env.JWT_EXPIRES_IN || 3600;
+    const configExpiresIn = parseInt(process.env.JWT_EXPIRES_IN, 0) || 3600;
     const expiresIn = moment()
-      .add(configExpiresIn)
+      .add(configExpiresIn, 'second')
       .unix();
     return {
       bearerKey: jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: configExpiresIn }),
