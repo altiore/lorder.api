@@ -10,7 +10,6 @@ pipelines:
         script:
           - npm ci
           - npm run build
-          - npm run test:remote
         services:
           - postgres
           - redis
@@ -22,10 +21,6 @@ pipelines:
             - node
           script:
             - npm ci
-            - npm run test:remote
-          services:
-            - postgres
-            - redis
       - step:
           name: Staging DEPLOY
           caches:
@@ -50,10 +45,6 @@ pipelines:
             - node
           script:
             - npm ci
-            - npm run test:remote
-          services:
-            - postgres
-            - redis
       - step:
           name: Production DEPLOY
           deployment: production

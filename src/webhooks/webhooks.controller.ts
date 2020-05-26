@@ -8,7 +8,7 @@ import { WebHook } from '@orm/webhook/webhook.entity';
 
 import { WebHooksService } from './webhooks.service';
 
-const sigHeaderName = 'X-Hub-Signature';
+const sigHeaderName = 'x-hub-signature';
 
 @ApiTags('webHooks')
 @Crud({
@@ -41,9 +41,8 @@ export class WebHooksController implements CrudController<WebHook> {
       return 'OK';
     } catch (e) {
       return {
+        action: ((webHook || { action: 'NO ACTION' }) as any).action,
         error: e,
-
-        body: webHook,
         sig,
       };
     }
