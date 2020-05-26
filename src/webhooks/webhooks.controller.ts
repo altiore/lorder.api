@@ -41,7 +41,7 @@ export class WebHooksController implements CrudController<WebHook> {
       return 'OK';
     } catch (e) {
       return {
-        message: e.getMessage(),
+        error: e,
 
         body: webHook,
         sig,
