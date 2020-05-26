@@ -64,6 +64,7 @@
     "class-validator": "0.12.1",
     "cli-highlight": "2.1.1",
     "cookie-parser": "1.4.4",
+    "cors": "2.8.5",
     "crypto": "1.0.1",
     "gravatar": "1.6.0",
     "helmet": "3.21.1",

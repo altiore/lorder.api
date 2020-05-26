@@ -8,6 +8,8 @@ import { WebHook } from '@orm/webhook/webhook.entity';
 
 import { WebHooksService } from './webhooks.service';
 
+const sigHeaderName = 'X-Hub-Signature';
+
 @ApiTags('webHooks')
 @Crud({
   model: {
@@ -33,9 +35,12 @@ export class WebHooksController implements CrudController<WebHook> {
   }
 
   @Override()
-  createOne(@Headers('x-hub-signature') hitHubSecret: string, @Body() webHook: object) {
-    if (hitHubSecret === process.env.GIT_HUB_WEBHOOKS_SECRET) {
-      return this.service.postWebHook(webHook);
+  async createOne(@Headers(sigHeaderName) sig: string, @Body() webHook: object): Promise<string> {
+    try {
+      await this.service.postWebHook(webHook, sig);
+      return 'OK';
+    } catch (e) {
+      return 'SECRET FAIL';
     }
   }
 }
