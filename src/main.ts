@@ -19,7 +19,7 @@ function except(currentHost, paths, fn) {
   return function(req, res, next) {
     const referer = req.get('referer') || '';
     // Не проверять CORS заголовки для запросов, посланных с того же домена и содержащих пути из списка paths
-    if (referer.match(currentHost) || paths.includes(req.path)) {
+    if (referer.match(currentHost) || (paths.includes(req.path) && req.method === 'POST')) {
       return next();
     }
 
