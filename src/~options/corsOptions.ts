@@ -2,9 +2,11 @@ import { CorsOptions, CustomOrigin } from '@nestjs/common/interfaces/external/co
 
 const whitelist = process.env.SERVER_ORIGIN_WHITELIST
   ? JSON.parse(process.env.SERVER_ORIGIN_WHITELIST)
-  : (process.env.SERVER_ORIGIN ? [process.env.SERVER_ORIGIN] : []);
+  : process.env.SERVER_ORIGIN
+    ? [process.env.SERVER_ORIGIN]
+    : [];
 
-export const corsOptions = (isProd: boolean, currentOrigin: string) =>
+export const corsOptions = (isProd: boolean) =>
   ({
     /**
      * Заголовки, которые приходят в ответе на preflight request и которые могут быть использованы в
@@ -25,10 +27,6 @@ export const corsOptions = (isProd: boolean, currentOrigin: string) =>
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     origin: isProd
       ? (function(origin, callback) {
-          if (origin === currentOrigin) {
-            callback(null, true);
-            return;
-          }
           if (whitelist.indexOf(origin) !== -1) {
             callback(null, true);
           } else {
