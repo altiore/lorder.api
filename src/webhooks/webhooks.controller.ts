@@ -35,12 +35,17 @@ export class WebHooksController implements CrudController<WebHook> {
   }
 
   @Override()
-  async createOne(@Headers(sigHeaderName) sig: string, @Body() webHook: object): Promise<string> {
+  async createOne(@Headers(sigHeaderName) sig: string, @Body() webHook: object): Promise<any> {
     try {
       await this.service.postWebHook(webHook, sig);
       return 'OK';
     } catch (e) {
-      return 'SECRET FAIL';
+      return {
+        message: e.getMessage(),
+
+        body: webHook,
+        sig,
+      };
     }
   }
 }
