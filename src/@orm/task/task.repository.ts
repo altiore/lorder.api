@@ -15,6 +15,8 @@ export enum TaskOrderByField {
   'value' = 'value',
 }
 
+const requiredRelations = ['userTasks', 'projectParts'];
+
 @EntityRepository(Task)
 export class TaskRepository extends Repository<Task> {
   public findAllByProjectId(
@@ -23,7 +25,7 @@ export class TaskRepository extends Repository<Task> {
   ): Promise<[Task[], number]> {
     return this.findAndCount({
       order: { [orderBy]: order.toUpperCase() },
-      relations: ['userTasks'],
+      relations: requiredRelations,
       skip,
       take: count,
       where: { project: { id: projectId }, isArchived: false },
@@ -39,7 +41,7 @@ export class TaskRepository extends Repository<Task> {
       order: {
         [orderBy]: order.toUpperCase(),
       },
-      relations: ['userTasks', 'projectParts'],
+      relations: requiredRelations,
       skip,
       take: count,
       where: {
