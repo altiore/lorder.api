@@ -1,12 +1,10 @@
 import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from '@orm/project';
-import { ProjectTaskTypeRepository } from '@orm/project-task-type';
+import { ProjectTaskType, ProjectTaskTypeRepository } from '@orm/project-task-type';
 import { DeepPartial, DeleteResult } from 'typeorm';
 
-import { TaskType } from '../../@orm/task-type/task-type.entity';
 import { TaskTypeRepository } from '../../@orm/task-type/task-type.repository';
-
 
 @Injectable()
 export class ProjectTaskTypeService {
@@ -15,9 +13,8 @@ export class ProjectTaskTypeService {
     @InjectRepository(ProjectTaskTypeRepository) private readonly projectTaskTypeRepo: ProjectTaskTypeRepository
   ) {}
 
-  public async all(project: DeepPartial<Project>): Promise<TaskType[]> {
-    const projectTaskTypes = await this.projectTaskTypeRepo.findAllByProject(project);
-    return projectTaskTypes.map(ptt => ptt.taskType);
+  public async all(project: DeepPartial<Project>): Promise<ProjectTaskType[]> {
+    return await this.projectTaskTypeRepo.findAllByProject(project);
   }
 
   public async addTaskType(project: DeepPartial<Project>, taskTypeId: number): Promise<any> {

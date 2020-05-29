@@ -1,17 +1,16 @@
+import { PaginationDto } from '@common/dto';
 import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Project } from '@orm/project';
+import { User } from '@orm/user';
+import { ACCESS_LEVEL } from '@orm/user-project';
 import { ValidationError } from 'class-validator';
 import * as moment from 'moment';
 import { DeleteResult, EntityManager, IsNull } from 'typeorm';
 
-import { Project } from '@orm/project';
-import { User } from '@orm/user';
-import { ACCESS_LEVEL } from '@orm/user-project';
-
-import { PaginationDto } from '@common/dto';
-
 import { ValidationException } from '../@common/exceptions/validation.exception';
 import { Task, TASK_SIMPLE_STATUS } from '../@orm/task';
+import { TaskType } from '../@orm/task-type/task-type.entity';
 import { UserTask } from '../@orm/user-task';
 import { UserWork, UserWorkRepository } from '../@orm/user-work';
 import { ProjectMemberService } from '../project/member/project.member.service';
@@ -386,10 +385,12 @@ export class UserWorkService {
         );
       }
     } else {
+      const taskType = await curManager.findOne(TaskType, { name: 'feature' });
       const taskData = {
         description: userWorkData.description || '',
         performerId: userWorkData.performerId || user.id,
         status: TASK_SIMPLE_STATUS.IN_PROGRESS,
+        typeId: taskType ? taskType.id : undefined,
         title: userWorkData.title,
       };
       startedTask = await this.taskService.createByProject(taskData, project, user, curManager);

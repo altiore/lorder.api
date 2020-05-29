@@ -13,7 +13,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { TaskType } from '../../@orm/task-type/task-type.entity';
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { ProjectPart } from '../project-part/project-part.entity';
 import { ProjectPub } from '../project-pub/project-pub.entity';
@@ -106,16 +105,6 @@ export class Project {
 
   @OneToOne(() => ProjectPub, m => m.project)
   pub: ProjectPub;
-
-  @ApiPropertyOptional({ type: TaskType, isArray: true })
-  get taskTypes() {
-    return this.projectTaskTypes &&
-      this.projectTaskTypes.length &&
-      this.projectTaskTypes[0] &&
-      this.projectTaskTypes[0].taskType
-      ? this.projectTaskTypes.map(ptt => ptt.taskType)
-      : [];
-  }
 
   @ApiPropertyOptional({ type: UserProject, isArray: true })
   @OneToMany(() => UserProject, m => m.project)

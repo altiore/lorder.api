@@ -156,7 +156,7 @@ describe(`POST ${h.url}`, () => {
         source: null,
         status: Task.statuses.IN_PROGRESS,
         title: 'Задача Altiore',
-        typeId: null,
+        typeId: expect.any(Number),
         updatedAt: expect.any(moment),
         value: null,
       })
@@ -202,7 +202,7 @@ describe(`POST ${h.url}`, () => {
         source: null,
         status: Task.statuses.IN_PROGRESS,
         title: 'Задача Altiore',
-        typeId: null,
+        typeId: expect.any(Number),
         updatedAt: expect.any(moment),
         value: null,
       })

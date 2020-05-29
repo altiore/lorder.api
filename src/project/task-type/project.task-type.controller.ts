@@ -10,7 +10,6 @@ import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 
 import { Roles, UserJWT } from '../../@common/decorators';
 import { RolesGuard } from '../../@common/guards';
-import { TaskType } from '../../@orm/task-type/task-type.entity';
 import { AccessLevel, ProjectParam } from '../@common/decorators';
 import { AccessLevelGuard } from '../@common/guards';
 
@@ -37,7 +36,7 @@ export class ProjectTaskTypeController {
     @UserJWT() user: User,
     @Param('projectId', ParseIntPipe) projectId: number,
     @ProjectParam() project: DeepPartial<Project>
-  ): Promise<TaskType[]> {
+  ): Promise<ProjectTaskType[]> {
     return this.projectTaskTypeService.all(project);
   }
 
@@ -54,7 +53,7 @@ export class ProjectTaskTypeController {
     @UserJWT() user: User,
     @Param('projectId', ParseIntPipe) projectId: number,
     @ProjectParam() project: DeepPartial<Project>
-  ): Promise<any> {
+  ): Promise<ProjectTaskType> {
     return this.projectTaskTypeService.addTaskType(project, dto.taskTypeId);
   }
 
@@ -88,7 +87,7 @@ export class ProjectTaskTypeController {
     @UserJWT() user: User,
     @Param('projectId', ParseIntPipe) projectId: number,
     @ProjectParam() project: DeepPartial<Project>
-  ): Promise<any> {
+  ): Promise<ProjectTaskType> {
     return this.projectTaskTypeService.update(project, dto.taskTypes);
   }
 
