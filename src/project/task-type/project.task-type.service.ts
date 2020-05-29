@@ -7,7 +7,6 @@ import { DeepPartial, DeleteResult } from 'typeorm';
 import { TaskType } from '../../@orm/task-type/task-type.entity';
 import { TaskTypeRepository } from '../../@orm/task-type/task-type.repository';
 
-import { CreateTaskTypeDto } from './dto';
 
 @Injectable()
 export class ProjectTaskTypeService {
@@ -51,16 +50,16 @@ export class ProjectTaskTypeService {
     }
   }
 
-  public async createTaskType(project: DeepPartial<Project>, taskInfo: CreateTaskTypeDto): Promise<TaskType> {
-    let taskType = await this.taskTypeRepo.findOne({
-      where: {
-        name: taskInfo.name,
-      },
-    });
-    if (!taskType) {
-      taskType = await this.taskTypeRepo.createOne(taskInfo);
-    }
-    await this.addTaskType(project, taskType.id);
-    return taskType;
-  }
+  // public async createTaskType(project: DeepPartial<Project>, taskInfo: CreateTaskTypeDto): Promise<TaskType> {
+  //   let taskType = await this.taskTypeRepo.findOne({
+  //     where: {
+  //       name: taskInfo.name,
+  //     },
+  //   });
+  //   if (!taskType) {
+  //     taskType = await this.taskTypeRepo.createOne(taskInfo);
+  //   }
+  //   await this.addTaskType(project, taskType.id);
+  //   return taskType;
+  // }
 }
