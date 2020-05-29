@@ -96,7 +96,7 @@ export class Task {
   typeId: number;
 
   @ApiPropertyOptional()
-  @ManyToOne(() => TaskType, { nullable: true, onDelete: 'SET NULL', onUpdate: 'CASCADE' })
+  @ManyToOne(() => TaskType, { nullable: false, onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
   type: TaskType;
 
   @Column('boolean', { default: false })

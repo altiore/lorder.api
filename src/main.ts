@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
 import * as cors from 'cors';
+import { get } from 'lodash';
 
 import { AppModule } from './app.module';
 import { corsOptions } from './~options/corsOptions';
@@ -15,11 +16,19 @@ const HOST = process.env.HOST || process.env.HOSTNAME || 'localhost';
 const IS_PROD = process.env.NODE_ENV === 'production';
 const SCHEMA = IS_PROD ? 'https' : 'http';
 
+const whitelist = process.env.SERVER_ORIGIN_WHITELIST
+  ? JSON.parse(process.env.SERVER_ORIGIN_WHITELIST)
+  : process.env.SERVER_ORIGIN
+    ? [process.env.SERVER_ORIGIN]
+    : [];
+
 function except(currentHost, paths, fn) {
   return function(req, res, next) {
     const referer = req.get('referer') || '';
+    const refererHost = get(referer.match(/^(http[s]?):\/\/[\w-\.:]*/), 0);
     // Не проверять CORS заголовки для запросов, посланных с того же домена и содержащих пути из списка paths
-    if (referer.match(currentHost) || (paths.includes(req.path) && req.method === 'POST')) {
+
+    if (refererHost === currentHost || (paths.includes(req.path) && req.method === 'POST')) {
       return next();
     }
 
@@ -32,14 +41,14 @@ async function bootstrap() {
   app.setGlobalPrefix('v1');
 
   const currentHost = `${SCHEMA}://${HOST}`;
-  const currentHostWithPort = currentHost + ([80, 433, '80', '433'].indexOf(PORT) === -1 ? ':' + PORT : '');
+  const currentHostWithPort = currentHost + ([80, 443, '80', '443'].indexOf(PORT) === -1 ? ':' + PORT : '');
 
   if (process.env.SERVER_ORIGIN !== 'https://altiore.org') {
     const document = SwaggerModule.createDocument(app, swaggerOptions);
     SwaggerModule.setup('api', app, document, swaggerCustomOptions);
   }
 
-  app.use(except(currentHost, ['/v1/webhooks'], cors(corsOptions(IS_PROD))));
+  app.use(except(currentHost, ['/v1/webhooks'], cors(corsOptions(IS_PROD, whitelist))));
 
   await app.listen(
     PORT, // '0.0.0.0',

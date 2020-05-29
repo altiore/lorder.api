@@ -142,9 +142,18 @@ export class ProjectTaskService {
         if (!projectTaskType) {
           throw new ValidationException(undefined, 'Тип задачи не был найдет в текущем проекте');
         }
-        preparedData.type = { id: projectTaskType.taskType.id } as TaskType;
       }
       preparedData.typeId = taskDto.typeId;
+    } else {
+      const taskType = await curManager.findOne(TaskType, {
+        where: {
+          name: 'feature',
+        },
+      });
+      if (!taskType) {
+        throw new ValidationException(undefined, 'Тип задачи "feature" не был найдет в системе');
+      }
+      preparedData.typeId = taskType.id;
     }
     if (taskDto.performerId !== undefined) {
       if (!taskDto.performerId) {

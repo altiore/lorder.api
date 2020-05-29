@@ -1,12 +1,6 @@
 import { CorsOptions, CustomOrigin } from '@nestjs/common/interfaces/external/cors-options.interface';
 
-const whitelist = process.env.SERVER_ORIGIN_WHITELIST
-  ? JSON.parse(process.env.SERVER_ORIGIN_WHITELIST)
-  : process.env.SERVER_ORIGIN
-    ? [process.env.SERVER_ORIGIN]
-    : [];
-
-export const corsOptions = (isProd: boolean) =>
+export const corsOptions = (isProd: boolean, whitelist: string[] = []) =>
   ({
     /**
      * Заголовки, которые приходят в ответе на preflight request и которые могут быть использованы в
@@ -33,5 +27,5 @@ export const corsOptions = (isProd: boolean) =>
             callback(new Error('Not allowed by CORS'));
           }
         } as CustomOrigin)
-      : false,
+      : true,
   } as CorsOptions);
