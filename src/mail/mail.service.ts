@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ClientResponse } from '@sendgrid/client/src/response';
+import { MailData } from '@sendgrid/helpers/classes/mail';
 import * as sgMail from '@sendgrid/mail';
 import { readFileSync } from 'fs';
 import * as Mustache from 'mustache';
 import { resolve } from 'path';
 
-import { MailAcceptedDto, MessageDto } from './dto';
+import { MailAcceptedDto } from './dto';
 
 /**
  * каждое письмо соответсвует одноименному файлу в папке mjml
@@ -15,7 +16,10 @@ export type IMailTemplate = 'invite' | 'magic';
 
 @Injectable()
 export class MailService {
-  public static readonly ADMIN_EMAIL = 'razzwan@altiore.org';
+  public static readonly ADMIN_EMAIL = {
+    email: 'noreplay@lorder.org',
+    name: 'Lorder.org',
+  };
 
   private static readonly INVITE_TEMPLATE = 'invite';
   private static readonly MAGIC_LINK = 'magic';
@@ -79,7 +83,7 @@ export class MailService {
   /**
    * Отправка почты. Можно поменять способ отправки здесь, чтоб почта отправлялась любым другим способом.
    */
-  private send(msg: MessageDto): Promise<MailAcceptedDto> {
+  private send(msg: MailData): Promise<MailAcceptedDto> {
     return this.sendWithSendGrid(msg);
   }
 
@@ -92,7 +96,7 @@ export class MailService {
    * Full documentation here:
    * @see https://sendgrid.com/docs/API_Reference/Web_API_v3/index.html
    */
-  private async sendWithSendGrid(msg: MessageDto): Promise<MailAcceptedDto> {
+  private async sendWithSendGrid(msg: MailData): Promise<MailAcceptedDto> {
     const [res] = (await sgMail.send(msg)) as [ClientResponse, {}];
     return {
       statusCode: res.statusCode,
