@@ -100,7 +100,7 @@ export class AuthService {
     const exception = this.findException(user, data);
 
     if (exception) {
-      if (user && !user.password) {
+      if (user && (!user.password || !this.userRepo.isPasswordValid(user, data.password))) {
         const link = await this.createMagicLink(
           {
             email: data.email,
