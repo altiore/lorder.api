@@ -43,7 +43,7 @@ async function bootstrap() {
   const currentHost = `${SCHEMA}://${HOST}`;
   const currentHostWithPort = currentHost + ([80, 443, '80', '443'].indexOf(PORT) === -1 ? ':' + PORT : '');
 
-  if (process.env.SERVER_ORIGIN !== 'https://altiore.org') {
+  if (process.env.SERVER_ORIGIN !== 'https://lorder.org') {
     const document = SwaggerModule.createDocument(app, swaggerOptions);
     SwaggerModule.setup('api', app, document, swaggerCustomOptions);
   }

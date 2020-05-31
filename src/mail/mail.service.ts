@@ -51,7 +51,7 @@ export class MailService {
     return this.send({
       from: MailService.ADMIN_EMAIL,
       html: output,
-      subject: `Приглашение в проект ${project} (Altiore)`,
+      subject: `Приглашение в проект ${project} (Lorder)`,
       to: email,
     });
   }
@@ -66,7 +66,7 @@ export class MailService {
     return this.send({
       from: MailService.ADMIN_EMAIL,
       html: output,
-      subject: 'Магическая ссылка Altiore',
+      subject: 'Магическая ссылка Lorder',
       to: email,
     });
   }

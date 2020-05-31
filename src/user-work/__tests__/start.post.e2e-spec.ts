@@ -132,7 +132,7 @@ describe(`POST ${h.url}`, () => {
       .send({
         description: 'Описание новой задачи',
         projectId,
-        title: 'Задача Altiore',
+        title: 'Задача Lorder',
       })
       .expect(201);
     expect(body).toEqual({
@@ -155,7 +155,7 @@ describe(`POST ${h.url}`, () => {
         sequenceNumber: expect.any(Number),
         source: null,
         status: Task.statuses.IN_PROGRESS,
-        title: 'Задача Altiore',
+        title: 'Задача Lorder',
         typeId: expect.any(Number),
         updatedAt: expect.any(moment),
         value: null,
@@ -172,7 +172,7 @@ describe(`POST ${h.url}`, () => {
       .send({
         description: 'Описание новой задачи',
         projectId,
-        title: 'Задача Altiore',
+        title: 'Задача Lorder',
       })
       .expect(201);
     expect(body).toEqual({
@@ -201,7 +201,7 @@ describe(`POST ${h.url}`, () => {
         sequenceNumber: expect.any(Number),
         source: null,
         status: Task.statuses.IN_PROGRESS,
-        title: 'Задача Altiore',
+        title: 'Задача Lorder',
         typeId: expect.any(Number),
         updatedAt: expect.any(moment),
         value: null,
@@ -220,7 +220,7 @@ describe(`POST ${h.url}`, () => {
       .send({
         description: 'Описание новой задачи',
         projectId,
-        title: 'Задача Altiore',
+        title: 'Задача Lorder',
         taskId: taskInTesting.id,
       })
       .expect(201);
