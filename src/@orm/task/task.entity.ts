@@ -139,7 +139,10 @@ export class Task {
   @OneToMany(type => TaskComment, m => m.task)
   comments: TaskComment[];
 
-  @ManyToMany(t => ProjectPart, p => p.tasks)
+  @ManyToMany(t => ProjectPart, p => p.tasks, {
+    onDelete: 'RESTRICT',
+    onUpdate: 'CASCADE',
+  })
   @JoinTable()
   projectParts: ProjectPart[];
 }

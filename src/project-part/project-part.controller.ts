@@ -3,6 +3,8 @@ import { Controller, Param, ParseIntPipe } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Crud, CrudController, CrudRequest, Override, ParsedBody, ParsedRequest } from '@nestjsx/crud';
 
+import { get } from 'lodash';
+
 import { Project } from '@orm/project';
 import { ProjectPart } from '@orm/project-part/project-part.entity';
 import { ROLES } from '@orm/role';
@@ -27,15 +29,18 @@ import { ProjectPartService } from './project-part.service';
     getManyBase: {
       decorators: [Auth(res(ProjectPart).getMany, ROLES.USER, ACCESS_LEVEL.RED)],
     },
-    deleteOneBase: {
-      decorators: [Auth(res(ProjectPart).deleteOne, ROLES.USER, ACCESS_LEVEL.VIOLET)],
-    },
     updateOneBase: {
       decorators: [Auth(res(ProjectPart).updateOne, ROLES.USER, ACCESS_LEVEL.VIOLET)],
     },
   },
   query: {
     alwaysPaginate: true,
+    join: {
+      tasks: {
+        allow: ['id'],
+        eager: true,
+      },
+    },
   },
 })
 @Controller('projects/:projectId/parts')
@@ -55,5 +60,13 @@ export class ProjectPartController implements CrudController<ProjectPart> {
     @Param('projectId', ParseIntPipe) projectId: number
   ) {
     return this.base.createOneBase(req, { ...dto, project: { id: projectId } as Project });
+  }
+
+  @Auth(res(ProjectPart).createOne, ROLES.USER, ACCESS_LEVEL.VIOLET)
+  @Override()
+  async deleteOne(@ParsedRequest() req: CrudRequest) {
+    const curId = get(req, ['parsed', 'paramsFilter', 0, 'value']);
+    await this.service.checkCanRemove(curId);
+    return this.base.deleteOneBase(req);
   }
 }
