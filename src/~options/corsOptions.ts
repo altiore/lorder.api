@@ -18,7 +18,7 @@ export const corsOptions = (isProd: boolean, whitelist: string[] = []) =>
      * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers
      */
     exposedHeaders: 'Authorization',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     origin: isProd
       ? (function(origin, callback) {
           if (whitelist.indexOf(origin) !== -1) {
