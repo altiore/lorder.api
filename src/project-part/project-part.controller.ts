@@ -19,7 +19,8 @@ import { ProjectPartService } from './project-part.service';
   },
   params: {
     projectId: {
-      disabled: true,
+      field: '"ProjectPart"."projectId"',
+      disabled: false,
       primary: false,
       type: 'number',
     },
