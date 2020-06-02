@@ -13,6 +13,7 @@ import { RolesGuard } from '../../@common/guards';
 import { AccessLevel, ProjectParam } from '../@common/decorators';
 import { AccessLevelGuard } from '../@common/guards';
 
+import { RequestMembership } from './dto/request.membership';
 import { UserProjectUpdateDto } from './dto/user-project.update.dto';
 import { ProjectMemberService } from './project.member.service';
 
@@ -94,5 +95,16 @@ export class ProjectMemberController {
     @Param('memberId', ParseIntPipe) memberId: number
   ) {
     return this.projectMemberService.updateMember(memberId, project, data);
+  }
+
+  @ApiResponse({ status: 200, type: Boolean })
+  @Post('request')
+  @Roles('user')
+  public async requestMembership(
+    @Body() data: RequestMembership,
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @UserJWT() user: User
+  ): Promise<UserProject> {
+    return this.projectMemberService.requestMembership(user, projectId, data);
   }
 }

@@ -4,13 +4,16 @@ import { Project } from '@orm/project';
 import { EmailDto, User, UserRepository } from '@orm/user';
 import { UserProject, UserProjectRepository } from '@orm/user-project';
 import { AuthService } from 'auth/auth.service';
+import { ValidationError } from 'class-validator';
 import * as moment from 'moment';
 import { DeepPartial, EntityManager } from 'typeorm';
 
 import { IdDto } from '../../@common/dto';
+import { ValidationException } from '../../@common/exceptions/validation.exception';
 import { UserWork } from '../../@orm/user-work';
 import { ProjectRoleService } from '../role/project-role.service';
 
+import { RequestMembership } from './dto/request.membership';
 import { UserProjectUpdateDto } from './dto/user-project.update.dto';
 
 @Injectable()
@@ -112,5 +115,35 @@ export class ProjectMemberService {
       await manager.save(curUserTask);
     }
     return await manager.save(userProject);
+  }
+
+  public async requestMembership(user: User, projectId: number, data: RequestMembership): Promise<UserProject> {
+    const member = await this.findMember(user.id, { id: projectId } as Project);
+    if (!member) {
+      const roles = await this.projectRoleService.findByRoles([data.role], { id: projectId } as Project);
+      if (roles && roles.length) {
+        const newMember = this.userProjectRepo.create({
+          accessLevel: -1,
+          member: user,
+          projectId,
+        });
+        return await this.userProjectRepo.save(newMember);
+      }
+
+      // TODO: по-умолчанию, предлагать роль, указанную в проекте, как роль для старта по-умолчанию
+      throw new ValidationException([
+        Object.assign(new ValidationError(), {
+          constraints: {
+            isNotExists: 'Запрошеная роль в проекте не существует',
+          },
+          property: 'role',
+          value: data.role,
+        }),
+      ]);
+    }
+
+    throw new NotAcceptableException(
+      'Вы уже являетесь участником проекта или уже отсылали запрос и он все еще на рассмотрении'
+    );
   }
 }

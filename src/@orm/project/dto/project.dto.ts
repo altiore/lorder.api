@@ -20,4 +20,18 @@ export class ProjectDto {
   @IsIn(Object.values(PROJECT_TYPE))
   @IsOptional()
   type?: PROJECT_TYPE;
+
+  @ApiPropertyOptional()
+  @MaxLength(253)
+  @MinLength(20)
+  @IsString()
+  @IsOptional()
+  desc?: string;
+
+  @ApiPropertyOptional()
+  @MaxLength(140)
+  @MinLength(20)
+  @IsString()
+  @IsOptional()
+  slogan?: string;
 }

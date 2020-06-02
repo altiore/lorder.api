@@ -39,8 +39,8 @@ export class UserProject {
   valueSum: number;
 
   @ApiProperty({ type: () => User })
-  @ManyToOne(t => User, m => m.invitedMembers, { nullable: false })
-  inviter: User;
+  @ManyToOne(t => User, m => m.invitedMembers, { nullable: true })
+  inviter?: User;
 
   @ManyToMany(t => ProjectRole)
   @JoinTable()

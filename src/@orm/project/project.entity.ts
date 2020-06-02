@@ -43,13 +43,13 @@ export class Project {
   @Column()
   title: string;
 
-  // @ApiProperty()
-  // @Column()
-  // desc: string;
-  //
-  // @ApiProperty()
-  // @Column()
-  // slogan: string;
+  @ApiPropertyOptional()
+  @Column({ nullable: true })
+  desc?: string;
+
+  @ApiPropertyOptional()
+  @Column({ nullable: true })
+  slogan?: string;
 
   @ApiProperty()
   @Column('int', { nullable: true })
