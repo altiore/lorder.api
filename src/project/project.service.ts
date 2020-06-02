@@ -276,7 +276,7 @@ export class ProjectService {
         'projectTaskTypes',
         'pub',
         'roles',
-        'parts',
+        // 'parts',
       ],
       where: { id: project.id },
     });
