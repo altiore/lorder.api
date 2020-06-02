@@ -66,19 +66,7 @@ export class ProjectService {
   }
 
   public async update(project: Project, data: ProjectDto, user: User): Promise<Project> {
-    if (data.title) {
-      project.title = data.title;
-    }
-    if (typeof data.monthlyBudget === 'number') {
-      project.monthlyBudget = data.monthlyBudget;
-    }
-    await this.projectRepo.update(
-      { id: project.id },
-      {
-        title: project.title,
-        monthlyBudget: project.monthlyBudget,
-      }
-    );
+    await this.projectRepo.update({ id: project.id }, data);
     // TODO: разобраться, нужны ли разные названия для публичного и не публичного проектов?
     if (project.pub) {
       await this.projectPubRepo.update(
