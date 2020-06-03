@@ -1,4 +1,4 @@
-import { forwardRef, Global, Module } from '@nestjs/common';
+import { forwardRef, Global, HttpModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UserRepository } from '@orm/user';
@@ -18,6 +18,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
   controllers: [AuthController],
   exports: [AuthService, JwtAuthGuard],
   imports: [
+    HttpModule,
     MailModule,
     RedisModule,
     SessionsModule,

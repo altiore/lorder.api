@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
 import * as cors from 'cors';
-import { get } from 'lodash';
 
+import getReferer from './@common/helpers/getReferer';
 import { AppModule } from './app.module';
 import { corsOptions } from './~options/corsOptions';
 import { swaggerCustomOptions, swaggerOptions } from './~options/swaggerOptions';
@@ -24,8 +24,7 @@ const whitelist = process.env.SERVER_ORIGIN_WHITELIST
 
 function except(currentHost, paths, fn) {
   return function(req, res, next) {
-    const referer = req.get('referer') || '';
-    const refererHost = get(referer.match(/^(http[s]?):\/\/[\w-\.:]*/), 0);
+    const refererHost = getReferer(req.get('referer'));
     // Не проверять CORS заголовки для запросов, посланных с того же домена и содержащих пути из списка paths
 
     if (refererHost === currentHost || (paths.includes(req.path) && req.method === 'POST')) {

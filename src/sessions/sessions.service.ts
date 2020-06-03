@@ -1,11 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotAcceptableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
-import { get } from 'lodash';
+import { isEqual, pick } from 'lodash';
 import { Repository } from 'typeorm';
 
+import getReferer from '../@common/helpers/getReferer';
 import { Session } from '../@orm/session/session.entity';
 import { RefreshUserDto, User } from '../@orm/user';
 import { requiredUserRelations } from '../@orm/user/dto/required.relations';
@@ -19,20 +20,19 @@ export class SessionsService extends TypeOrmCrudService<Session> {
 
   public async startSession(user: User, device: string, req: Request): Promise<Session> {
     const session = await this.findByDevice(user.id, device);
+    const refreshToken = this.createRefreshToken({ uid: user.id });
+
     if (session) {
-      await this.repo.update({ id: session.id }, { headers: req.headers });
-      return session;
+      const updated = {
+        ...this.getSession(device, req),
+        refreshToken,
+      };
+      await this.repo.update({ id: session.id }, updated);
+      return this.repo.merge(session, updated);
     }
 
-    const maxRes = await this.repo.query(
-      `SELECT MAX("deviceNumber") + 1 as "deviceNumber" FROM "session" WHERE "userId"=${user.id}`
-    );
-    const deviceNumber = get(maxRes, [0, 'deviceNumber'], 1) || 1;
-    const refreshToken = this.createRefreshToken({ uid: user.id });
     const model = this.repo.create({
       ...this.getSession(device, req),
-      device,
-      deviceNumber,
       refreshToken,
       userId: user.id,
     });
@@ -44,33 +44,45 @@ export class SessionsService extends TypeOrmCrudService<Session> {
       relations: this.relations,
       where: {
         refreshToken: data.refreshToken,
-        ...this.getFindOptions(req),
       },
     });
+    if (!session) {
+      throw new NotAcceptableException('Session was not found');
+    }
     try {
-      this.validateToken(session.refreshToken, user);
+      if (this.validateSession(session, user, req)) {
+        await this.repo.update(
+          { id: session.id },
+          {
+            headers: req.headers,
+          }
+        );
+        return session;
+      }
     } catch (e) {
       Logger.log(e);
+      throw e;
     }
-    await this.repo.update(
-      { id: session.id },
-      {
-        headers: req.headers,
-      }
-    );
-    return session;
   }
 
   public createRefreshToken(userInfo: JwtPayload): string {
-    return jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: '7 days' });
+    return jwt.sign(userInfo, process.env.REFRESH_SECRET, { expiresIn: process.env.REFRESH_EXPIRES_IN });
   }
 
-  public validateToken(token: string, user: User): void {
-    jwt.verify(token, process.env.JWT_SECRET);
+  public validateToken(token: string, user: User): boolean {
+    jwt.verify(token, process.env.REFRESH_SECRET);
     const userData = jwt.decode(token) as JwtPayload;
     if (userData.uid !== user.id) {
       throw new Error('Invalid token owner');
     }
+
+    return true;
+  }
+
+  public validateSession(session: Session, user: User, req): boolean {
+    const sessionInfoFromReq = this.getFindOptions(req);
+    const sessionInfo = pick(session, Object.keys(sessionInfoFromReq));
+    return isEqual(sessionInfoFromReq, sessionInfo) && this.validateToken(session.refreshToken, user);
   }
 
   private findByDevice(userId: number, device: string) {
@@ -86,7 +98,7 @@ export class SessionsService extends TypeOrmCrudService<Session> {
   private getFindOptions(req: Request): Partial<Session> {
     return {
       acceptLanguage: req.header('accept-language') || 'en',
-      referer: req.header('referer') || 'no referer',
+      referer: getReferer(req.header('referer')) || 'no referer',
       userAgent: req.header('user-agent') || 'no user-agent',
     };
   }
@@ -96,7 +108,7 @@ export class SessionsService extends TypeOrmCrudService<Session> {
       acceptLanguage: req.header('accept-language') || 'en',
       device,
       headers: req.headers,
-      referer: req.header('referer') || 'no referer',
+      referer: getReferer(req.header('referer')) || 'no referer',
       userAgent: req.header('user-agent') || 'no user-agent',
     };
   }

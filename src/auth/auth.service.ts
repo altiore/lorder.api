@@ -1,5 +1,6 @@
 import {
   HttpException,
+  HttpService,
   Injectable,
   NotAcceptableException,
   NotFoundException,
@@ -27,6 +28,13 @@ import { UserService } from '../user/user.service';
 import { ActivateDto, IdentityDto } from './dto';
 import { JwtPayload } from './interfaces';
 
+interface GoogleReCaptchaResponse {
+  success: boolean;
+  challenge_ts: number; // timestamp of the challenge load (ISO format yyyy-MM-dd'T'HH:mm:ssZZ)
+  hostname: string; // the hostname of the site where the reCAPTCHA was solved
+  'error-codes': any; // optional
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -35,7 +43,8 @@ export class AuthService {
     private readonly mailService: MailService,
     private readonly redisService: RedisService,
     private readonly userService: UserService,
-    private readonly sessionService: SessionsService
+    private readonly sessionService: SessionsService,
+    private httpService: HttpService
   ) {}
 
   public async sendMagicLink(
@@ -188,7 +197,32 @@ export class AuthService {
     };
   }
 
-  private async createMagicLink(userData: LoginUserDto | EmailDto, host: string, query: string = ''): Promise<string> {
+  public async checkGoogleReCaptcha(response: string): Promise<void> {
+    if (!process.env.GOOGLE_RECAPTCHA_TOKEN) {
+      return;
+    }
+
+    const postParams = {
+      secret: process.env.GOOGLE_RECAPTCHA_TOKEN,
+      response,
+    };
+
+    const googleRes = await this.httpService
+      .post<GoogleReCaptchaResponse>('https://www.google.com/recaptcha/api/siteverify', undefined, {
+        params: postParams,
+      })
+      .toPromise();
+
+    if (!googleRes.data.success) {
+      throw new NotAcceptableException('Ошбика Google reCaptcha');
+    }
+  }
+
+  private async createMagicLink(
+    userData: Omit<LoginUserDto, 'reCaptcha'> | Omit<EmailDto, 'reCaptcha'>,
+    host: string,
+    query: string = ''
+  ): Promise<string> {
     const resetLinkToken = await this.redisService.createOneTimeToken(userData);
     return `${host}/start/${resetLinkToken}${query ? `?${query}` : ''}`;
   }

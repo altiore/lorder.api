@@ -23,13 +23,8 @@ export class AuthController {
   @HttpCode(202)
   @Post('magic')
   public async magic(@Body() data: EmailDto, @Headers('origin') origin: string): Promise<MailAcceptedDto> {
+    await this.authService.checkGoogleReCaptcha(data.reCaptcha);
     return (await this.authService.sendMagicLink(data, origin)) as MailAcceptedDto;
-  }
-
-  @ApiResponse({ status: 200, description: 'Возвращает Bearer ключ', type: IdentityDto })
-  @Get('activate')
-  public activate(@Query() activateDto: ActivateDto, @Request() req: Req): Promise<IdentityDto> {
-    return this.authService.activate(activateDto, req);
   }
 
   @ApiResponse({ status: 200, type: IdentityDto })
@@ -40,6 +35,7 @@ export class AuthController {
     @Headers('origin') origin: string,
     @Request() req: Req
   ): Promise<IdentityDto> {
+    await this.authService.checkGoogleReCaptcha(data.reCaptcha);
     return await this.authService.login(data, origin, req);
   }
 
@@ -52,7 +48,14 @@ export class AuthController {
     @Request() req: Req,
     @Response() response: Res
   ): Promise<MailAcceptedDto> {
+    await this.authService.checkGoogleReCaptcha(data.reCaptcha);
     return response.status(202).send(await this.authService.registration(data, origin));
+  }
+
+  @ApiResponse({ status: 200, description: 'Возвращает Bearer ключ', type: IdentityDto })
+  @Get('activate')
+  public activate(@Query() activateDto: ActivateDto, @Request() req: Req): Promise<IdentityDto> {
+    return this.authService.activate(activateDto, req);
   }
 
   @ApiResponse({ status: 200, type: IdentityDto })

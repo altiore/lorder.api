@@ -1,7 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class EmailDto {
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  public readonly reCaptcha?: string;
+
   @ApiProperty()
   @IsEmail()
   @IsString()

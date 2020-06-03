@@ -54,7 +54,7 @@ describe(`PATCH refresh ${h.url}`, () => {
 
   it('by super-admin+password@mail.com - correct token, but incorrect headers', async () => {
     const userId = await h.getUser('super-admin+password@mail.com');
-    const correctRefreshToken = jwt.sign({ uid: userId }, process.env.JWT_SECRET);
+    const correctRefreshToken = jwt.sign({ uid: userId }, process.env.REFRESH_SECRET);
     await h.manager.query(`UPDATE "session" SET "refreshToken"='${correctRefreshToken}' WHERE "userId"=${userId}`);
     await h
       .requestBy(userId)
