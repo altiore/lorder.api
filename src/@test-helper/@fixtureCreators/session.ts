@@ -10,7 +10,6 @@ export const createSessionFixture = fixtureCreator<Session>(Session, function(en
     referer: 'no referer',
     acceptLanguage: 'en',
     device: 'common',
-    deviceNumber: index + 1,
     refreshToken: random.words(1),
     headers: { test: 'Test' },
     ...entity,

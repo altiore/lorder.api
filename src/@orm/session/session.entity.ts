@@ -6,8 +6,8 @@ import { momentDateTransformer } from '../@columns/moment.date.transformer';
 
 import { User } from '../user/user.entity';
 
-@Index(['userId', 'deviceNumber'])
-@Unique(['userId', 'deviceNumber'])
+@Index(['userId', 'device'])
+@Unique(['userId', 'device'])
 @Unique(['refreshToken'])
 @Entity()
 export class Session {
@@ -38,10 +38,6 @@ export class Session {
   @Index()
   @Column()
   device: string;
-
-  @Index()
-  @Column('int', { nullable: false, default: 1 })
-  deviceNumber: number;
 
   @Index()
   @Column()
