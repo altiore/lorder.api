@@ -39,7 +39,7 @@ export class SessionsService extends TypeOrmCrudService<Session> {
     return this.repo.save(model);
   }
 
-  public async findUserByRefresh(data: RefreshUserDto, user, req: Request): Promise<Session> {
+  public async findUserByRefresh(data: RefreshUserDto, req: Request): Promise<Session> {
     const session = await this.repo.findOne({
       relations: this.relations,
       where: {
@@ -50,7 +50,7 @@ export class SessionsService extends TypeOrmCrudService<Session> {
       throw new NotAcceptableException('Session was not found');
     }
     try {
-      if (this.validateSession(session, user, req)) {
+      if (this.validateSession(session, req)) {
         await this.repo.update(
           { id: session.id },
           {
@@ -69,20 +69,14 @@ export class SessionsService extends TypeOrmCrudService<Session> {
     return jwt.sign(userInfo, process.env.REFRESH_SECRET, { expiresIn: process.env.REFRESH_EXPIRES_IN });
   }
 
-  public validateToken(token: string, user: User): boolean {
-    jwt.verify(token, process.env.REFRESH_SECRET);
-    const userData = jwt.decode(token) as JwtPayload;
-    if (userData.uid !== user.id) {
-      throw new Error('Invalid token owner');
-    }
-
-    return true;
+  public validateToken(token: string): boolean {
+    return Boolean(jwt.verify(token, process.env.REFRESH_SECRET));
   }
 
-  public validateSession(session: Session, user: User, req): boolean {
+  public validateSession(session: Session, req): boolean {
     const sessionInfoFromReq = this.getFindOptions(req);
     const sessionInfo = pick(session, Object.keys(sessionInfoFromReq));
-    return isEqual(sessionInfoFromReq, sessionInfo) && this.validateToken(session.refreshToken, user);
+    return isEqual(sessionInfoFromReq, sessionInfo) && this.validateToken(session.refreshToken);
   }
 
   private findByDevice(userId: number, device: string) {

@@ -131,15 +131,15 @@ export class AuthService {
     };
   }
 
-  public async refresh(data: RefreshUserDto, req: Request, user: User): Promise<IdentityDto> {
+  public async refresh(data: RefreshUserDto, req: Request): Promise<IdentityDto> {
     let session: Session = null;
     try {
-      session = await this.sessionService.findUserByRefresh(data, user, req);
+      session = await this.sessionService.findUserByRefresh(data, req);
     } catch (e) {
       throw new UnauthorizedException();
     }
 
-    if (!session || !session.user || session.userId !== user.id) {
+    if (!session || !session.user) {
       throw new UnauthorizedException();
     }
 

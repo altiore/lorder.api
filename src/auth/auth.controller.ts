@@ -1,13 +1,11 @@
 import { Body, Controller, Get, Headers, HttpCode, Patch, Post, Query, Request, Response } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { RefreshUserDto, User } from '@orm/user';
+import { RefreshUserDto } from '@orm/user';
 import { EmailDto, LoginUserDto } from '@orm/user/dto';
 import { Request as Req, Response as Res } from 'express';
 
 import { ValidationException } from '@common/exceptions/validation.exception';
 
-import { Auth, res, UserJWT } from '../@common/decorators';
-import { ROLES } from '../@orm/role';
 import { RegisterUserDto } from '../@orm/user/dto/register.user.dto';
 import { MailAcceptedDto } from '../mail/dto';
 
@@ -60,9 +58,8 @@ export class AuthController {
 
   @ApiResponse({ status: 200, type: IdentityDto })
   @ApiResponse({ status: 422, type: ValidationException })
-  @Auth(res(IdentityDto).getOne, ROLES.USER)
   @Patch('refresh')
-  public async refresh(@Body() data: RefreshUserDto, @Request() req: Req, @UserJWT() user: User): Promise<IdentityDto> {
-    return await this.authService.refresh(data, req, user);
+  public async refresh(@Body() data: RefreshUserDto, @Request() req: Req): Promise<IdentityDto> {
+    return await this.authService.refresh(data, req);
   }
 }

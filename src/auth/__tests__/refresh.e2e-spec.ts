@@ -14,7 +14,7 @@ describe(`PATCH refresh ${h.url}`, () => {
     await h
       .requestBy()
       .patch(h.url)
-      .expect(401);
+      .expect(422);
   });
 
   it('empty device', async () => {
