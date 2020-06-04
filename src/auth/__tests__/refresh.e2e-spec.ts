@@ -56,13 +56,21 @@ describe(`PATCH refresh ${h.url}`, () => {
     const userId = await h.getUser('super-admin+password@mail.com');
     const correctRefreshToken = jwt.sign({ uid: userId }, process.env.REFRESH_SECRET);
     await h.manager.query(`UPDATE "session" SET "refreshToken"='${correctRefreshToken}' WHERE "userId"=${userId}`);
-    await h
-      .requestBy(userId)
+    const { body } = await h
+      .requestBy()
       .patch(h.url)
       .send({
         device: 'common',
         refreshToken: correctRefreshToken,
       })
       .expect(200);
+
+    expect(body).toEqual(
+      expect.objectContaining({
+        id: userId,
+      })
+    );
+
+    expect(body.refreshToken).not.toEqual(correctRefreshToken);
   });
 });

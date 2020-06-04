@@ -134,7 +134,7 @@ export class AuthService {
   public async refresh(data: RefreshUserDto, req: Request): Promise<IdentityDto> {
     let session: Session = null;
     try {
-      session = await this.sessionService.findUserByRefresh(data, req);
+      session = await this.sessionService.refreshSession(data, req);
     } catch (e) {
       throw new UnauthorizedException();
     }

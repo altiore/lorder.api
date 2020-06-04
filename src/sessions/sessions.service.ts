@@ -39,7 +39,7 @@ export class SessionsService extends TypeOrmCrudService<Session> {
     return this.repo.save(model);
   }
 
-  public async findUserByRefresh(data: RefreshUserDto, req: Request): Promise<Session> {
+  public async refreshSession(data: RefreshUserDto, req: Request): Promise<Session> {
     const session = await this.repo.findOne({
       relations: this.relations,
       where: {
@@ -51,13 +51,12 @@ export class SessionsService extends TypeOrmCrudService<Session> {
     }
     try {
       if (this.validateSession(session, req)) {
-        await this.repo.update(
-          { id: session.id },
-          {
-            headers: req.headers,
-          }
-        );
-        return session;
+        const updateFields = {
+          ...this.getSession(session.device, req),
+          refreshToken: this.createRefreshToken({ uid: session.userId }),
+        };
+        await this.repo.update({ id: session.id }, updateFields);
+        return this.repo.merge(session, updateFields);
       }
     } catch (e) {
       Logger.log(e);
