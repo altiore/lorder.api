@@ -78,7 +78,7 @@ export class ProjectService {
         }
       );
     }
-    return project;
+    return this.projectRepo.merge(project, data);
   }
 
   public async remove(id: number, force: boolean = false): Promise<number> {
