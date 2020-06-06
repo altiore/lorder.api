@@ -1,4 +1,16 @@
-import { Body, Controller, Get, Headers, HttpCode, Patch, Post, Query, Request, Response } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  HttpCode,
+  NotAcceptableException,
+  Patch,
+  Post,
+  Query,
+  Request,
+  Response,
+} from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RefreshUserDto } from '@orm/user';
 import { EmailDto, LoginUserDto } from '@orm/user/dto';
@@ -26,6 +38,11 @@ export class AuthController {
   }
 
   @ApiResponse({ status: 200, type: IdentityDto })
+  @ApiResponse({
+    status: 406,
+    type: NotAcceptableException,
+    description: 'A link to activate the password has been sent',
+  })
   @ApiResponse({ status: 422, type: ValidationException })
   @Patch('login')
   public async login(
@@ -61,5 +78,16 @@ export class AuthController {
   @Patch('refresh')
   public async refresh(@Body() data: RefreshUserDto, @Request() req: Req): Promise<IdentityDto> {
     return await this.authService.refresh(data, req);
+  }
+
+  @ApiResponse({ status: 200, type: MailAcceptedDto })
+  @Patch('update-password')
+  public async updatePassword(
+    @Body() data: LoginUserDto,
+    @Headers('origin') origin: string,
+    @Request() req: Req
+  ): Promise<MailAcceptedDto> {
+    await this.authService.checkGoogleReCaptcha(data.reCaptcha);
+    return await this.authService.updatePassword(data, origin, req);
   }
 }

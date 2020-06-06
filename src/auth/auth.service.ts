@@ -1,5 +1,4 @@
 import {
-  HttpException,
   HttpService,
   Injectable,
   NotAcceptableException,
@@ -106,22 +105,10 @@ export class AuthService {
 
   public async login(data: LoginUserDto, hostWithProtocol: string, req: Request): Promise<IdentityDto> {
     const user = await this.userService.findUserByEmail(data.email, true);
-    const exception = this.findException(user, data);
 
-    if (exception) {
-      if (user && (!user.password || !this.userRepo.isPasswordValid(user, data.password))) {
-        const link = await this.createMagicLink(
-          {
-            email: data.email,
-            password: this.userRepo.hashPassword(data.password),
-          },
-          hostWithProtocol
-        );
-        await this.mailService.sendMagicLink(data.email, link);
-      }
+    await this.validateExistingUser(user, data, hostWithProtocol);
 
-      throw exception;
-    }
+    await this.validateUserPassword(user, data, hostWithProtocol);
 
     const session = await this.sessionService.startSession(user, data.device, req);
     return {
@@ -166,14 +153,8 @@ export class AuthService {
     }
 
     await this.userService.createUser({ email: data.email });
-    const link = await this.createMagicLink(
-      {
-        email: data.email,
-        password: this.userRepo.hashPassword(data.password),
-      },
-      hostWithProtocol
-    );
-    return await this.mailService.sendMagicLink(data.email, link);
+
+    return await this.createAndSendMagicLink(data, hostWithProtocol);
   }
 
   /**
@@ -197,7 +178,7 @@ export class AuthService {
     };
   }
 
-  public async checkGoogleReCaptcha(response: string): Promise<void> {
+  public async checkGoogleReCaptcha(response: string, field: string = 'reCaptcha'): Promise<void> {
     if (!process.env.GOOGLE_RECAPTCHA_TOKEN) {
       return;
     }
@@ -214,8 +195,30 @@ export class AuthService {
       .toPromise();
 
     if (!googleRes.data.success) {
-      throw new NotAcceptableException('Ошбика Google reCaptcha');
+      throw new ValidationException(
+        [
+          Object.assign(new ValidationError(), {
+            constraints: {
+              isInvalid: 'Google думает, что вы бот, или вы пытаетесь хакнуть сайт',
+            },
+            property: field,
+            value: '[REMOVED BY SECURITY POLICE]',
+          }),
+        ],
+        'Ошбика Google reCAPTCHA'
+      );
     }
+  }
+
+  public async updatePassword(data: LoginUserDto, hostWithProtocol: string, req: Request): Promise<MailAcceptedDto> {
+    const user = await this.userService.findUserByEmail(data.email, true);
+
+    this.validateExistingUser(user, data, hostWithProtocol);
+
+    // TODO: нужно так же проверять сессию и сохранять устройство с которого пользователь обновляет пароль
+    // это должно улучшить безопастность
+
+    return await this.createAndSendMagicLink(data, hostWithProtocol);
   }
 
   private async createMagicLink(
@@ -227,9 +230,9 @@ export class AuthService {
     return `${host}/start/${resetLinkToken}${query ? `?${query}` : ''}`;
   }
 
-  private findException(user: User, data: LoginUserDto): HttpException {
+  private async validateExistingUser(user: User, data: { email: string; password: string }, hostWithProtocol: string) {
     if (!user) {
-      return new ValidationException(
+      throw new ValidationException(
         [
           Object.assign(new ValidationError(), {
             constraints: {
@@ -242,32 +245,49 @@ export class AuthService {
         'Поьзователь не был найден'
       );
     }
-    if (!user.password) {
-      return new NotAcceptableException(
-        'Пароль пользователя никогда ранее не был задан.' +
-          ' Мы отправили ссылку для активации нового пароля. Пожалуйста, проверьте почту'
-      );
-    }
+
     if (!this.userRepo.isStatusActive(user)) {
-      return new NotAcceptableException(
+      await this.createAndSendMagicLink(data, hostWithProtocol);
+      throw new NotAcceptableException(
         'Email пользовтаеля еще не подтвержден.' +
           ' Мы отправили ссылку для активации пользователя. Пожалуйста, проверьте почту'
       );
     }
-    if (!this.userRepo.isPasswordValid(user, data.password)) {
-      return new ValidationException(
-        [
-          Object.assign(new ValidationError(), {
-            constraints: {
-              isNotFound: 'Пароль неверен',
-            },
-            property: 'password',
-            value: data.email,
-          }),
-        ],
-        'Мы выслали вам ссылку для восстановления пароля. Пожалуйста, проверьте почту, чтоб зайти'
+  }
+
+  private async createAndSendMagicLink(
+    data: { email: string; password: string },
+    hostWithProtocol: string
+  ): Promise<MailAcceptedDto> {
+    const link = await this.createMagicLink(
+      {
+        email: data.email,
+        password: this.userRepo.hashPassword(data.password),
+      },
+      hostWithProtocol
+    );
+    return await this.mailService.sendMagicLink(data.email, link);
+  }
+
+  private async validateUserPassword(user: User, data, hostWithProtocol) {
+    if (!user.password) {
+      await this.createAndSendMagicLink(data, hostWithProtocol);
+      throw new NotAcceptableException(
+        'Пароль пользователя никогда ранее не был задан.' +
+          ' Мы отправили ссылку для активации нового пароля. Пожалуйста, проверьте почту'
       );
     }
-    return null;
+
+    if (!this.userRepo.isPasswordValid(user, data.password)) {
+      throw new ValidationException([
+        Object.assign(new ValidationError(), {
+          constraints: {
+            isNotFound: 'Пароль неверен',
+          },
+          property: 'password',
+          value: data.email,
+        }),
+      ]);
+    }
   }
 }
