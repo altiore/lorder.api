@@ -7,7 +7,7 @@ import * as moment from 'moment';
 
 import { Project, ProjectDto, ProjectRepository } from '@orm/project';
 import { ProjectPub, ProjectPubRepository } from '@orm/project-pub';
-import { Task } from '@orm/task';
+import { Task, TASK_SIMPLE_STATUS } from '@orm/task';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL, UserProject, UserProjectRepository } from '@orm/user-project';
 
@@ -147,14 +147,17 @@ export class ProjectService {
     let userTasksPortion;
     const projectTimeSums: { [key: number]: { timeSum: number; valueSum: number } } = {};
 
+    // Удалить статистику для задачи, в которой нет работы
     await manager.query(
       `DELETE FROM "user_tasks"
-             WHERE "user_tasks"."userId"=${user.id}
-              AND (
-                SELECT SUM(EXTRACT('epoch' from "user_work"."finishAt") - EXTRACT('epoch' from "user_work"."startAt"))
+              WHERE
+                "user_tasks"."userId"=${user.id}
+                AND (
+                  SELECT COUNT("id")
                   FROM "user_work"
-                WHERE "userId"="user_tasks"."userId"
-                  AND "taskId"="user_tasks"."taskId") IS NULL`
+                  WHERE
+                    "userId"="user_tasks"."userId"
+                    AND "taskId"="user_tasks"."taskId") = 0`
     );
 
     await manager.query(
@@ -169,11 +172,6 @@ export class ProjectService {
     do {
       // TODO: userProject должен хранить последний зафиксированный элемент,
       //  чтоб можно было пересчитывать только последнюю измененную часть
-      const where: any = { user };
-      if (projectId) {
-        where.task = { projectId };
-      }
-
       userTasksPortion = await manager
         .createQueryBuilder()
         .select('user_tasks.userId')
@@ -239,13 +237,66 @@ export class ProjectService {
         where: { id: project.id },
       });
 
-      const data: { [key: number]: { value: number; time: number } } = {};
       for (const member of projectWithMembers.members) {
-        const stats = await this.calculateUserStatistic(member.member, project.id);
-        data[member.member.id] = {
-          time: get(stats, [project.id, 'timeSum'], 0) || 0,
-          value: get(stats, [project.id, 'valueSum'], 0) || 0,
-        };
+        await this.calculateUserStatistic(member.member, project.id);
+      }
+
+      const manager = this.projectRepo.manager;
+      // 1. Посчитать скорость выполнения проекта в задачах, поинтах, расходуемых часах
+      // TODO: находить динамически статус завершенных задач из стратегии подсчета статистики проекта
+      const finishedStatus = TASK_SIMPLE_STATUS.DONE;
+      const [{ count }] = await manager.query(`
+        SELECT
+          COUNT(*)
+        FROM
+          "task"
+        WHERE
+          "projectId"=${project.id}
+           AND "status"=${finishedStatus}
+           AND "isArchived"=false 
+      `);
+      const [{ developed_seconds, members_count }] = await manager.query(`
+        SELECT
+          EXTRACT('epoch' from NOW() - "project"."createdAt") as developed_seconds,
+          COUNT("user_project"."memberId") as members_count
+        FROM
+          "project"
+        LEFT JOIN "user_project" ON "user_project"."projectId"="project"."id"
+        WHERE
+            "project"."id"=${project.id}
+            AND "user_project"."accessLevel">0
+        GROUP BY "project"."createdAt"
+      `);
+      const [{ timeSum, valueSum }] = await manager.query(`
+        SELECT
+          SUM("user_project"."timeSum") as "timeSum",
+          SUM("user_project"."valueSum") as "valueSum"
+        FROM
+          "user_project"
+        WHERE
+          "user_project"."projectId"=${project.id};
+      `);
+      const developedDays = Math.ceil(developed_seconds / 86400);
+      const developedMonths = Math.ceil(developedDays / 30.4375);
+      const days8hours = Math.round((timeSum * 100) / 20571000) / 100;
+
+      if (projectWithMembers.pub) {
+        await this.projectPubRepo.update(
+          { uuid: projectWithMembers.pub.uuid },
+          {
+            statistic: {
+              metrics: {
+                membersTimeProductivity: Math.floor((days8hours * 10000) / developedDays / members_count) / 10000,
+                developedDays,
+                developedMonths,
+                membersCount: parseInt(members_count, 0),
+                tasksCount: parseInt(count, 0),
+                timeSumIn8hoursDays: days8hours,
+                value: valueSum,
+              },
+            },
+          }
+        );
       }
 
       return await this.userProjectRepo.find({ where: { project } });
@@ -264,7 +315,6 @@ export class ProjectService {
         'projectTaskTypes',
         'pub',
         'roles',
-        // 'parts',
       ],
       where: { id: project.id },
     });
