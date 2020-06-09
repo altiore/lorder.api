@@ -5,6 +5,12 @@ import { EntityManager } from 'typeorm';
 import { get, pick } from 'lodash';
 import * as moment from 'moment';
 
+import {
+  daysToMonths,
+  millisecondsTo8hoursDays,
+  secondsToDays,
+  timeProductivity,
+} from '@common/helpers/metricConverter';
 import { Project, ProjectDto, ProjectRepository } from '@orm/project';
 import { ProjectPub, ProjectPubRepository } from '@orm/project-pub';
 import { Task, TASK_SIMPLE_STATUS } from '@orm/task';
@@ -276,24 +282,92 @@ export class ProjectService {
         WHERE
           "user_project"."projectId"=${project.id};
       `);
-      const developedDays = Math.ceil(developed_seconds / 86400);
-      const developedMonths = Math.ceil(developedDays / 30.4375);
-      const days8hours = Math.round((timeSum * 100) / 20571000) / 100;
+      const [weekTaskValue] = await manager.query(`
+        SELECT
+            COUNT(DISTINCT "task"."id") as count,
+            COUNT(DISTINCT "user_tasks"."userId") as "membersCount",
+            SUM("task"."value") as value,
+            SUM("user_tasks"."time") as time,
+            EXTRACT(DOW FROM NOW())::INTEGER as days
+        FROM
+            "user_tasks"
+                LEFT JOIN "task" ON "user_tasks"."taskId"="task"."id"
+        WHERE
+                "user_tasks"."taskId" IN (
+                SELECT
+                  DISTINCT "task"."id"
+                FROM
+                  "task"
+                LEFT JOIN "task_log" ON "task_log"."taskId"="task"."id"
+                WHERE
+                  "task"."status" = ${finishedStatus}
+                  AND "task"."projectId"=${project.id}
+                  AND "task_log"."createdAt"::DATE >= NOW()::DATE-EXTRACT(DOW FROM NOW())::INTEGER + 1
+          )
+          AND "task"."value" IS NOT NULL;
+      `);
+      const [monthTasksValue] = await manager.query(`
+        SELECT
+            COUNT(DISTINCT "task"."id") as count,
+            COUNT(DISTINCT "user_tasks"."userId") as "membersCount",
+            SUM("task"."value") as value,
+            SUM("user_tasks"."time") as time,
+            EXTRACT(DAY FROM NOW())::INTEGER as days
+        FROM
+            "user_tasks"
+                LEFT JOIN "task" ON "user_tasks"."taskId"="task"."id"
+        WHERE
+                "user_tasks"."taskId" IN (
+                    SELECT
+                      DISTINCT "task"."id"
+                    FROM
+                      "task"
+                    LEFT JOIN "task_log" ON "task_log"."taskId"="task"."id"
+                    WHERE
+                      "task"."status" = ${finishedStatus}
+                      AND "task"."projectId"=${project.id}
+                      AND "task_log"."createdAt"::DATE >= NOW()::DATE-EXTRACT(DAY FROM NOW())::INTEGER + 1
+          )
+          AND "task"."value" IS NOT NULL;
+      `);
+      const developedDays = secondsToDays(developed_seconds);
+      const developedMonths = daysToMonths(developedDays);
+      const days8hours = millisecondsTo8hoursDays(timeSum);
+
+      const statisticMetrics = {
+        all: {
+          count: parseInt(count, 0),
+          days: developedDays,
+          membersCount: parseInt(members_count, 0),
+          months: developedMonths,
+          timeProductivity: timeProductivity(days8hours, developedDays, members_count),
+          timeSumIn8hoursDays: days8hours,
+          value: valueSum,
+        },
+        lastWeek: {
+          count: parseInt(weekTaskValue.count, 0),
+          days: parseInt(weekTaskValue.days, 0),
+          membersCount: parseInt(weekTaskValue.membersCount, 0),
+          months: 0,
+          timeSumIn8hoursDays: millisecondsTo8hoursDays(weekTaskValue.time),
+          value: parseInt(weekTaskValue.value, 0),
+        },
+        lastMonth: {
+          count: parseInt(monthTasksValue.count, 0),
+          days: parseInt(monthTasksValue.days, 0),
+          membersCount: parseInt(monthTasksValue.membersCount, 0),
+          months: 1,
+          timeSumIn8hoursDays: millisecondsTo8hoursDays(monthTasksValue.time),
+          value: parseInt(monthTasksValue.value, 0),
+        },
+      };
 
       if (projectWithMembers.pub) {
         await this.projectPubRepo.update(
           { uuid: projectWithMembers.pub.uuid },
           {
             statistic: {
-              metrics: {
-                membersTimeProductivity: Math.floor((days8hours * 10000) / developedDays / members_count) / 10000,
-                developedDays,
-                developedMonths,
-                membersCount: parseInt(members_count, 0),
-                tasksCount: parseInt(count, 0),
-                timeSumIn8hoursDays: days8hours,
-                value: valueSum,
-              },
+              metrics: statisticMetrics,
             },
           }
         );
