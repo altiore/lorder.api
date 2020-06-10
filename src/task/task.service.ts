@@ -34,7 +34,7 @@ export class TaskService {
   public findOneBySequenceNumber(sequenceNumber: number, projectId: number): Promise<Task> {
     return this.taskRepo.findOne({
       where: { sequenceNumber, project: { id: projectId } },
-      relations: ['projectParts'],
+      relations: ['projectParts', 'userTasks'],
     });
   }
 
