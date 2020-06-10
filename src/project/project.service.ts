@@ -303,6 +303,7 @@ export class ProjectService {
                   "task"."status" = ${finishedStatus}
                   AND "task"."projectId"=${project.id}
                   AND "task_log"."createdAt"::DATE >= NOW()::DATE-EXTRACT(DOW FROM NOW())::INTEGER + 1
+                  AND "task"."isArchived" = false
           )
           AND "task"."value" IS NOT NULL;
       `);
@@ -327,6 +328,7 @@ export class ProjectService {
                       "task"."status" = ${finishedStatus}
                       AND "task"."projectId"=${project.id}
                       AND "task_log"."createdAt"::DATE >= NOW()::DATE-EXTRACT(DAY FROM NOW())::INTEGER + 1
+                      AND "task"."isArchived" = false
           )
           AND "task"."value" IS NOT NULL;
       `);
