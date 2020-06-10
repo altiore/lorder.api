@@ -261,7 +261,7 @@ export class ProjectService {
            AND "status"=${finishedStatus}
            AND "isArchived"=false 
       `);
-      const [{ developed_seconds, members_count }] = await manager.query(`
+      const [res1] = await manager.query(`
         SELECT
           EXTRACT('epoch' from NOW() - "project"."createdAt") as developed_seconds,
           COUNT("user_project"."memberId") as members_count
@@ -332,37 +332,41 @@ export class ProjectService {
           )
           AND "task"."value" IS NOT NULL;
       `);
-      const developedDays = secondsToDays(developed_seconds);
-      const developedMonths = daysToMonths(developedDays);
-      const days8hours = millisecondsTo8hoursDays(timeSum);
+      let statisticMetrics = {};
+      if (res1) {
+        const { developed_seconds, members_count } = res1;
+        const developedDays = secondsToDays(developed_seconds);
+        const developedMonths = daysToMonths(developedDays);
+        const days8hours = millisecondsTo8hoursDays(timeSum);
 
-      const statisticMetrics = {
-        all: {
-          count: parseInt(count, 0),
-          days: developedDays,
-          membersCount: parseInt(members_count, 0),
-          months: developedMonths,
-          timeProductivity: timeProductivity(days8hours, developedDays, members_count),
-          timeSumIn8hoursDays: days8hours,
-          value: valueSum,
-        },
-        lastWeek: {
-          count: parseInt(weekTaskValue.count, 0),
-          days: parseInt(weekTaskValue.days, 0),
-          membersCount: parseInt(weekTaskValue.membersCount, 0),
-          months: 0,
-          timeSumIn8hoursDays: millisecondsTo8hoursDays(weekTaskValue.time),
-          value: parseInt(weekTaskValue.value, 0),
-        },
-        lastMonth: {
-          count: parseInt(monthTasksValue.count, 0),
-          days: parseInt(monthTasksValue.days, 0),
-          membersCount: parseInt(monthTasksValue.membersCount, 0),
-          months: 1,
-          timeSumIn8hoursDays: millisecondsTo8hoursDays(monthTasksValue.time),
-          value: parseInt(monthTasksValue.value, 0),
-        },
-      };
+        statisticMetrics = {
+          all: {
+            count: parseInt(count, 0),
+            days: developedDays,
+            membersCount: parseInt(members_count, 0),
+            months: developedMonths,
+            timeProductivity: timeProductivity(days8hours, developedDays, members_count),
+            timeSumIn8hoursDays: days8hours,
+            value: valueSum,
+          },
+          lastWeek: {
+            count: parseInt(weekTaskValue.count, 0),
+            days: parseInt(weekTaskValue.days, 0),
+            membersCount: parseInt(weekTaskValue.membersCount, 0),
+            months: 0,
+            timeSumIn8hoursDays: millisecondsTo8hoursDays(weekTaskValue.time),
+            value: parseInt(weekTaskValue.value, 0),
+          },
+          lastMonth: {
+            count: parseInt(monthTasksValue.count, 0),
+            days: parseInt(monthTasksValue.days, 0),
+            membersCount: parseInt(monthTasksValue.membersCount, 0),
+            months: 1,
+            timeSumIn8hoursDays: millisecondsTo8hoursDays(monthTasksValue.time),
+            value: parseInt(monthTasksValue.value, 0),
+          },
+        };
+      }
 
       if (projectWithMembers.pub) {
         await this.projectPubRepo.update(

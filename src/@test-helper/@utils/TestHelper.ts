@@ -68,6 +68,15 @@ export class TestHelper {
     await getConnection().close();
     await this.app.get(RedisService).closeConnection();
     await this.app.close();
+
+    try {
+      if (global.gc) {
+        global.gc();
+      }
+    } catch (e) {
+      console.log('`node --expose-gc index.js`');
+      process.exit();
+    }
   };
 
   public async getUser(email?: string): Promise<number | undefined> {
