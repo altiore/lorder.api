@@ -2,21 +2,12 @@
 import { INestApplication, ModuleMetadata } from '@nestjs/common/interfaces';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeormFixtures } from 'typeorm-fixtures';
-import {
-  Connection,
-  DeleteResult,
-  EntityManager,
-  FindConditions,
-  getConnection,
-  In,
-  ObjectID,
-  ObjectType,
-} from 'typeorm';
+import { DeleteResult, EntityManager, FindConditions, getConnection, In, ObjectID, ObjectType } from 'typeorm';
 import * as supertest from 'supertest';
 const defaults = require('superagent-defaults');
 import * as jwt from 'jsonwebtoken';
+import * as v8 from 'v8';
 
-import { AppModule } from '../../app.module';
 import { RedisService } from '../../redis/redis.service';
 import { Role } from '../../@orm/role';
 import { MailService } from '../../mail/mail.service';
@@ -30,7 +21,7 @@ export class TestHelper {
 
   constructor(
     public readonly url: string,
-    public readonly metadata: ModuleMetadata = { imports: [AppModule] },
+    public metadata?: ModuleMetadata,
     public readonly debug: boolean = process.env.TYPEORM_LOGGING === 'true'
   ) {
     const findCondition = {
@@ -39,6 +30,7 @@ export class TestHelper {
       },
     };
     this.fixtureHelper = new TypeormFixtures(debug).findEntities(findCondition, Role);
+    v8.setFlagsFromString('--expose_gc');
   }
 
   public get manager(): EntityManager {
@@ -47,6 +39,10 @@ export class TestHelper {
 
   public readonly before = async (): Promise<void> => {
     await this.fixtureHelper.loadFixtures();
+    if (!this.metadata) {
+      const appModule = await import('../../app.module');
+      this.metadata = { imports: [appModule.AppModule] };
+    }
     this.testingModule = await Test.createTestingModule(this.metadata)
       .overrideProvider(MailService)
       .useValue(
@@ -67,7 +63,10 @@ export class TestHelper {
     await this.fixtureHelper.dropFixtures();
     await getConnection().close();
     await this.app.get(RedisService).closeConnection();
-    await this.app.close();
+
+    this.testingModule = null;
+    this.fixtureHelper = null;
+    this.metadata = null;
 
     try {
       if (global.gc) {
@@ -77,6 +76,8 @@ export class TestHelper {
       console.log('`node --expose-gc index.js`');
       process.exit();
     }
+
+    await this.app.close();
   };
 
   public async getUser(email?: string): Promise<number | undefined> {
