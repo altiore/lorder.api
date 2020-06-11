@@ -42,9 +42,10 @@ export class ProjectTaskController {
   @ApiResponse({ status: 200, type: ListResponseDto, description: 'ACCESS_LEVEL.RED' })
   public all(
     @Query() pagesDto: PaginationDto,
-    @Param('projectId', ParseIntPipe) projectId: number
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @UserJWT() user: User
   ): Promise<ListResponseDto<Task>> {
-    return this.taskService.findAll(pagesDto, projectId);
+    return this.taskService.findAll(pagesDto, projectId, user);
   }
 
   @Get(':sequenceNumber')

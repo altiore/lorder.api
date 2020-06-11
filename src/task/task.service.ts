@@ -27,8 +27,11 @@ export class TaskService {
   ) {}
 
   public async findAllByProject(pagesDto: PaginationDto, projectId: number): Promise<ListResponseDto<Task>> {
-    const [list, total] = await this.taskRepo.findAllByProjectId(pagesDto, projectId);
-    return { list, total };
+    const count = (pagesDto.count || 20) * 1;
+    const page = (pagesDto.skip || 0) / count + 1;
+    const [data, total] = await this.taskRepo.findAllByProjectId(pagesDto, projectId);
+    const pageCount = Math.ceil(total / count);
+    return { count, data, page, pageCount, total };
   }
 
   public findOneBySequenceNumber(sequenceNumber: number, projectId: number): Promise<Task> {

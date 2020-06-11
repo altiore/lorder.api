@@ -9,7 +9,7 @@ import { ACCESS_LEVEL } from './user-project.consts';
 
 @Entity()
 export class UserProject {
-  static simpleFields = ['accessLevel', 'timeSum', 'valueSum'];
+  static simpleFields = ['accessLevel', 'timeSum', 'valueSum', 'roles'];
 
   @Column({ primary: true })
   memberId: number;

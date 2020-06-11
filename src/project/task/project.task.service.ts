@@ -1,4 +1,4 @@
-import { ListResponseDto, PaginationDto } from '@common/dto';
+import { PaginationDto } from '@common/dto';
 import { ValidationException } from '@common/exceptions/validation.exception';
 import { ForbiddenException, Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,12 +8,14 @@ import { Task } from '@orm/task';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL, UserProject } from '@orm/user-project';
 import { ValidationError } from 'class-validator';
+import { omit } from 'lodash';
 import { TaskService } from 'task/task.service';
 import { EntityManager } from 'typeorm';
 
 import { TaskType } from '../../@orm/task-type/task-type.entity';
 
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
+import { TaskListDto } from './dto/task.list.dto';
 
 @Injectable()
 export class ProjectTaskService {
@@ -22,8 +24,57 @@ export class ProjectTaskService {
     private readonly taskService: TaskService
   ) {}
 
-  public async findAll(pagesDto: PaginationDto, projectId: number): Promise<ListResponseDto<Task>> {
-    return await this.taskService.findAllByProject(pagesDto, projectId);
+  public async findAll(pagesDto: PaginationDto, projectId: number, user: User): Promise<TaskListDto> {
+    const res = await this.taskService.findAllByProject(pagesDto, projectId);
+
+    // TODO: добавлять колонки в зависимости от стратегии перемещения задач
+    const access = await this.projectTaskTypeRepo.manager.findOne(UserProject, {
+      relations: ['roles', 'roles.role', 'roles.allowedMoves', 'roles.allowedMoves.from', 'roles.allowedMoves.to'],
+      where: {
+        member: { id: user.id },
+        project: { id: projectId },
+      },
+    });
+    let columns = [];
+    if (access && access.roles) {
+      const allowedMoves = access.roles.reduce((arr, cur) => {
+        arr = arr.concat(
+          cur.allowedMoves.map(am => ({
+            title: cur.role.id + '_' + am.type,
+            ...am,
+          }))
+        );
+        return arr;
+      }, []);
+      columns = allowedMoves.reduce((arr, am) => {
+        const fromIndex = arr.findIndex(el => el.id === am.fromId);
+        const toIndex = arr.findIndex(el => el.id === am.toId);
+        const preparedAm = omit(am, ['from', 'to']);
+        if (fromIndex === -1) {
+          if (toIndex === -1) {
+            arr.push({
+              ...am.to,
+              moves: [preparedAm],
+            });
+            arr.push({
+              ...am.from,
+              moves: [preparedAm],
+            });
+          } else {
+            arr[toIndex].moves.push(preparedAm);
+          }
+        } else {
+          if (toIndex === -1) {
+            arr[fromIndex].moves.push(preparedAm);
+          } else {
+            arr[fromIndex].moves.push(preparedAm);
+            arr[toIndex].moves.push(preparedAm);
+          }
+        }
+        return arr;
+      }, []);
+    }
+    return { ...res, columns };
   }
 
   public findOne(sequenceNumber: number, projectId: number): Promise<Task> {
