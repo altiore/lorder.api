@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class TaskStatus {
   @ApiProperty()
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn()
   id!: number;
 
   @IsNotEmpty()

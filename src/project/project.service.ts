@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable, NotAcceptableException, NotFoundExcepti
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 
-import { get, pick } from 'lodash';
+import { get, omit, pick } from 'lodash';
 import * as moment from 'moment';
 
 import {
@@ -11,7 +11,7 @@ import {
   secondsToDays,
   timeProductivity,
 } from '@common/helpers/metricConverter';
-import { Project, ProjectDto, ProjectRepository } from '@orm/project';
+import { ITaskColumn, Project, PROJECT_STRATEGY, ProjectDto, ProjectRepository } from '@orm/project';
 import { ProjectPub, ProjectPubRepository } from '@orm/project-pub';
 import { Task, TASK_SIMPLE_STATUS } from '@orm/task';
 import { User } from '@orm/user';
@@ -385,7 +385,7 @@ export class ProjectService {
     }
   }
 
-  async findProjectDetails(project: Project): Promise<Project> {
+  async findProjectDetails(project: Project, user: User): Promise<Project> {
     const p = await this.projectRepo.findOne({
       relations: [
         'defaultTaskType',
@@ -399,6 +399,83 @@ export class ProjectService {
       where: { id: project.id },
     });
     p.accessLevel = project.accessLevel;
+    p.taskColumns = await this.getColumns(project, user);
     return p;
+  }
+
+  private async getColumns(project: Project, user: User): Promise<ITaskColumn[]> {
+    switch (project.strategy) {
+      case PROJECT_STRATEGY.ADVANCED:
+        return this.columnStrategyAdvanced(project, user);
+      case PROJECT_STRATEGY.SIMPLE:
+        return this.columnStrategySimple();
+      case PROJECT_STRATEGY.DOUBLE_CHECK:
+        return this.columnStrategySimple();
+      default:
+        return this.columnStrategySimple();
+    }
+  }
+
+  private async columnStrategySimple(): Promise<ITaskColumn[]> {
+    return Object.values(TASK_SIMPLE_STATUS)
+      .filter(el => typeof el === 'number')
+      .map((enumValue: number) => ({
+        id: enumValue,
+        moves: [],
+        name: TASK_SIMPLE_STATUS[enumValue],
+        statusFrom: enumValue,
+        statusTo: enumValue,
+      }));
+  }
+
+  private async columnStrategyAdvanced(project: Project, user: User): Promise<ITaskColumn[]> {
+    const access = await this.projectRepo.manager.findOne(UserProject, {
+      relations: ['roles', 'roles.role', 'roles.allowedMoves', 'roles.allowedMoves.from', 'roles.allowedMoves.to'],
+      where: {
+        member: { id: user.id },
+        project: { id: project.id },
+      },
+    });
+    let columns: ITaskColumn[] = [];
+    if (access && access.roles) {
+      const allowedMoves = access.roles.reduce((arr, cur) => {
+        arr = arr.concat(
+          cur.allowedMoves.map(am => ({
+            title: cur.role.id + '_' + am.type,
+            ...am,
+          }))
+        );
+        return arr;
+      }, []);
+      columns = allowedMoves.reduce((arr, am) => {
+        const fromIndex = arr.findIndex(el => el.id === am.fromId);
+        const toIndex = arr.findIndex(el => el.id === am.toId);
+        const preparedAm = omit(am, ['from', 'to']);
+        if (fromIndex === -1) {
+          if (toIndex === -1) {
+            arr.push({
+              ...am.to,
+              moves: [preparedAm],
+            });
+            arr.push({
+              ...am.from,
+              moves: [preparedAm],
+            });
+          } else {
+            arr[toIndex].moves.push(preparedAm);
+          }
+        } else {
+          if (toIndex === -1) {
+            arr[fromIndex].moves.push(preparedAm);
+          } else {
+            arr[fromIndex].moves.push(preparedAm);
+            arr[toIndex].moves.push(preparedAm);
+          }
+        }
+        return arr;
+      }, []);
+    }
+
+    return columns.sort((a, b) => (a.id > b.id ? 1 : -1));
   }
 }

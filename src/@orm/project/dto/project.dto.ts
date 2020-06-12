@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
-import { PROJECT_TYPE } from '../project.entity';
+import { PROJECT_STRATEGY, PROJECT_TYPE } from '../project.entity';
 
 export class ProjectDto {
   @ApiProperty()
@@ -34,4 +34,10 @@ export class ProjectDto {
   @IsString()
   @IsOptional()
   slogan?: string;
+
+  @ApiPropertyOptional()
+  @IsIn(Object.values(PROJECT_STRATEGY))
+  @IsString()
+  @IsOptional()
+  strategy?: PROJECT_STRATEGY;
 }

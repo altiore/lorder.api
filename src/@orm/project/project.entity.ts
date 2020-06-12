@@ -16,6 +16,7 @@ import {
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { ProjectPart } from '../project-part/project-part.entity';
 import { ProjectPub } from '../project-pub/project-pub.entity';
+import { ITaskMove } from '../project-role-allowed-move/project-role-allowed-move.entity';
 import { ProjectRole } from '../project-role/project-role.entity';
 import { ProjectTaskType } from '../project-task-type/project-task-type.entity';
 import { Task } from '../task/task.entity';
@@ -29,8 +30,19 @@ export enum PROJECT_TYPE {
 }
 
 export enum PROJECT_STRATEGY {
+  ADVANCED = 'ADVANCED',
   SIMPLE = 'SIMPLE',
   DOUBLE_CHECK = 'DOUBLE_CHECK',
+}
+
+export interface ITaskColumn {
+  id: number;
+  name: string;
+
+  moves: ITaskMove[];
+
+  statusFrom: number;
+  statusTo: number;
 }
 
 @Entity()
@@ -129,6 +141,8 @@ export class Project {
   @ApiPropertyOptional({ type: () => ProjectPart, isArray: true })
   @OneToMany(() => ProjectPart, m => m.project)
   parts: ProjectPart[];
+
+  taskColumns?: ITaskColumn[];
 
   isAccess(accessLevel: ACCESS_LEVEL) {
     if (!this.accessLevel) {

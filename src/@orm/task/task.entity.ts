@@ -18,6 +18,7 @@ import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { ProjectPart } from '../project-part/project-part.entity';
 import { Project } from '../project/project.entity';
 import { TaskComment } from '../task-comment/task-comment.entity';
+import { TaskStatus } from '../task-status/task-status.entity';
 import { TaskType } from '../task-type/task-type.entity';
 import { UserTask } from '../user-task/user-task.entity';
 import { UserWork } from '../user-work/user-work.entity';
@@ -90,6 +91,12 @@ export class Task {
   @ApiPropertyOptional()
   @Column({ default: 0 })
   status: number;
+
+  @Column({ nullable: true })
+  statusTypeId: number;
+
+  @ManyToOne(t => TaskStatus, { nullable: true, onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
+  statusType: TaskStatus;
 
   @ApiPropertyOptional()
   @Column({ nullable: true })

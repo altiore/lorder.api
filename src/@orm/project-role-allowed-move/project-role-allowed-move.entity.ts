@@ -32,6 +32,16 @@ export enum TASK_STATUS_MOVE_TYPE {
   ASK_RECHECK = 'ask_recheck',
 }
 
+export interface ITaskMove {
+  id: number;
+  title: string;
+  type: TASK_STATUS_MOVE_TYPE;
+
+  projectRoleId: number;
+  fromId: number;
+  toId: number;
+}
+
 @Entity()
 export class ProjectRoleAllowedMove {
   @ApiProperty()
