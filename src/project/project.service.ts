@@ -115,7 +115,7 @@ export class ProjectService {
     if (await this.projectPubRepo.findPublishedByProject(project)) {
       throw new NotAcceptableException('Этот проект уже опубликован!');
     }
-    await this.projectPubRepo.publishNew(project);
+    project.pub = await this.projectPubRepo.publishNew(project);
     return project;
   }
 
