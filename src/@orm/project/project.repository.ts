@@ -2,7 +2,6 @@ import { EntityManager, EntityRepository, Repository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { User } from '../user/user.entity';
-
 import { ProjectDto } from './dto';
 import { Project, PROJECT_TYPE } from './project.entity';
 

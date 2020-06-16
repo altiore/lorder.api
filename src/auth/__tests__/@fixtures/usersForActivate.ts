@@ -1,9 +1,8 @@
 import { createHash } from 'crypto';
 
 import { ROLES } from '../../../@orm/role';
-import { createUsers } from '../../../@test-helper/@fixtureCreators';
-
 import { User } from '../../../@orm/user';
+import { createUsers } from '../../../@test-helper/@fixtureCreators';
 
 export const usersFixture = createUsers([
   {

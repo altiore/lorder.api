@@ -1,5 +1,4 @@
 import { TestHelper } from '../../../@test-helper/@utils/TestHelper';
-
 import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture } from './@fixtures/update';
 
 const h = new TestHelper('/projects/:projectId/tasks/:sequenceNumber')

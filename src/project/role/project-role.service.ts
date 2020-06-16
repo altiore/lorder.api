@@ -1,14 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Project } from '@orm/project';
-import { User } from '@orm/user';
+
 import { classToClass } from 'class-transformer';
 import { In } from 'typeorm';
+
+import { Project } from '@orm/project';
+import { User } from '@orm/user';
 
 import { ProjectRoleAllowedMove } from '../../@orm/project-role-allowed-move/project-role-allowed-move.entity';
 import { ProjectRole } from '../../@orm/project-role/project-role.entity';
 import { RoleService } from '../../role/role.service';
-
 import { ProjectRoleCreateDto } from './dto';
 import { ProjectRoleRepository } from './project-role.repository';
 

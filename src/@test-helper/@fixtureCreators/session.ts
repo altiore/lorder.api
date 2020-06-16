@@ -1,5 +1,6 @@
-import { random } from 'faker';
 import { fixtureCreator, one } from 'typeorm-fixtures';
+
+import { random } from 'faker';
 
 import { Session } from '../../@orm/session/session.entity';
 import { User } from '../../@orm/user';

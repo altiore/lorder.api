@@ -1,7 +1,6 @@
 import { TaskType } from '@orm/task-type/task-type.entity';
 
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
-
 import { taskTypesFixtures, usersFixture } from './@fixtures/post';
 
 const h = new TestHelper('/task-types').addFixture(usersFixture).addFixture(taskTypesFixtures);

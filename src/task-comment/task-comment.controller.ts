@@ -1,4 +1,3 @@
-import { Auth, res, UserJWT } from '@common/decorators';
 import { Controller, Param, ParseIntPipe } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Crud, CrudController, CrudRequest, Override, ParsedBody, ParsedRequest } from '@nestjsx/crud';
@@ -7,6 +6,8 @@ import { ROLES } from '@orm/role';
 import { TaskComment } from '@orm/task-comment/task-comment.entity';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
+
+import { Auth, res, UserJWT } from '@common/decorators';
 
 import { TaskCommentCreateDto } from './dto';
 import { TaskCommentService } from './task-comment.service';

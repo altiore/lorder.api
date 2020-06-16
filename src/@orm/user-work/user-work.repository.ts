@@ -5,7 +5,6 @@ import { EntityManager, EntityRepository, IsNull, Repository, SelectQueryBuilder
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Task } from '../task/task.entity';
 import { User } from '../user/user.entity';
-
 import { UserWork } from './user-work.entity';
 
 @EntityRepository(UserWork)

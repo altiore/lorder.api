@@ -1,12 +1,12 @@
-import { Auth, res } from '@common/decorators';
 import { Controller } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Crud } from '@nestjsx/crud';
 
 import { ROLES } from '@orm/role';
 
-import { TaskStatus } from '../@orm/task-status/task-status.entity';
+import { Auth, res } from '@common/decorators';
 
+import { TaskStatus } from '../@orm/task-status/task-status.entity';
 import { TaskStatusService } from './task-status.service';
 
 @ApiTags('task-statuses (roles: user(get), super-admin(create/edit/delete))')

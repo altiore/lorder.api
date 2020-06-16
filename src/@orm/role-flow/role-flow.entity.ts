@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 import { IsLowercase, IsString, Length, Matches } from 'class-validator';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class RoleFlow {

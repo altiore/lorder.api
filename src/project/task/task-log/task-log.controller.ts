@@ -1,19 +1,18 @@
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
-
 import { Project } from '@orm/project';
 import { TaskLog } from '@orm/task-log';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
+
+import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 
 import { Roles, UserJWT } from '../../../@common/decorators';
 import { ListDto } from '../../../@common/dto';
 import { RolesGuard } from '../../../@common/guards';
 import { AccessLevel, ProjectParam } from '../../@common/decorators';
 import { AccessLevelGuard } from '../../@common/guards';
-
 import { TaskLogService } from './task-log.service';
 
 @ApiBearerAuth()

@@ -3,7 +3,6 @@ import { Between, EntityManager, EntityRepository, In, Repository } from 'typeor
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Project } from '../project/project.entity';
 import { User } from '../user/user.entity';
-
 import { Task } from './task.entity';
 
 export enum TaskOrderByField {

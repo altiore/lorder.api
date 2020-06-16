@@ -1,6 +1,8 @@
 import { IoAdapter } from '@nestjs/platform-socket.io';
-import { ServerOptions } from 'socket.io';
+
 import * as redisIoAdapter from 'socket.io-redis';
+
+import { ServerOptions } from 'socket.io';
 
 const redisAdapter = redisIoAdapter({ host: 'localhost', port: 6379 });
 

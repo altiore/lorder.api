@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
+
 import { Moment } from 'moment';
 import { Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
 
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
-
 import { User } from '../user/user.entity';
 
 @Index(['userId', 'device'])

@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Session } from '../@orm/session/session.entity';
-
 import { SessionsController } from './sessions.controller';
 import { SessionsService } from './sessions.service';
 

@@ -3,7 +3,6 @@ import * as moment from 'moment';
 import { Task, TASK_SIMPLE_STATUS } from '../../@orm/task';
 import { UserWork } from '../../@orm/user-work';
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
-
 import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/pause';
 
 const h = new TestHelper('/user-works/:userTaskId/pause')

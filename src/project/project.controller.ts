@@ -1,4 +1,3 @@
-import { Auth, res, UserJWT } from '@common/decorators';
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -6,6 +5,8 @@ import { Project, ProjectDto } from '@orm/project';
 import { ROLES } from '@orm/role';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL, UserProject } from '@orm/user-project';
+
+import { Auth, res, UserJWT } from '@common/decorators';
 
 import { ProjectParam } from './@common/decorators';
 import { ProjectPaginationDto } from './@dto';

@@ -1,5 +1,7 @@
 import { FileInterceptor } from '@nestjs/platform-express';
+
 import { diskStorage } from 'multer';
+
 import { extname } from 'path';
 
 export const MyFileInterceptor = FileInterceptor('file', {

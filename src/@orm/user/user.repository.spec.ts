@@ -1,5 +1,4 @@
 import { TypeormTestHelper } from '../typeorm.test.helper';
-
 import { UserRepository } from './user.repository';
 
 const tth = new TypeormTestHelper();

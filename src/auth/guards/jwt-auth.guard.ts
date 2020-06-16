@@ -1,7 +1,9 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
-import { Request, Response } from 'express';
+
 import * as jwt from 'jsonwebtoken';
 import { ExtractJwt } from 'passport-jwt';
+
+import { Request, Response } from 'express';
 
 import { User } from '../../@orm/user';
 import { AuthService } from '../auth.service';

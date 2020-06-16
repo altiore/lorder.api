@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
-import { TaskComment } from '@orm/task-comment/task-comment.entity';
+
 import { EntityManager } from 'typeorm';
+
+import { TaskComment } from '@orm/task-comment/task-comment.entity';
 
 import { Task } from '../@orm/task';
 import { User } from '../@orm/user';

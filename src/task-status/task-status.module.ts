@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { TaskStatus } from '../@orm/task-status/task-status.entity';
-
 import { TaskStatusController } from './task-status.controller';
 import { TaskStatusService } from './task-status.service';
 

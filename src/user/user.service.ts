@@ -1,16 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+
+import { DeepPartial, EntityManager } from 'typeorm';
+
 import { Media, MEDIA_TYPE } from '@orm/media';
 import { Project, PROJECT_TYPE } from '@orm/project';
 import { RoleRepository } from '@orm/role';
 import { UpdateUserDto, User, UserRepository } from '@orm/user';
-import { DeepPartial, EntityManager } from 'typeorm';
 
 import { UserRole } from '../@orm/user-role/user-role.entity';
 import { JwtPayload } from '../auth/interfaces';
 import { FileService } from '../file/file.service';
 import { ProjectService } from '../project/project.service';
-
 import { UserDto, UserPaginationDto } from './dto';
 // @see https://github.com/emerleite/node-gravatar
 const gravatar = require('gravatar');

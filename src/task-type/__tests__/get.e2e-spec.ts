@@ -1,5 +1,4 @@
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
-
 import { taskTypesFixtures, usersFixture } from './@fixtures/get';
 
 const h = new TestHelper('/task-types').addFixture(usersFixture).addFixture(taskTypesFixtures);

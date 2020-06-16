@@ -1,4 +1,5 @@
 import { CacheModule, CacheModuleOptions, DynamicModule, Module } from '@nestjs/common';
+
 import * as redisStore from 'cache-manager-redis-store';
 
 import { REDIS_CACHE_MANAGER } from './redis.constants';

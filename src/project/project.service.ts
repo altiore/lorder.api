@@ -1,9 +1,15 @@
 import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager } from 'typeorm';
 
 import { get, omit, pick } from 'lodash';
 import * as moment from 'moment';
+import { EntityManager } from 'typeorm';
+
+import { ITaskColumn, Project, ProjectDto, ProjectRepository, PROJECT_STRATEGY } from '@orm/project';
+import { ProjectPub, ProjectPubRepository } from '@orm/project-pub';
+import { Task, TASK_SIMPLE_STATUS } from '@orm/task';
+import { User } from '@orm/user';
+import { ACCESS_LEVEL, UserProject, UserProjectRepository } from '@orm/user-project';
 
 import {
   daysToMonths,
@@ -11,11 +17,6 @@ import {
   secondsToDays,
   timeProductivity,
 } from '@common/helpers/metricConverter';
-import { ITaskColumn, Project, PROJECT_STRATEGY, ProjectDto, ProjectRepository } from '@orm/project';
-import { ProjectPub, ProjectPubRepository } from '@orm/project-pub';
-import { Task, TASK_SIMPLE_STATUS } from '@orm/task';
-import { User } from '@orm/user';
-import { ACCESS_LEVEL, UserProject, UserProjectRepository } from '@orm/user-project';
 
 import { ProjectPaginationDto } from './@dto';
 

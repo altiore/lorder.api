@@ -5,7 +5,6 @@ import { User } from '../../@orm/user';
 import { ACCESS_LEVEL, UserProject } from '../../@orm/user-project';
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
 import { RedisService } from '../../redis/redis.service';
-
 import { projectsFixture } from './@fixtures/projects';
 import { userProjectsFixture } from './@fixtures/userProjects';
 import { usersFixture } from './@fixtures/usersForActivate';

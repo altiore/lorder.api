@@ -4,7 +4,6 @@ import { DeepPartial, EntityRepository, In, Repository } from 'typeorm';
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Role } from '../role/role.entity';
 import { UserRole } from '../user-role/user-role.entity';
-
 import { requiredUserRelations } from './dto/required.relations';
 import { User } from './user.entity';
 

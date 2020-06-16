@@ -1,5 +1,6 @@
-import { name } from 'faker';
 import { fixtureCreator, many } from 'typeorm-fixtures';
+
+import { name } from 'faker';
 
 import { Role } from '../../@orm/role';
 import { User } from '../../@orm/user';

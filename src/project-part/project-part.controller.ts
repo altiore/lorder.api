@@ -1,4 +1,3 @@
-import { Auth, res } from '@common/decorators';
 import { Controller, Param, ParseIntPipe } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Crud, CrudController, CrudRequest, Override, ParsedBody, ParsedRequest } from '@nestjsx/crud';
@@ -9,6 +8,8 @@ import { Project } from '@orm/project';
 import { ProjectPart } from '@orm/project-part/project-part.entity';
 import { ROLES } from '@orm/role';
 import { ACCESS_LEVEL } from '@orm/user-project';
+
+import { Auth, res } from '@common/decorators';
 
 import { ProjectPartService } from './project-part.service';
 

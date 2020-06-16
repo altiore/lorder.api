@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
 import { IsNotEmpty, IsNumberString, IsOptional, IsString } from 'class-validator';
 
 export class ActivateDto {

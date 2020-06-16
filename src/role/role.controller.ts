@@ -1,11 +1,13 @@
-import { Auth, res } from '@common/decorators';
 import { Body, Controller, Delete } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Crud } from '@nestjsx/crud';
+
 import { DeleteResult } from 'typeorm';
 
 import { ROLES } from '@orm/role';
 import { RoleFlow } from '@orm/role-flow';
+
+import { Auth, res } from '@common/decorators';
 
 import { BulkDeleteRoleDto } from './dto';
 import { RoleService } from './role.service';

@@ -1,7 +1,9 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { TaskOrderByField } from '@orm/task';
+
 import { IsIn, IsOptional, IsString } from 'class-validator';
 import { toArray } from 'lodash';
+
+import { TaskOrderByField } from '@orm/task';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 

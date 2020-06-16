@@ -9,39 +9,6 @@
     "quotemark": [true, "single"],
     "indent": false,
     "member-access": [false],
-    "ordered-imports": [
-      true,
-      {
-        "grouped-imports": true,
-        "groups": [
-          {
-            "name": "@nextjs",
-            "match": "@nextjs",
-            "order": 10
-          },
-          {
-            "name": "external libraries",
-            "match": "@google-cloud|@sendgrid|cache-manager|cache-manager-redis-store|class-transformer|class-validator|cookie-parser|crypto|fastify-formbody|fastify-swagger|generate-password|gravatar|helmet|jsonwebtoken|lodash|moment|multer|mustache|passport|passport-http-bearer|passport-jwt|pg|redis|reflect-metadata|rxjs|socket.io-redis|swagger-ui-express|typeorm",
-            "order": 20
-          },
-          {
-            "name": "local common modules",
-            "match": "@orm|@common",
-            "order": 30
-          },
-          {
-            "name": "local modules",
-            "match": "^\\w",
-            "order": 40
-          },
-          {
-            "name": "relative modules",
-            "match": "^\\.",
-            "order": 50
-          }
-        ]
-      }
-    ],
     "object-literal-sort-keys": false,
     "max-line-length": [true, 120],
     "no-unused-variable": true,
@@ -56,7 +23,46 @@
     "no-var-requires": false,
     "only-arrow-functions": false,
     "no-namespace": false,
-    "no-console": false
+    "no-console": false,
+    "ordered-imports": [
+      true,
+      {
+        "named-imports-order": "case-insensitive",
+        "grouped-imports": true,
+        "groups": [
+          {
+            "name": "@nest.js",
+            "match": "@nest.*",
+            "order": 10
+          },
+          {
+            "name": "external libraries",
+            "match": "^@google-cloud|^@sendgrid|^cache-manager|^cache-manager-redis-store|^class-transformer|^class-validator|cookie-parser|^crypto|^fastify-formbody|^fastify-swagger|^generate-password|^gravatar|^helmet|^jsonwebtoken|^lodash|^moment|^multer|^mustache|^passport|^passport-http-bearer|^passport-jwt|^pg|^redis|^reflect-metadata|^rxjs|^socket.io-redis|^swagger-ui-express|^typeorm",
+            "order": 20
+          },
+          {
+            "name": "local common modules",
+            "match": "^@orm",
+            "order": 30
+          },
+          {
+            "name": "local common modules",
+            "match": "^@common",
+            "order": 40
+          },
+          {
+            "name": "should be moved to other group!!!",
+            "match": "^\\w",
+            "order": 52
+          },
+          {
+            "name": "relative modules",
+            "match": "^\\.",
+            "order": 60
+          }
+        ]
+      }
+    ]
   },
   "rulesDirectory": [],
   "linterOptions": {

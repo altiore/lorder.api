@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 import { IsNumber, IsString, Length } from 'class-validator';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 export enum ROLES {
   ADMIN = 'admin',

@@ -1,14 +1,13 @@
 import { Controller, Get, NotFoundException, Param, ParseIntPipe, Patch, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
-
 import { Task } from '@orm/task';
 import { User } from '@orm/user';
 
+import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
+
 import { Roles, UserJWT } from '../@common/decorators';
 import { RolesGuard } from '../@common/guards';
-
 import { TaskPagination } from './dto';
 import { TaskService } from './task.service';
 

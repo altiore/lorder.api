@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+
 import { IsInt, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 
 import { ACCESS_LEVEL } from '@orm/user-project';

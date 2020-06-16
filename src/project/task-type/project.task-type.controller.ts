@@ -1,10 +1,12 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { DeepPartial, DeleteResult } from 'typeorm';
+
 import { Project } from '@orm/project';
 import { ProjectTaskType } from '@orm/project-task-type';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
-import { DeepPartial, DeleteResult } from 'typeorm';
 
 import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 
@@ -12,7 +14,6 @@ import { Roles, UserJWT } from '../../@common/decorators';
 import { RolesGuard } from '../../@common/guards';
 import { AccessLevel, ProjectParam } from '../@common/decorators';
 import { AccessLevelGuard } from '../@common/guards';
-
 import { TaskTypeDto, TaskTypesDto } from './dto';
 import { ProjectTaskTypeService } from './project.task-type.service';
 

@@ -1,7 +1,9 @@
 import { CanActivate, ExecutionContext, Injectable, NotAcceptableException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ACCESS_LEVEL } from '@orm/user-project';
+
 import { get } from 'lodash';
+
+import { ACCESS_LEVEL } from '@orm/user-project';
 
 import { ProjectService } from '../../project.service';
 

@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
+
 import { ClientResponse } from '@sendgrid/client/src/response';
 import { MailData } from '@sendgrid/helpers/classes/mail';
 import * as sgMail from '@sendgrid/mail';
-import { readFileSync } from 'fs';
 import * as Mustache from 'mustache';
+
+import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
 import { MailAcceptedDto } from './dto';

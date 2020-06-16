@@ -1,5 +1,4 @@
 import { TestHelper } from '../@test-helper/@utils/TestHelper';
-
 import { usersFixture } from './@fixtures/users';
 
 const h = new TestHelper('/users').addFixture(usersFixture);

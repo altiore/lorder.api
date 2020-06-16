@@ -1,10 +1,8 @@
 import { ForbiddenException, Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+
 import { ValidationError } from 'class-validator';
 import { EntityManager } from 'typeorm';
-
-import { ListResponseDto, PaginationDto } from '@common/dto';
-import { ValidationException } from '@common/exceptions/validation.exception';
 
 import { Project } from '@orm/project';
 import { ProjectTaskType, ProjectTaskTypeRepository } from '@orm/project-task-type';
@@ -12,6 +10,9 @@ import { Task } from '@orm/task';
 import { TaskType } from '@orm/task-type/task-type.entity';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL, UserProject } from '@orm/user-project';
+
+import { ListResponseDto, PaginationDto } from '@common/dto';
+import { ValidationException } from '@common/exceptions/validation.exception';
 
 import { TaskService } from 'task/task.service';
 

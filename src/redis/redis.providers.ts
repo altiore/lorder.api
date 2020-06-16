@@ -1,4 +1,5 @@
 import { Provider } from '@nestjs/common';
+
 import { create } from 'cache-manager-redis-store';
 
 import { REDIS_CACHE_MANAGER } from './redis.constants';

@@ -6,14 +6,16 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+
 import { ValidationError } from 'class-validator';
-import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
 import * as moment from 'moment';
 import { DeepPartial } from 'typeorm';
 
 import { EmailDto, LoginUserDto, RefreshUserDto, User, UserRepository } from '@orm/user';
 import { UserProjectRepository } from '@orm/user-project';
+
+import { Request } from 'express';
 
 import { ValidationException } from '../@common/exceptions/validation.exception';
 import { Session } from '../@orm/session/session.entity';
@@ -23,7 +25,6 @@ import { MailService } from '../mail/mail.service';
 import { RedisService } from '../redis/redis.service';
 import { SessionsService } from '../sessions/sessions.service';
 import { UserService } from '../user/user.service';
-
 import { ActivateDto, IdentityDto } from './dto';
 import { JwtPayload } from './interfaces';
 

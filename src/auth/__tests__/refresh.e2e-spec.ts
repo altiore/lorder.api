@@ -1,7 +1,6 @@
 import * as jwt from 'jsonwebtoken';
 
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
-
 import { sessionsFixture, usersFixture } from './@fixtures/users';
 
 const h = new TestHelper('/auth/refresh').addFixture(usersFixture).addFixture(sessionsFixture);

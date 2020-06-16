@@ -3,7 +3,6 @@ import { DeepPartial, EntityManager, EntityRepository, MoreThanOrEqual, Reposito
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Project } from '../project/project.entity';
 import { User } from '../user/user.entity';
-
 import { ACCESS_LEVEL } from './user-project.consts';
 import { UserProject } from './user-project.entity';
 

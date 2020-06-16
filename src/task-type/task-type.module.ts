@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { TaskTypeRepository } from '../@orm/task-type/task-type.repository';
-
 import { TaskTypeController } from './task-type.controller';
 import { TaskTypeService } from './task-type.service';
 

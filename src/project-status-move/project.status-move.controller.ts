@@ -1,4 +1,3 @@
-import { Auth, res } from '@common/decorators';
 import { Controller } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Crud } from '@nestjsx/crud';
@@ -6,6 +5,8 @@ import { Crud } from '@nestjsx/crud';
 import { ProjectRoleAllowedMove } from '@orm/project-role-allowed-move/project-role-allowed-move.entity';
 import { ROLES } from '@orm/role';
 import { ACCESS_LEVEL } from '@orm/user-project';
+
+import { Auth, res } from '@common/decorators';
 
 import { ProjectStatusMoveService } from './project.status-move.service';
 

@@ -1,5 +1,6 @@
 import { Controller, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
+
 import { Media } from '@orm/media';
 
 import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
@@ -8,7 +9,6 @@ import { Roles } from '../@common/decorators';
 import { FileUploadDto } from '../@common/dto';
 import { RolesGuard } from '../@common/guards';
 import { MyFileInterceptor } from '../@common/interceptors';
-
 import { FileService } from './file.service';
 
 @ApiBearerAuth()

@@ -1,6 +1,5 @@
 import { TASK_SIMPLE_STATUS } from '../../../@orm/task';
 import { TestHelper } from '../../../@test-helper/@utils/TestHelper';
-
 import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture } from './@fixtures/move';
 
 const h = new TestHelper('/projects/:projectId/tasks/:sequenceNumber/move')

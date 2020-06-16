@@ -1,5 +1,6 @@
-import { company } from 'faker';
 import { fixtureCreator, many, one } from 'typeorm-fixtures';
+
+import { company } from 'faker';
 
 import { Project } from '../../@orm/project';
 import { ProjectRoleAllowedMove } from '../../@orm/project-role-allowed-move/project-role-allowed-move.entity';

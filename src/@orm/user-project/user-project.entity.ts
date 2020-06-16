@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
+
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 
 import { ProjectRole } from '../project-role/project-role.entity';
 import { Project } from '../project/project.entity';
 import { User } from '../user/user.entity';
-
 import { ACCESS_LEVEL } from './user-project.consts';
 
 @Entity()

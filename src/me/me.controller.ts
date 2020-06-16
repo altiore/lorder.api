@@ -1,10 +1,10 @@
 import { Body, Controller, Patch } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+
 import { ROLES } from '@orm/role';
 import { UpdateUserDto, User } from '@orm/user';
 
 import { Auth, res, UserJWT } from '../@common/decorators';
-
 import { MeService } from './me.service';
 
 @ApiTags('me')

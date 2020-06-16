@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProjectRoleAllowedMove } from '@orm/project-role-allowed-move/project-role-allowed-move.entity';
 
 import { ProjectModule } from '../project/project.module';
-
 import { ProjectStatusMoveController } from './project.status-move.controller';
 import { ProjectStatusMoveService } from './project.status-move.service';
 

@@ -1,18 +1,18 @@
 import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+
 import { DeleteResult, EntityManager } from 'typeorm';
 
 import { Project } from '@orm/project';
 import { ProjectPart } from '@orm/project-part/project-part.entity';
-import { Task, TASK_SIMPLE_STATUS, TaskRepository } from '@orm/task';
-import { TASK_CHANGE_TYPE, TaskLogRepository } from '@orm/task-log';
+import { Task, TaskRepository, TASK_SIMPLE_STATUS } from '@orm/task';
+import { TaskLogRepository, TASK_CHANGE_TYPE } from '@orm/task-log';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
 
 import { ListResponseDto, PaginationDto } from '../@common/dto';
 import { ProjectPartService } from '../project-part/project-part.service';
 import { ProjectService } from '../project/project.service';
-
 import { TaskPagination } from './dto';
 import { TaskGateway } from './task.gateway';
 

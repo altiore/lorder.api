@@ -1,5 +1,6 @@
-import { random } from 'faker';
 import { fixtureCreator } from 'typeorm-fixtures';
+
+import { random } from 'faker';
 
 import { RoleFlow } from '../../@orm/role-flow';
 

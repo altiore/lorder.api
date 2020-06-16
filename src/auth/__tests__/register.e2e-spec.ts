@@ -4,7 +4,6 @@ import { Media } from '../../@orm/media';
 import { Project } from '../../@orm/project';
 import { User } from '../../@orm/user';
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
-
 import { usersFixture } from './@fixtures/users';
 
 const h = new TestHelper('/auth/register').addFixture(usersFixture);

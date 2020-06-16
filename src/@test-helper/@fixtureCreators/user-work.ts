@@ -1,6 +1,7 @@
-import { internet, random } from 'faker';
 import moment = require('moment');
 import { fixtureCreator, one } from 'typeorm-fixtures';
+
+import { internet, random } from 'faker';
 
 import { Task } from '../../@orm/task';
 import { User } from '../../@orm/user';

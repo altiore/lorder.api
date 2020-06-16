@@ -1,5 +1,6 @@
-import { lorem } from 'faker';
 import { fixtureCreator, one } from 'typeorm-fixtures';
+
+import { lorem } from 'faker';
 
 import { Task } from '../../@orm/task';
 import { TaskComment } from '../../@orm/task-comment/task-comment.entity';

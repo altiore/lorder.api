@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+
 import { ArrayMinSize, IsNotEmpty, IsNumber } from 'class-validator';
 
 export class TaskTypesDto {

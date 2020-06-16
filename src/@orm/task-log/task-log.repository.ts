@@ -3,8 +3,7 @@ import { EntityRepository, Repository } from 'typeorm';
 
 import { Task } from '../task/task.entity';
 import { User } from '../user/user.entity';
-
-import { TASK_CHANGE_TYPE, TaskLog } from './task-log.entity';
+import { TaskLog, TASK_CHANGE_TYPE } from './task-log.entity';
 
 @EntityRepository(TaskLog)
 export class TaskLogRepository extends Repository<TaskLog> {

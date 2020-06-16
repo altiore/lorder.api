@@ -15,17 +15,16 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
-
 import { Media } from '@orm/media';
 import { User } from '@orm/user';
+
+import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 
 import { Roles } from '../@common/decorators/roles.decorator';
 import { UserJWT } from '../@common/decorators/user-jwt.decorator';
 import { FileUploadDto } from '../@common/dto';
 import { RolesGuard } from '../@common/guards/roles.guard';
 import { MyFileInterceptor } from '../@common/interceptors';
-
 import { UserDto, UserPaginationDto } from './dto';
 import { UserService } from './user.service';
 

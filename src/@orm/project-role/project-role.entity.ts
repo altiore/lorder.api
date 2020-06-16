@@ -1,12 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
 import { Exclude } from 'class-transformer';
 import { IsOptional, IsString } from 'class-validator';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
+import { ProjectRoleAllowedMove } from '../project-role-allowed-move/project-role-allowed-move.entity';
 import { Project } from '../project/project.entity';
 import { RoleFlow } from '../role-flow/role-flow.entity';
-
-import { ProjectRoleAllowedMove } from '../project-role-allowed-move/project-role-allowed-move.entity';
 
 @Unique(['role', 'projectId'])
 @Entity()

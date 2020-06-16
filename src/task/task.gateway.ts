@@ -8,9 +8,10 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
 
 import { Task } from '@orm/task';
+
+import { Server, Socket } from 'socket.io';
 
 const PROJECT_ROOM_PREFIX = 'ProjectRoom';
 

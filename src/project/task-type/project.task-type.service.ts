@@ -1,8 +1,10 @@
 import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+
+import { DeepPartial, DeleteResult } from 'typeorm';
+
 import { Project } from '@orm/project';
 import { ProjectTaskType, ProjectTaskTypeRepository } from '@orm/project-task-type';
-import { DeepPartial, DeleteResult } from 'typeorm';
 
 import { TaskTypeRepository } from '../../@orm/task-type/task-type.repository';
 

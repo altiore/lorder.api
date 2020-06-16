@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum MEDIA_TYPE {

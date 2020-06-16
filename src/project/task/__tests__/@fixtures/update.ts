@@ -1,13 +1,12 @@
+import { ROLES } from '../../../../@orm/role';
+import { TASK_SIMPLE_STATUS } from '../../../../@orm/task';
+import { ACCESS_LEVEL } from '../../../../@orm/user-project';
 import {
   createProjects,
   createTasks,
   createUserProjects,
   createUsers,
 } from '../../../../@test-helper/@fixtureCreators';
-
-import { ROLES } from '../../../../@orm/role';
-import { TASK_SIMPLE_STATUS } from '../../../../@orm/task';
-import { ACCESS_LEVEL } from '../../../../@orm/user-project';
 
 export const usersFixture = createUsers([
   {

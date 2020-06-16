@@ -1,6 +1,3 @@
-import { Roles, UserJWT } from '@common/decorators';
-import { ListResponseDto, PaginationDto } from '@common/dto';
-import { RolesGuard } from '@common/guards';
 import {
   Body,
   Controller,
@@ -15,14 +12,19 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { DeepPartial } from 'typeorm';
 
-import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
+import { DeepPartial } from 'typeorm';
 
 import { Project } from '@orm/project';
 import { Task } from '@orm/task';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
+
+import { Roles, UserJWT } from '@common/decorators';
+import { ListResponseDto, PaginationDto } from '@common/dto';
+import { RolesGuard } from '@common/guards';
+
+import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 import { AccessLevel, ProjectParam } from 'project/@common/decorators';
 import { AccessLevelGuard } from 'project/@common/guards';
 
