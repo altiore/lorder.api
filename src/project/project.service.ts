@@ -73,9 +73,12 @@ export class ProjectService {
   }
 
   public async update(project: Project, data: ProjectDto, user: User): Promise<Project> {
+    // обновляем стратегию в информации о задачах
+    await this.changeStrategy(project, data.strategy);
+
     await this.projectRepo.update({ id: project.id }, data);
     // TODO: разобраться, нужны ли разные названия для публичного и не публичного проектов?
-    if (project.pub) {
+    if (project.pub && data.title !== project.title) {
       await this.projectPubRepo.update(
         {
           uuid: project.pub.uuid,
@@ -85,7 +88,9 @@ export class ProjectService {
         }
       );
     }
-    return this.projectRepo.merge(project, data);
+    const updatedProject = this.projectRepo.merge(project, data);
+    updatedProject.taskColumns = await this.getColumns(updatedProject, user);
+    return updatedProject;
   }
 
   public async remove(id: number, force: boolean = false): Promise<number> {
@@ -478,5 +483,45 @@ export class ProjectService {
     }
 
     return columns.sort((a, b) => (a.id > b.id ? 1 : -1));
+  }
+
+  private async changeStrategy(project: Project, newStrategy: PROJECT_STRATEGY): Promise<true> {
+    if (project.strategy === newStrategy) {
+      return true;
+    }
+
+    // проверям стратегию В которую собераемся перейти
+    switch (newStrategy) {
+      case PROJECT_STRATEGY.ADVANCED:
+        switch (project.strategy) {
+          case PROJECT_STRATEGY.SIMPLE:
+            // 1.
+            return true;
+          case PROJECT_STRATEGY.DOUBLE_CHECK:
+            throw new NotAcceptableException('Такое изменение стратегии не поддерживается!');
+          default:
+            throw new NotAcceptableException('Такое изменение стратегии не поддерживается!');
+        }
+      case PROJECT_STRATEGY.SIMPLE:
+        switch (project.strategy) {
+          case PROJECT_STRATEGY.ADVANCED:
+            // 1. Проверяем, все ли роли есть в проекте для успешного передвижения по новой стратегии
+            // 2. Проверяем, есть ли хотя бы один пользователь для каждой стадии в новой стратегии
+            // TODO: нужно добавить в константы статусы задач стратегии ADVANCED
+            // 3. Проверяем, для всех ли ролей в проекте есть замкнутые стратегии передвижения задач
+            // 4. Проверяем, все ли статусы имеют движение вперед. Какие-то статусы могут не иметь движения назад, но
+            // движение вперед должно быть всегда
+            // 5. Переводим статусы задач в правильные значения
+            // 6. Проверяем, указана ли роль по-умолчанию для пользователя, который будет подключен к проекту
+            // await this.projectRepo.manager.query(``);
+            return true;
+          case PROJECT_STRATEGY.DOUBLE_CHECK:
+            throw new NotAcceptableException('Такое изменение стратегии не поддерживается!');
+          default:
+            throw new NotAcceptableException('Такое изменение стратегии не поддерживается!');
+        }
+      default:
+        throw new NotAcceptableException('Такое изменение стратегии не поддерживается!');
+    }
   }
 }

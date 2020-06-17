@@ -6,19 +6,6 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { ProjectRole } from '../project-role/project-role.entity';
 import { TaskStatus } from '../task-status/task-status.entity';
 
-// TODO: нужно ли несколько стадий TODO или достаточно одной?
-export enum TASK_STATUS_TYPE {
-  NO_AVAILABLE = 'NO_AVAILABLE',
-  TO_DO_1 = 'TO_DO_1',
-  IN_PROGRESS_1 = 'IN_PROGRESS_1',
-  TO_DO_2 = 'TO_DO_2',
-  IN_PROGRESS_2 = 'IN_PROGRESS_2',
-  TO_DO_3 = 'TO_DO_3',
-  IN_PROGRESS_3 = 'IN_PROGRESS_3',
-  IN_REVIEW = 'IN_REVIEW',
-  DONE = 'DONE',
-}
-
 export enum TASK_STATUS_MOVE_TYPE {
   PREPARE = 'prepare',
   ASK_IMPROVE = 'ask_improve',
