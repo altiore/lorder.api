@@ -33,6 +33,20 @@ export enum TASK_SIMPLE_STATUS {
   DONE = 4,
 }
 
+export enum TASK_STATUS_TYPE {
+  CREATING = 'creating',
+  ARCHITECT_ESTIMATION = 'architect-estimation',
+  PROF_ESTIMATION = 'prof-estimation',
+  READY_TO_DO = 'ready-to-do',
+  IN_PROGRESS = 'in-progress',
+  PROF_REVIEW = 'prof-review',
+  TESTING = 'testing',
+  ARCHITECT_REVIEW = 'architect-review',
+  PROF_ESTIMATION_2 = 'prof-estimation-2',
+  ARCHITECT_ESTIMATION_2 = 'architect-estimation-2',
+  DONE = 'done',
+}
+
 @Entity()
 @Index(['projectId', 'sequenceNumber'])
 @Unique(['projectId', 'sequenceNumber'])
@@ -46,12 +60,34 @@ export class Task {
   };
 
   // TODO: удалить, когда с UI будет приходить правильное значение
-  static statusToName(status: number) {
+  static statusToName(status: number): TASK_STATUS_TYPE {
     if (![0, 1, 2, 3, 4].includes(status)) {
       throw new Error('Недопустимое значение');
     }
 
-    return ['creating', 'ready-to-do', 'in-progress', 'testing', 'done'][status];
+    return [
+      TASK_STATUS_TYPE.CREATING,
+      TASK_STATUS_TYPE.READY_TO_DO,
+      TASK_STATUS_TYPE.IN_PROGRESS,
+      TASK_STATUS_TYPE.TESTING,
+      TASK_STATUS_TYPE.DONE,
+    ][status];
+  }
+
+  static statusTypeNameToSimpleStatus(statusTypeName: TASK_STATUS_TYPE): TASK_SIMPLE_STATUS {
+    return {
+      [TASK_STATUS_TYPE.CREATING]: 0,
+      [TASK_STATUS_TYPE.ARCHITECT_ESTIMATION]: 0,
+      [TASK_STATUS_TYPE.PROF_ESTIMATION]: 0,
+      [TASK_STATUS_TYPE.READY_TO_DO]: 1,
+      [TASK_STATUS_TYPE.IN_PROGRESS]: 2,
+      [TASK_STATUS_TYPE.PROF_REVIEW]: 3,
+      [TASK_STATUS_TYPE.TESTING]: 3,
+      [TASK_STATUS_TYPE.ARCHITECT_REVIEW]: 3,
+      [TASK_STATUS_TYPE.PROF_ESTIMATION_2]: 3,
+      [TASK_STATUS_TYPE.ARCHITECT_ESTIMATION_2]: 3,
+      [TASK_STATUS_TYPE.DONE]: 4,
+    }[statusTypeName];
   }
 
   @ApiProperty()
@@ -103,7 +139,7 @@ export class Task {
   status: number;
 
   @Column({ nullable: true })
-  statusTypeName: string;
+  statusTypeName: TASK_STATUS_TYPE;
 
   @ManyToOne(t => TaskStatus, { nullable: true, onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
   statusType: TaskStatus;

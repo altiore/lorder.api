@@ -3,7 +3,7 @@ import { fixtureCreator, many, one } from 'typeorm-fixtures';
 import { company, random } from 'faker';
 
 import { Project } from '../../@orm/project';
-import { Task, TASK_SIMPLE_STATUS } from '../../@orm/task';
+import { Task, TASK_SIMPLE_STATUS, TASK_STATUS_TYPE } from '../../@orm/task';
 import { User } from '../../@orm/user';
 import { UserTask } from '../../@orm/user-task';
 
@@ -12,7 +12,7 @@ export const createTasks = fixtureCreator<Task>(Task, function(entity, index) {
     description: random.words(5),
     sequenceNumber: index,
     status: TASK_SIMPLE_STATUS.JUST_CREATED,
-    statusTypeName: 'in-progress',
+    statusTypeName: TASK_STATUS_TYPE.IN_PROGRESS,
     title: company.companyName(),
     value: random.number(100),
     ...entity,

@@ -1,6 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
+import { IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
+
+import { TASK_STATUS_TYPE } from '@orm/task';
 
 export class TaskCreateDto {
   @ApiProperty()
@@ -33,8 +35,9 @@ export class TaskCreateDto {
 
   @ApiPropertyOptional()
   @IsString()
+  @IsIn(Object.values(TASK_STATUS_TYPE))
   @IsOptional()
-  statusTypeName?: string;
+  statusTypeName?: TASK_STATUS_TYPE;
 
   @ApiPropertyOptional()
   @IsNumber()

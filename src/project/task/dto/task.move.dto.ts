@@ -1,10 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsIn, IsNotEmpty, IsString } from 'class-validator';
+
+import { TASK_STATUS_TYPE } from '@orm/task';
 
 export class TaskMoveDto {
   @ApiProperty()
   @IsString()
+  @IsIn(Object.values(TASK_STATUS_TYPE))
   @IsNotEmpty()
-  statusTypeName: string;
+  statusTypeName?: TASK_STATUS_TYPE;
 }

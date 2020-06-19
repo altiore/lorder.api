@@ -12,7 +12,7 @@ import { ACCESS_LEVEL } from '@orm/user-project';
 import { PaginationDto } from '@common/dto';
 
 import { ValidationException } from '../@common/exceptions/validation.exception';
-import { Task, TASK_SIMPLE_STATUS } from '../@orm/task';
+import { Task, TASK_SIMPLE_STATUS, TASK_STATUS_TYPE } from '../@orm/task';
 import { TaskType } from '../@orm/task-type/task-type.entity';
 import { UserTask } from '../@orm/user-task';
 import { UserWork, UserWorkRepository } from '../@orm/user-work';
@@ -101,7 +101,7 @@ export class UserWorkService {
     curManager: EntityManager,
     userWork: UserWork,
     user: User,
-    status?: TASK_SIMPLE_STATUS
+    statusTypeName?: TASK_STATUS_TYPE
   ): Promise<UserWork> {
     userWork.finishAt = moment();
     if (!userWork.projectId || !userWork.task.userTasks) {
@@ -110,9 +110,12 @@ export class UserWorkService {
         where: { id: userWork.taskId },
       });
     }
-    if (typeof status === 'number') {
+    if (typeof statusTypeName === 'string') {
+      userWork.task.statusTypeName = statusTypeName;
+      // TODO: status нужно определить по statusTypeName
+      const status = Task.statusTypeNameToSimpleStatus(statusTypeName);
       userWork.task.status = status;
-      await this.taskService.updateByUser(userWork.task, { status }, user, curManager);
+      await this.taskService.updateByUser(userWork.task, { status, statusTypeName }, user, curManager);
     }
     const curUserTask = userWork.task.userTasks.find(el => el.userId === user.id);
 
@@ -161,7 +164,7 @@ export class UserWorkService {
 
     return await Promise.all(
       userWorks.map(async userWork => {
-        return await this.finishTask(manager, userWork, user, TASK_SIMPLE_STATUS.IN_TESTING);
+        return await this.finishTask(manager, userWork, user, TASK_STATUS_TYPE.TESTING);
       })
     );
   }
@@ -196,7 +199,7 @@ export class UserWorkService {
       previous: null,
     };
     await this.userWorkRepo.manager.transaction(async entityManager => {
-      result.previous = await this.finishTask(entityManager, userWork, user, TASK_SIMPLE_STATUS.IN_TESTING);
+      result.previous = await this.finishTask(entityManager, userWork, user, TASK_STATUS_TYPE.TESTING);
 
       const project = await this.userService.getDefaultProject(user, entityManager);
 
@@ -220,7 +223,7 @@ export class UserWorkService {
       previous: null,
     };
     await this.userWorkRepo.manager.transaction(async manager => {
-      stopResponse.previous = await this.finishTask(manager, userWork, user, TASK_SIMPLE_STATUS.TO_DO);
+      stopResponse.previous = await this.finishTask(manager, userWork, user, TASK_STATUS_TYPE.READY_TO_DO);
 
       const project = await this.userService.getDefaultProject(user, manager);
 
@@ -382,7 +385,7 @@ export class UserWorkService {
       if (startedTask.status !== TASK_SIMPLE_STATUS.IN_PROGRESS) {
         startedTask = await this.taskService.updateByUser(
           startedTask,
-          { status: TASK_SIMPLE_STATUS.IN_PROGRESS, statusTypeName: 'in-progress' },
+          { status: TASK_SIMPLE_STATUS.IN_PROGRESS, statusTypeName: TASK_STATUS_TYPE.IN_PROGRESS },
           user,
           curManager
         );
@@ -392,7 +395,9 @@ export class UserWorkService {
       const taskData = {
         description: userWorkData.description || '',
         performerId: userWorkData.performerId || user.id,
-        status: TASK_SIMPLE_STATUS.IN_PROGRESS,
+        // TODO: status must be calculated from statusTypeName according to strategy
+        status: Task.statusTypeNameToSimpleStatus(TASK_STATUS_TYPE.IN_PROGRESS),
+        statusTypeName: TASK_STATUS_TYPE.IN_PROGRESS,
         typeId: taskType ? taskType.id : undefined,
         title: userWorkData.title,
       };
