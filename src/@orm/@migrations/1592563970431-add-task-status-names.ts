@@ -2,7 +2,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddTaskStatusNames1592563970431 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
-    await queryRunner.query(`UPDATE "task" SET "statusTypeName" = 'created' WHERE "task"."status"=0`);
+    await queryRunner.query(`UPDATE "task" SET "statusTypeName" = 'creating' WHERE "task"."status"=0`);
     await queryRunner.query(`UPDATE "task" SET "statusTypeName" = 'ready-to-do' WHERE "task"."status"=1`);
     await queryRunner.query(`UPDATE "task" SET "statusTypeName" = 'in-progress' WHERE "task"."status"=2`);
     await queryRunner.query(`UPDATE "task" SET "statusTypeName" = 'testing' WHERE "task"."status"=3`);
