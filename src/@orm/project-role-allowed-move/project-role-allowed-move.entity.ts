@@ -57,21 +57,19 @@ export class ProjectRoleAllowedMove {
   public type!: TASK_STATUS_MOVE_TYPE;
 
   @IsNotEmpty()
-  @IsNumber()
-  @IsInt()
+  @IsString()
   @ApiProperty()
   @Column({ nullable: false })
-  fromId!: number;
+  fromName!: string;
 
   @ManyToOne(t => TaskStatus, { nullable: false, onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
   from!: TaskStatus;
 
   @IsNotEmpty()
-  @IsNumber()
-  @IsInt()
+  @IsString()
   @ApiProperty()
   @Column({ nullable: false })
-  toId!: number;
+  toName!: string;
 
   @ManyToOne(t => TaskStatus, { nullable: false, onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
   to!: TaskStatus;

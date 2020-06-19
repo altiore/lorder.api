@@ -426,9 +426,8 @@ export class ProjectService {
     return Object.values(TASK_SIMPLE_STATUS)
       .filter(el => typeof el === 'number')
       .map((enumValue: number) => ({
-        id: enumValue,
         moves: [],
-        name: TASK_SIMPLE_STATUS[enumValue],
+        name: Task.statusToName(enumValue),
         statusFrom: enumValue,
         statusTo: enumValue,
       }));
@@ -482,7 +481,7 @@ export class ProjectService {
       }, []);
     }
 
-    return columns.sort((a, b) => (a.id > b.id ? 1 : -1));
+    return columns.sort((a, b) => (a.name > b.name ? 1 : -1));
   }
 
   private async changeStrategy(project: Project, newStrategy: PROJECT_STRATEGY): Promise<true> {

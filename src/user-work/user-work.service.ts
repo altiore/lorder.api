@@ -378,10 +378,11 @@ export class UserWorkService {
       }
     }
     if (startedTask) {
+      // TODO: изменять данные в зависимости от стратегии
       if (startedTask.status !== TASK_SIMPLE_STATUS.IN_PROGRESS) {
         startedTask = await this.taskService.updateByUser(
           startedTask,
-          { status: TASK_SIMPLE_STATUS.IN_PROGRESS },
+          { status: TASK_SIMPLE_STATUS.IN_PROGRESS, statusTypeName: 'in-progress' },
           user,
           curManager
         );

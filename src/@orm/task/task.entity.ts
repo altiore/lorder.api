@@ -45,6 +45,15 @@ export class Task {
     DONE: 4,
   };
 
+  // TODO: удалить, когда с UI будет приходить правильное значение
+  static statusToName(status: number) {
+    if (![0, 1, 2, 3, 4].includes(status)) {
+      throw new Error('Недопустимое значение');
+    }
+
+    return ['creating', 'ready-to-do', 'in-progress', 'testing', 'done'][status];
+  }
+
   @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
@@ -94,7 +103,7 @@ export class Task {
   status: number;
 
   @Column({ nullable: true })
-  statusTypeId: number;
+  statusTypeName: string;
 
   @ManyToOne(t => TaskStatus, { nullable: true, onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
   statusType: TaskStatus;

@@ -129,6 +129,7 @@ export class TaskService {
       ...taskData,
       performerId: taskData.performerId || user.id,
       status: typeof taskData.status === 'number' ? taskData.status : TASK_SIMPLE_STATUS.JUST_CREATED,
+      statusTypeName: typeof taskData.statusTypeName === 'string' ? taskData.statusTypeName : 'creating',
     };
     const task = await this.taskRepo.createByProject(prepareTaskData, project, curManager);
 
@@ -145,7 +146,7 @@ export class TaskService {
         throw new NotAcceptableException('Task должен быть вилидной сохраненной задачей');
       }
       const changeType =
-        typeof newTaskData.status !== 'undefined' && task.status !== newTaskData.status
+        typeof newTaskData.statusTypeName !== 'undefined' && task.statusTypeName !== newTaskData.statusTypeName
           ? TASK_CHANGE_TYPE.MOVE
           : TASK_CHANGE_TYPE.UPDATE;
       await entityManager.save(this.taskLogRepo.createTaskLogByType(changeType, task, user));
@@ -164,6 +165,7 @@ export class TaskService {
     const curTask = typeof task === 'number' ? ({ id: task } as Task) : task;
     const curManager = manager || this.taskRepo.manager;
     const preparedData = { ...taskData };
+
     let projectParts: ProjectPart[];
     if (taskData.projectParts) {
       projectParts = taskData.projectParts.slice(0);

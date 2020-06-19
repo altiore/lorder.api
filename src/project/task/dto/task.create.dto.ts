@@ -32,6 +32,11 @@ export class TaskCreateDto {
   status?: number;
 
   @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  statusTypeName?: string;
+
+  @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
   performerId?: number;

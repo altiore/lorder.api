@@ -1,4 +1,3 @@
-import { TASK_SIMPLE_STATUS } from '../../../@orm/task';
 import { TestHelper } from '../../../@test-helper/@utils/TestHelper';
 import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture } from './@fixtures/move';
 
@@ -34,11 +33,11 @@ describe(`PATCH (MOVE) ${h.url}`, () => {
     const { body } = await h
       .requestBy(await h.getUser('project-owner@mail.com'))
       .patch(h.path(projectId, taskSequenceNumber))
-      .send({ status: TASK_SIMPLE_STATUS.IN_TESTING })
+      .send({ statusTypeName: 'testing' })
       .expect(200);
     expect(body).toEqual(
       expect.objectContaining({
-        status: TASK_SIMPLE_STATUS.IN_TESTING,
+        statusTypeName: 'testing',
       })
     );
   });
@@ -47,11 +46,11 @@ describe(`PATCH (MOVE) ${h.url}`, () => {
     const { body } = await h
       .requestBy(await h.getUser('member@mail.com'))
       .patch(h.path(projectId, taskSequenceNumber))
-      .send({ status: TASK_SIMPLE_STATUS.IN_TESTING })
+      .send({ statusTypeName: 'testing' })
       .expect(200);
     expect(body).toEqual(
       expect.objectContaining({
-        status: TASK_SIMPLE_STATUS.IN_TESTING,
+        statusTypeName: 'testing',
       })
     );
   });
@@ -73,7 +72,7 @@ describe(`PATCH (MOVE) ${h.url}`, () => {
     const { body } = await h
       .requestBy(await h.getUser('access-level-white@mail.com'))
       .patch(h.path(projectId, taskSequenceNumber))
-      .send({ status: TASK_SIMPLE_STATUS.IN_TESTING })
+      .send({ statusTypeName: 'testing' })
       .expect(403);
     expect(body).toEqual({
       error: 'Forbidden',

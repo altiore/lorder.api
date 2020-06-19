@@ -37,7 +37,6 @@ export enum PROJECT_STRATEGY {
 }
 
 export interface ITaskColumn {
-  id: number;
   name: string;
 
   moves: ITaskMove[];

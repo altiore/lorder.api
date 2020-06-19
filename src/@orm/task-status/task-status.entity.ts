@@ -5,14 +5,10 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class TaskStatus {
-  @ApiProperty()
-  @PrimaryColumn()
-  id!: number;
-
   @IsNotEmpty()
   @IsString()
   @ApiProperty()
-  @Column({ unique: true })
+  @PrimaryColumn()
   name!: string;
 
   @IsNotEmpty()

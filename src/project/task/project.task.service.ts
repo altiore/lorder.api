@@ -132,6 +132,9 @@ export class ProjectTaskService {
     if (taskDto.status !== undefined) {
       preparedData.status = taskDto.status;
     }
+    if (taskDto.statusTypeName !== undefined) {
+      preparedData.statusTypeName = taskDto.statusTypeName;
+    }
     if (taskDto.typeId !== undefined) {
       if (!taskDto.typeId) {
         preparedData.typeId = null;

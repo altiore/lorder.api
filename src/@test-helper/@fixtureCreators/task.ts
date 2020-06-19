@@ -12,6 +12,7 @@ export const createTasks = fixtureCreator<Task>(Task, function(entity, index) {
     description: random.words(5),
     sequenceNumber: index,
     status: TASK_SIMPLE_STATUS.JUST_CREATED,
+    statusTypeName: 'in-progress',
     title: company.companyName(),
     value: random.number(100),
     ...entity,
