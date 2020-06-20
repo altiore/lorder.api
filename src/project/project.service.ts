@@ -426,6 +426,7 @@ export class ProjectService {
     return Object.values(TASK_SIMPLE_STATUS)
       .filter(el => typeof el === 'number')
       .map((enumValue: number) => ({
+        id: enumValue + 1,
         moves: [],
         name: Task.statusToName(enumValue),
         statusFrom: enumValue,
@@ -453,35 +454,32 @@ export class ProjectService {
         return arr;
       }, []);
       columns = allowedMoves.reduce((arr, am) => {
-        const fromIndex = arr.findIndex(el => el.id === am.fromId);
-        const toIndex = arr.findIndex(el => el.id === am.toId);
+        const fromIndex = arr.findIndex(el => el.name === am.fromName);
+        const toIndex = arr.findIndex(el => el.name === am.toName);
         const preparedAm = omit(am, ['from', 'to']);
-        if (fromIndex === -1) {
-          if (toIndex === -1) {
-            arr.push({
-              ...am.to,
-              moves: [preparedAm],
-            });
-            arr.push({
-              ...am.from,
-              moves: [preparedAm],
-            });
-          } else {
-            arr[toIndex].moves.push(preparedAm);
-          }
+        if (toIndex === -1) {
+          arr.push({
+            ...am.to,
+            moves: [preparedAm],
+          });
         } else {
-          if (toIndex === -1) {
-            arr[fromIndex].moves.push(preparedAm);
-          } else {
-            arr[fromIndex].moves.push(preparedAm);
-            arr[toIndex].moves.push(preparedAm);
-          }
+          arr[toIndex].moves.push(preparedAm);
         }
+
+        if (fromIndex === -1) {
+          arr.push({
+            ...am.from,
+            moves: [preparedAm],
+          });
+        } else {
+          arr[fromIndex].moves.push(preparedAm);
+        }
+
         return arr;
       }, []);
     }
 
-    return columns.sort((a, b) => (a.name > b.name ? 1 : -1));
+    return columns.sort((a, b) => (a.statusFrom > b.statusFrom ? 1 : -1));
   }
 
   private async changeStrategy(project: Project, newStrategy: PROJECT_STRATEGY): Promise<true> {
