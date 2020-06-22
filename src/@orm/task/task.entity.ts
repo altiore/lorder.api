@@ -19,7 +19,7 @@ import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { ProjectPart } from '../project-part/project-part.entity';
 import { Project } from '../project/project.entity';
 import { TaskComment } from '../task-comment/task-comment.entity';
-import { TaskStatus } from '../task-status/task-status.entity';
+import { STATUS_NAME } from '../task-status/task-status.entity';
 import { TaskType } from '../task-type/task-type.entity';
 import { UserTask } from '../user-task/user-task.entity';
 import { UserWork } from '../user-work/user-work.entity';
@@ -31,20 +31,6 @@ export enum TASK_SIMPLE_STATUS {
   IN_PROGRESS = 2,
   IN_TESTING = 3,
   DONE = 4,
-}
-
-export enum TASK_STATUS_TYPE {
-  CREATING = 'creating',
-  ARCHITECT_ESTIMATION = 'architect-estimation',
-  PROF_ESTIMATION = 'prof-estimation',
-  READY_TO_DO = 'ready-to-do',
-  IN_PROGRESS = 'in-progress',
-  PROF_REVIEW = 'prof-review',
-  TESTING = 'testing',
-  ARCHITECT_REVIEW = 'architect-review',
-  PROF_ESTIMATION_2 = 'prof-estimation-2',
-  ARCHITECT_ESTIMATION_2 = 'architect-estimation-2',
-  DONE = 'done',
 }
 
 @Entity()
@@ -60,34 +46,50 @@ export class Task {
   };
 
   // TODO: удалить, когда с UI будет приходить правильное значение
-  static statusToName(status: number): TASK_STATUS_TYPE {
+  static statusToName(status: number): STATUS_NAME {
     if (![0, 1, 2, 3, 4].includes(status)) {
       throw new Error('Недопустимое значение');
     }
 
     return [
-      TASK_STATUS_TYPE.CREATING,
-      TASK_STATUS_TYPE.READY_TO_DO,
-      TASK_STATUS_TYPE.IN_PROGRESS,
-      TASK_STATUS_TYPE.TESTING,
-      TASK_STATUS_TYPE.DONE,
+      STATUS_NAME.CREATING,
+      STATUS_NAME.READY_TO_DO,
+      STATUS_NAME.IN_PROGRESS,
+      STATUS_NAME.TESTING,
+      STATUS_NAME.DONE,
     ][status];
   }
 
-  static statusTypeNameToSimpleStatus(statusTypeName: TASK_STATUS_TYPE): TASK_SIMPLE_STATUS {
-    return {
-      [TASK_STATUS_TYPE.CREATING]: 0,
-      [TASK_STATUS_TYPE.ARCHITECT_ESTIMATION]: 0,
-      [TASK_STATUS_TYPE.PROF_ESTIMATION]: 0,
-      [TASK_STATUS_TYPE.READY_TO_DO]: 1,
-      [TASK_STATUS_TYPE.IN_PROGRESS]: 2,
-      [TASK_STATUS_TYPE.PROF_REVIEW]: 3,
-      [TASK_STATUS_TYPE.TESTING]: 3,
-      [TASK_STATUS_TYPE.ARCHITECT_REVIEW]: 3,
-      [TASK_STATUS_TYPE.PROF_ESTIMATION_2]: 3,
-      [TASK_STATUS_TYPE.ARCHITECT_ESTIMATION_2]: 3,
-      [TASK_STATUS_TYPE.DONE]: 4,
+  static statusTypeNameToSimpleStatus(statusTypeName: STATUS_NAME): TASK_SIMPLE_STATUS {
+    const res = {
+      [STATUS_NAME.CREATING]: 0,
+      [STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING]: 0,
+      [STATUS_NAME.ASSIGNING_RESPONSIBLE]: 0,
+      [STATUS_NAME.ESTIMATION_BEFORE_PERFORMER]: 0,
+      [STATUS_NAME.ASSIGNING_PERFORMER]: 0,
+      [STATUS_NAME.ESTIMATION_BEFORE_TO_DO]: 0,
+      [STATUS_NAME.ASSIGNING_RESPONSIBLE]: 0,
+      [STATUS_NAME.READY_TO_DO]: 1,
+      [STATUS_NAME.IN_PROGRESS]: 2,
+      [STATUS_NAME.AUTO_TESTING]: 3,
+      [STATUS_NAME.PROF_REVIEW]: 3,
+      [STATUS_NAME.ESTIMATION_BEFORE_TEST]: 3,
+      [STATUS_NAME.READY_TO_TEST]: 3,
+      [STATUS_NAME.TESTING]: 3,
+      [STATUS_NAME.ARCHITECT_REVIEW]: 3,
+      [STATUS_NAME.READY_TO_DEPLOY]: 4,
+      [STATUS_NAME.DEPLOYING]: 4,
+      [STATUS_NAME.DEPLOYED_PROF_ESTIMATION]: 4,
+      [STATUS_NAME.DEPLOYED_ARCHITECT_ESTIMATION]: 4,
+      [STATUS_NAME.DEPLOYED_COMMUNITY_ESTIMATION]: 4,
+      [STATUS_NAME.DEPLOYED_ESTIMATION]: 4,
+      [STATUS_NAME.DONE]: 4,
     }[statusTypeName];
+    if (typeof res === 'number') {
+      return res;
+    }
+
+    return 0;
   }
 
   @ApiProperty()
@@ -139,10 +141,10 @@ export class Task {
   status: number;
 
   @Column({ nullable: true })
-  statusTypeName: TASK_STATUS_TYPE;
+  statusTypeName: STATUS_NAME;
 
-  @ManyToOne(t => TaskStatus, { nullable: true, onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
-  statusType: TaskStatus;
+  // @ManyToOne(t => TaskStatus, { nullable: true, onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
+  // statusType: TaskStatus;
 
   @ApiPropertyOptional()
   @Column({ nullable: true })

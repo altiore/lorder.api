@@ -5,8 +5,9 @@ import { DeleteResult, EntityManager } from 'typeorm';
 
 import { Project } from '@orm/project';
 import { ProjectPart } from '@orm/project-part/project-part.entity';
-import { Task, TaskRepository, TASK_SIMPLE_STATUS, TASK_STATUS_TYPE } from '@orm/task';
+import { Task, TaskRepository, TASK_SIMPLE_STATUS } from '@orm/task';
 import { TaskLogRepository, TASK_CHANGE_TYPE } from '@orm/task-log';
+import { STATUS_NAME } from '@orm/task-status/task-status.entity';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
 
@@ -129,7 +130,7 @@ export class TaskService {
       ...taskData,
       performerId: taskData.performerId || user.id,
       status: typeof taskData.status === 'number' ? taskData.status : TASK_SIMPLE_STATUS.JUST_CREATED,
-      statusTypeName: typeof taskData.statusTypeName === 'string' ? taskData.statusTypeName : TASK_STATUS_TYPE.CREATING,
+      statusTypeName: typeof taskData.statusTypeName === 'string' ? taskData.statusTypeName : STATUS_NAME.CREATING,
     };
     const task = await this.taskRepo.createByProject(prepareTaskData, project, curManager);
 

@@ -6,13 +6,14 @@ import * as moment from 'moment';
 import { DeleteResult, EntityManager, IsNull } from 'typeorm';
 
 import { Project } from '@orm/project';
+import { STATUS_NAME } from '@orm/task-status/task-status.entity';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
 
 import { PaginationDto } from '@common/dto';
 
 import { ValidationException } from '../@common/exceptions/validation.exception';
-import { Task, TASK_SIMPLE_STATUS, TASK_STATUS_TYPE } from '../@orm/task';
+import { Task, TASK_SIMPLE_STATUS } from '../@orm/task';
 import { TaskType } from '../@orm/task-type/task-type.entity';
 import { UserTask } from '../@orm/user-task';
 import { UserWork, UserWorkRepository } from '../@orm/user-work';
@@ -101,7 +102,7 @@ export class UserWorkService {
     curManager: EntityManager,
     userWork: UserWork,
     user: User,
-    statusTypeName?: TASK_STATUS_TYPE
+    statusTypeName?: STATUS_NAME
   ): Promise<UserWork> {
     userWork.finishAt = moment();
     if (!userWork.projectId || !userWork.task.userTasks) {
@@ -164,7 +165,7 @@ export class UserWorkService {
 
     return await Promise.all(
       userWorks.map(async userWork => {
-        return await this.finishTask(manager, userWork, user, TASK_STATUS_TYPE.TESTING);
+        return await this.finishTask(manager, userWork, user, STATUS_NAME.TESTING);
       })
     );
   }
@@ -199,7 +200,7 @@ export class UserWorkService {
       previous: null,
     };
     await this.userWorkRepo.manager.transaction(async entityManager => {
-      result.previous = await this.finishTask(entityManager, userWork, user, TASK_STATUS_TYPE.TESTING);
+      result.previous = await this.finishTask(entityManager, userWork, user, STATUS_NAME.TESTING);
 
       const project = await this.userService.getDefaultProject(user, entityManager);
 
@@ -223,7 +224,7 @@ export class UserWorkService {
       previous: null,
     };
     await this.userWorkRepo.manager.transaction(async manager => {
-      stopResponse.previous = await this.finishTask(manager, userWork, user, TASK_STATUS_TYPE.READY_TO_DO);
+      stopResponse.previous = await this.finishTask(manager, userWork, user, STATUS_NAME.READY_TO_DO);
 
       const project = await this.userService.getDefaultProject(user, manager);
 
@@ -385,7 +386,7 @@ export class UserWorkService {
       if (startedTask.status !== TASK_SIMPLE_STATUS.IN_PROGRESS) {
         startedTask = await this.taskService.updateByUser(
           startedTask,
-          { status: TASK_SIMPLE_STATUS.IN_PROGRESS, statusTypeName: TASK_STATUS_TYPE.IN_PROGRESS },
+          { status: TASK_SIMPLE_STATUS.IN_PROGRESS, statusTypeName: STATUS_NAME.IN_PROGRESS },
           user,
           curManager
         );
@@ -396,8 +397,8 @@ export class UserWorkService {
         description: userWorkData.description || '',
         performerId: userWorkData.performerId || user.id,
         // TODO: status must be calculated from statusTypeName according to strategy
-        status: Task.statusTypeNameToSimpleStatus(TASK_STATUS_TYPE.IN_PROGRESS),
-        statusTypeName: TASK_STATUS_TYPE.IN_PROGRESS,
+        status: Task.statusTypeNameToSimpleStatus(STATUS_NAME.IN_PROGRESS),
+        statusTypeName: STATUS_NAME.IN_PROGRESS,
         typeId: taskType ? taskType.id : undefined,
         title: userWorkData.title,
       };
