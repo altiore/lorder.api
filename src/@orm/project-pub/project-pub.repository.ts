@@ -9,7 +9,7 @@ import { ProjectPub } from './project-pub.entity';
 export class ProjectPubRepository extends Repository<ProjectPub> {
   public async findPublishedByUuid(uuid: string): Promise<ProjectPub> {
     const pubProject = await this.findOneOrFail({
-      relations: ['project', 'project.members'],
+      relations: ['project', 'project.members', 'project.members.roles', 'project.roles', 'project.roles.role'],
       where: { uuid },
     });
     if (pubProject.members) {
