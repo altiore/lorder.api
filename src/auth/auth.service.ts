@@ -170,9 +170,7 @@ export class AuthService {
    */
   public createBearerKey(userInfo: JwtPayload): { bearerKey: string; expiresIn: number } {
     const configExpiresIn = parseInt(process.env.JWT_EXPIRES_IN, 0) || 3600;
-    const expiresIn = moment()
-      .add(configExpiresIn, 'second')
-      .unix();
+    const expiresIn = moment().add(configExpiresIn, 'second').unix();
     return {
       bearerKey: jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: configExpiresIn }),
       expiresIn,

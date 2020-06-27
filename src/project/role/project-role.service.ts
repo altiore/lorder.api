@@ -7,6 +7,7 @@ import { In } from 'typeorm';
 import { Project } from '@orm/project';
 import { User } from '@orm/user';
 
+import { ROLE } from '../../@domains/strategy';
 import { ProjectRoleAllowedMove } from '../../@orm/project-role-allowed-move/project-role-allowed-move.entity';
 import { ProjectRole } from '../../@orm/project-role/project-role.entity';
 import { RoleService } from '../../role/role.service';
@@ -38,13 +39,13 @@ export class ProjectRoleService {
     const projectRoleData: Partial<ProjectRole> = {
       project,
       role,
-      allowedMoves: projectRoleDto.allowedMoveIds.map(id => ({ id })) as ProjectRoleAllowedMove[],
+      allowedMoves: projectRoleDto.allowedMoveIds.map((id) => ({ id })) as ProjectRoleAllowedMove[],
     };
     const entity = this.repo.create(projectRoleData);
     return classToClass(await this.repo.save(entity));
   }
 
-  public async deleteOne(project: Project, user: User, roleId: string) {
+  public async deleteOne(project: Project, user: User, roleId: ROLE) {
     return this.repo.delete({
       project,
       role: { id: roleId },

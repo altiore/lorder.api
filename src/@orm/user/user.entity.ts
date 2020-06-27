@@ -36,8 +36,8 @@ export class User {
     length: 254,
     nullable: true,
     transformer: {
-      from: d => d,
-      to: d => (d ? d.toLowerCase() : undefined),
+      from: (d) => d,
+      to: (d) => (d ? d.toLowerCase() : undefined),
     },
     // select: false,
     unique: true,
@@ -49,8 +49,8 @@ export class User {
     length: 13,
     nullable: true,
     transformer: {
-      from: d => d,
-      to: d => (d ? d.replace(/[\D]/gi, '') : undefined),
+      from: (d) => d,
+      to: (d) => (d ? d.replace(/[\D]/gi, '') : undefined),
     },
     select: false,
     unique: true,
@@ -73,7 +73,7 @@ export class User {
   @JoinColumn()
   avatar?: Media;
 
-  @ManyToOne(t => Project, { nullable: true, onDelete: 'SET NULL', onUpdate: 'CASCADE' })
+  @ManyToOne((t) => Project, { nullable: true, onDelete: 'SET NULL', onUpdate: 'CASCADE' })
   defaultProject: Project;
 
   @Column({ nullable: true })
@@ -88,32 +88,32 @@ export class User {
   updatedAt: Moment;
 
   @ApiProperty({ type: UserRole, isArray: true })
-  @OneToMany(() => UserRole, m => m.user, { eager: true, cascade: ['insert', 'update', 'remove'] })
+  @OneToMany(() => UserRole, (m) => m.user, { eager: true, cascade: ['insert', 'update', 'remove'] })
   @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
   userRoles: UserRole[];
 
   get roles(): Role[] {
-    return this.userRoles ? this.userRoles.map(el => el.role) : [];
+    return this.userRoles ? this.userRoles.map((el) => el.role) : [];
   }
 
   @ApiPropertyOptional()
   @Column({ nullable: true })
   displayName: string;
 
-  @OneToMany(type => Project, project => project.owner)
+  @OneToMany((type) => Project, (project) => project.owner)
   ownProjects: Project[];
 
-  @OneToMany(type => UserProject, userProject => userProject.member)
+  @OneToMany((type) => UserProject, (userProject) => userProject.member)
   memberProjects: UserProject[];
 
-  @OneToMany(type => UserProject, userProject => userProject.member)
+  @OneToMany((type) => UserProject, (userProject) => userProject.member)
   invitedMembers: UserProject[];
 
-  @OneToMany(type => UserWork, userWork => userWork.user)
+  @OneToMany((type) => UserWork, (userWork) => userWork.user)
   works: UserWork[];
 
   get role(): ROLES {
-    const stringRoles = this.roles.map(uRole => uRole.name);
+    const stringRoles = this.roles.map((uRole) => uRole.name);
     if (includes(stringRoles, ROLES.SUPER_ADMIN)) {
       return ROLES.SUPER_ADMIN;
     }

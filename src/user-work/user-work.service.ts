@@ -6,13 +6,13 @@ import * as moment from 'moment';
 import { DeleteResult, EntityManager, IsNull } from 'typeorm';
 
 import { Project } from '@orm/project';
-import { STATUS_NAME } from '@orm/task-status/task-status.entity';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
 
 import { PaginationDto } from '@common/dto';
 
 import { ValidationException } from '../@common/exceptions/validation.exception';
+import { STATUS_NAME } from '../@domains/strategy';
 import { Task, TASK_SIMPLE_STATUS } from '../@orm/task';
 import { TaskType } from '../@orm/task-type/task-type.entity';
 import { UserTask } from '../@orm/user-task';
@@ -91,7 +91,7 @@ export class UserWorkService {
 
   public async remove(userWork: UserWork, user): Promise<DeleteResult | undefined> {
     let result: DeleteResult;
-    await this.userWorkRepo.manager.transaction(async entityManager => {
+    await this.userWorkRepo.manager.transaction(async (entityManager) => {
       result = await entityManager.delete(UserWork, { id: userWork.id });
       await this.projectService.calculateUserStatistic(user, 0, entityManager);
     });
@@ -118,7 +118,7 @@ export class UserWorkService {
       userWork.task.status = status;
       await this.taskService.updateByUser(userWork.task, { status, statusTypeName }, user, curManager);
     }
-    const curUserTask = userWork.task.userTasks.find(el => el.userId === user.id);
+    const curUserTask = userWork.task.userTasks.find((el) => el.userId === user.id);
 
     // TODO: проверить стратегию проекта
 
@@ -149,7 +149,7 @@ export class UserWorkService {
   public async updateBenefitParts(userTasks: UserTask[], manager?: EntityManager): Promise<void> {
     const curManager = manager || this.userWorkRepo.manager;
     const usersCount = userTasks.length;
-    userTasks.map(ut => {
+    userTasks.map((ut) => {
       const accuracy = 1000000;
       ut.benefitPart = Math.round(accuracy / usersCount) / accuracy;
     });
@@ -164,7 +164,7 @@ export class UserWorkService {
     });
 
     return await Promise.all(
-      userWorks.map(async userWork => {
+      userWorks.map(async (userWork) => {
         return await this.finishTask(manager, userWork, user, STATUS_NAME.TESTING);
       })
     );
@@ -175,7 +175,7 @@ export class UserWorkService {
       finished: [],
       started: null,
     };
-    await this.userWorkRepo.manager.transaction(async entityManager => {
+    await this.userWorkRepo.manager.transaction(async (entityManager) => {
       // TODO: добавить транзакции на процесс создания всех частей задачи
       // 1. Завершить предыдущие задачи, если есть незавершенные
       result.finished = await this.finishNotFinished(user, entityManager);
@@ -199,7 +199,7 @@ export class UserWorkService {
       next: null,
       previous: null,
     };
-    await this.userWorkRepo.manager.transaction(async entityManager => {
+    await this.userWorkRepo.manager.transaction(async (entityManager) => {
       result.previous = await this.finishTask(entityManager, userWork, user, STATUS_NAME.TESTING);
 
       const project = await this.userService.getDefaultProject(user, entityManager);
@@ -223,7 +223,7 @@ export class UserWorkService {
       next: null,
       previous: null,
     };
-    await this.userWorkRepo.manager.transaction(async manager => {
+    await this.userWorkRepo.manager.transaction(async (manager) => {
       stopResponse.previous = await this.finishTask(manager, userWork, user, STATUS_NAME.READY_TO_DO);
 
       const project = await this.userService.getDefaultProject(user, manager);
@@ -256,7 +256,7 @@ export class UserWorkService {
 
       // 2. удалить все задачи, полностью включенные в этот промежуток времени
       removed = touchedUserWorks.filter(
-        el =>
+        (el) =>
           el.startAt.diff(userWorkDto.startAt ? moment(userWorkDto.startAt) : userWork.startAt) >= 0 &&
           (el.finishAt
             ? el.finishAt.diff(userWorkDto.finishAt ? moment(userWorkDto.finishAt) : userWork.finishAt || moment()) <= 0
@@ -269,9 +269,9 @@ export class UserWorkService {
       }
 
       // 3. изменить все задачи, которые затрагивает этот промежуток времени
-      touched = touchedUserWorks.filter((tuw: any) => removed.findIndex(el => el.id === tuw.id) === -1);
+      touched = touchedUserWorks.filter((tuw: any) => removed.findIndex((el) => el.id === tuw.id) === -1);
       if (touched.length) {
-        touched = touched.map(el => {
+        touched = touched.map((el) => {
           if (
             el.startAt &&
             userWorkDto.finishAt &&

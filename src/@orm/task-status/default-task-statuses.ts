@@ -1,4 +1,4 @@
-import { STATUS_NAME } from './task-status.entity';
+import { STATUS_NAME } from '../../@domains/strategy';
 
 export default [
   { name: STATUS_NAME.CREATING, statusFrom: 1, statusTo: 1000 },

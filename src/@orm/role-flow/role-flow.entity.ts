@@ -3,6 +3,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsLowercase, IsString, Length, Matches } from 'class-validator';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
+import { ROLE } from '../../@domains/strategy';
+
 @Entity()
 export class RoleFlow {
   @ApiProperty()
@@ -11,7 +13,7 @@ export class RoleFlow {
   @Matches(/^[a-z][a-z0-9\-_]{3,19}$/)
   @Length(3, 20)
   @PrimaryColumn()
-  id: string;
+  id: ROLE;
 
   @ApiProperty()
   @IsString()

@@ -2,7 +2,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 
 import { IsIn, IsNumber, IsOptional, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
 
-import { STATUS_NAME } from '@orm/task-status/task-status.entity';
+import { STATUS_NAME } from '../../../@domains/strategy';
 
 export class TaskUpdateDto {
   @ApiPropertyOptional()

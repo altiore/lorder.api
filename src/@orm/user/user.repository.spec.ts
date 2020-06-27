@@ -30,9 +30,11 @@ describe('The UserRepository', () => {
   it('updateEntity tel', async () => {
     const user = await userRepository.findOneByEmail('test');
     expect(
-      (await userRepository.updateOne(user, {
-        tel: '7777777777',
-      })).tel
+      (
+        await userRepository.updateOne(user, {
+          tel: '7777777777',
+        })
+      ).tel
     ).toBe('7777777777');
     expect((await userRepository.find({ where: { tel: '7777777777' } })).length).toBe(1);
   });
@@ -41,9 +43,11 @@ describe('The UserRepository', () => {
     const user = await userRepository.findOneByEmail('test');
     const newTes = '380997777777';
     expect(
-      (await userRepository.updateOne(user, {
-        tel: newTes,
-      })).email
+      (
+        await userRepository.updateOne(user, {
+          tel: newTes,
+        })
+      ).email
     ).toBe(user.email);
     expect((await userRepository.find({ where: { email: user.email } })).length).toBe(1);
     await userRepository.remove(user);

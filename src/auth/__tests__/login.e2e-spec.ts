@@ -8,10 +8,7 @@ describe(`PATCH ${h.url}`, () => {
   afterAll(h.after);
 
   it('by guest - validation error', async () => {
-    await h
-      .requestBy()
-      .patch(h.url)
-      .expect(422);
+    await h.requestBy().patch(h.url).expect(422);
   });
 
   it('by guest - correct data', async () => {

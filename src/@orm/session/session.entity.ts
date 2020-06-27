@@ -19,7 +19,7 @@ export class Session {
   @Column()
   userId: number;
 
-  @ManyToOne(t => User, {
+  @ManyToOne((t) => User, {
     nullable: false,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',

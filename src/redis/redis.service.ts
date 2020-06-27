@@ -12,11 +12,11 @@ export class RedisService {
   createOneTimeToken(userData: UserDataDto, expiresInSeconds: number = 300): Promise<string> {
     const token = guid();
     return new Promise((resolve, reject) => {
-      this.redis.hmset(token, userData as any, err => {
+      this.redis.hmset(token, userData as any, (err) => {
         if (err) {
           reject(err);
         } else {
-          this.redis.expire(token, expiresInSeconds, err2 => {
+          this.redis.expire(token, expiresInSeconds, (err2) => {
             if (err2) {
               reject(err2);
             } else {
@@ -34,7 +34,7 @@ export class RedisService {
         if (err) {
           reject(err);
         } else {
-          this.redis.del(token, err2 => {
+          this.redis.del(token, (err2) => {
             if (err2) {
               reject(err2);
             } else {
@@ -55,7 +55,7 @@ export class RedisService {
 
   closeConnection(): Promise<void> {
     return new Promise((ok, reject) => {
-      this.redis.quit(err => {
+      this.redis.quit((err) => {
         if (err) {
           reject();
         } else {

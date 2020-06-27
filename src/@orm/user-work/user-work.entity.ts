@@ -44,7 +44,7 @@ export class UserWork {
   @Column({ nullable: false })
   userId: number;
 
-  @ManyToOne(() => User, user => user.works, {
+  @ManyToOne(() => User, (user) => user.works, {
     nullable: false,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
@@ -56,7 +56,7 @@ export class UserWork {
   taskId: number;
 
   @ApiProperty({ type: () => Task })
-  @ManyToOne(() => Task, task => task.userWorks, {
+  @ManyToOne(() => Task, (task) => task.userWorks, {
     nullable: false,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',

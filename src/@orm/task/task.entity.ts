@@ -15,11 +15,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { STATUS_NAME } from '../../@domains/strategy';
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { ProjectPart } from '../project-part/project-part.entity';
 import { Project } from '../project/project.entity';
 import { TaskComment } from '../task-comment/task-comment.entity';
-import { STATUS_NAME } from '../task-status/task-status.entity';
 import { TaskType } from '../task-type/task-type.entity';
 import { UserTask } from '../user-task/user-task.entity';
 import { UserWork } from '../user-work/user-work.entity';
@@ -105,7 +105,7 @@ export class Task {
   projectId: number;
 
   @ApiProperty({ type: () => Project })
-  @ManyToOne(() => Project, project => project.tasks, {
+  @ManyToOne(() => Project, (project) => project.tasks, {
     nullable: false,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
@@ -113,11 +113,11 @@ export class Task {
   project: Project;
 
   // ApiModel does not work here due to circular dependency
-  @ManyToOne(type => Task, m => m.children)
+  @ManyToOne((type) => Task, (m) => m.children)
   parentTask?: Task;
 
   // ApiModel does not work here due to circular dependency
-  @OneToMany(type => Task, m => m.parentTask)
+  @OneToMany((type) => Task, (m) => m.parentTask)
   children?: Task[];
 
   @ApiProperty()
@@ -157,6 +157,9 @@ export class Task {
   @Column('boolean', { default: false })
   isArchived: boolean = false;
 
+  // @Column('boolean', { default: false })
+  // inProgress: boolean = false;
+
   @ApiProperty()
   @Column({ nullable: true })
   performerId: number;
@@ -175,10 +178,10 @@ export class Task {
   @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL', onUpdate: 'CASCADE' })
   createdBy: User;
 
-  @OneToMany(type => UserWork, userWork => userWork.task, { eager: false })
+  @OneToMany((type) => UserWork, (userWork) => userWork.task, { eager: false })
   userWorks: UserWork[];
 
-  @OneToMany(type => UserTask, m => m.task)
+  @OneToMany((type) => UserTask, (m) => m.task)
   userTasks: UserTask[];
 
   // TODO: can be removed. Redundant and exists in task-log table
@@ -191,10 +194,10 @@ export class Task {
   @UpdateDateColumn(momentDateTransformer)
   updatedAt: Moment;
 
-  @OneToMany(type => TaskComment, m => m.task)
+  @OneToMany((type) => TaskComment, (m) => m.task)
   comments: TaskComment[];
 
-  @ManyToMany(t => ProjectPart, p => p.tasks, {
+  @ManyToMany((t) => ProjectPart, (p) => p.tasks, {
     onDelete: 'RESTRICT',
     onUpdate: 'CASCADE',
   })

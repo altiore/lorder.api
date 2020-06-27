@@ -14,10 +14,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { IColumn } from '../../@domains/strategy';
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { ProjectPart } from '../project-part/project-part.entity';
 import { ProjectPub } from '../project-pub/project-pub.entity';
-import { ITaskMove } from '../project-role-allowed-move/project-role-allowed-move.entity';
 import { ProjectRole } from '../project-role/project-role.entity';
 import { ProjectTaskType } from '../project-task-type/project-task-type.entity';
 import { Task } from '../task/task.entity';
@@ -34,16 +34,6 @@ export enum PROJECT_STRATEGY {
   ADVANCED = 'ADVANCED',
   SIMPLE = 'SIMPLE',
   DOUBLE_CHECK = 'DOUBLE_CHECK',
-}
-
-export interface ITaskColumn {
-  id: number;
-  name: string;
-
-  moves: ITaskMove[];
-
-  statusFrom: number;
-  statusTo: number;
 }
 
 @Entity()
@@ -97,7 +87,7 @@ export class Project {
   ownerId: number;
 
   @ApiProperty({ type: () => User })
-  @ManyToOne(() => User, m => m.ownProjects, {
+  @ManyToOne(() => User, (m) => m.ownProjects, {
     nullable: false,
     onDelete: 'CASCADE',
     onUpdate: 'NO ACTION',
@@ -105,7 +95,7 @@ export class Project {
   owner: User;
 
   @ApiProperty({ type: Task, isArray: true })
-  @OneToMany(() => Task, m => m.project)
+  @OneToMany(() => Task, (m) => m.project)
   tasks: Task[];
 
   @ApiPropertyOptional({ type: ProjectTaskType })
@@ -113,18 +103,18 @@ export class Project {
   @JoinColumn()
   defaultTaskType: ProjectTaskType;
 
-  @OneToMany(() => ProjectTaskType, m => m.project)
+  @OneToMany(() => ProjectTaskType, (m) => m.project)
   projectTaskTypes: ProjectTaskType[];
 
-  @OneToOne(() => ProjectPub, m => m.project)
+  @OneToOne(() => ProjectPub, (m) => m.project)
   pub: ProjectPub;
 
   @ApiPropertyOptional({ type: UserProject, isArray: true })
-  @OneToMany(() => UserProject, m => m.project)
+  @OneToMany(() => UserProject, (m) => m.project)
   members: UserProject[];
 
   @ApiPropertyOptional({ type: () => ProjectRole, isArray: true })
-  @OneToMany(() => ProjectRole, m => m.project)
+  @OneToMany(() => ProjectRole, (m) => m.project)
   roles: ProjectRole[];
 
   @ApiPropertyOptional({
@@ -140,10 +130,10 @@ export class Project {
   valueSum?: number;
 
   @ApiPropertyOptional({ type: () => ProjectPart, isArray: true })
-  @OneToMany(() => ProjectPart, m => m.project)
+  @OneToMany(() => ProjectPart, (m) => m.project)
   parts: ProjectPart[];
 
-  taskColumns?: ITaskColumn[];
+  taskColumns?: IColumn[];
 
   isAccess(accessLevel: ACCESS_LEVEL) {
     if (!this.accessLevel) {

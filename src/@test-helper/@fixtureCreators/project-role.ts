@@ -7,7 +7,7 @@ import { ProjectRoleAllowedMove } from '../../@orm/project-role-allowed-move/pro
 import { ProjectRole } from '../../@orm/project-role/project-role.entity';
 import { RoleFlow } from '../../@orm/role-flow';
 
-export const createProjectRoles = fixtureCreator<ProjectRole>(ProjectRole, function(entity, index) {
+export const createProjectRoles = fixtureCreator<ProjectRole>(ProjectRole, function (entity, index) {
   return {
     name: `${company.companyName()} ${index}`,
     ...entity,

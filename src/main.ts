@@ -20,11 +20,11 @@ const SCHEMA = IS_PROD ? 'https' : 'http';
 const whitelist = process.env.SERVER_ORIGIN_WHITELIST
   ? JSON.parse(process.env.SERVER_ORIGIN_WHITELIST)
   : process.env.SERVER_ORIGIN
-    ? [process.env.SERVER_ORIGIN]
-    : [];
+  ? [process.env.SERVER_ORIGIN]
+  : [];
 
 function except(currentHost, paths, fn) {
-  return function(req, res, next) {
+  return function (req, res, next) {
     const refererHost = getReferer(req.get('referer'));
     // Не проверять CORS заголовки для запросов, посланных с того же домена и содержащих пути из списка paths
 

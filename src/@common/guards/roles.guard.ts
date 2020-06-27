@@ -21,7 +21,10 @@ export class RolesGuard implements CanActivate {
     if (!user || !user.roles) {
       return false;
     }
-    const isHasRole = intersection(user.roles.map(r => r.name), preparedRoles).length;
+    const isHasRole = intersection(
+      user.roles.map((r) => r.name),
+      preparedRoles
+    ).length;
     return Boolean(isHasRole);
   }
 }

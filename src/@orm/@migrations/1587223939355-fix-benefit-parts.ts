@@ -9,8 +9,9 @@ export class FixBenefitParts1587223939355 implements MigrationInterface {
       let tasksPart;
       do {
         tasksPart = await queryRunner.query(
-          `SELECT "id" FROM "task" WHERE "task"."projectId"=${project.id} ORDER BY "id" ASC LIMIT ${step} OFFSET ${i *
-            step}`
+          `SELECT "id" FROM "task" WHERE "task"."projectId"=${project.id} ORDER BY "id" ASC LIMIT ${step} OFFSET ${
+            i * step
+          }`
         );
         for (const task of tasksPart) {
           const distinctUsers = await queryRunner.query(
@@ -25,15 +26,11 @@ export class FixBenefitParts1587223939355 implements MigrationInterface {
               );
               if (!userTask) {
                 await queryRunner.query(
-                  `INSERT INTO "user_tasks" (userId, taskId, benefitPart) VALUES (${user.userId}, ${
-                    task.id
-                  }, ${benefitPart})`
+                  `INSERT INTO "user_tasks" (userId, taskId, benefitPart) VALUES (${user.userId}, ${task.id}, ${benefitPart})`
                 );
               } else {
                 await queryRunner.query(
-                  `UPDATE "user_tasks" SET "benefitPart"=${benefitPart} WHERE "userId"=${user.userId} AND "taskId"=${
-                    task.id
-                  }`
+                  `UPDATE "user_tasks" SET "benefitPart"=${benefitPart} WHERE "userId"=${user.userId} AND "taskId"=${task.id}`
                 );
               }
             }

@@ -16,7 +16,7 @@ export class ProjectPub {
   projectId: number;
 
   @ApiProperty({ type: () => Project })
-  @OneToOne(() => Project, project => project.pub, { nullable: false })
+  @OneToOne(() => Project, (project) => project.pub, { nullable: false })
   @JoinColumn()
   project: Project;
 

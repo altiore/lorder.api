@@ -15,13 +15,13 @@ export class UserProject {
   memberId: number;
 
   @ApiProperty({ type: () => User })
-  @ManyToOne(t => User, m => m.memberProjects, { eager: true, primary: true })
+  @ManyToOne((t) => User, (m) => m.memberProjects, { eager: true, primary: true })
   member: User;
 
   @Column({ primary: true })
   projectId: number;
 
-  @ManyToOne(t => Project, m => m.members, {
+  @ManyToOne((t) => Project, (m) => m.members, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
     primary: true,
@@ -39,10 +39,10 @@ export class UserProject {
   valueSum: number;
 
   @ApiProperty({ type: () => User })
-  @ManyToOne(t => User, m => m.invitedMembers, { nullable: true })
+  @ManyToOne((t) => User, (m) => m.invitedMembers, { nullable: true })
   inviter?: User;
 
-  @ManyToMany(t => ProjectRole)
+  @ManyToMany((t) => ProjectRole)
   @JoinTable()
   roles: ProjectRole[];
 }

@@ -109,6 +109,6 @@ export class SessionsService extends TypeOrmCrudService<Session> {
   }
 
   private get relations() {
-    return ['user', ...requiredUserRelations.map(el => `user.` + el)];
+    return ['user', ...requiredUserRelations.map((el) => `user.` + el)];
   }
 }

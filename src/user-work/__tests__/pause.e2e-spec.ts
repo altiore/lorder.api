@@ -18,20 +18,16 @@ describe(`PATCH ${h.url}`, () => {
 
   beforeAll(async () => {
     await h.before();
-    notFinishedUserWorkId = h.entities.UserWork.find(el => el.task.title === 'NotFinished').id;
-    finishedUserWorkId = h.entities.UserWork.find(el => el.task.title === 'Finished').id;
+    notFinishedUserWorkId = h.entities.UserWork.find((el) => el.task.title === 'NotFinished').id;
+    finishedUserWorkId = h.entities.UserWork.find((el) => el.task.title === 'Finished').id;
   });
   afterAll(h.after);
 
   it('by guest', async () => {
-    await h
-      .requestBy()
-      .patch(h.path(notFinishedUserWorkId))
-      .expect(401)
-      .expect({
-        message: 'Unauthorized',
-        statusCode: 401,
-      });
+    await h.requestBy().patch(h.path(notFinishedUserWorkId)).expect(401).expect({
+      message: 'Unauthorized',
+      statusCode: 401,
+    });
   });
 
   it('by white-accessLevel@mail.com', async () => {
@@ -84,7 +80,7 @@ describe(`PATCH ${h.url}`, () => {
     const currentUser = h.entities.User[0];
     expect(currentUser.email).toBe(email);
     // it was not finished before
-    expect(h.entities.UserWork.find(el => el.id === notFinishedUserWorkId).finishAt).toBeNull();
+    expect(h.entities.UserWork.find((el) => el.id === notFinishedUserWorkId).finishAt).toBeNull();
     const currentUserWork = await h.findOne(UserWork, { id: notFinishedUserWorkId });
     expect(currentUserWork.finishAt).toEqual(expect.any(moment));
     expect(body.next).toMatchObject({

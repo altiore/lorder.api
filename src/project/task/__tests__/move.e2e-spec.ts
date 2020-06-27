@@ -14,19 +14,15 @@ describe(`PATCH (MOVE) ${h.url}`, () => {
   beforeAll(async () => {
     await h.before();
     projectId = h.entities.Project[0].id;
-    taskSequenceNumber = h.entities.Task.find(el => el.title === 'task1').sequenceNumber;
+    taskSequenceNumber = h.entities.Task.find((el) => el.title === 'task1').sequenceNumber;
   });
   afterAll(h.after);
 
   it('by guest - anauthorized error', async () => {
-    await h
-      .requestBy()
-      .patch(h.path(projectId, taskSequenceNumber))
-      .expect(401)
-      .expect({
-        message: 'Unauthorized',
-        statusCode: 401,
-      });
+    await h.requestBy().patch(h.path(projectId, taskSequenceNumber)).expect(401).expect({
+      message: 'Unauthorized',
+      statusCode: 401,
+    });
   });
 
   it('by project owner', async () => {

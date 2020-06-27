@@ -13,10 +13,7 @@ describe(`POST ${h.url}`, () => {
   afterAll(h.after);
 
   it('by guest - validation error', async () => {
-    const { body } = await h
-      .requestBy()
-      .post(h.url)
-      .expect(422);
+    const { body } = await h.requestBy().post(h.url).expect(422);
     expect(body).toEqual({
       errors: [
         {

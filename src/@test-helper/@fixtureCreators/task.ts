@@ -2,13 +2,13 @@ import { fixtureCreator, many, one } from 'typeorm-fixtures';
 
 import { company, random } from 'faker';
 
+import { STATUS_NAME } from '../../@domains/strategy';
 import { Project } from '../../@orm/project';
 import { Task, TASK_SIMPLE_STATUS } from '../../@orm/task';
-import { STATUS_NAME } from '../../@orm/task-status/task-status.entity';
 import { User } from '../../@orm/user';
 import { UserTask } from '../../@orm/user-task';
 
-export const createTasks = fixtureCreator<Task>(Task, function(entity, index) {
+export const createTasks = fixtureCreator<Task>(Task, function (entity, index) {
   return {
     description: random.words(5),
     sequenceNumber: index,

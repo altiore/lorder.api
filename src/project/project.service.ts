@@ -1,11 +1,11 @@
 import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { get, omit, pick } from 'lodash';
+import { get, pick } from 'lodash';
 import * as moment from 'moment';
-import { EntityManager } from 'typeorm';
+import { EntityManager, In } from 'typeorm';
 
-import { ITaskColumn, Project, ProjectDto, ProjectRepository, PROJECT_STRATEGY } from '@orm/project';
+import { Project, ProjectDto, ProjectRepository, PROJECT_STRATEGY } from '@orm/project';
 import { ProjectPub, ProjectPubRepository } from '@orm/project-pub';
 import { Task, TASK_SIMPLE_STATUS } from '@orm/task';
 import { User } from '@orm/user';
@@ -18,6 +18,9 @@ import {
   timeProductivity,
 } from '@common/helpers/metricConverter';
 
+import { IColumn, STATUS_NAME } from '../@domains/strategy';
+import { getColumns, roles } from '../@domains/strategy/advanced';
+import { ProjectRole } from '../@orm/project-role/project-role.entity';
 import { ProjectPaginationDto } from './@dto';
 
 @Injectable()
@@ -207,13 +210,13 @@ export class ProjectService {
         break;
       }
 
-      userTasksPortion.map(userT => {
+      userTasksPortion.map((userT) => {
         projectTimeSums[userT.task.projectId] = {
           timeSum: get(projectTimeSums, [userT.task.projectId, 'timeSum'], 0) || 0,
           valueSum:
             (get(projectTimeSums, [userT.task.projectId, 'valueSum'], 0) || 0) + userT.benefitPart * userT.task.value,
         };
-        userT.task.userWorks.map(uw => {
+        userT.task.userWorks.map((uw) => {
           projectTimeSums[userT.task.projectId] = {
             timeSum:
               (get(projectTimeSums, [userT.task.projectId, 'timeSum'], 0) || 0) +
@@ -409,7 +412,7 @@ export class ProjectService {
     return p;
   }
 
-  private async getColumns(project: Project, user: User): Promise<ITaskColumn[]> {
+  private async getColumns(project: Project, user: User): Promise<IColumn[]> {
     switch (project.strategy) {
       case PROJECT_STRATEGY.ADVANCED:
         return this.columnStrategyAdvanced(project, user);
@@ -422,19 +425,17 @@ export class ProjectService {
     }
   }
 
-  private async columnStrategySimple(): Promise<ITaskColumn[]> {
+  private async columnStrategySimple(): Promise<IColumn[]> {
     return Object.values(TASK_SIMPLE_STATUS)
-      .filter(el => typeof el === 'number')
+      .filter((el) => typeof el === 'number')
       .map((enumValue: number) => ({
-        id: enumValue + 1,
+        column: Task.statusToName(enumValue),
         moves: [],
-        name: Task.statusToName(enumValue),
-        statusFrom: enumValue,
-        statusTo: enumValue,
+        statuses: [Task.statusToName(enumValue)],
       }));
   }
 
-  private async columnStrategyAdvanced(project: Project, user: User): Promise<ITaskColumn[]> {
+  private async columnStrategyAdvanced(project: Project, user: User): Promise<IColumn[]> {
     const access = await this.projectRepo.manager.findOne(UserProject, {
       relations: ['roles', 'roles.role', 'roles.allowedMoves', 'roles.allowedMoves.from', 'roles.allowedMoves.to'],
       where: {
@@ -442,45 +443,57 @@ export class ProjectService {
         project: { id: project.id },
       },
     });
-    let columns: ITaskColumn[] = [];
-    if (access && access.roles) {
-      const allowedMoves = access.roles.reduce((arr, cur) => {
-        arr = arr.concat(
-          cur.allowedMoves.map(am => ({
-            title: cur.role.id + '_' + am.type,
-            ...am,
-          }))
-        );
-        return arr;
-      }, []);
-      columns = allowedMoves.reduce((arr, am) => {
-        const fromIndex = arr.findIndex(el => el.name === am.fromName);
-        const toIndex = arr.findIndex(el => el.name === am.toName);
-        const preparedAm = omit(am, ['from', 'to']);
-        if (toIndex === -1) {
-          arr.push({
-            ...am.to,
-            moves: [preparedAm],
-          });
-        } else {
-          arr[toIndex].moves.push(preparedAm);
-        }
 
-        if (fromIndex === -1) {
-          arr.push({
-            ...am.from,
-            moves: [preparedAm],
-          });
-        } else {
-          arr[fromIndex].moves.push(preparedAm);
-        }
-
-        return arr;
-      }, []);
-    }
-
-    return columns.sort((a, b) => (a.statusFrom > b.statusFrom ? 1 : -1));
+    return getColumns(access.roles.map((el) => el.roleId));
   }
+
+  // private async columnStrategyAdvanced(project: Project, user: User): Promise<ITaskColumn[]> {
+  //   const access = await this.projectRepo.manager.findOne(UserProject, {
+  //     relations: ['roles', 'roles.role', 'roles.allowedMoves', 'roles.allowedMoves.from', 'roles.allowedMoves.to'],
+  //     where: {
+  //       member: { id: user.id },
+  //       project: { id: project.id },
+  //     },
+  //   });
+  //   let columns: ITaskColumn[] = [];
+  //   if (access && access.roles) {
+  //     const allowedMoves = access.roles.reduce((arr, cur) => {
+  //       arr = arr.concat(
+  //         cur.allowedMoves.map(am => ({
+  //           title: cur.role.id + '_' + am.type,
+  //           ...am,
+  //         }))
+  //       );
+  //       return arr;
+  //     }, []);
+  //     columns = allowedMoves.reduce((arr, am) => {
+  //       const fromIndex = arr.findIndex(el => el.name === am.fromName);
+  //       const toIndex = arr.findIndex(el => el.name === am.toName);
+  //       const preparedAm = omit(am, ['from', 'to']);
+  //       if (toIndex === -1) {
+  //         arr.push({
+  //           ...am.to,
+  //           moves: [preparedAm],
+  //         });
+  //       } else {
+  //         arr[toIndex].moves.push(preparedAm);
+  //       }
+  //
+  //       if (fromIndex === -1) {
+  //         arr.push({
+  //           ...am.from,
+  //           moves: [preparedAm],
+  //         });
+  //       } else {
+  //         arr[fromIndex].moves.push(preparedAm);
+  //       }
+  //
+  //       return arr;
+  //     }, []);
+  //   }
+  //
+  //   return columns.sort((a, b) => (a.statusFrom > b.statusFrom ? 1 : -1));
+  // }
 
   private async changeStrategy(project: Project, newStrategy: PROJECT_STRATEGY): Promise<true> {
     if (project.strategy === newStrategy) {
@@ -492,19 +505,36 @@ export class ProjectService {
       case PROJECT_STRATEGY.ADVANCED:
         switch (project.strategy) {
           case PROJECT_STRATEGY.SIMPLE:
-            // 1. заменить status во всех задачах проекта на тот, что указан в конфигурации проекта в таблицах
-            await this.projectRepo.manager.query(
-              `UPDATE "task" SET "status"=(SELECT "statusFrom" FROM "task_status" WHERE "name"="task"."statusTypeName")`
-            );
-            // 2. Проверяем, все ли роли есть в проекте для успешного передвижения по новой стратегии
-            // 3. Проверяем, есть ли хотя бы один пользователь для каждой стадии в новой стратегии
-            // TODO: нужно добавить в константы статусы задач стратегии ADVANCED
-            // 4. Проверяем, для всех ли ролей в проекте есть замкнутые стратегии передвижения задач
-            // 5. Проверяем, все ли статусы имеют движение вперед. Какие-то статусы могут не иметь движения назад, но
-            // движение вперед должно быть всегда
-            // 6. Переводим статусы задач в правильные значения
-            // 7. Проверяем, указана ли роль по-умолчанию для пользователя, который будет подключен к проекту
-            // await this.projectRepo.manager.query(``);
+            await this.projectRepo.manager.transaction(async (manager) => {
+              // 1. заменить status во всех задачах проекта на тот, что указан в конфигурации проекта в таблицах
+              await manager.query(
+                `UPDATE "task" SET "status"=(SELECT "statusFrom" FROM "task_status" WHERE "name"="task"."statusTypeName")`
+              );
+              // 2. Проверяем, все ли роли есть в проекте для успешного передвижения по новой стратегии
+              const projectRoles = await manager.find(ProjectRole, {
+                where: { roleId: In(roles.map((el) => el.id)) },
+              });
+              if (!projectRoles || !roles || projectRoles.length !== roles.length) {
+                throw new NotAcceptableException(
+                  `Найдено ${projectRoles.length} ролей из ${roles.length} необходимых для данного типа стратегии перемещения задач. Пожалуйста, добавте все необходимые роли для данной стратегии!`
+                );
+              }
+              // 3. Проверяем, есть ли хотя бы один пользователь для каждой роли в новой стратегии
+              for (const role of projectRoles) {
+                const membersCountRes = await manager.query(
+                  `SELECT COUNT(DISTINCT("userProjectMemberId")) FROM "user_project_roles_project_role" WHERE "userProjectProjectId"=${project.id} AND "projectRoleId"=${role.id}`
+                );
+                if (!parseInt(membersCountRes?.[0]?.count, 0)) {
+                  throw new NotAcceptableException(`В проекте нет ни одного пользователя с ролью ${role.roleId}`);
+                }
+              }
+              // TODO: 4. Проверяем, для всех ли ролей в проекте есть замкнутые стратегии передвижения задач
+              // TODO: 5. Проверяем, все ли статусы имеют движение вперед.
+              //  Какие-то статусы могут не иметь движения назад, но движение вперед должно быть всегда
+              // TODO: 6. Проверяем, указана ли роль по-умолчанию для пользователя, который будет подключен к проекту
+              // TODO: 7. Добавляем все недостающие разрешенные перемещения
+            });
+
             return true;
           case PROJECT_STRATEGY.DOUBLE_CHECK:
             throw new NotAcceptableException('Такое изменение стратегии не поддерживается!');
@@ -514,6 +544,16 @@ export class ProjectService {
       case PROJECT_STRATEGY.SIMPLE:
         switch (project.strategy) {
           case PROJECT_STRATEGY.ADVANCED:
+            await this.projectRepo.manager.transaction(async (manager) => {
+              // 1. заменить status во всех задачах проекта на тот, что указан в конфиге
+              for (const status of Object.values(STATUS_NAME)) {
+                await manager.query(
+                  `UPDATE "task" SET "status"=${Task.statusTypeNameToSimpleStatus(
+                    status
+                  )} WHERE "statusTypeName"='${status}'`
+                );
+              }
+            });
             return true;
           case PROJECT_STRATEGY.DOUBLE_CHECK:
             throw new NotAcceptableException('Такое изменение стратегии не поддерживается!');

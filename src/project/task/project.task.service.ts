@@ -16,6 +16,7 @@ import { ValidationException } from '@common/exceptions/validation.exception';
 
 import { TaskService } from 'task/task.service';
 
+import { STATUS_NAME } from '../../@domains/strategy';
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
 
 @Injectable()
@@ -187,7 +188,7 @@ export class ProjectTaskService {
       throw new NotAcceptableException('Заархивированная задача не может быть изменена');
     }
     // TODO: проверить так же, была ли задача завершена, в соответсвии с обновленным FLOW задач
-    if (task.status >= 4) {
+    if (task.statusTypeName === STATUS_NAME.DONE) {
       throw new NotAcceptableException(
         'Завершенная задача не может быть изменена! Это противоречит логике,' +
           ' ведь задача была оценена, описанная именно этим образом. Если мы изменим задачу после окончания,' +

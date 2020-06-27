@@ -46,14 +46,14 @@ export class TestHelper {
     this.testingModule = await Test.createTestingModule(this.metadata)
       .overrideProvider(MailService)
       .useValue(
-        new class {
+        new (class {
           public async sendMagicLink(): Promise<MailAcceptedDto> {
             return {
               statusCode: 202,
               statusMessage: 'TEST Accepted',
             };
           }
-        }()
+        })()
       )
       .compile();
     this.app = await this.testingModule.createNestApplication().init();

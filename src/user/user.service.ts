@@ -51,7 +51,7 @@ export class UserService {
       throw new NotFoundException(`Пользователь с id: ${userId} не найден`);
     }
     const roles = await this.roleRepo.findRolesByName(data.role);
-    user.userRoles = roles.map(el => {
+    user.userRoles = roles.map((el) => {
       const m = new UserRole();
       m.role = el;
       return m;

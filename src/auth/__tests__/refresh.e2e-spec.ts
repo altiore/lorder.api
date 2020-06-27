@@ -10,10 +10,7 @@ describe(`PATCH refresh ${h.url}`, () => {
   afterAll(h.after);
 
   it('by guest - validation error', async () => {
-    await h
-      .requestBy()
-      .patch(h.url)
-      .expect(422);
+    await h.requestBy().patch(h.url).expect(422);
   });
 
   it('empty device', async () => {

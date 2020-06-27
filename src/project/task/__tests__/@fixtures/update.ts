@@ -1,5 +1,5 @@
+import { STATUS_NAME } from '../../../../@domains/strategy';
 import { ROLES } from '../../../../@orm/role';
-import { TASK_SIMPLE_STATUS } from '../../../../@orm/task';
 import { ACCESS_LEVEL } from '../../../../@orm/user-project';
 import {
   createProjects,
@@ -87,7 +87,7 @@ export const tasksFixture = createTasks([
   {
     performer: { email: 'member@mail.com' },
     project: { owner: { email: 'project-owner@mail.com' } },
-    status: TASK_SIMPLE_STATUS.DONE,
+    statusTypeName: STATUS_NAME.DONE,
     title: 'finished task',
     userTasks: [{ user: { email: 'member@mail.com' } }],
   },

@@ -5,7 +5,7 @@ import { random } from 'faker';
 import { Session } from '../../@orm/session/session.entity';
 import { User } from '../../@orm/user';
 
-export const createSessionFixture = fixtureCreator<Session>(Session, function(entity, index) {
+export const createSessionFixture = fixtureCreator<Session>(Session, function (entity, index) {
   return {
     userAgent: 'node-superagent/3.8.3',
     referer: 'no referer',

@@ -7,7 +7,7 @@ import { Task } from '../../@orm/task';
 import { User } from '../../@orm/user';
 import { UserWork } from '../../@orm/user-work';
 
-export const createUserWorks = fixtureCreator<UserWork>(UserWork, function(entity, index) {
+export const createUserWorks = fixtureCreator<UserWork>(UserWork, function (entity, index) {
   return {
     description: random.words(3),
     finishAt: moment(),

@@ -11,7 +11,6 @@
     "member-access": [false],
     "object-literal-sort-keys": false,
     "max-line-length": [true, 120],
-    "no-unused-variable": true,
     "curly": false,
     "interface-name": [false],
     "array-type": [false],
@@ -52,7 +51,7 @@
           },
           {
             "name": "should be moved to other group!!!",
-            "match": "^\\w",
+            "match": "^@|^\\w",
             "order": 52
           },
           {

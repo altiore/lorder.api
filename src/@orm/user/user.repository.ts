@@ -45,7 +45,7 @@ export class UserRepository extends Repository<User> {
     const user = this.create(data);
     // создаваемый пользователь всегда неактивен
     user.status = 1;
-    user.userRoles = roles.map(el => {
+    user.userRoles = roles.map((el) => {
       const m = new UserRole();
       m.role = el;
       return m;
@@ -99,8 +99,6 @@ export class UserRepository extends Repository<User> {
   }
 
   public hashPassword(password) {
-    return createHash('md5')
-      .update(password)
-      .digest('hex');
+    return createHash('md5').update(password).digest('hex');
   }
 }

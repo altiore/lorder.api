@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { IsIn, IsNotEmpty, IsString } from 'class-validator';
 
-import { STATUS_NAME } from '@orm/task-status/task-status.entity';
+import { STATUS_NAME } from '../../../@domains/strategy';
 
 export class TaskMoveDto {
   @ApiProperty()

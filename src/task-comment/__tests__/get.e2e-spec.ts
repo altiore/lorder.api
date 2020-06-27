@@ -20,14 +20,10 @@ describe(`GET ${h.url}`, () => {
   afterAll(h.after);
 
   it('by guest', async () => {
-    await h
-      .requestBy()
-      .get(h.path(projectId, taskId))
-      .expect(401)
-      .expect({
-        message: 'Unauthorized',
-        statusCode: 401,
-      });
+    await h.requestBy().get(h.path(projectId, taskId)).expect(401).expect({
+      message: 'Unauthorized',
+      statusCode: 401,
+    });
   });
 
   it('by member@mail.com RED level', async () => {

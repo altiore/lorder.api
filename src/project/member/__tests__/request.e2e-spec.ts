@@ -1,3 +1,4 @@
+import { ROLE } from '../../../@domains/strategy';
 import { UserProject } from '../../../@orm/user-project';
 import { TestHelper } from '../../../@test-helper/@utils/TestHelper';
 import { projectRoles, projectsFixture, roleFlows, userProjectsFixture, usersFixture } from './@fixtures/request';
@@ -19,21 +20,17 @@ describe(`POST ${h.url}`, () => {
   afterAll(h.after);
 
   it('by guest - anauthorized error', async () => {
-    await h
-      .requestBy()
-      .post(h.path(projectId))
-      .expect(401)
-      .expect({
-        message: 'Unauthorized',
-        statusCode: 401,
-      });
+    await h.requestBy().post(h.path(projectId)).expect(401).expect({
+      message: 'Unauthorized',
+      statusCode: 401,
+    });
   });
 
   it('by project owner', async () => {
     await h
       .requestBy(await h.getUser('project-owner@mail.com'))
       .post(h.path(projectId))
-      .send({ role: 'test' })
+      .send({ role: ROLE.DESIGNER })
       .expect(406);
   });
 
@@ -41,7 +38,7 @@ describe(`POST ${h.url}`, () => {
     await h
       .requestBy(await h.getUser('member@mail.com'))
       .post(h.path(projectId))
-      .send({ role: 'test' })
+      .send({ role: ROLE.DESIGNER })
       .expect(406);
   });
 
@@ -49,17 +46,13 @@ describe(`POST ${h.url}`, () => {
     await h
       .requestBy(await h.getUser('not-member@mail.com'))
       .post(h.path(projectId))
-      .send({ role: 'test' })
+      .send({ role: ROLE.DESIGNER })
       .expect(422);
   });
 
   it('by NEW member CORRECT ROLE', async () => {
     const notMemberId = await h.getUser('not-member@mail.com');
-    const { body } = await h
-      .requestBy(notMemberId)
-      .post(h.path(projectId))
-      .send({ role: 'dev-full' })
-      .expect(201);
+    const { body } = await h.requestBy(notMemberId).post(h.path(projectId)).send({ role: ROLE.DEVELOPER }).expect(201);
 
     expect(body).toEqual(
       expect.objectContaining({

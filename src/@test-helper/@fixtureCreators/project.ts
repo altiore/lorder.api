@@ -5,7 +5,7 @@ import { company, random } from 'faker';
 import { Project, PROJECT_TYPE } from '../../@orm/project';
 import { User } from '../../@orm/user';
 
-export const createProjects = fixtureCreator<Project>(Project, function(entity, index) {
+export const createProjects = fixtureCreator<Project>(Project, function (entity, index) {
   return {
     monthlyBudget: random.number(100),
     title: `${company.companyName()} ${index}`,

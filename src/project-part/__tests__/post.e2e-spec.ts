@@ -18,14 +18,10 @@ describe(`POST ${h.url}`, () => {
   afterAll(h.after);
 
   it('by guest', async () => {
-    await h
-      .requestBy()
-      .post(h.path(projectId))
-      .expect(401)
-      .expect({
-        message: 'Unauthorized',
-        statusCode: 401,
-      });
+    await h.requestBy().post(h.path(projectId)).expect(401).expect({
+      message: 'Unauthorized',
+      statusCode: 401,
+    });
   });
 
   it('by white-level@mail.com', async () => {

@@ -5,7 +5,7 @@ import { Project } from '../../@orm/project';
 import { User } from '../../@orm/user';
 import { ACCESS_LEVEL, UserProject } from '../../@orm/user-project';
 
-export const createUserProjects = fixtureCreator<UserProject>(UserProject, function(entity, index) {
+export const createUserProjects = fixtureCreator<UserProject>(UserProject, function (entity, index) {
   return {
     accessLevel: ACCESS_LEVEL.WHITE,
     timeSum: 0,

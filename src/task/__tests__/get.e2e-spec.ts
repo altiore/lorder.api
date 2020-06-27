@@ -13,14 +13,10 @@ describe(`GET ${h.url}`, () => {
   afterAll(h.after);
 
   it('by guest', async () => {
-    await h
-      .requestBy()
-      .get(h.path())
-      .expect(401)
-      .expect({
-        message: 'Unauthorized',
-        statusCode: 401,
-      });
+    await h.requestBy().get(h.path()).expect(401).expect({
+      message: 'Unauthorized',
+      statusCode: 401,
+    });
   });
 
   it('by user@mail.com', async () => {

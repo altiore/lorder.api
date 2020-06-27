@@ -19,7 +19,7 @@ export class ProjectPart {
   title!: string;
 
   @ApiProperty({ type: () => Project })
-  @ManyToOne(() => Project, m => m.parts, { nullable: false })
+  @ManyToOne(() => Project, (m) => m.parts, { nullable: false })
   @JoinColumn()
   project!: Project;
 
@@ -30,13 +30,13 @@ export class ProjectPart {
   parentId?: number;
 
   @ApiPropertyOptional({ type: ProjectPart })
-  @ManyToOne(t => ProjectPart, m => m.children, { nullable: true })
+  @ManyToOne((t) => ProjectPart, (m) => m.children, { nullable: true })
   parent?: ProjectPart;
 
   @ApiProperty({ type: ProjectPart, isArray: true })
-  @OneToMany(t => ProjectPart, m => m.parent)
+  @OneToMany((t) => ProjectPart, (m) => m.parent)
   children: ProjectPart[];
 
-  @ManyToMany(t => Task, t => t.projectParts)
+  @ManyToMany((t) => Task, (t) => t.projectParts)
   tasks: Task;
 }

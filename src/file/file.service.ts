@@ -12,9 +12,9 @@ import { parseGoogleObjName } from '../@common/helpers/parseGoogleObjName';
 
 const BASE_GOOGLE_URL = 'storage.googleapis.com';
 
-const removeFile = fileName => {
+const removeFile = (fileName) => {
   return new Promise((resolve, reject) => {
-    fs.unlink(fileName, function(err) {
+    fs.unlink(fileName, function (err) {
       if (err) {
         reject(err);
       }

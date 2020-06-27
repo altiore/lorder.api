@@ -6,9 +6,7 @@ import { createSessionFixture, createUsers } from '../../../@test-helper/@fixtur
 export const usersFixture = createUsers([
   {
     email: 'user+password@mail.com',
-    password: createHash('md5')
-      .update('correct password')
-      .digest('hex'),
+    password: createHash('md5').update('correct password').digest('hex'),
     roles: [{ name: ROLES.USER }],
   },
   {
@@ -17,9 +15,7 @@ export const usersFixture = createUsers([
   },
   {
     email: 'admin+password@mail.com',
-    password: createHash('md5')
-      .update('correct password')
-      .digest('hex'),
+    password: createHash('md5').update('correct password').digest('hex'),
     roles: [{ name: ROLES.USER }, { name: ROLES.ADMIN }],
   },
   {
@@ -28,9 +24,7 @@ export const usersFixture = createUsers([
   },
   {
     email: 'super-admin+password@mail.com',
-    password: createHash('md5')
-      .update('correct password')
-      .digest('hex'),
+    password: createHash('md5').update('correct password').digest('hex'),
     roles: [{ name: ROLES.USER }, { name: ROLES.ADMIN }, { name: ROLES.SUPER_ADMIN }],
   },
   {

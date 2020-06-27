@@ -1,3 +1,4 @@
+import { ROLE } from '../../../@domains/strategy';
 import { ROLES } from '../../../@orm/role';
 import { ACCESS_LEVEL } from '../../../@orm/user-project';
 import {
@@ -7,7 +8,7 @@ import {
   createUsers,
 } from '../../../@test-helper/@fixtureCreators';
 
-export const rolesFixture = createRoleFlows([{ id: 'dev-full' }, { id: 'creator' }, { id: 'qa' }]);
+export const rolesFixture = createRoleFlows([{ id: ROLE.DEVELOPER }, { id: ROLE.ARCHITECT }, { id: ROLE.TESTER }]);
 
 export const usersFixture = createUsers([
   {

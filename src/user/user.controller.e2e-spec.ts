@@ -8,14 +8,10 @@ describe(`GET ${h.url}`, () => {
   afterAll(h.after);
 
   it('by guest', async () => {
-    await h
-      .requestBy()
-      .get(h.url)
-      .expect(401)
-      .expect({
-        message: 'Unauthorized',
-        statusCode: 401,
-      });
+    await h.requestBy().get(h.url).expect(401).expect({
+      message: 'Unauthorized',
+      statusCode: 401,
+    });
   });
 
   it('by user', async () => {
@@ -47,7 +43,7 @@ describe(`GET ${h.url}`, () => {
       .requestBy(await h.getUser('super-admin@mail.com'))
       .get(h.url)
       .expect(200);
-    expect(body.map(el => el.email)).toEqual(
+    expect(body.map((el) => el.email)).toEqual(
       expect.arrayContaining(['admin@mail.com', 'super-admin@mail.com', 'user@mail.com', 'razvanlomov@gmail.com'])
     );
   });

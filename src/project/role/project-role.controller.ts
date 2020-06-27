@@ -10,6 +10,7 @@ import { ACCESS_LEVEL } from '@orm/user-project';
 
 import { Auth, res, UserJWT } from '@common/decorators';
 
+import { ROLE } from '../../@domains/strategy';
 import { ProjectRole } from '../../@orm/project-role/project-role.entity';
 import { ProjectParam } from '../@common/decorators';
 import { ProjectRoleCreateDto } from './dto';
@@ -47,7 +48,7 @@ export class ProjectRoleController {
     @ProjectParam() project: Project,
     @Param('projectId', ParseIntPipe) projectId: number,
     @UserJWT() user: User,
-    @Param('roleId') roleId: string
+    @Param('roleId') roleId: ROLE
   ): Promise<DeleteResult> {
     return this.projectRoleService.deleteOne(project, user, roleId);
   }

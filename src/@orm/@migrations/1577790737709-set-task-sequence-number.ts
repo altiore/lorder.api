@@ -4,7 +4,7 @@ export class setTaskSequenceNumber1577790737709 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
     const projects = await queryRunner.query(`SELECT * FROM "project"`);
     await Promise.all(
-      projects.map(async project => {
+      projects.map(async (project) => {
         const [{ count: tasksCount }] = await queryRunner.query(
           `SELECT count(*) FROM "task" WHERE "projectId"=${project.id}`
         );

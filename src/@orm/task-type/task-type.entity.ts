@@ -14,6 +14,6 @@ export class TaskType {
   @Column({ nullable: false, unique: true })
   name: string;
 
-  @OneToMany(type => ProjectTaskType, projectTaskType => projectTaskType.taskType)
+  @OneToMany((type) => ProjectTaskType, (projectTaskType) => projectTaskType.taskType)
   projectTaskTypes: ProjectTaskType[];
 }

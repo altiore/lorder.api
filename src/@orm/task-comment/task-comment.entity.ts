@@ -35,7 +35,7 @@ export class TaskComment {
   taskId!: number;
 
   @Exclude()
-  @ManyToOne(t => User, {
+  @ManyToOne((t) => User, {
     nullable: false,
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
@@ -43,7 +43,7 @@ export class TaskComment {
   user!: User;
 
   @ApiProperty({ type: () => Task })
-  @ManyToOne(t => Task, t => t.comments, {
+  @ManyToOne((t) => Task, (t) => t.comments, {
     nullable: false,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',

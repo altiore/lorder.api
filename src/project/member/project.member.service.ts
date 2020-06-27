@@ -111,7 +111,7 @@ export class ProjectMemberService {
       userWork.task.value && userWork.task.userTasks.length
         ? userWork.task.value / userWork.task.userTasks.length + userProject.valueSum
         : userProject.valueSum;
-    const curUserTask = userWork.task.userTasks.find(el => el.userId === userWork.projectId);
+    const curUserTask = userWork.task.userTasks.find((el) => el.userId === userWork.projectId);
     if (curUserTask) {
       curUserTask.time += addedTimeSum;
       await manager.save(curUserTask);
@@ -128,6 +128,8 @@ export class ProjectMemberService {
           accessLevel: -1,
           member: user,
           projectId,
+          // TODO: сохранять роль!
+          // roles,
         });
         return await this.userProjectRepo.save(newMember);
       }

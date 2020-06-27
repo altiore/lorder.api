@@ -41,7 +41,7 @@ export class TaskGateway implements OnGatewayConnection, OnGatewayDisconnect, On
   @SubscribeMessage('joinAllParticipantProjectRooms')
   handleJoinAllParticipantProjects(client: Socket, projectIds: number[]) {
     // TODO: check project access before joining the project room
-    projectIds.forEach(projectId => {
+    projectIds.forEach((projectId) => {
       client.join(`${PROJECT_ROOM_PREFIX}${projectId}`);
       client.emit('joinParticipantProjectRoom', projectId);
     });

@@ -18,14 +18,10 @@ describe(`PATCH ${h.url}`, () => {
   afterAll(h.after);
 
   it('by guest', async () => {
-    await h
-      .requestBy()
-      .patch(h.path())
-      .expect(401)
-      .expect({
-        message: 'Unauthorized',
-        statusCode: 401,
-      });
+    await h.requestBy().patch(h.path()).expect(401).expect({
+      message: 'Unauthorized',
+      statusCode: 401,
+    });
   });
 
   it('by owner', async () => {

@@ -22,11 +22,7 @@ export class ProjectTaskTypeRepository extends Repository<ProjectTaskType> {
         taskType,
       })
     );
-    await this.createQueryBuilder()
-      .insert()
-      .into(ProjectTaskType)
-      .values(entities)
-      .execute();
+    await this.createQueryBuilder().insert().into(ProjectTaskType).values(entities).execute();
     return entities;
   }
 
@@ -42,6 +38,9 @@ export class ProjectTaskTypeRepository extends Repository<ProjectTaskType> {
 
   public async removeFromProject(project: DeepPartial<Project>, taskType: TaskType): Promise<any> {
     const entities = await this.find({ where: { project }, order: { order: 'ASC' } });
-    return this.createMultiple(project, entities.map(el => el.taskType).filter(el => el.id !== taskType.id));
+    return this.createMultiple(
+      project,
+      entities.map((el) => el.taskType).filter((el) => el.id !== taskType.id)
+    );
   }
 }

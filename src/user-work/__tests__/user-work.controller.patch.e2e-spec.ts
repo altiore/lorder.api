@@ -22,19 +22,15 @@ describe(`PATCH ${h.url}`, () => {
   beforeAll(async () => {
     await h.before();
     projectId = h.entities.Project[0].id;
-    userWorkId = h.entities.UserWork.find(el => el.description === 'super-admin@mail.com userWork').id;
+    userWorkId = h.entities.UserWork.find((el) => el.description === 'super-admin@mail.com userWork').id;
   });
   afterAll(h.after);
 
   it('by guest', async () => {
-    await h
-      .requestBy()
-      .patch(h.path(userWorkId))
-      .expect(401)
-      .expect({
-        message: 'Unauthorized',
-        statusCode: 401,
-      });
+    await h.requestBy().patch(h.path(userWorkId)).expect(401).expect({
+      message: 'Unauthorized',
+      statusCode: 401,
+    });
   });
 
   it('by user@mail.com without projectId', async () => {
@@ -224,13 +220,9 @@ describe(`PATCH ${h.url}`, () => {
       .requestBy(await h.getUser('super-admin@mail.com'))
       .patch(h.path(userWorkId))
       .send({
-        finishAt: moment()
-          .add(1, 'minutes')
-          .toISOString(),
+        finishAt: moment().add(1, 'minutes').toISOString(),
         projectId,
-        startAt: moment()
-          .add(1, 'minutes')
-          .toISOString(),
+        startAt: moment().add(1, 'minutes').toISOString(),
       })
       .expect(422);
     expect(body).toMatchObject({
@@ -280,13 +272,9 @@ describe(`PATCH ${h.url}`, () => {
       .requestBy(await h.getUser('super-admin@mail.com'))
       .patch(h.path(userWorkId))
       .send({
-        finishAt: moment()
-          .subtract(2, 'minutes')
-          .toISOString(),
+        finishAt: moment().subtract(2, 'minutes').toISOString(),
         projectId,
-        startAt: moment()
-          .subtract(1, 'minutes')
-          .toISOString(),
+        startAt: moment().subtract(1, 'minutes').toISOString(),
       })
       .expect(422);
     expect(body).toMatchObject({
@@ -304,14 +292,10 @@ describe(`PATCH ${h.url}`, () => {
   it('by owner with not existing taskId', async () => {
     const newValue = {
       description: lorem.words(2),
-      finishAt: moment()
-        .subtract(2, 'minutes')
-        .toISOString(),
+      finishAt: moment().subtract(2, 'minutes').toISOString(),
       projectId,
       source: lorem.words(2),
-      startAt: moment()
-        .subtract(20, 'minutes')
-        .toISOString(),
+      startAt: moment().subtract(20, 'minutes').toISOString(),
       taskId: 444,
       value: 10,
     };
@@ -325,14 +309,10 @@ describe(`PATCH ${h.url}`, () => {
   it('by owner with correct data', async () => {
     const newValue = {
       description: lorem.words(2),
-      finishAt: moment()
-        .subtract(2, 'minutes')
-        .toISOString(),
+      finishAt: moment().subtract(2, 'minutes').toISOString(),
       projectId,
       source: lorem.words(2),
-      startAt: moment()
-        .subtract(20, 'minutes')
-        .toISOString(),
+      startAt: moment().subtract(20, 'minutes').toISOString(),
       taskId: h.entities.Task[1].id,
       value: 10,
     };
@@ -356,7 +336,7 @@ describe(`PATCH ${h.url}`, () => {
   });
 
   it('by owner with correct data (without dates)', async () => {
-    const userWorkId2 = h.entities.UserWork.find(el => el.description === 'super-admin@mail.com userWork2').id;
+    const userWorkId2 = h.entities.UserWork.find((el) => el.description === 'super-admin@mail.com userWork2').id;
     const newValue = {
       description: lorem.words(2),
       finishAt: undefined,
@@ -386,7 +366,7 @@ describe(`PATCH ${h.url}`, () => {
   });
 
   it('by member with correct data (without dates)', async () => {
-    const userWorkId3 = h.entities.UserWork.find(el => el.description === 'exist-not-finished@mail.com userWork3').id;
+    const userWorkId3 = h.entities.UserWork.find((el) => el.description === 'exist-not-finished@mail.com userWork3').id;
     const newValue = {
       description: 'New value description ha-ha',
       finishAt: moment().subtract(1, 'minutes'),

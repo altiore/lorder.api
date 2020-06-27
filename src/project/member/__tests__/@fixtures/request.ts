@@ -1,3 +1,4 @@
+import { ROLE } from '../../../../@domains/strategy';
 import { ROLES } from '../../../../@orm/role';
 import { ACCESS_LEVEL } from '../../../../@orm/user-project';
 import {
@@ -47,26 +48,26 @@ export const userProjectsFixture = createUserProjects([
 
 export const roleFlows = createRoleFlows([
   {
-    id: 'architect',
+    id: ROLE.ARCHITECT,
     name: 'Архитектор',
   },
   {
-    id: 'dev-full',
+    id: ROLE.DEVELOPER,
     name: 'Фулл Стек Разработчик',
   },
   {
-    id: 'not-in-project',
+    id: ROLE.DESIGNER,
     name: 'Роли нет в проекте',
   },
 ]);
 
 export const projectRoles = createProjectRoles([
   {
-    role: { id: 'architect' },
+    role: { id: ROLE.ARCHITECT },
     project: { title: 'Test1' },
   },
   {
-    role: { id: 'dev-full' },
+    role: { id: ROLE.DEVELOPER },
     project: { title: 'Test1' },
   },
 ]);

@@ -19,10 +19,7 @@ describe(`GET ${h.url}`, () => {
   afterAll(h.after);
 
   it('validation error', async () => {
-    const { body } = await h
-      .requestBy()
-      .get(h.url)
-      .expect(422);
+    const { body } = await h.requestBy().get(h.url).expect(422);
     expect(body).toEqual({
       errors: expect.arrayContaining([
         expect.objectContaining({

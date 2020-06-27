@@ -7,11 +7,11 @@ import { Project } from '@orm/project';
 import { ProjectPart } from '@orm/project-part/project-part.entity';
 import { Task, TaskRepository, TASK_SIMPLE_STATUS } from '@orm/task';
 import { TaskLogRepository, TASK_CHANGE_TYPE } from '@orm/task-log';
-import { STATUS_NAME } from '@orm/task-status/task-status.entity';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
 
 import { ListResponseDto, PaginationDto } from '../@common/dto';
+import { STATUS_NAME } from '../@domains/strategy';
 import { ProjectPartService } from '../project-part/project-part.service';
 import { ProjectService } from '../project/project.service';
 import { TaskPagination } from './dto';
@@ -44,7 +44,7 @@ export class TaskService {
 
   public async findAll(pagesDto: TaskPagination, user: User): Promise<Task[]> {
     const userProjects = await this.projectService.findAllParticipantByUser({}, user, ACCESS_LEVEL.RED);
-    const projectIds = userProjects.map(el => el.project.id).filter(id => id !== user.defaultProjectId);
+    const projectIds = userProjects.map((el) => el.project.id).filter((id) => id !== user.defaultProjectId);
     if (!projectIds.length) {
       return [];
     }
@@ -88,7 +88,7 @@ export class TaskService {
     let task = await this.findOneById(taskId, user, ACCESS_LEVEL.YELLOW, { isArchived: false });
 
     if (task) {
-      await this.taskRepo.manager.transaction(async entityManager => {
+      await this.taskRepo.manager.transaction(async (entityManager) => {
         task = await this.updateByUser(task, { isArchived: true }, user, entityManager);
       });
     }

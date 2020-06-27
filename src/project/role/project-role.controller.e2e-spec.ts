@@ -1,3 +1,4 @@
+import { ROLE } from '../../@domains/strategy';
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
 import { projectsFixture, rolesFixture, userProjectFixture, usersFixture } from './@fixtures/post';
 
@@ -12,7 +13,7 @@ let projectId: number;
 describe(`POST ${h.url}`, () => {
   beforeAll(async () => {
     await h.before();
-    projectId = h.entities.Project.find(el => el.title === 'Test User is Owner').id;
+    projectId = h.entities.Project.find((el) => el.title === 'Test User is Owner').id;
   });
   afterAll(h.after);
 
@@ -21,7 +22,7 @@ describe(`POST ${h.url}`, () => {
       .requestBy()
       .post(h.path(projectId))
       .send({
-        roleId: '11',
+        roleId: ROLE.ARCHITECT,
       })
       .expect(401)
       .expect({
@@ -31,12 +32,12 @@ describe(`POST ${h.url}`, () => {
   });
 
   it('by test@mail.com to alien project', async () => {
-    const alienProjectId = h.entities.Project.find(el => el.title === 'Admin is Owner').id;
+    const alienProjectId = h.entities.Project.find((el) => el.title === 'Admin is Owner').id;
     await h
       .requestBy(await h.getUser('test@mail.com'))
       .post(h.path(alienProjectId))
       .send({
-        roleId: 'creator',
+        roleId: ROLE.ARCHITECT,
       })
       .expect(403)
       .expect({
@@ -52,16 +53,6 @@ describe(`POST ${h.url}`, () => {
       .post(h.path(projectId))
       .send({
         roleId: 1,
-      })
-      .expect(422);
-  });
-
-  it('by test@mail.com to own project with workFlow validation error', async () => {
-    await h
-      .requestBy(await h.getUser('test@mail.com'))
-      .post(h.path(projectId))
-      .send({
-        roleId: 2,
       })
       .expect(422);
   });

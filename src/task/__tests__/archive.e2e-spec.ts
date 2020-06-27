@@ -14,19 +14,15 @@ describe(`PATCH ${h.url}`, () => {
   beforeAll(async () => {
     await h.before();
 
-    taskId = h.entities.Task.find(el => el.title === 'task1').id;
-    alreadyArchivedTaskId = h.entities.Task.find(el => el.title === 'already-archived').id;
+    taskId = h.entities.Task.find((el) => el.title === 'task1').id;
+    alreadyArchivedTaskId = h.entities.Task.find((el) => el.title === 'already-archived').id;
   });
 
   it('by guest - an authentication error', async () => {
-    await h
-      .requestBy()
-      .patch(h.path(taskId))
-      .expect(401)
-      .expect({
-        message: 'Unauthorized',
-        statusCode: 401,
-      });
+    await h.requestBy().patch(h.path(taskId)).expect(401).expect({
+      message: 'Unauthorized',
+      statusCode: 401,
+    });
   });
 
   it('by non task owner - an authentication error', async () => {

@@ -20,7 +20,7 @@ export const corsOptions = (isProd: boolean, whitelist: string[] = []) =>
     exposedHeaders: 'Authorization',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     origin: isProd
-      ? (function(origin, callback) {
+      ? (function (origin, callback) {
           if (whitelist.indexOf(origin) !== -1) {
             callback(null, true);
           } else {

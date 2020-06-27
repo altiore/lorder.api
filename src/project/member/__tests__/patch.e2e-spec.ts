@@ -1,3 +1,4 @@
+import { ROLE } from '../../../@domains/strategy';
 import { ACCESS_LEVEL, UserProject } from '../../../@orm/user-project';
 import { TestHelper } from '../../../@test-helper/@utils/TestHelper';
 import { projectRoles, projectsFixture, roleFlows, userProjectsFixture, usersFixture } from './@fixtures/patch';
@@ -16,19 +17,15 @@ describe(`PATCH ${h.url}`, () => {
   beforeAll(async () => {
     await h.before();
     projectId = h.entities.Project[0].id;
-    memberId = h.entities.User.find(el => el.email === 'member@mail.com').id;
+    memberId = h.entities.User.find((el) => el.email === 'member@mail.com').id;
   });
   afterAll(h.after);
 
   it('by guest - anauthorized error', async () => {
-    await h
-      .requestBy()
-      .patch(h.path(projectId, memberId))
-      .expect(401)
-      .expect({
-        message: 'Unauthorized',
-        statusCode: 401,
-      });
+    await h.requestBy().patch(h.path(projectId, memberId)).expect(401).expect({
+      message: 'Unauthorized',
+      statusCode: 401,
+    });
   });
 
   it('by NOT project owner', async () => {
@@ -66,14 +63,14 @@ describe(`PATCH ${h.url}`, () => {
     const { body } = await h
       .requestBy(await h.getUser('project-owner@mail.com'))
       .patch(h.path(projectId, memberId))
-      .send({ roles: ['architect'] })
+      .send({ roles: [ROLE.ARCHITECT] })
       .expect(200);
     expect(body).toEqual(
       expect.objectContaining({
         roles: expect.arrayContaining([
           expect.objectContaining({
             role: expect.objectContaining({
-              id: 'architect',
+              id: ROLE.ARCHITECT,
             }),
           }),
         ]),
@@ -91,7 +88,7 @@ describe(`PATCH ${h.url}`, () => {
       expect.arrayContaining([
         expect.objectContaining({
           role: expect.objectContaining({
-            id: 'architect',
+            id: ROLE.ARCHITECT,
           }),
         }),
       ])
@@ -102,14 +99,14 @@ describe(`PATCH ${h.url}`, () => {
     const { body } = await h
       .requestBy(await h.getUser('project-owner@mail.com'))
       .patch(h.path(projectId, memberId))
-      .send({ roles: ['dev-full'] })
+      .send({ roles: [ROLE.DEVELOPER] })
       .expect(200);
     expect(body).toEqual(
       expect.objectContaining({
         roles: expect.arrayContaining([
           expect.objectContaining({
             role: expect.objectContaining({
-              id: 'dev-full',
+              id: ROLE.DEVELOPER,
             }),
           }),
         ]),
@@ -128,7 +125,7 @@ describe(`PATCH ${h.url}`, () => {
       expect.arrayContaining([
         expect.objectContaining({
           role: expect.objectContaining({
-            id: 'dev-full',
+            id: ROLE.DEVELOPER,
           }),
         }),
       ])
@@ -139,14 +136,14 @@ describe(`PATCH ${h.url}`, () => {
     const { body } = await h
       .requestBy(await h.getUser('project-owner@mail.com'))
       .patch(h.path(projectId, memberId))
-      .send({ roles: ['dev-full', 'not-in-project'] })
+      .send({ roles: [ROLE.DEVELOPER, ROLE.DESIGNER] })
       .expect(200);
     expect(body).toEqual(
       expect.objectContaining({
         roles: expect.arrayContaining([
           expect.objectContaining({
             role: expect.objectContaining({
-              id: 'dev-full',
+              id: ROLE.DEVELOPER,
             }),
           }),
         ]),

@@ -9,14 +9,14 @@ export class UserTask {
   @Column({ primary: true })
   userId: number;
 
-  @ManyToOne(t => User, { eager: true, primary: true })
+  @ManyToOne((t) => User, { eager: true, primary: true })
   user: User;
 
   @Index()
   @Column({ primary: true })
   taskId: number;
 
-  @ManyToOne(t => Task, m => m.userTasks, {
+  @ManyToOne((t) => Task, (m) => m.userTasks, {
     onDelete: 'CASCADE',
     primary: true,
   })
