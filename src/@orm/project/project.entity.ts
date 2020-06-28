@@ -15,6 +15,7 @@ import {
 } from 'typeorm';
 
 import { IColumn } from '../../@domains/strategy';
+import { TASK_FLOW_STRATEGY } from '../../@domains/strategy';
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { ProjectPart } from '../project-part/project-part.entity';
 import { ProjectPub } from '../project-pub/project-pub.entity';
@@ -28,12 +29,6 @@ import { User } from '../user/user.entity';
 export enum PROJECT_TYPE {
   SOCIALLY_USEFUL = 'socially_useful',
   PERSONALLY_USEFUL = 'personally_useful',
-}
-
-export enum PROJECT_STRATEGY {
-  ADVANCED = 'ADVANCED',
-  SIMPLE = 'SIMPLE',
-  DOUBLE_CHECK = 'DOUBLE_CHECK',
 }
 
 @Entity()
@@ -78,9 +73,9 @@ export class Project {
   @Column('enum', { enum: PROJECT_TYPE, nullable: false, default: PROJECT_TYPE.SOCIALLY_USEFUL })
   type: PROJECT_TYPE;
 
-  @ApiProperty({ enum: PROJECT_STRATEGY })
-  @Column('enum', { enum: PROJECT_STRATEGY, nullable: false, default: PROJECT_STRATEGY.SIMPLE })
-  strategy: PROJECT_STRATEGY;
+  @ApiProperty({ enum: TASK_FLOW_STRATEGY })
+  @Column('enum', { enum: TASK_FLOW_STRATEGY, nullable: false, default: TASK_FLOW_STRATEGY.SIMPLE })
+  strategy: TASK_FLOW_STRATEGY;
 
   @ApiProperty()
   @Column({ nullable: false })

@@ -12,7 +12,7 @@ import { ACCESS_LEVEL } from '@orm/user-project';
 import { PaginationDto } from '@common/dto';
 
 import { ValidationException } from '../@common/exceptions/validation.exception';
-import { STATUS_NAME } from '../@domains/strategy';
+import { IColumn, STATUS_NAME, TaskFlowStrategy } from '../@domains/strategy';
 import { Task, TASK_SIMPLE_STATUS } from '../@orm/task';
 import { TaskType } from '../@orm/task-type/task-type.entity';
 import { UserTask } from '../@orm/user-task';
@@ -165,7 +165,7 @@ export class UserWorkService {
 
     return await Promise.all(
       userWorks.map(async (userWork) => {
-        return await this.finishTask(manager, userWork, user, STATUS_NAME.TESTING);
+        return await this.finishTask(curManager, userWork, user, STATUS_NAME.TESTING);
       })
     );
   }
@@ -176,16 +176,21 @@ export class UserWorkService {
       started: null,
     };
     await this.userWorkRepo.manager.transaction(async (entityManager) => {
-      // TODO: добавить транзакции на процесс создания всех частей задачи
-      // 1. Завершить предыдущие задачи, если есть незавершенные
+      // 1. Найти или создать новую задачу
+      const task = await this.findTaskOrCreateDefault(project, user, userWorkData, entityManager);
+
+      // 2. Проверить, что эту задачу может начать текущий пользователь
+      await this.checkUserCanStart(project, user, task);
+
+      // 3. Завершить предыдущие задачи, если есть незавершенные
       result.finished = await this.finishNotFinished(user, entityManager);
 
-      // 2. Создать новую задачу
+      // 4. Создать новую запись в таблице "работа пользователя" и обновить информацию о задаче
       let startAt;
       if (result.finished && result.finished.length) {
         startAt = result.finished[0].finishAt;
       }
-      result.started = await this.startNew(project, user, userWorkData, startAt, entityManager);
+      result.started = await this.startNew(task, user, userWorkData, startAt, entityManager);
     });
 
     return result;
@@ -359,14 +364,18 @@ export class UserWorkService {
     });
   }
 
-  private async startNew(
+  public async checkUserCanStart(project: Project, user: User, task: Task): Promise<TaskFlowStrategy> {
+    const strategy = await this.projectService.getCurrentUserStrategy(project, user);
+
+    return strategy;
+  }
+
+  private async findTaskOrCreateDefault(
     project: Project,
     user: User,
     userWorkData: UserWorkCreateDto,
-    startAt: moment.Moment,
-    manager?: EntityManager
-  ): Promise<UserWork> {
-    const curManager = manager || this.userWorkRepo.manager;
+    manager: EntityManager
+  ): Promise<Task> {
     let startedTask;
     if (userWorkData.taskId) {
       startedTask = await this.taskService.findOneById(
@@ -375,24 +384,13 @@ export class UserWorkService {
         undefined,
         undefined,
         undefined,
-        curManager
+        manager
       );
       if (!startedTask) {
         throw new NotFoundException(`Указанная задача ${userWorkData.taskId} не найдена в проекте ${project.title}`);
       }
-    }
-    if (startedTask) {
-      // TODO: изменять данные в зависимости от стратегии
-      if (startedTask.status !== TASK_SIMPLE_STATUS.IN_PROGRESS) {
-        startedTask = await this.taskService.updateByUser(
-          startedTask,
-          { status: TASK_SIMPLE_STATUS.IN_PROGRESS, statusTypeName: STATUS_NAME.IN_PROGRESS },
-          user,
-          curManager
-        );
-      }
     } else {
-      const taskType = await curManager.findOne(TaskType, { name: 'feature' });
+      const taskType = await manager.findOne(TaskType, { name: 'feature' });
       const taskData = {
         description: userWorkData.description || '',
         performerId: userWorkData.performerId || user.id,
@@ -402,8 +400,33 @@ export class UserWorkService {
         typeId: taskType ? taskType.id : undefined,
         title: userWorkData.title,
       };
-      startedTask = await this.taskService.createByProject(taskData, project, user, curManager);
+      startedTask = await this.taskService.createByProject(taskData, project, user, manager);
     }
+
+    return startedTask;
+  }
+
+  private async startNew(
+    taskOrProject: Task | Project,
+    user: User,
+    userWorkData: UserWorkCreateDto,
+    startAt: moment.Moment,
+    manager?: EntityManager
+  ): Promise<UserWork> {
+    const curManager = manager || this.userWorkRepo.manager;
+    let startedTask =
+      taskOrProject instanceof Task
+        ? taskOrProject
+        : await this.findTaskOrCreateDefault(taskOrProject as Project, user, userWorkData, curManager);
+    if (startedTask.status !== TASK_SIMPLE_STATUS.IN_PROGRESS) {
+      startedTask = await this.taskService.updateByUser(
+        startedTask,
+        { status: TASK_SIMPLE_STATUS.IN_PROGRESS, statusTypeName: STATUS_NAME.IN_PROGRESS },
+        user,
+        curManager
+      );
+    }
+
     return await this.userWorkRepo.startTask(
       startedTask,
       user,

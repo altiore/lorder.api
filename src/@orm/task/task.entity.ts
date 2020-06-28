@@ -15,7 +15,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { STATUS_NAME } from '../../@domains/strategy';
+import { STATUS_NAME, TaskFlowStrategy } from '../../@domains/strategy';
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { ProjectPart } from '../project-part/project-part.entity';
 import { Project } from '../project/project.entity';
@@ -24,14 +24,7 @@ import { TaskType } from '../task-type/task-type.entity';
 import { UserTask } from '../user-task/user-task.entity';
 import { UserWork } from '../user-work/user-work.entity';
 import { User } from '../user/user.entity';
-
-export enum TASK_SIMPLE_STATUS {
-  JUST_CREATED = 0,
-  TO_DO = 1,
-  IN_PROGRESS = 2,
-  IN_TESTING = 3,
-  DONE = 4,
-}
+import { TASK_SIMPLE_STATUS } from './task-simple-status';
 
 @Entity()
 @Index(['projectId', 'sequenceNumber'])
@@ -45,51 +38,9 @@ export class Task {
     DONE: 4,
   };
 
-  // TODO: удалить, когда с UI будет приходить правильное значение
-  static statusToName(status: number): STATUS_NAME {
-    if (![0, 1, 2, 3, 4].includes(status)) {
-      throw new Error('Недопустимое значение');
-    }
-
-    return [
-      STATUS_NAME.CREATING,
-      STATUS_NAME.READY_TO_DO,
-      STATUS_NAME.IN_PROGRESS,
-      STATUS_NAME.TESTING,
-      STATUS_NAME.DONE,
-    ][status];
-  }
-
+  // TODO: удалить, когда не будет ссылок. Нужно использовать аналог из TaskFlowStrategy
   static statusTypeNameToSimpleStatus(statusTypeName: STATUS_NAME): TASK_SIMPLE_STATUS {
-    const res = {
-      [STATUS_NAME.CREATING]: 0,
-      [STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING]: 0,
-      [STATUS_NAME.ASSIGNING_RESPONSIBLE]: 0,
-      [STATUS_NAME.ESTIMATION_BEFORE_PERFORMER]: 0,
-      [STATUS_NAME.ASSIGNING_PERFORMER]: 0,
-      [STATUS_NAME.ESTIMATION_BEFORE_TO_DO]: 0,
-      [STATUS_NAME.ASSIGNING_RESPONSIBLE]: 0,
-      [STATUS_NAME.READY_TO_DO]: 1,
-      [STATUS_NAME.IN_PROGRESS]: 2,
-      [STATUS_NAME.AUTO_TESTING]: 3,
-      [STATUS_NAME.PROF_REVIEW]: 3,
-      [STATUS_NAME.ESTIMATION_BEFORE_TEST]: 3,
-      [STATUS_NAME.READY_TO_TEST]: 3,
-      [STATUS_NAME.TESTING]: 3,
-      [STATUS_NAME.ARCHITECT_REVIEW]: 3,
-      [STATUS_NAME.READY_TO_DEPLOY]: 4,
-      [STATUS_NAME.DEPLOYING]: 4,
-      [STATUS_NAME.DEPLOYED_PROF_ESTIMATION]: 4,
-      [STATUS_NAME.DEPLOYED_ARCHITECT_ESTIMATION]: 4,
-      [STATUS_NAME.DEPLOYED_COMMUNITY_ESTIMATION]: 4,
-      [STATUS_NAME.DEPLOYED_ESTIMATION]: 4,
-      [STATUS_NAME.DONE]: 4,
-    }[statusTypeName];
-    if (typeof res === 'number') {
-      return res;
-    }
-
-    return 0;
+    return TaskFlowStrategy.statusTypeNameToSimpleStatus(statusTypeName);
   }
 
   @ApiProperty()

@@ -13,8 +13,12 @@ export enum COLUMN_TYPE {
   POST_ESTIMATION = 'post-estimation',
 }
 
+/**
+ * moves = true означает, что любые перемещения доступны
+ * TODO: Добавить все перемещения во все стратегии
+ */
 export interface IColumn {
   column: STATUS_NAME | COLUMN_TYPE;
   statuses: STATUS_NAME[];
-  moves: IMove[];
+  moves: IMove[] | true;
 }
