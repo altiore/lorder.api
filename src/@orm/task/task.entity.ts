@@ -15,11 +15,12 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { STATUS_NAME, TaskFlowStrategy } from '../../@domains/strategy';
+import { STATUS_NAME } from '../../@domains/strategy';
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { ProjectPart } from '../project-part/project-part.entity';
 import { Project } from '../project/project.entity';
 import { TaskComment } from '../task-comment/task-comment.entity';
+import { TaskStatus } from '../task-status/task-status.entity';
 import { TaskType } from '../task-type/task-type.entity';
 import { UserTask } from '../user-task/user-task.entity';
 import { UserWork } from '../user-work/user-work.entity';
@@ -30,18 +31,13 @@ import { TASK_SIMPLE_STATUS } from './task-simple-status';
 @Index(['projectId', 'sequenceNumber'])
 @Unique(['projectId', 'sequenceNumber'])
 export class Task {
+  // TODO: удалить, когда прекратим использовать захардкоженые статусы в простой стратегии
   static statuses: { [key in keyof typeof TASK_SIMPLE_STATUS]: TASK_SIMPLE_STATUS } = {
     JUST_CREATED: 0,
     TO_DO: 1,
-    IN_PROGRESS: 2,
     IN_TESTING: 3,
     DONE: 4,
   };
-
-  // TODO: удалить, когда не будет ссылок. Нужно использовать аналог из TaskFlowStrategy
-  static statusTypeNameToSimpleStatus(statusTypeName: STATUS_NAME): TASK_SIMPLE_STATUS {
-    return TaskFlowStrategy.statusTypeNameToSimpleStatus(statusTypeName);
-  }
 
   @ApiProperty()
   @PrimaryGeneratedColumn()
@@ -94,8 +90,8 @@ export class Task {
   @Column({ nullable: true })
   statusTypeName: STATUS_NAME;
 
-  // @ManyToOne(t => TaskStatus, { nullable: true, onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
-  // statusType: TaskStatus;
+  @ManyToOne((t) => TaskStatus, { nullable: true, onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
+  statusType: TaskStatus;
 
   @ApiPropertyOptional()
   @Column({ nullable: true })
@@ -108,8 +104,8 @@ export class Task {
   @Column('boolean', { default: false })
   isArchived: boolean = false;
 
-  // @Column('boolean', { default: false })
-  // inProgress: boolean = false;
+  @Column('boolean', { default: false })
+  inProgress: boolean = false;
 
   @ApiProperty()
   @Column({ nullable: true })

@@ -151,7 +151,7 @@ export class TaskService {
           ? TASK_CHANGE_TYPE.MOVE
           : TASK_CHANGE_TYPE.UPDATE;
       await entityManager.save(this.taskLogRepo.createTaskLogByType(changeType, task, user));
-      updatedTask = await this.updateTask(task.id, newTaskData, entityManager);
+      updatedTask = await this.updateTask(task, newTaskData, entityManager);
       return updatedTask;
     } catch (e) {
       throw new NotAcceptableException('Не удается изменить задачу...');

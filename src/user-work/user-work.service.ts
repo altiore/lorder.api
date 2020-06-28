@@ -12,8 +12,8 @@ import { ACCESS_LEVEL } from '@orm/user-project';
 import { PaginationDto } from '@common/dto';
 
 import { ValidationException } from '../@common/exceptions/validation.exception';
-import { IColumn, STATUS_NAME, TaskFlowStrategy } from '../@domains/strategy';
-import { Task, TASK_SIMPLE_STATUS } from '../@orm/task';
+import { STATUS_NAME, TaskFlowStrategy } from '../@domains/strategy';
+import { Task } from '../@orm/task';
 import { TaskType } from '../@orm/task-type/task-type.entity';
 import { UserTask } from '../@orm/user-task';
 import { UserWork, UserWorkRepository } from '../@orm/user-work';
@@ -102,7 +102,7 @@ export class UserWorkService {
     curManager: EntityManager,
     userWork: UserWork,
     user: User,
-    statusTypeName?: STATUS_NAME
+    statusTypeName: STATUS_NAME
   ): Promise<UserWork> {
     userWork.finishAt = moment();
     if (!userWork.projectId || !userWork.task.userTasks) {
@@ -111,13 +111,12 @@ export class UserWorkService {
         where: { id: userWork.taskId },
       });
     }
-    if (typeof statusTypeName === 'string') {
-      userWork.task.statusTypeName = statusTypeName;
-      // TODO: status нужно определить по statusTypeName
-      const status = Task.statusTypeNameToSimpleStatus(statusTypeName);
-      userWork.task.status = status;
-      await this.taskService.updateByUser(userWork.task, { status, statusTypeName }, user, curManager);
-    }
+
+    userWork.task.statusTypeName = statusTypeName;
+    // TODO: взять статус из стратегии
+    // userWork.task.status = TaskFlowStrategy.
+    await this.taskService.updateByUser(userWork.task, { statusTypeName, inProgress: false }, user, curManager);
+
     const curUserTask = userWork.task.userTasks.find((el) => el.userId === user.id);
 
     // TODO: проверить стратегию проекта
@@ -366,7 +365,8 @@ export class UserWorkService {
 
   public async checkUserCanStart(project: Project, user: User, task: Task): Promise<TaskFlowStrategy> {
     const strategy = await this.projectService.getCurrentUserStrategy(project, user);
-
+    // 1. Проверить, что задача в этом статусе доступна пользователю для выполнения
+    // 2. Проверить, что задача сейчас НЕ начата
     return strategy;
   }
 
@@ -395,7 +395,7 @@ export class UserWorkService {
         description: userWorkData.description || '',
         performerId: userWorkData.performerId || user.id,
         // TODO: status must be calculated from statusTypeName according to strategy
-        status: Task.statusTypeNameToSimpleStatus(STATUS_NAME.IN_PROGRESS),
+        status: TaskFlowStrategy.statusTypeNameToSimpleStatus(STATUS_NAME.IN_PROGRESS),
         statusTypeName: STATUS_NAME.IN_PROGRESS,
         typeId: taskType ? taskType.id : undefined,
         title: userWorkData.title,
@@ -418,10 +418,10 @@ export class UserWorkService {
       taskOrProject instanceof Task
         ? taskOrProject
         : await this.findTaskOrCreateDefault(taskOrProject as Project, user, userWorkData, curManager);
-    if (startedTask.status !== TASK_SIMPLE_STATUS.IN_PROGRESS) {
+    if (!startedTask.inProgress) {
       startedTask = await this.taskService.updateByUser(
         startedTask,
-        { status: TASK_SIMPLE_STATUS.IN_PROGRESS, statusTypeName: STATUS_NAME.IN_PROGRESS },
+        { inProgress: true, statusTypeName: STATUS_NAME.READY_TO_DO },
         user,
         curManager
       );

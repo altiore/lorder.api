@@ -493,7 +493,7 @@ export class ProjectService {
               // 1. заменить status во всех задачах проекта на тот, что указан в конфиге
               for (const status of Object.values(STATUS_NAME)) {
                 await manager.query(
-                  `UPDATE "task" SET "status"=${Task.statusTypeNameToSimpleStatus(
+                  `UPDATE "task" SET "status"=${TaskFlowStrategy.statusTypeNameToSimpleStatus(
                     status
                   )} WHERE "statusTypeName"='${status}'`
                 );

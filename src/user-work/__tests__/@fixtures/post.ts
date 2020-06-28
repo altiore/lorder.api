@@ -1,5 +1,5 @@
+import { STATUS_NAME } from '../../../@domains/strategy';
 import { ROLES } from '../../../@orm/role';
-import { TASK_SIMPLE_STATUS } from '../../../@orm/task';
 import { ACCESS_LEVEL } from '../../../@orm/user-project';
 import {
   createProjects,
@@ -56,7 +56,7 @@ export const tasksFixture = createTasks([
   },
   {
     project: { owner: { email: 'super-admin@mail.com' } },
-    status: TASK_SIMPLE_STATUS.IN_TESTING,
+    statusTypeName: STATUS_NAME.READY_TO_DO,
     title: 'IN_TESTING',
   },
 ]);

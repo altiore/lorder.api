@@ -1,5 +1,6 @@
 import moment = require('moment');
 
+import { STATUS_NAME } from '../../@domains/strategy';
 import { Task, TASK_SIMPLE_STATUS } from '../../@orm/task';
 import { User } from '../../@orm/user';
 import { UserWork } from '../../@orm/user-work';
@@ -221,7 +222,8 @@ describe(`POST ${h.url}`, () => {
       .expect(201);
     expect(body.started.task).toEqual(
       expect.objectContaining({
-        status: TASK_SIMPLE_STATUS.IN_PROGRESS,
+        inProgress: true,
+        statusTypeName: STATUS_NAME.READY_TO_DO,
       })
     );
     await h.removeCreated(UserWork, { id: body.started.id });

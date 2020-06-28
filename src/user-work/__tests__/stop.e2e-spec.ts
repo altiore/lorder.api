@@ -1,5 +1,6 @@
 import * as moment from 'moment';
 
+import { STATUS_NAME } from '../../@domains/strategy';
 import { Task, TASK_SIMPLE_STATUS } from '../../@orm/task';
 import { UserWork } from '../../@orm/user-work';
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
@@ -88,7 +89,7 @@ describe(`PATCH ${h.url}`, () => {
       startAt: expect.any(String),
     });
     expect(body.next.startAt).toBe(currentUserWork.finishAt.toJSON());
-    expect(body.previous.task.status).toBe(TASK_SIMPLE_STATUS.IN_TESTING);
+    expect(body.previous.task.statusTypeName).toBe(STATUS_NAME.TESTING);
     await h.removeCreated(Task, body.next.task.id);
     await h.removeCreated(UserWork, body.next.id);
   });

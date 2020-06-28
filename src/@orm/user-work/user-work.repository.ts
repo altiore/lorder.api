@@ -44,6 +44,7 @@ export class UserWorkRepository extends Repository<UserWork> {
       task,
       user,
     });
+    userWork.task = task;
     return this.prepare(await curManager.save(userWork));
   }
 
@@ -122,7 +123,6 @@ export class UserWorkRepository extends Repository<UserWork> {
   private prepare(userWork: UserWork): UserWork {
     const projectId = userWork.projectId;
     const prevProjectId = userWork.prevProjectId;
-    // delete userWork.task;
     return { ...userWork, prevProjectId, projectId };
   }
 }
