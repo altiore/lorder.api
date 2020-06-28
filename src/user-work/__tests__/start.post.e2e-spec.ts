@@ -1,7 +1,7 @@
 import moment = require('moment');
 
 import { STATUS_NAME } from '../../@domains/strategy';
-import { Task, TASK_SIMPLE_STATUS } from '../../@orm/task';
+import { Task } from '../../@orm/task';
 import { User } from '../../@orm/user';
 import { UserWork } from '../../@orm/user-work';
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
@@ -150,7 +150,7 @@ describe(`POST ${h.url}`, () => {
         projectId: expect.any(Number),
         sequenceNumber: expect.any(Number),
         source: null,
-        status: Task.statuses.IN_PROGRESS,
+        statusTypeName: STATUS_NAME.READY_TO_DO,
         title: 'Задача Lorder',
         typeId: expect.any(Number),
         updatedAt: expect.any(moment),
@@ -196,7 +196,7 @@ describe(`POST ${h.url}`, () => {
         projectId: expect.any(Number),
         sequenceNumber: expect.any(Number),
         source: null,
-        status: Task.statuses.IN_PROGRESS,
+        statusTypeName: STATUS_NAME.READY_TO_DO,
         title: 'Задача Lorder',
         typeId: expect.any(Number),
         updatedAt: expect.any(moment),

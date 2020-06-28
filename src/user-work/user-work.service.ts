@@ -60,6 +60,7 @@ export class UserWorkService {
     if (!project || !project.isAccess(accessLevel)) {
       throw new ForbiddenException('У вас нет доступа к проекту, к которому принадлежит эта задача');
     }
+    userWork.task.project = project;
     return userWork;
   }
 
@@ -102,7 +103,8 @@ export class UserWorkService {
     curManager: EntityManager,
     userWork: UserWork,
     user: User,
-    statusTypeName: STATUS_NAME
+    strategy: TaskFlowStrategy,
+    pushForward?: boolean
   ): Promise<UserWork> {
     userWork.finishAt = moment();
     if (!userWork.projectId || !userWork.task.userTasks) {
@@ -112,10 +114,16 @@ export class UserWorkService {
       });
     }
 
-    userWork.task.statusTypeName = statusTypeName;
-    // TODO: взять статус из стратегии
-    // userWork.task.status = TaskFlowStrategy.
-    await this.taskService.updateByUser(userWork.task, { statusTypeName, inProgress: false }, user, curManager);
+    const newTaskData: Partial<Task> = { inProgress: false };
+    if (pushForward) {
+      const moveTo = strategy.pushForward(userWork.task);
+      if (!moveTo) {
+        throw new NotAcceptableException('Невозможно изменить статус задачи. Видимо, у вас нет на это прав');
+      }
+      userWork.task.statusTypeName = moveTo.to;
+      newTaskData.statusTypeName = moveTo.to;
+    }
+    await this.taskService.updateByUser(userWork.task, newTaskData, user, curManager);
 
     const curUserTask = userWork.task.userTasks.find((el) => el.userId === user.id);
 
@@ -155,7 +163,7 @@ export class UserWorkService {
     await curManager.save(userTasks);
   }
 
-  public async finishNotFinished(user: User, manager?: EntityManager): Promise<UserWork[]> {
+  public async finishNotFinished(user: User, strategy: TaskFlowStrategy, manager?: EntityManager): Promise<UserWork[]> {
     const curManager = manager || this.userWorkRepo.manager;
     const userWorks = await curManager.find(UserWork, {
       relations: ['task', 'task.userTasks'],
@@ -164,7 +172,7 @@ export class UserWorkService {
 
     return await Promise.all(
       userWorks.map(async (userWork) => {
-        return await this.finishTask(curManager, userWork, user, STATUS_NAME.TESTING);
+        return await this.finishTask(curManager, userWork, user, strategy, true);
       })
     );
   }
@@ -175,21 +183,24 @@ export class UserWorkService {
       started: null,
     };
     await this.userWorkRepo.manager.transaction(async (entityManager) => {
+      // 0. Находим стратегию перемещения задач
+      const strategy = await this.projectService.getCurrentUserStrategy(project, user);
+
       // 1. Найти или создать новую задачу
-      const task = await this.findTaskOrCreateDefault(project, user, userWorkData, entityManager);
+      const task = await this.findTaskOrCreateDefault(project, user, userWorkData, strategy, entityManager);
 
       // 2. Проверить, что эту задачу может начать текущий пользователь
-      await this.checkUserCanStart(project, user, task);
+      await this.checkUserCanStart(strategy, task);
 
       // 3. Завершить предыдущие задачи, если есть незавершенные
-      result.finished = await this.finishNotFinished(user, entityManager);
+      result.finished = await this.finishNotFinished(user, strategy, entityManager);
 
       // 4. Создать новую запись в таблице "работа пользователя" и обновить информацию о задаче
       let startAt;
       if (result.finished && result.finished.length) {
         startAt = result.finished[0].finishAt;
       }
-      result.started = await this.startNew(task, user, userWorkData, startAt, entityManager);
+      result.started = await this.startNew(task, user, userWorkData, startAt, strategy, entityManager);
     });
 
     return result;
@@ -204,16 +215,26 @@ export class UserWorkService {
       previous: null,
     };
     await this.userWorkRepo.manager.transaction(async (entityManager) => {
-      result.previous = await this.finishTask(entityManager, userWork, user, STATUS_NAME.TESTING);
+      // 0. Находим стратегию перемещения задач
+      const strategy = await this.projectService.getCurrentUserStrategy(userWork.task.project, user);
 
-      const project = await this.userService.getDefaultProject(user, entityManager);
+      result.previous = await this.finishTask(entityManager, userWork, user, strategy, true);
+
+      const defProject = await this.userService.getDefaultProject(user, entityManager);
 
       const userWorkData = {
         description: `После "${result.previous.task.title}"`,
-        projectId: project.id,
+        projectId: defProject.id,
         title: 'Перерыв/Отдых',
       };
-      result.next = await this.startNew(project, user, userWorkData, result.previous.finishAt, entityManager);
+      result.next = await this.startNew(
+        defProject,
+        user,
+        userWorkData,
+        result.previous.finishAt,
+        strategy,
+        entityManager
+      );
     });
     return result;
   }
@@ -228,7 +249,10 @@ export class UserWorkService {
       previous: null,
     };
     await this.userWorkRepo.manager.transaction(async (manager) => {
-      stopResponse.previous = await this.finishTask(manager, userWork, user, STATUS_NAME.READY_TO_DO);
+      // 0. Находим стратегию перемещения задач
+      const strategy = await this.projectService.getCurrentUserStrategy(userWork.task.project, user);
+
+      stopResponse.previous = await this.finishTask(manager, userWork, user, strategy);
 
       const project = await this.userService.getDefaultProject(user, manager);
 
@@ -238,7 +262,14 @@ export class UserWorkService {
         title: 'Перерыв/Отдых',
         prevTaskId: userWork.taskId,
       };
-      stopResponse.next = await this.startNew(project, user, userWorkData, stopResponse.previous.finishAt, manager);
+      stopResponse.next = await this.startNew(
+        project,
+        user,
+        userWorkData,
+        stopResponse.previous.finishAt,
+        strategy,
+        manager
+      );
       stopResponse.next.prevTask = userWork.task;
     });
 
@@ -363,17 +394,16 @@ export class UserWorkService {
     });
   }
 
-  public async checkUserCanStart(project: Project, user: User, task: Task): Promise<TaskFlowStrategy> {
-    const strategy = await this.projectService.getCurrentUserStrategy(project, user);
+  public async checkUserCanStart(strategy: TaskFlowStrategy, task: Task): Promise<void> {
     // 1. Проверить, что задача в этом статусе доступна пользователю для выполнения
     // 2. Проверить, что задача сейчас НЕ начата
-    return strategy;
   }
 
   private async findTaskOrCreateDefault(
     project: Project,
     user: User,
     userWorkData: UserWorkCreateDto,
+    strategy: TaskFlowStrategy,
     manager: EntityManager
   ): Promise<Task> {
     let startedTask;
@@ -394,9 +424,8 @@ export class UserWorkService {
       const taskData = {
         description: userWorkData.description || '',
         performerId: userWorkData.performerId || user.id,
-        // TODO: status must be calculated from statusTypeName according to strategy
-        status: TaskFlowStrategy.statusTypeNameToSimpleStatus(STATUS_NAME.IN_PROGRESS),
-        statusTypeName: STATUS_NAME.IN_PROGRESS,
+        status: strategy.startedStatus.status,
+        statusTypeName: strategy.startedStatus.statusTypeName,
         typeId: taskType ? taskType.id : undefined,
         title: userWorkData.title,
       };
@@ -411,13 +440,14 @@ export class UserWorkService {
     user: User,
     userWorkData: UserWorkCreateDto,
     startAt: moment.Moment,
+    strategy: TaskFlowStrategy,
     manager?: EntityManager
   ): Promise<UserWork> {
     const curManager = manager || this.userWorkRepo.manager;
     let startedTask =
       taskOrProject instanceof Task
         ? taskOrProject
-        : await this.findTaskOrCreateDefault(taskOrProject as Project, user, userWorkData, curManager);
+        : await this.findTaskOrCreateDefault(taskOrProject as Project, user, userWorkData, strategy, curManager);
     if (!startedTask.inProgress) {
       startedTask = await this.taskService.updateByUser(
         startedTask,
