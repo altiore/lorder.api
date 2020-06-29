@@ -134,7 +134,6 @@ export class TaskFlowStrategy {
   }
 
   public canBeMoved(fromStatus: STATUS_NAME, toStatus: STATUS_NAME) {
-    console.log('canBeMoved', { columns: this.columns });
     return (
       this.columns.findIndex((col) => {
         return (
