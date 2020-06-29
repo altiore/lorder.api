@@ -229,4 +229,32 @@ describe(`POST ${h.url}`, () => {
     await h.removeCreated(UserWork, { id: body.started.id });
     await h.removeCreated(Task, { id: body.started.taskId });
   });
+
+  it('could not start task which was already started', async () => {
+    const taskInTesting = await h.findOne(Task, { title: 'STARTED BY user@mail.com' });
+    await h
+      .requestBy(await h.getUser('admin@mail.com'))
+      .post(h.path())
+      .send({
+        description: 'Описание новой задачи',
+        projectId,
+        title: 'Задача Lorder',
+        taskId: taskInTesting.id,
+      })
+      .expect(403);
+  });
+
+  it('could not start task which was already started', async () => {
+    const taskInTesting = await h.findOne(Task, { title: 'STARTED BY user@mail.com' });
+    await h
+      .requestBy(await h.getUser('admin@mail.com'))
+      .post(h.path())
+      .send({
+        description: 'Описание новой задачи',
+        projectId,
+        title: 'Задача Lorder',
+        taskId: taskInTesting.id,
+      })
+      .expect(403);
+  });
 });

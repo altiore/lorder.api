@@ -190,7 +190,7 @@ export class UserWorkService {
       const task = await this.findTaskOrCreateDefault(project, user, userWorkData, strategy, entityManager);
 
       // 2. Проверить, что эту задачу может начать текущий пользователь
-      await this.checkUserCanStart(strategy, task);
+      await this.checkUserCanStart(strategy, task, user);
 
       // 3. Завершить предыдущие задачи, если есть незавершенные
       result.finished = await this.finishNotFinished(user, strategy, entityManager);
@@ -394,9 +394,22 @@ export class UserWorkService {
     });
   }
 
-  public async checkUserCanStart(strategy: TaskFlowStrategy, task: Task): Promise<void> {
-    // 1. Проверить, что задача в этом статусе доступна пользователю для выполнения
-    // 2. Проверить, что задача сейчас НЕ начата
+  public async checkUserCanStart(strategy: TaskFlowStrategy, task: Task, user: User): Promise<void> {
+    // 1. Проверить, что пользователь назначен на текущую задачу
+    if (task.performerId !== user.id) {
+      throw new NotAcceptableException('Вы не можете начать эту задачу. Она назначена на кого-то другого');
+    }
+
+    // 2. Проверить, что задачу никто не выполняет
+    if (task.inProgress) {
+      // TODO: проверить так же, что нет незаконченных работ в этой задаче
+      throw new NotAcceptableException('Над этой задачей уже кто-то работает!');
+    }
+
+    // 3. Проверить, что задача в этом статусе доступна пользователю для выполнения
+    if (!strategy.canBeStarted(task.statusTypeName)) {
+      throw new NotAcceptableException('Вы не можете начать выполнять задачу в этом статусе');
+    }
   }
 
   private async findTaskOrCreateDefault(

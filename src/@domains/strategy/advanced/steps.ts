@@ -19,6 +19,7 @@ export function getColumns(roles: ROLE | ROLE[]): IColumn[] {
 
   if (rolesArr.length === 1) {
     const role = rolesArr[0];
+    // TODO: учитывать разные типы задач
     return getSteps(TASK_TYPE.FEAT).reduce((res, cur) => {
       // Если роли нет в списке ролей, которым доступен статус, то пропустить этот шаг
       if (cur.roles.indexOf(role) === -1) {

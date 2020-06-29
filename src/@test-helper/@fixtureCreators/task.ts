@@ -4,15 +4,16 @@ import { company, random } from 'faker';
 
 import { STATUS_NAME } from '../../@domains/strategy';
 import { Project } from '../../@orm/project';
-import { Task, TASK_SIMPLE_STATUS } from '../../@orm/task';
+import { Task } from '../../@orm/task';
 import { User } from '../../@orm/user';
 import { UserTask } from '../../@orm/user-task';
 
 export const createTasks = fixtureCreator<Task>(Task, function (entity, index) {
   return {
     description: random.words(5),
+    inProgress: false,
     sequenceNumber: index,
-    status: TASK_SIMPLE_STATUS.TO_DO,
+    status: 1,
     statusTypeName: STATUS_NAME.READY_TO_DO,
     title: company.companyName(),
     value: random.number(100),

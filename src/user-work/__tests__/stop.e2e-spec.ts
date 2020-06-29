@@ -1,7 +1,7 @@
 import * as moment from 'moment';
 
 import { STATUS_NAME } from '../../@domains/strategy';
-import { Task, TASK_SIMPLE_STATUS } from '../../@orm/task';
+import { Task } from '../../@orm/task';
 import { UserWork } from '../../@orm/user-work';
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
 import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/stop';

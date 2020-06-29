@@ -31,18 +31,37 @@ export class TaskFlowStrategy {
       case TASK_FLOW_STRATEGY.SIMPLE: {
         this._columns = Object.values(TASK_SIMPLE_STATUS)
           .filter((el) => typeof el === 'number')
-          .map((enumValue: number) => ({
-            column: TaskFlowStrategy.statusToName(enumValue),
-            moves: [
-              {
-                type: MOVE_TYPE.PUSH_FORWARD,
-                to: STATUS_NAME.TESTING,
-                role: undefined,
-                requirements: {},
-              },
-            ],
-            statuses: [TaskFlowStrategy.statusToName(enumValue)],
-          }));
+          .map((enumValue: number) => {
+            const statusName = TaskFlowStrategy.statusToName(enumValue);
+            return {
+              column: statusName,
+              moves:
+                statusName === STATUS_NAME.DONE
+                  ? [
+                      {
+                        type: MOVE_TYPE.ANY,
+                        to: STATUS_NAME.ANY,
+                        role: undefined,
+                        requirements: {},
+                      },
+                    ]
+                  : [
+                      {
+                        type: MOVE_TYPE.PUSH_FORWARD,
+                        to: STATUS_NAME.TESTING,
+                        role: undefined,
+                        requirements: {},
+                      },
+                      {
+                        type: MOVE_TYPE.ANY,
+                        to: STATUS_NAME.ANY,
+                        role: undefined,
+                        requirements: {},
+                      },
+                    ],
+              statuses: [statusName],
+            };
+          });
         break;
       }
     }
@@ -103,12 +122,28 @@ export class TaskFlowStrategy {
     return undefined;
   }
 
-  static statuses: { [key in keyof typeof TASK_SIMPLE_STATUS]: TASK_SIMPLE_STATUS } = {
-    JUST_CREATED: 0,
-    TO_DO: 1,
-    IN_TESTING: 3,
-    DONE: 4,
-  };
+  public canBeStarted(statusTypeName: STATUS_NAME) {
+    return (
+      this.columns.findIndex((col) => {
+        return (
+          col.statuses.includes(statusTypeName) &&
+          col.moves.findIndex((move) => move.type === MOVE_TYPE.PUSH_FORWARD) !== -1
+        );
+      }) !== -1
+    );
+  }
+
+  public canBeMoved(fromStatus: STATUS_NAME, toStatus: STATUS_NAME) {
+    console.log('canBeMoved', { columns: this.columns });
+    return (
+      this.columns.findIndex((col) => {
+        return (
+          col.statuses.includes(fromStatus) &&
+          col.moves.findIndex((move) => move.to === toStatus || move.to === STATUS_NAME.ANY) !== -1
+        );
+      }) !== -1
+    );
+  }
 
   // TODO: удалить, когда с UI будет приходить правильное значение
   static statusToName(status: number): STATUS_NAME {

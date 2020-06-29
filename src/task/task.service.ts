@@ -129,7 +129,7 @@ export class TaskService {
     const prepareTaskData = {
       ...taskData,
       performerId: taskData.performerId || user.id,
-      status: typeof taskData.status === 'number' ? taskData.status : TASK_SIMPLE_STATUS.JUST_CREATED,
+      status: typeof taskData.status === 'number' ? taskData.status : 0,
       statusTypeName: typeof taskData.statusTypeName === 'string' ? taskData.statusTypeName : STATUS_NAME.CREATING,
     };
     const task = await this.taskRepo.createByProject(prepareTaskData, project, curManager);

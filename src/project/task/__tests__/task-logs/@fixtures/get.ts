@@ -1,5 +1,4 @@
 import { ROLES } from '../../../../../@orm/role';
-import { TASK_SIMPLE_STATUS } from '../../../../../@orm/task';
 import { ACCESS_LEVEL } from '../../../../../@orm/user-project';
 import {
   createProjects,
@@ -80,28 +79,24 @@ export const tasksFixture = createTasks([
   {
     performer: { email: 'user@mail.com' },
     project: { owner: { email: 'super-admin@mail.com' } },
-    status: TASK_SIMPLE_STATUS.IN_PROGRESS,
     title: 'First Task',
     userTasks: [{ user: { email: 'user@mail.com' } }],
   },
   {
     performer: { email: 'removed@mail.com' },
     project: { owner: { email: 'super-admin@mail.com' } },
-    status: TASK_SIMPLE_STATUS.IN_PROGRESS,
     title: 'Second Task',
     userTasks: [{ user: { email: 'removed@mail.com' } }],
   },
   {
     performer: { email: 'white-status@mail.com' },
     project: { owner: { email: 'super-admin@mail.com' } },
-    status: TASK_SIMPLE_STATUS.IN_PROGRESS,
     title: 'Third Task',
     userTasks: [{ user: { email: 'white-status@mail.com' } }],
   },
   {
     performer: { email: 'user@mail.com' },
     project: { owner: { email: 'user@mail.com' } },
-    status: TASK_SIMPLE_STATUS.IN_PROGRESS,
     title: 'Fourth Task',
     userTasks: [{ user: { email: 'user@mail.com' } }],
   },

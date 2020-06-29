@@ -20,5 +20,5 @@ export enum COLUMN_TYPE {
 export interface IColumn {
   column: STATUS_NAME | COLUMN_TYPE;
   statuses: STATUS_NAME[];
-  moves: IMove[] | true;
+  moves: IMove[];
 }

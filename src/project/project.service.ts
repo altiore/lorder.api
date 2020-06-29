@@ -7,7 +7,7 @@ import { EntityManager, In } from 'typeorm';
 
 import { Project, ProjectDto, ProjectRepository } from '@orm/project';
 import { ProjectPub, ProjectPubRepository } from '@orm/project-pub';
-import { Task, TASK_SIMPLE_STATUS } from '@orm/task';
+import { Task } from '@orm/task';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL, UserProject, UserProjectRepository } from '@orm/user-project';
 
@@ -247,30 +247,30 @@ export class ProjectService {
    */
   public async updateStatistic(project: Project): Promise<UserProject[]> {
     try {
-      const projectWithMembers = await this.projectRepo.findOne({
-        relations: ['members', 'pub'],
-        where: { id: project.id },
-      });
+      let result: UserProject[] = [];
+      await this.projectRepo.manager.transaction(async (manager) => {
+        const projectWithMembers = await manager.findOne(Project, {
+          relations: ['members', 'pub'],
+          where: { id: project.id },
+        });
 
-      for (const member of projectWithMembers.members) {
-        await this.calculateUserStatistic(member.member, project.id);
-      }
+        for (const member of projectWithMembers.members) {
+          await this.calculateUserStatistic(member.member, project.id, manager);
+        }
 
-      const manager = this.projectRepo.manager;
-      // 1. Посчитать скорость выполнения проекта в задачах, поинтах, расходуемых часах
-      // TODO: находить динамически статус завершенных задач из стратегии подсчета статистики проекта
-      const finishedStatus = TASK_SIMPLE_STATUS.DONE;
-      const [{ count }] = await manager.query(`
-        SELECT
-          COUNT(*)
-        FROM
-          "task"
-        WHERE
-          "projectId"=${project.id}
-           AND "status"=${finishedStatus}
-           AND "isArchived"=false 
-      `);
-      const [res1] = await manager.query(`
+        // 1. Посчитать скорость выполнения проекта в задачах, поинтах, расходуемых часах
+        const finishedStatus = STATUS_NAME.DONE;
+        const [{ count }] = await manager.query(`
+          SELECT
+            COUNT(*)
+          FROM
+            "task"
+          WHERE
+            "projectId"=${project.id}
+             AND "statusTypeName"='${finishedStatus}'
+             AND "isArchived"=false 
+        `);
+        const [res1] = await manager.query(`
         SELECT
           EXTRACT('epoch' from NOW() - "project"."createdAt") as developed_seconds,
           COUNT("user_project"."memberId") as members_count
@@ -282,7 +282,7 @@ export class ProjectService {
             AND "user_project"."accessLevel">0
         GROUP BY "project"."createdAt"
       `);
-      const [{ timeSum, valueSum }] = await manager.query(`
+        const [{ timeSum, valueSum }] = await manager.query(`
         SELECT
           SUM("user_project"."timeSum") as "timeSum",
           SUM("user_project"."valueSum") as "valueSum"
@@ -291,7 +291,7 @@ export class ProjectService {
         WHERE
           "user_project"."projectId"=${project.id};
       `);
-      const [weekTaskValue] = await manager.query(`
+        const [weekTaskValue] = await manager.query(`
         SELECT
             COUNT(DISTINCT "task"."id") as count,
             COUNT(DISTINCT "user_tasks"."userId") as "membersCount",
@@ -309,14 +309,14 @@ export class ProjectService {
                   "task"
                 LEFT JOIN "task_log" ON "task_log"."taskId"="task"."id"
                 WHERE
-                  "task"."status" = ${finishedStatus}
+                  "task"."statusTypeName" = '${finishedStatus}'
                   AND "task"."projectId"=${project.id}
                   AND "task_log"."createdAt"::DATE >= NOW()::DATE-EXTRACT(DOW FROM NOW())::INTEGER + 1
                   AND "task"."isArchived" = false
           )
           AND "task"."value" IS NOT NULL;
       `);
-      const [monthTasksValue] = await manager.query(`
+        const [monthTasksValue] = await manager.query(`
         SELECT
             COUNT(DISTINCT "task"."id") as count,
             COUNT(DISTINCT "user_tasks"."userId") as "membersCount",
@@ -334,61 +334,65 @@ export class ProjectService {
                       "task"
                     LEFT JOIN "task_log" ON "task_log"."taskId"="task"."id"
                     WHERE
-                      "task"."status" = ${finishedStatus}
+                      "task"."statusTypeName" = '${finishedStatus}'
                       AND "task"."projectId"=${project.id}
                       AND "task_log"."createdAt"::DATE >= NOW()::DATE-EXTRACT(DAY FROM NOW())::INTEGER + 1
                       AND "task"."isArchived" = false
           )
           AND "task"."value" IS NOT NULL;
       `);
-      let statisticMetrics = {};
-      if (res1) {
-        const { developed_seconds, members_count } = res1;
-        const developedDays = secondsToDays(developed_seconds);
-        const developedMonths = daysToMonths(developedDays);
-        const days8hours = millisecondsTo8hoursDays(timeSum);
+        let statisticMetrics = {};
+        if (res1) {
+          const { developed_seconds, members_count } = res1;
+          const developedDays = secondsToDays(developed_seconds);
+          const developedMonths = daysToMonths(developedDays);
+          const days8hours = millisecondsTo8hoursDays(timeSum);
 
-        statisticMetrics = {
-          all: {
-            count: parseInt(count, 0),
-            days: developedDays,
-            membersCount: parseInt(members_count, 0),
-            months: developedMonths,
-            timeProductivity: timeProductivity(days8hours, developedDays, members_count),
-            timeSumIn8hoursDays: days8hours,
-            value: valueSum,
-          },
-          lastWeek: {
-            count: parseInt(weekTaskValue.count, 0),
-            days: parseInt(weekTaskValue.days, 0),
-            membersCount: parseInt(weekTaskValue.membersCount, 0),
-            months: 0,
-            timeSumIn8hoursDays: millisecondsTo8hoursDays(weekTaskValue.time),
-            value: parseInt(weekTaskValue.value, 0),
-          },
-          lastMonth: {
-            count: parseInt(monthTasksValue.count, 0),
-            days: parseInt(monthTasksValue.days, 0),
-            membersCount: parseInt(monthTasksValue.membersCount, 0),
-            months: 1,
-            timeSumIn8hoursDays: millisecondsTo8hoursDays(monthTasksValue.time),
-            value: parseInt(monthTasksValue.value, 0),
-          },
-        };
-      }
-
-      if (projectWithMembers.pub) {
-        await this.projectPubRepo.update(
-          { uuid: projectWithMembers.pub.uuid },
-          {
-            statistic: {
-              metrics: statisticMetrics,
+          statisticMetrics = {
+            all: {
+              count: parseInt(count, 0),
+              days: developedDays,
+              membersCount: parseInt(members_count, 0),
+              months: developedMonths,
+              timeProductivity: timeProductivity(days8hours, developedDays, members_count),
+              timeSumIn8hoursDays: days8hours,
+              value: valueSum,
             },
-          }
-        );
-      }
+            lastWeek: {
+              count: parseInt(weekTaskValue.count, 0),
+              days: parseInt(weekTaskValue.days, 0),
+              membersCount: parseInt(weekTaskValue.membersCount, 0),
+              months: 0,
+              timeSumIn8hoursDays: millisecondsTo8hoursDays(weekTaskValue.time),
+              value: parseInt(weekTaskValue.value, 0),
+            },
+            lastMonth: {
+              count: parseInt(monthTasksValue.count, 0),
+              days: parseInt(monthTasksValue.days, 0),
+              membersCount: parseInt(monthTasksValue.membersCount, 0),
+              months: 1,
+              timeSumIn8hoursDays: millisecondsTo8hoursDays(monthTasksValue.time),
+              value: parseInt(monthTasksValue.value, 0),
+            },
+          };
+        }
 
-      return await this.userProjectRepo.find({ where: { project } });
+        if (projectWithMembers.pub) {
+          await manager.update(
+            ProjectPub,
+            { uuid: projectWithMembers.pub.uuid },
+            {
+              statistic: {
+                metrics: statisticMetrics,
+              },
+            }
+          );
+        }
+
+        result = await manager.find(UserProject, { where: { project } });
+      });
+
+      return result;
     } catch (e) {
       throw e;
     }

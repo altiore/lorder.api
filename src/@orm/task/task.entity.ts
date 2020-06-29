@@ -25,20 +25,11 @@ import { TaskType } from '../task-type/task-type.entity';
 import { UserTask } from '../user-task/user-task.entity';
 import { UserWork } from '../user-work/user-work.entity';
 import { User } from '../user/user.entity';
-import { TASK_SIMPLE_STATUS } from './task-simple-status';
 
 @Entity()
 @Index(['projectId', 'sequenceNumber'])
 @Unique(['projectId', 'sequenceNumber'])
 export class Task {
-  // TODO: удалить, когда прекратим использовать захардкоженые статусы в простой стратегии
-  static statuses: { [key in keyof typeof TASK_SIMPLE_STATUS]: TASK_SIMPLE_STATUS } = {
-    JUST_CREATED: 0,
-    TO_DO: 1,
-    IN_TESTING: 3,
-    DONE: 4,
-  };
-
   @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;

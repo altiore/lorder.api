@@ -16,13 +16,15 @@ import { ValidationException } from '@common/exceptions/validation.exception';
 
 import { TaskService } from 'task/task.service';
 
-import { STATUS_NAME } from '../../@domains/strategy';
+import { STATUS_NAME, TaskFlowStrategy } from '../../@domains/strategy';
+import { ProjectService } from '../project.service';
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
 
 @Injectable()
 export class ProjectTaskService {
   constructor(
     @InjectRepository(ProjectTaskTypeRepository) private readonly projectTaskTypeRepo: ProjectTaskTypeRepository,
+    private readonly projectService: ProjectService,
     private readonly taskService: TaskService
   ) {}
 
@@ -61,9 +63,11 @@ export class ProjectTaskService {
   public async move(sequenceNumber: number, project: Project, user: User, taskMoveDto: TaskMoveDto): Promise<Task> {
     // 1. Проверить соответсвие проекта задаче и уровень доступа пользователя к проекту
     const checkedTask = await this.checkAccess(sequenceNumber, project, user);
-    // 2. TODO: проверить разрешенное перемещение задачи для данного статуса
-    // 3. TODO: проверить разрешенное перемещение задачи для данного пользователя
-    // 4. Обновить и вернуть обновленную задачу
+
+    // 2. TODO: проверить разрешенное перемещение задачи для данного пользователя
+    await this.checkUserCanMove(project, user, checkedTask, taskMoveDto.statusTypeName);
+
+    // 3. Обновить и вернуть обновленную задачу
     return this.taskService.updateByUser(checkedTask, taskMoveDto, user);
   }
 
@@ -181,6 +185,13 @@ export class ProjectTaskService {
     }
 
     return preparedData;
+  }
+
+  private async checkUserCanMove(project: Project, user: User, task: Task, toStatus: STATUS_NAME) {
+    const strategy = await this.projectService.getCurrentUserStrategy(project, user);
+    if (!strategy.canBeMoved(task.statusTypeName, toStatus)) {
+      throw new NotAcceptableException('Задача не может быть перемещена в этот статус!');
+    }
   }
 
   private checkCanBeEdit(task: Task): void {

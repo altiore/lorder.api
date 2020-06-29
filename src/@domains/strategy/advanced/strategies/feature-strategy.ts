@@ -30,7 +30,7 @@ export const feature_strategy: Array<IStep> = [
       {
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.ARCHITECT,
-        to: STATUS_NAME.ASSIGNING_RESPONSIBLE,
+        to: STATUS_NAME.ESTIMATION_BEFORE_PERFORMER,
         requirements: {
           fields: ['value'],
         },
