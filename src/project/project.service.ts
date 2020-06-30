@@ -77,7 +77,7 @@ export class ProjectService {
 
   public async update(project: Project, data: ProjectDto, user: User): Promise<Project> {
     // обновляем стратегию в информации о задачах
-    await this.changeStrategy(project, data.strategy);
+    await this.changeStrategy(project, user, data.strategy);
 
     await this.projectRepo.update({ id: project.id }, data);
     // TODO: разобраться, нужны ли разные названия для публичного и не публичного проектов?
@@ -443,7 +443,7 @@ export class ProjectService {
     return strategy;
   }
 
-  private async changeStrategy(project: Project, newStrategy: TASK_FLOW_STRATEGY): Promise<true> {
+  private async changeStrategy(project: Project, user: User, newStrategy: TASK_FLOW_STRATEGY): Promise<true> {
     if (project.strategy === newStrategy) {
       return true;
     }
@@ -458,16 +458,23 @@ export class ProjectService {
               await manager.query(
                 `UPDATE "task" SET "status"=(SELECT "statusFrom" FROM "task_status" WHERE "name"="task"."statusTypeName")`
               );
+
               // 2. Проверяем, все ли роли есть в проекте для успешного передвижения по новой стратегии
-              const roles = new TaskFlowStrategy(newStrategy).roles;
+              project.strategy = newStrategy;
+              const strategy = await this.getCurrentUserStrategy(project, user);
+              const roles = strategy.roles;
+              if (!roles || !roles.length) {
+                throw new NotAcceptableException('Не удалось найти роли в стратегии');
+              }
               const projectRoles = await manager.find(ProjectRole, {
-                where: { roleId: In(roles.map((el) => el.id)) },
+                where: { roleId: In(roles.map((el) => el.id)), projectId: project.id },
               });
               if (!projectRoles || !roles || projectRoles.length !== roles.length) {
                 throw new NotAcceptableException(
                   `Найдено ${projectRoles.length} ролей из ${roles.length} необходимых для данного типа стратегии перемещения задач. Пожалуйста, добавте все необходимые роли для данной стратегии!`
                 );
               }
+
               // 3. Проверяем, есть ли хотя бы один пользователь для каждой роли в новой стратегии
               for (const role of projectRoles) {
                 const membersCountRes = await manager.query(
