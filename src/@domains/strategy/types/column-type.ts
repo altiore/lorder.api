@@ -7,8 +7,8 @@ export enum COLUMN_TYPE {
   DEVELOPING = 'developing',
   TO_DO = 'to-do',
   REVIEWING = 'reviewing',
-  TESTING = 'testing',
-  DONE = 'done',
+  CHECKING = 'checking',
+  FINISHING = 'finishing',
 
   POST_ESTIMATION = 'post-estimation',
 }

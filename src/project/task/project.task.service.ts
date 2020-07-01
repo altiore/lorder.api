@@ -28,8 +28,8 @@ export class ProjectTaskService {
     private readonly taskService: TaskService
   ) {}
 
-  public async findAll(pagesDto: PaginationDto, projectId: number): Promise<ListResponseDto<Task>> {
-    return await this.taskService.findAllByProject(pagesDto, projectId);
+  public async findAll(pagesDto: PaginationDto, project: Project, user: User): Promise<ListResponseDto<Task>> {
+    return await this.taskService.findAllByProject(pagesDto, project, user);
   }
 
   public findOne(sequenceNumber: number, projectId: number): Promise<Task> {
@@ -37,7 +37,8 @@ export class ProjectTaskService {
   }
 
   public async create(taskCreateDto: TaskCreateDto, project: Project, user: User): Promise<Task> {
-    const preparedData = await this.parseTaskDtoToTaskObj(taskCreateDto, project.id);
+    const strategy = await this.projectService.getCurrentUserStrategy(project, user, this.projectTaskTypeRepo.manager);
+    const preparedData = await this.parseTaskDtoToTaskObj(taskCreateDto, project.id, strategy);
     return await this.taskService.createByProject(preparedData, project, user);
   }
 
@@ -47,6 +48,8 @@ export class ProjectTaskService {
     project: Project,
     user: User
   ): Promise<Task> {
+    const strategy = await this.projectService.getCurrentUserStrategy(project, user, this.projectTaskTypeRepo.manager);
+
     // 1. Проверить соответсвие проекта задаче и уровень доступа пользователя к проекту
     const checkedTask = await this.checkAccess(sequenceNumber, project, user, ACCESS_LEVEL.YELLOW);
 
@@ -54,21 +57,23 @@ export class ProjectTaskService {
     this.checkCanBeEdit(checkedTask);
 
     // 3. Подготовить данные для обновления задачи
-    const preparedData = await this.parseTaskDtoToTaskObj(taskUpdateDto, project.id);
+    const preparedData = await this.parseTaskDtoToTaskObj(taskUpdateDto, project.id, strategy);
 
     // 4. Обновить задачу
     return await this.taskService.updateByUser(checkedTask, preparedData, user);
   }
 
   public async move(sequenceNumber: number, project: Project, user: User, taskMoveDto: TaskMoveDto): Promise<Task> {
+    const manager = this.projectTaskTypeRepo.manager;
+
     // 1. Проверить соответсвие проекта задаче и уровень доступа пользователя к проекту
     const checkedTask = await this.checkAccess(sequenceNumber, project, user);
 
     // 2. TODO: проверить разрешенное перемещение задачи для данного пользователя
-    await this.checkUserCanMove(project, user, checkedTask, taskMoveDto.statusTypeName);
+    const toStatus = await this.checkUserCanMove(project, user, checkedTask, taskMoveDto.statusTypeName, manager);
 
     // 3. Обновить и вернуть обновленную задачу
-    return this.taskService.updateByUser(checkedTask, taskMoveDto, user);
+    return this.taskService.updateByUser(checkedTask, { statusTypeName: toStatus }, user);
   }
 
   public async delete(sequenceNumber: number, projectId: number): Promise<Task | false> {
@@ -101,6 +106,7 @@ export class ProjectTaskService {
   private async parseTaskDtoToTaskObj(
     taskDto: TaskCreateDto | TaskUpdateDto,
     projectId: number,
+    strategy: TaskFlowStrategy,
     manager?: EntityManager
   ): Promise<Partial<Task>> {
     const curManager = manager || this.projectTaskTypeRepo.manager;
@@ -138,7 +144,7 @@ export class ProjectTaskService {
       preparedData.status = taskDto.status;
     }
     if (taskDto.statusTypeName !== undefined) {
-      preparedData.statusTypeName = taskDto.statusTypeName;
+      preparedData.statusTypeName = strategy.getStartedStatus(taskDto.statusTypeName);
     }
     if (taskDto.typeId !== undefined) {
       if (!taskDto.typeId) {
@@ -187,11 +193,20 @@ export class ProjectTaskService {
     return preparedData;
   }
 
-  private async checkUserCanMove(project: Project, user: User, task: Task, toStatus: STATUS_NAME) {
-    const strategy = await this.projectService.getCurrentUserStrategy(project, user);
-    if (!strategy.canBeMoved(task.statusTypeName, toStatus)) {
+  private async checkUserCanMove(
+    project: Project,
+    user: User,
+    task: Task,
+    toStatus: STATUS_NAME,
+    manager: EntityManager
+  ): Promise<STATUS_NAME> {
+    const strategy = await this.projectService.getCurrentUserStrategy(project, user, manager);
+    const correctToStatus = strategy.canBeMoved(task.statusTypeName, toStatus);
+    if (!correctToStatus) {
       throw new NotAcceptableException('Задача не может быть перемещена в этот статус!');
     }
+
+    return correctToStatus;
   }
 
   private checkCanBeEdit(task: Task): void {

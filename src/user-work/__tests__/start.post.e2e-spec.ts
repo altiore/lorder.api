@@ -121,44 +121,32 @@ describe(`POST ${h.url}`, () => {
     });
   });
 
-  it('by owner with correct data', async () => {
-    const { body } = await h
-      .requestBy(await h.getUser('super-admin@mail.com'))
+  it('could not start task which was already started', async () => {
+    const taskInTesting = await h.findOne(Task, { title: 'STARTED BY user@mail.com' });
+    await h
+      .requestBy(await h.getUser('admin@mail.com'))
       .post(h.path())
       .send({
         description: 'Описание новой задачи',
         projectId,
         title: 'Задача Lorder',
+        taskId: taskInTesting.id,
       })
-      .expect(201);
-    expect(body).toEqual({
-      finished: [],
-      started: expect.objectContaining({
+      .expect(403);
+  });
+
+  it('could not start task which was already started', async () => {
+    const taskInTesting = await h.findOne(Task, { title: 'STARTED BY user@mail.com' });
+    await h
+      .requestBy(await h.getUser('admin@mail.com'))
+      .post(h.path())
+      .send({
         description: 'Описание новой задачи',
-        taskId: expect.any(Number),
-      }),
-    });
-    const task = await h.findOne(Task, { id: body.started.taskId });
-    expect(task).toEqual(
-      expect.objectContaining({
-        createdAt: expect.any(moment),
-        createdById: null,
-        description: 'Описание новой задачи',
-        id: expect.any(Number),
-        isArchived: false,
-        performerId: (await h.findOne(User, { email: 'super-admin@mail.com' })).id,
-        projectId: expect.any(Number),
-        sequenceNumber: expect.any(Number),
-        source: null,
-        statusTypeName: STATUS_NAME.READY_TO_DO,
+        projectId,
         title: 'Задача Lorder',
-        typeId: expect.any(Number),
-        updatedAt: expect.any(moment),
-        value: null,
+        taskId: taskInTesting.id,
       })
-    );
-    await h.removeCreated(UserWork, { id: body.started.id });
-    await h.removeCreated(Task, { id: body.started.taskId });
+      .expect(403);
   });
 
   it('by owner with correct data, when exists not finished user work', async () => {
@@ -210,6 +198,7 @@ describe(`POST ${h.url}`, () => {
 
   it('by owner with correct data existing task with IN_TESTING status', async () => {
     const taskInTesting = await h.findOne(Task, { title: 'IN_TESTING' });
+    expect(taskInTesting.statusTypeName).toBe(STATUS_NAME.READY_TO_DO);
     const { body } = await h
       .requestBy(await h.getUser('exist-not-finished@mail.com'))
       .post(h.path())
@@ -230,31 +219,43 @@ describe(`POST ${h.url}`, () => {
     await h.removeCreated(Task, { id: body.started.taskId });
   });
 
-  it('could not start task which was already started', async () => {
-    const taskInTesting = await h.findOne(Task, { title: 'STARTED BY user@mail.com' });
-    await h
-      .requestBy(await h.getUser('admin@mail.com'))
+  it('by owner with correct data', async () => {
+    const { body } = await h
+      .requestBy(await h.getUser('super-admin@mail.com'))
       .post(h.path())
       .send({
         description: 'Описание новой задачи',
         projectId,
         title: 'Задача Lorder',
-        taskId: taskInTesting.id,
       })
-      .expect(403);
-  });
-
-  it('could not start task which was already started', async () => {
-    const taskInTesting = await h.findOne(Task, { title: 'STARTED BY user@mail.com' });
-    await h
-      .requestBy(await h.getUser('admin@mail.com'))
-      .post(h.path())
-      .send({
+      .expect(201);
+    expect(body).toEqual({
+      finished: [],
+      started: expect.objectContaining({
         description: 'Описание новой задачи',
-        projectId,
+        taskId: expect.any(Number),
+      }),
+    });
+    const task = await h.findOne(Task, { id: body.started.taskId });
+    expect(task).toEqual(
+      expect.objectContaining({
+        createdAt: expect.any(moment),
+        createdById: null,
+        description: 'Описание новой задачи',
+        id: expect.any(Number),
+        isArchived: false,
+        performerId: (await h.findOne(User, { email: 'super-admin@mail.com' })).id,
+        projectId: expect.any(Number),
+        sequenceNumber: expect.any(Number),
+        source: null,
+        statusTypeName: STATUS_NAME.READY_TO_DO,
         title: 'Задача Lorder',
-        taskId: taskInTesting.id,
+        typeId: expect.any(Number),
+        updatedAt: expect.any(moment),
+        value: null,
       })
-      .expect(403);
+    );
+    await h.removeCreated(UserWork, { id: body.started.id });
+    await h.removeCreated(Task, { id: body.started.taskId });
   });
 });

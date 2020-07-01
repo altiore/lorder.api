@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { DeleteResult, EntityManager } from 'typeorm';
+import { DeleteResult, EntityManager, FindConditions, In } from 'typeorm';
 
 import { Project } from '@orm/project';
 import { ProjectPart } from '@orm/project-part/project-part.entity';
@@ -27,10 +27,15 @@ export class TaskService {
     private readonly projectPartService: ProjectPartService
   ) {}
 
-  public async findAllByProject(pagesDto: PaginationDto, projectId: number): Promise<ListResponseDto<Task>> {
+  public async findAllByProject(pagesDto: PaginationDto, project: Project, user: User): Promise<ListResponseDto<Task>> {
     const count = (pagesDto.count || 20) * 1;
     const page = (pagesDto.skip || 0) / count + 1;
-    const [data, total] = await this.taskRepo.findAllByProjectId(pagesDto, projectId);
+    const strategy = await this.projectService.getCurrentUserStrategy(project, user, this.taskRepo.manager);
+
+    // Найти только задачи, доступные пользователю в текущем статусе
+    const [data, total] = await this.taskRepo.findAllByProjectId(pagesDto, project.id, {
+      statusTypeName: In(strategy.availableStatuses),
+    });
     const pageCount = Math.ceil(total / count);
     return { count, data, page, pageCount, total };
   }

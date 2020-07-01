@@ -53,6 +53,8 @@ export const tasksFixture = createTasks([
   {
     project: { owner: { email: 'super-admin@mail.com' } },
     title: 'NotFinished',
+    statusTypeName: STATUS_NAME.READY_TO_DO,
+    inProgress: true,
   },
   {
     performer: { email: 'exist-not-finished@mail.com' },
@@ -64,7 +66,6 @@ export const tasksFixture = createTasks([
     project: { owner: { email: 'super-admin@mail.com' } },
     statusTypeName: STATUS_NAME.READY_TO_DO,
     title: 'STARTED BY user@mail.com',
-    inProgress: true,
   },
 ]);
 

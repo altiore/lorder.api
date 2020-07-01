@@ -22,7 +22,7 @@ describe('strategy advanced', () => {
   it('getRoleSteps TESTER', () => {
     const testerColumns = getColumns(ROLE.TESTER);
 
-    expect(testerColumns.length).toEqual(3);
+    expect(testerColumns.length).toEqual(4);
     expect(testerColumns).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -32,7 +32,7 @@ describe('strategy advanced', () => {
           column: COLUMN_TYPE.REVIEWING,
         }),
         expect.objectContaining({
-          column: COLUMN_TYPE.DONE,
+          column: COLUMN_TYPE.FINISHING,
         }),
       ])
     );

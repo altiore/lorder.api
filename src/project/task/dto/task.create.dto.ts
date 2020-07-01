@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import { IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
 
-import { STATUS_NAME } from '../../../@domains/strategy';
+import { COLUMN_TYPE, STATUS_NAME } from '../../../@domains/strategy';
 
 export class TaskCreateDto {
   @ApiProperty()
@@ -35,7 +35,7 @@ export class TaskCreateDto {
 
   @ApiPropertyOptional()
   @IsString()
-  @IsIn(Object.values(STATUS_NAME))
+  @IsIn([...Object.values(STATUS_NAME), ...Object.values(COLUMN_TYPE)])
   @IsOptional()
   statusTypeName?: STATUS_NAME;
 

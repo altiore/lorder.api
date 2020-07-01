@@ -116,7 +116,7 @@ export class UserWorkService {
 
     const newTaskData: Partial<Task> = { inProgress: false };
     if (pushForward) {
-      const moveTo = strategy.pushForward(userWork.task);
+      const moveTo = strategy.pushForward(userWork.task.statusTypeName);
       if (!moveTo) {
         throw new NotAcceptableException('Невозможно изменить статус задачи. Видимо, у вас нет на это прав');
       }
@@ -163,15 +163,16 @@ export class UserWorkService {
     await curManager.save(userTasks);
   }
 
-  public async finishNotFinished(user: User, strategy: TaskFlowStrategy, manager?: EntityManager): Promise<UserWork[]> {
+  public async finishNotFinished(user: User, manager?: EntityManager): Promise<UserWork[]> {
     const curManager = manager || this.userWorkRepo.manager;
     const userWorks = await curManager.find(UserWork, {
-      relations: ['task', 'task.userTasks'],
+      relations: ['task', 'task.userTasks', 'task.project'],
       where: { finishAt: IsNull(), user },
     });
 
     return await Promise.all(
       userWorks.map(async (userWork) => {
+        const strategy = await this.projectService.getCurrentUserStrategy(userWorks[0].task.project, user, manager);
         return await this.finishTask(curManager, userWork, user, strategy, true);
       })
     );
@@ -184,7 +185,7 @@ export class UserWorkService {
     };
     await this.userWorkRepo.manager.transaction(async (entityManager) => {
       // 0. Находим стратегию перемещения задач
-      const strategy = await this.projectService.getCurrentUserStrategy(project, user);
+      const strategy = await this.projectService.getCurrentUserStrategy(project, user, entityManager);
 
       // 1. Найти или создать новую задачу
       const task = await this.findTaskOrCreateDefault(project, user, userWorkData, strategy, entityManager);
@@ -193,7 +194,7 @@ export class UserWorkService {
       await this.checkUserCanStart(strategy, task, user);
 
       // 3. Завершить предыдущие задачи, если есть незавершенные
-      result.finished = await this.finishNotFinished(user, strategy, entityManager);
+      result.finished = await this.finishNotFinished(user, entityManager);
 
       // 4. Создать новую запись в таблице "работа пользователя" и обновить информацию о задаче
       let startAt;
@@ -216,7 +217,7 @@ export class UserWorkService {
     };
     await this.userWorkRepo.manager.transaction(async (entityManager) => {
       // 0. Находим стратегию перемещения задач
-      const strategy = await this.projectService.getCurrentUserStrategy(userWork.task.project, user);
+      const strategy = await this.projectService.getCurrentUserStrategy(userWork.task.project, user, entityManager);
 
       result.previous = await this.finishTask(entityManager, userWork, user, strategy, true);
 
@@ -250,7 +251,7 @@ export class UserWorkService {
     };
     await this.userWorkRepo.manager.transaction(async (manager) => {
       // 0. Находим стратегию перемещения задач
-      const strategy = await this.projectService.getCurrentUserStrategy(userWork.task.project, user);
+      const strategy = await this.projectService.getCurrentUserStrategy(userWork.task.project, user, manager);
 
       stopResponse.previous = await this.finishTask(manager, userWork, user, strategy);
 
@@ -437,8 +438,7 @@ export class UserWorkService {
       const taskData = {
         description: userWorkData.description || '',
         performerId: userWorkData.performerId || user.id,
-        status: strategy.startedStatus.status,
-        statusTypeName: strategy.startedStatus.statusTypeName,
+        statusTypeName: strategy.getStartedStatus(),
         typeId: taskType ? taskType.id : undefined,
         title: userWorkData.title,
       };
@@ -464,7 +464,7 @@ export class UserWorkService {
     if (!startedTask.inProgress) {
       startedTask = await this.taskService.updateByUser(
         startedTask,
-        { inProgress: true, statusTypeName: STATUS_NAME.READY_TO_DO },
+        { inProgress: true, statusTypeName: strategy.getStartedStatus(startedTask.statusTypeName) },
         user,
         curManager
       );

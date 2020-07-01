@@ -92,7 +92,9 @@ export class ProjectService {
       );
     }
     const updatedProject = this.projectRepo.merge(project, data);
-    updatedProject.taskColumns = (await this.getCurrentUserStrategy(updatedProject, user)).columns;
+    updatedProject.taskColumns = (
+      await this.getCurrentUserStrategy(updatedProject, user, this.projectRepo.manager)
+    ).columns;
     return updatedProject;
   }
 
@@ -412,7 +414,7 @@ export class ProjectService {
       where: { id: project.id },
     });
     p.accessLevel = project.accessLevel;
-    p.taskColumns = (await this.getCurrentUserStrategy(project, user)).columns;
+    p.taskColumns = (await this.getCurrentUserStrategy(project, user, this.projectRepo.manager)).columns;
     return p;
   }
 
@@ -420,15 +422,11 @@ export class ProjectService {
    * Возвращает информацию о доступных текущему пользователю перемещениях в рамках текущего проекта.
    * По-сути, этот метод возвращает только ту часть стратегии перемещения задач по проекту,
    * которая доступна текущему пользователю
-   *
-   * @param project
-   * @param user
-   * @return Promise<IColumn[]>
    */
-  public async getCurrentUserStrategy(project: Project, user: User): Promise<TaskFlowStrategy> {
+  public async getCurrentUserStrategy(project: Project, user: User, manager: EntityManager): Promise<TaskFlowStrategy> {
     let userRoles: ROLE[] = [];
     if (project.strategy !== TASK_FLOW_STRATEGY.SIMPLE) {
-      const access = await this.projectRepo.manager.findOne(UserProject, {
+      const access = await manager.findOne(UserProject, {
         relations: ['roles', 'roles.role', 'roles.allowedMoves', 'roles.allowedMoves.from', 'roles.allowedMoves.to'],
         where: {
           member: { id: user.id },
@@ -438,9 +436,7 @@ export class ProjectService {
       userRoles = access.roles.map((el) => el.roleId);
     }
 
-    const strategy = new TaskFlowStrategy(project.strategy, userRoles);
-
-    return strategy;
+    return new TaskFlowStrategy(project.strategy, userRoles);
   }
 
   private async changeStrategy(project: Project, user: User, newStrategy: TASK_FLOW_STRATEGY): Promise<true> {
@@ -461,13 +457,13 @@ export class ProjectService {
 
               // 2. Проверяем, все ли роли есть в проекте для успешного передвижения по новой стратегии
               project.strategy = newStrategy;
-              const strategy = await this.getCurrentUserStrategy(project, user);
-              const roles = strategy.roles;
+              const strategy = await this.getCurrentUserStrategy(project, user, manager);
+              const roles = strategy.userStrategyRoles;
               if (!roles || !roles.length) {
                 throw new NotAcceptableException('Не удалось найти роли в стратегии');
               }
               const projectRoles = await manager.find(ProjectRole, {
-                where: { roleId: In(roles.map((el) => el.id)), projectId: project.id },
+                where: { roleId: In(roles), projectId: project.id },
               });
               if (!projectRoles || !roles || projectRoles.length !== roles.length) {
                 throw new NotAcceptableException(

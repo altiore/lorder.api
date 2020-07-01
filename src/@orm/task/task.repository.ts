@@ -1,4 +1,4 @@
-import { Between, EntityManager, EntityRepository, In, Repository } from 'typeorm';
+import { Between, EntityManager, EntityRepository, FindConditions, In, Repository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Project } from '../project/project.entity';
@@ -20,14 +20,15 @@ const requiredRelations = ['userTasks', 'projectParts'];
 export class TaskRepository extends Repository<Task> {
   public findAllByProjectId(
     { skip = 0, count = 20, orderBy = 'id', order = 'desc' }: PaginationDto,
-    projectId: number
+    projectId: number,
+    where: FindConditions<Task> = {}
   ): Promise<[Task[], number]> {
     return this.findAndCount({
       order: { [orderBy]: order.toUpperCase() },
       relations: requiredRelations,
       skip,
       take: count,
-      where: { project: { id: projectId }, isArchived: false },
+      where: { project: { id: projectId }, isArchived: false, ...where },
     });
   }
 
