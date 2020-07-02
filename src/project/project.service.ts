@@ -111,7 +111,15 @@ export class ProjectService {
     user: User,
     minimumAccessLevel?: ACCESS_LEVEL
   ): Promise<UserProject[]> {
-    return await this.userProjectRepo.findAllParticipantProjects(pagesDto, user, minimumAccessLevel);
+    const userProjects = await this.userProjectRepo.findAllParticipantProjects(pagesDto, user, minimumAccessLevel);
+    await Promise.all(
+      userProjects.map(async (uProject) => {
+        const strategy = await this.getCurrentUserStrategy(uProject.project, user, this.projectRepo.manager);
+        uProject.project.taskColumns = strategy.columns;
+      })
+    );
+
+    return userProjects;
   }
 
   public async findAllBySuperAdmin(pagesDto: ProjectPaginationDto): Promise<Project[]> {
