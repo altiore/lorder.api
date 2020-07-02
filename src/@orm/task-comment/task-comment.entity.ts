@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Exclude } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
 import { Moment } from 'moment';
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
@@ -19,10 +19,12 @@ export class TaskComment {
   text!: string;
 
   @ApiProperty({ example: '2018-05-26T09:05:39.378Z' })
+  @Transform((momentDateTransformer.transformer as any).to)
   @CreateDateColumn(momentDateTransformer)
   createdAt!: Moment;
 
   @ApiProperty({ example: '2018-05-26T09:05:39.378Z' })
+  @Transform((momentDateTransformer.transformer as any).to)
   @UpdateDateColumn(momentDateTransformer)
   updatedAt: Moment;
 

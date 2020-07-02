@@ -28,7 +28,8 @@ import { TaskCommentService } from './task-comment.service';
       type: 'number',
     },
     taskId: {
-      disabled: true,
+      field: '"TaskComment"."taskId"',
+      disabled: false,
       primary: false,
       type: 'number',
     },
