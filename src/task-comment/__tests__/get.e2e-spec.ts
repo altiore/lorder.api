@@ -34,11 +34,11 @@ describe(`GET ${h.url}`, () => {
 
     expect(body).toEqual(
       expect.objectContaining({
-        count: 3,
+        count: 2,
         data: expect.any(Object),
         page: 1,
         pageCount: 1,
-        total: 3,
+        total: 2,
       })
     );
   });
@@ -51,11 +51,11 @@ describe(`GET ${h.url}`, () => {
 
     expect(body).toEqual(
       expect.objectContaining({
-        count: 3,
+        count: 2,
         data: expect.any(Object),
         page: 1,
         pageCount: 1,
-        total: 3,
+        total: 2,
       })
     );
   });
@@ -68,11 +68,11 @@ describe(`GET ${h.url}`, () => {
 
     expect(body).toEqual(
       expect.objectContaining({
-        count: 3,
+        count: 2,
         data: expect.any(Object),
         page: 1,
         pageCount: 1,
-        total: 3,
+        total: 2,
       })
     );
   });
