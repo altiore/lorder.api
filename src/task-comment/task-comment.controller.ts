@@ -1,4 +1,11 @@
-import { Controller, Param, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  ForbiddenException,
+  NotAcceptableException,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Crud, CrudController, CrudRequest, Override, ParsedBody, ParsedRequest } from '@nestjsx/crud';
 
@@ -39,12 +46,6 @@ import { TaskCommentService } from './task-comment.service';
     getManyBase: {
       decorators: [Auth(res(TaskComment).getMany, ROLES.USER, ACCESS_LEVEL.RED)],
     },
-    deleteOneBase: {
-      decorators: [Auth(res(TaskComment).deleteOne, ROLES.USER, ACCESS_LEVEL.ORANGE)],
-    },
-    updateOneBase: {
-      decorators: [Auth(res(TaskComment).updateOne, ROLES.USER, ACCESS_LEVEL.ORANGE)],
-    },
   },
   query: {
     alwaysPaginate: true,
@@ -70,5 +71,43 @@ export class TaskCommentController implements CrudController<TaskComment> {
   ): Promise<TaskComment> {
     const task = await this.service.findTaskByIdAndCheckAccess(taskId, projectId, user, ACCESS_LEVEL.ORANGE);
     return this.base.createOneBase(req, { ...dto, taskId: task.id, userId: user.id } as TaskComment);
+  }
+
+  @Auth(res(TaskComment).deleteOne, ROLES.USER, ACCESS_LEVEL.RED)
+  @Override()
+  public async updateOne(
+    @ParsedRequest() req: CrudRequest,
+    @ParsedBody() dto: TaskComment,
+    @UserJWT() user: User
+  ): Promise<TaskComment> {
+    const idEl = req?.parsed?.paramsFilter.find((el) => el.field === 'id');
+    if (!idEl || !idEl.value) {
+      throw new NotAcceptableException('Не удалось найти id комментария');
+    }
+    const taskComment = await this.service.findOnById(idEl.value);
+    if (!taskComment) {
+      throw new NotFoundException('комментарий не найден');
+    }
+    if (taskComment.userId !== user.id) {
+      throw new ForbiddenException('Нельзя изменить чужой комментарий');
+    }
+    return this.base.updateOneBase(req, dto);
+  }
+
+  @Auth(res(TaskComment).deleteOne, ROLES.USER, ACCESS_LEVEL.ORANGE)
+  @Override()
+  public async deleteOne(@ParsedRequest() req: CrudRequest, @UserJWT() user: User): Promise<void | TaskComment> {
+    const idEl = req?.parsed?.paramsFilter.find((el) => el.field === 'id');
+    if (!idEl || !idEl.value) {
+      throw new NotAcceptableException('Не удалось найти id комментария');
+    }
+    const taskComment = await this.service.findOnById(idEl.value);
+    if (!taskComment) {
+      throw new NotFoundException('комментарий не найден');
+    }
+    if (taskComment.userId !== user.id) {
+      throw new ForbiddenException('Нельзя удалить чужой комментарий');
+    }
+    return this.base.deleteOneBase(req);
   }
 }

@@ -26,4 +26,8 @@ export class TaskCommentService extends TypeOrmCrudService<TaskComment> {
   ): Promise<Task> {
     return this.taskService.findOneById(taskId, user, accessLevel, { projectId }, true, manager);
   }
+
+  public async findOnById(id: number): Promise<TaskComment> {
+    return await this.repo.findOne({ where: { id } });
+  }
 }
