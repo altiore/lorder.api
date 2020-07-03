@@ -235,6 +235,9 @@ export class TaskFlowStrategy {
         }
       }
     });
+    if (this.strategy === TASK_FLOW_STRATEGY.SIMPLE) {
+      return allowedMove ? (toStatus as STATUS_NAME) : false;
+    }
     return allowedMove ? allowedMove.to : false;
   }
 
