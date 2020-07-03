@@ -16,7 +16,7 @@ describe('strategy advanced', () => {
   });
 
   it('getRoleSteps DEVELOPER', () => {
-    expect(getColumns(ROLE.DEVELOPER).length).toEqual(7);
+    expect(getColumns(ROLE.DEVELOPER).length).toEqual(8);
   });
 
   it('getRoleSteps TESTER', () => {
