@@ -99,13 +99,13 @@ export class UserWorkService {
     return result;
   }
 
-  public async finishTask(
+  private async finishTask(
     curManager: EntityManager,
     userWork: UserWork,
     user: User,
-    strategy: TaskFlowStrategy,
     pushForward?: boolean
   ): Promise<UserWork> {
+    const strategy = await this.projectService.getCurrentUserStrategy(userWork.task.project, user, curManager);
     userWork.finishAt = moment();
     if (!userWork.projectId || !userWork.task.userTasks) {
       userWork.task = await curManager.findOne(Task, {
@@ -118,7 +118,9 @@ export class UserWorkService {
     if (pushForward) {
       const moveTo = strategy.pushForward(userWork.task.statusTypeName);
       if (!moveTo) {
-        throw new NotAcceptableException('Невозможно изменить статус задачи. Видимо, у вас нет на это прав');
+        throw new NotAcceptableException(
+          `Невозможно изменить статус задачи "${userWork.task.statusTypeName}". Видимо, у вас нет на это прав`
+        );
       }
       userWork.task.statusTypeName = moveTo.to;
       newTaskData.statusTypeName = moveTo.to;
@@ -172,8 +174,7 @@ export class UserWorkService {
 
     return await Promise.all(
       userWorks.map(async (userWork) => {
-        const strategy = await this.projectService.getCurrentUserStrategy(userWorks[0].task.project, user, manager);
-        return await this.finishTask(curManager, userWork, user, strategy, true);
+        return await this.finishTask(curManager, userWork, user, true);
       })
     );
   }
@@ -201,7 +202,7 @@ export class UserWorkService {
       if (result.finished && result.finished.length) {
         startAt = result.finished[0].finishAt;
       }
-      result.started = await this.startNew(task, user, userWorkData, startAt, strategy, entityManager);
+      result.started = await this.startTask(task, user, userWorkData, startAt, strategy, entityManager);
     });
 
     return result;
@@ -216,26 +217,18 @@ export class UserWorkService {
       previous: null,
     };
     await this.userWorkRepo.manager.transaction(async (entityManager) => {
-      // 0. Находим стратегию перемещения задач
-      const strategy = await this.projectService.getCurrentUserStrategy(userWork.task.project, user, entityManager);
+      // 1. Решаем вопрос с предыдущей задачей
+      result.previous = await this.finishTask(entityManager, userWork, user, true);
 
-      result.previous = await this.finishTask(entityManager, userWork, user, strategy, true);
-
+      // 2. Решаем вопрос с новой задачей
       const defProject = await this.userService.getDefaultProject(user, entityManager);
-
       const userWorkData = {
         description: `После "${result.previous.task.title}"`,
         projectId: defProject.id,
         title: 'Перерыв/Отдых',
       };
-      result.next = await this.startNew(
-        defProject,
-        user,
-        userWorkData,
-        result.previous.finishAt,
-        strategy,
-        entityManager
-      );
+      const { task, strategy } = await this.createTaskByProject(defProject, user, userWorkData, entityManager);
+      result.next = await this.startTask(task, user, userWorkData, result.previous.finishAt, strategy, entityManager);
     });
     return result;
   }
@@ -250,27 +243,28 @@ export class UserWorkService {
       previous: null,
     };
     await this.userWorkRepo.manager.transaction(async (manager) => {
-      // 0. Находим стратегию перемещения задач
-      const strategy = await this.projectService.getCurrentUserStrategy(userWork.task.project, user, manager);
+      // 1. Останавливаем предыдущую задачу
+      stopResponse.previous = await this.finishTask(manager, userWork, user);
 
-      stopResponse.previous = await this.finishTask(manager, userWork, user, strategy);
-
-      const project = await this.userService.getDefaultProject(user, manager);
-
+      // 2. Создаем новую С ПРАВИЛЬНЫМ prevTaskId!
+      const defProject = await this.userService.getDefaultProject(user, manager);
       const userWorkData = {
         description: `После "${stopResponse.previous.task.title}"`,
-        projectId: project.id,
+        projectId: defProject.id,
         title: 'Перерыв/Отдых',
         prevTaskId: userWork.taskId,
       };
-      stopResponse.next = await this.startNew(
-        project,
+      const { task, strategy } = await this.createTaskByProject(defProject, user, userWorkData, manager);
+      stopResponse.next = await this.startTask(
+        task,
         user,
         userWorkData,
         stopResponse.previous.finishAt,
         strategy,
         manager
       );
+
+      // 3. Добавляем в ответ предыдущую задачу к той, что только что создали, чтоб знать, какую задачв возобновлять
       stopResponse.next.prevTask = userWork.task;
     });
 
@@ -438,7 +432,7 @@ export class UserWorkService {
       const taskData = {
         description: userWorkData.description || '',
         performerId: userWorkData.performerId || user.id,
-        statusTypeName: strategy.getStartedStatus(),
+        statusTypeName: strategy.getCreatedStatus(),
         typeId: taskType ? taskType.id : undefined,
         title: userWorkData.title,
       };
@@ -448,8 +442,19 @@ export class UserWorkService {
     return startedTask;
   }
 
-  private async startNew(
-    taskOrProject: Task | Project,
+  private async createTaskByProject(
+    project: Project,
+    user: User,
+    userWorkData: UserWorkCreateDto,
+    manager: EntityManager
+  ): Promise<{ task: Task; strategy }> {
+    const strategy = await this.projectService.getCurrentUserStrategy(project, user, manager);
+    const task = await this.findTaskOrCreateDefault(project, user, userWorkData, strategy, manager);
+    return { task, strategy };
+  }
+
+  private async startTask(
+    task: Task,
     user: User,
     userWorkData: UserWorkCreateDto,
     startAt: moment.Moment,
@@ -457,14 +462,12 @@ export class UserWorkService {
     manager?: EntityManager
   ): Promise<UserWork> {
     const curManager = manager || this.userWorkRepo.manager;
-    let startedTask =
-      taskOrProject instanceof Task
-        ? taskOrProject
-        : await this.findTaskOrCreateDefault(taskOrProject as Project, user, userWorkData, strategy, curManager);
-    if (!startedTask.inProgress) {
+    let startedTask: Task = task;
+
+    if (!task.inProgress) {
       startedTask = await this.taskService.updateByUser(
         startedTask,
-        { inProgress: true, statusTypeName: strategy.getStartedStatus(startedTask.statusTypeName) },
+        { inProgress: true, statusTypeName: strategy.getInProgressStatus(task.statusTypeName) },
         user,
         curManager
       );

@@ -11,7 +11,8 @@ import { TASK_FLOW_STRATEGY } from './types/task-flow-strategy';
 export class TaskFlowStrategy {
   private readonly strategy: string;
   private readonly userRoles: ROLE | ROLE[];
-  private _startedStatus?: STATUS_NAME;
+  private _createdStatus?: STATUS_NAME;
+  private _inProgressStatus?: STATUS_NAME;
   private _roles?: IRole[];
   private _columns?: IColumn[];
   private _userStrategyRoles?: ROLE[];
@@ -164,35 +165,60 @@ export class TaskFlowStrategy {
     return this._roles;
   }
 
-  getStartedStatus(statusTypeName?: STATUS_NAME): STATUS_NAME {
-    if (this._startedStatus) {
-      return this._startedStatus;
+  getInProgressStatus(statusTypeName: STATUS_NAME): STATUS_NAME {
+    if (this._inProgressStatus) {
+      return this._inProgressStatus;
     }
 
     switch (this.strategy) {
       case TASK_FLOW_STRATEGY.ADVANCED: {
-        const userRoles = this.userStrategyRoles;
-        if (userRoles.includes(ROLE.ARCHITECT)) {
-          this._startedStatus = statusTypeName || STATUS_NAME.CREATING;
-          break;
-        }
-
-        if (userRoles.includes(ROLE.DEVELOPER)) {
-          this._startedStatus = STATUS_NAME.ASSIGNING_RESPONSIBLE;
-          break;
-        }
-
-        this._startedStatus = STATUS_NAME.ESTIMATION_BEFORE_TO_DO;
+        this._inProgressStatus = statusTypeName;
 
         break;
       }
       default: {
-        this._startedStatus = STATUS_NAME.READY_TO_DO;
+        this._inProgressStatus = STATUS_NAME.READY_TO_DO;
         break;
       }
     }
 
-    return this._startedStatus;
+    return this._inProgressStatus;
+  }
+
+  getCreatedStatus(taskStatusName?: STATUS_NAME | COLUMN_TYPE): STATUS_NAME {
+    if (this._createdStatus) {
+      return this._createdStatus;
+    }
+
+    switch (this.strategy) {
+      case TASK_FLOW_STRATEGY.SIMPLE: {
+        this._createdStatus = (taskStatusName as STATUS_NAME) || STATUS_NAME.READY_TO_DO;
+        break;
+      }
+      case TASK_FLOW_STRATEGY.ADVANCED: {
+        const userRoles = this.userStrategyRoles;
+        if (userRoles.includes(ROLE.ARCHITECT)) {
+          this._createdStatus = STATUS_NAME.CREATING;
+          break;
+        }
+
+        if (userRoles.includes(ROLE.DEVELOPER)) {
+          this._createdStatus = STATUS_NAME.ASSIGNING_RESPONSIBLE;
+          break;
+        }
+
+        // По-умолчанию начальный статус - это статус для QA-инженера
+        this._createdStatus = STATUS_NAME.ESTIMATION_BEFORE_TO_DO;
+
+        break;
+      }
+      default: {
+        this._createdStatus = STATUS_NAME.READY_TO_DO;
+        break;
+      }
+    }
+
+    return this._createdStatus;
   }
 
   pushForward(statusTypeName: STATUS_NAME): IMove | undefined {

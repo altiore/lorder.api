@@ -17,6 +17,8 @@ export function getSteps(taskType: TASK_TYPE) {
 export function getColumns(roles: ROLE | ROLE[]): IColumn[] {
   const rolesArr = Array.isArray(roles) ? roles : [roles];
 
+  const filterMoves = (m) => rolesArr.includes(m.role);
+
   if (rolesArr.length === 1) {
     const role = rolesArr[0];
     // TODO: учитывать разные типы задач
@@ -32,11 +34,11 @@ export function getColumns(roles: ROLE | ROLE[]): IColumn[] {
         res.push({
           column: columnName,
           statuses: [cur.status],
-          moves: cur.moves,
+          moves: cur.moves.filter(filterMoves),
         });
       } else {
         res[columnIndex].statuses.push(cur.status);
-        res[columnIndex].moves.concat(cur.moves);
+        res[columnIndex].moves.concat(cur.moves.filter(filterMoves));
       }
       return res;
     }, []);
@@ -48,7 +50,7 @@ export function getColumns(roles: ROLE | ROLE[]): IColumn[] {
       .map((el) => ({
         column: el.status,
         statuses: [el.status],
-        moves: el.moves,
+        moves: el.moves.filter(filterMoves),
       }));
   }
 }

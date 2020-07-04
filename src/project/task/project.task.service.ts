@@ -38,7 +38,7 @@ export class ProjectTaskService {
 
   public async create(taskCreateDto: TaskCreateDto, project: Project, user: User): Promise<Task> {
     const strategy = await this.projectService.getCurrentUserStrategy(project, user, this.projectTaskTypeRepo.manager);
-    const preparedData = await this.parseTaskDtoToTaskObj(taskCreateDto, project.id, strategy);
+    const preparedData = await this.parseTaskDtoToTaskObj(taskCreateDto, project.id, strategy, true);
     return await this.taskService.createByProject(preparedData, project, user);
   }
 
@@ -85,28 +85,11 @@ export class ProjectTaskService {
     return task;
   }
 
-  public async checkAccess(
-    sequenceNumber: number,
-    project: Project,
-    user: User,
-    statusLevel: ACCESS_LEVEL = ACCESS_LEVEL.RED
-  ): Promise<Task> {
-    const checkedTask = await this.taskService.findOne(sequenceNumber, project, user);
-    if (project.accessLevel.accessLevel < statusLevel) {
-      if (checkedTask.performerId !== user.id) {
-        throw new ForbiddenException({
-          message: 'У вас нет доступа к этой задаче',
-          task: checkedTask,
-        });
-      }
-    }
-    return checkedTask;
-  }
-
   private async parseTaskDtoToTaskObj(
     taskDto: TaskCreateDto | TaskUpdateDto,
     projectId: number,
     strategy: TaskFlowStrategy,
+    createNew: boolean = false,
     manager?: EntityManager
   ): Promise<Partial<Task>> {
     const curManager = manager || this.projectTaskTypeRepo.manager;
@@ -140,11 +123,8 @@ export class ProjectTaskService {
     if (taskDto.source !== undefined) {
       preparedData.source = taskDto.source;
     }
-    if (taskDto.status !== undefined) {
-      preparedData.status = taskDto.status;
-    }
-    if (taskDto.statusTypeName !== undefined) {
-      preparedData.statusTypeName = strategy.getStartedStatus(taskDto.statusTypeName);
+    if (taskDto.statusTypeName !== undefined && createNew) {
+      preparedData.statusTypeName = strategy.getCreatedStatus(taskDto.statusTypeName);
     }
     if (taskDto.typeId !== undefined) {
       if (!taskDto.typeId) {
@@ -191,6 +171,24 @@ export class ProjectTaskService {
     }
 
     return preparedData;
+  }
+
+  public async checkAccess(
+    sequenceNumber: number,
+    project: Project,
+    user: User,
+    statusLevel: ACCESS_LEVEL = ACCESS_LEVEL.RED
+  ): Promise<Task> {
+    const checkedTask = await this.taskService.findOne(sequenceNumber, project, user);
+    if (project.accessLevel.accessLevel < statusLevel) {
+      if (checkedTask.performerId !== user.id) {
+        throw new ForbiddenException({
+          message: 'У вас нет доступа к этой задаче',
+          task: checkedTask,
+        });
+      }
+    }
+    return checkedTask;
   }
 
   private async checkUserCanMove(
