@@ -7,6 +7,52 @@ import { TASK_FLOW_STRATEGY } from './types/task-flow-strategy';
 describe('task-flow-strategy', () => {
   let strategy;
 
+  describe('steps', () => {
+    describe('SIMPLE', () => {
+      beforeEach(() => {
+        strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.SIMPLE, []);
+      });
+
+      it('columns count', () => {
+        expect(strategy.steps.length).toBe(4);
+      });
+    });
+
+    describe('ADVANCED', () => {
+      describe('ARCHITECT', () => {
+        beforeEach(() => {
+          strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.ADVANCED, [ROLE.ARCHITECT]);
+        });
+        it('columns count', () => {
+          expect(strategy.steps.length).toBe(15);
+        });
+      });
+    });
+  });
+
+  describe('columns', () => {
+    describe('SIMPLE', () => {
+      beforeEach(() => {
+        strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.SIMPLE, []);
+      });
+
+      it('columns count', () => {
+        expect(strategy.columns.length).toBe(4);
+      });
+    });
+
+    describe('ADVANCED', () => {
+      describe('ARCHITECT', () => {
+        beforeEach(() => {
+          strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.ADVANCED, [ROLE.ARCHITECT]);
+        });
+        it('columns count', () => {
+          expect(strategy.columns.length).toBe(10);
+        });
+      });
+    });
+  });
+
   describe('SIMPLE strategy', () => {
     beforeEach(() => {
       strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.SIMPLE, []);

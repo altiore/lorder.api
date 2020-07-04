@@ -33,7 +33,4 @@ export enum STATUS_NAME {
   DEPLOYED_COMMUNITY_ESTIMATION = 'deployed_community_estimation',
   DEPLOYED_ESTIMATION = 'deployed_estimating',
   DONE = 'done',
-
-  // means any status
-  ANY = 'any',
 }

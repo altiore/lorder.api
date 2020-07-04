@@ -1,12 +1,15 @@
 import { intersection } from 'lodash';
 
 import { TASK_SIMPLE_STATUS } from '../../@orm/task/task-simple-status';
-import { getColumns, roles as advancedRoles } from './advanced';
+import { getColumns, getSteps as getAdvancedSteps, roles as advancedRoles } from './advanced';
+import { columns as simpleColumns, steps as simpleSteps } from './simple';
 import { COLUMN_TYPE, IColumn } from './types/column-type';
 import { IMove, MOVE_TYPE } from './types/move';
 import { IRole, ROLE } from './types/role';
 import { STATUS_NAME } from './types/status';
+import { IStep } from './types/step';
 import { TASK_FLOW_STRATEGY } from './types/task-flow-strategy';
+import { TASK_TYPE } from './types/task-type';
 
 export class TaskFlowStrategy {
   private readonly strategy: string;
@@ -18,10 +21,33 @@ export class TaskFlowStrategy {
   private _userStrategyRoles?: ROLE[];
   private _defaultRole?: ROLE;
   private _availableStatuses?: STATUS_NAME[];
+  private _steps: IStep[];
 
   constructor(strategyName: string, userRoles?: ROLE | ROLE[]) {
     this.strategy = strategyName;
     this.userRoles = userRoles;
+  }
+
+  get steps(): IStep[] {
+    if (this._steps) {
+      return this._steps;
+    }
+
+    switch (this.strategy) {
+      case TASK_FLOW_STRATEGY.ADVANCED: {
+        this._steps = getAdvancedSteps(TASK_TYPE.FEAT);
+        break;
+      }
+      case TASK_FLOW_STRATEGY.SIMPLE: {
+        this._steps = simpleSteps;
+        break;
+      }
+      default: {
+        this._steps = [];
+      }
+    }
+
+    return this._steps;
   }
 
   get defaultRole(): ROLE {
@@ -96,39 +122,7 @@ export class TaskFlowStrategy {
         break;
       }
       case TASK_FLOW_STRATEGY.SIMPLE: {
-        this._columns = Object.values(TASK_SIMPLE_STATUS)
-          .filter((el) => typeof el === 'number')
-          .map((enumValue: number) => {
-            const statusName = TaskFlowStrategy.statusToName(enumValue);
-            return {
-              column: statusName,
-              moves:
-                statusName === STATUS_NAME.DONE
-                  ? [
-                      {
-                        type: MOVE_TYPE.ANY,
-                        to: STATUS_NAME.ANY,
-                        role: undefined,
-                        requirements: {},
-                      },
-                    ]
-                  : [
-                      {
-                        type: MOVE_TYPE.PUSH_FORWARD,
-                        to: STATUS_NAME.TESTING,
-                        role: undefined,
-                        requirements: {},
-                      },
-                      {
-                        type: MOVE_TYPE.ANY,
-                        to: STATUS_NAME.ANY,
-                        role: undefined,
-                        requirements: {},
-                      },
-                    ],
-              statuses: [statusName],
-            };
-          });
+        this._columns = simpleColumns;
         break;
       }
     }
@@ -252,8 +246,8 @@ export class TaskFlowStrategy {
       if (col.column === fromStatus || col.statuses.includes(fromStatus as STATUS_NAME)) {
         const curMove = col.moves.find(
           (move) =>
-            (toColumn.statuses.includes(move.to) || move.to === STATUS_NAME.ANY) &&
-            (!this.userStrategyRoles.length || this.userStrategyRoles.includes(move.role))
+            (move.to === undefined || toColumn.statuses.includes(move.to)) &&
+            (move.role === undefined || this.userStrategyRoles.includes(move.role))
         );
 
         if (curMove) {
@@ -265,20 +259,6 @@ export class TaskFlowStrategy {
       return allowedMove ? (toStatus as STATUS_NAME) : false;
     }
     return allowedMove ? allowedMove.to : false;
-  }
-
-  // TODO: удалить, когда с UI будет приходить правильное значение
-  static statusToName(status: number): STATUS_NAME {
-    if (![0, 1, 3, 4].includes(status)) {
-      throw new Error('Недопустимое значение');
-    }
-
-    return {
-      0: STATUS_NAME.CREATING,
-      1: STATUS_NAME.READY_TO_DO,
-      3: STATUS_NAME.TESTING,
-      4: STATUS_NAME.DONE,
-    }[status];
   }
 
   static statusTypeNameToSimpleStatus(statusTypeName: STATUS_NAME): TASK_SIMPLE_STATUS {

@@ -9,7 +9,7 @@ export enum MOVE_TYPE {
 
 export interface IMove {
   type: MOVE_TYPE;
-  to: STATUS_NAME;
-  role: ROLE;
-  requirements: { fields?: string[] };
+  to?: STATUS_NAME;
+  role?: ROLE;
+  requirements?: { fields?: string[] };
 }
