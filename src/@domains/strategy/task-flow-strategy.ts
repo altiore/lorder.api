@@ -184,35 +184,40 @@ export class TaskFlowStrategy {
       return this._createdStatus;
     }
 
+    let createdStatus: STATUS_NAME;
     switch (this.strategy) {
       case TASK_FLOW_STRATEGY.SIMPLE: {
-        this._createdStatus = (taskStatusName as STATUS_NAME) || STATUS_NAME.READY_TO_DO;
+        createdStatus = (taskStatusName as STATUS_NAME) || STATUS_NAME.READY_TO_DO;
         break;
       }
       case TASK_FLOW_STRATEGY.ADVANCED: {
         const userRoles = this.userStrategyRoles;
         if (userRoles.includes(ROLE.ARCHITECT)) {
-          this._createdStatus = STATUS_NAME.CREATING;
+          createdStatus = this.roles.find((r) => r.id === ROLE.ARCHITECT)?.createdStatus;
           break;
         }
 
         if (userRoles.includes(ROLE.DEVELOPER)) {
-          this._createdStatus = STATUS_NAME.ASSIGNING_RESPONSIBLE;
+          createdStatus = this.roles.find((r) => r.id === ROLE.DEVELOPER)?.createdStatus;
           break;
         }
 
-        // По-умолчанию начальный статус - это статус для QA-инженера
-        this._createdStatus = STATUS_NAME.ESTIMATION_BEFORE_TO_DO;
+        // По-умолчанию начальный статус - это статус для QA-инженера (ROLE.TESTER)
+        createdStatus = this.roles.find((r) => r.id === ROLE.TESTER)?.createdStatus;
 
         break;
       }
       default: {
-        this._createdStatus = STATUS_NAME.READY_TO_DO;
+        createdStatus = STATUS_NAME.READY_TO_DO;
         break;
       }
     }
 
-    return this._createdStatus;
+    if (this.steps.findIndex((s) => s.status === createdStatus) === -1) {
+      throw new Error(`Запрещенный тип статуса ${createdStatus}!`);
+    }
+
+    return (this._createdStatus = createdStatus);
   }
 
   pushForward(statusTypeName: STATUS_NAME): IMove | undefined {

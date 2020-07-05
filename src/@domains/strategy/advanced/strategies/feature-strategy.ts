@@ -23,9 +23,10 @@ export const feature_strategy: Array<IStep> = [
   {
     column: {
       [ROLE.ARCHITECT]: COLUMN_TYPE.TO_DO,
+      [ROLE.DEVELOPER]: COLUMN_TYPE.BACK_LOG,
     },
     status: STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING,
-    roles: [ROLE.ARCHITECT],
+    roles: [ROLE.ARCHITECT, ROLE.DEVELOPER],
     moves: [
       {
         type: MOVE_TYPE.PUSH_FORWARD,

@@ -1,6 +1,6 @@
 import { TaskFlowStrategy } from './task-flow-strategy';
 import { COLUMN_TYPE } from './types/column-type';
-import { ROLE } from './types/role';
+import { IRole, ROLE } from './types/role';
 import { STATUS_NAME } from './types/status';
 import { TASK_FLOW_STRATEGY } from './types/task-flow-strategy';
 
@@ -48,6 +48,62 @@ describe('task-flow-strategy', () => {
         });
         it('columns count', () => {
           expect(strategy.columns.length).toBe(10);
+        });
+      });
+    });
+  });
+
+  describe('getCreatedStatus', () => {
+    describe('SIMPLE', () => {
+      beforeEach(() => {
+        strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.SIMPLE, []);
+      });
+
+      it('default STATUS_NAME', () => {
+        expect(strategy.getCreatedStatus()).toBe(STATUS_NAME.READY_TO_DO);
+      });
+
+      it('STATUS_NAME.CREATING', () => {
+        expect(strategy.getCreatedStatus(STATUS_NAME.CREATING)).toBe(STATUS_NAME.CREATING);
+      });
+
+      it('STATUS_NAME.READY_TO_DO', () => {
+        expect(strategy.getCreatedStatus(STATUS_NAME.READY_TO_DO)).toBe(STATUS_NAME.READY_TO_DO);
+      });
+
+      it('STATUS_NAME.TESTING', () => {
+        expect(strategy.getCreatedStatus(STATUS_NAME.TESTING)).toBe(STATUS_NAME.TESTING);
+      });
+
+      it('STATUS_NAME.DONE', () => {
+        expect(strategy.getCreatedStatus(STATUS_NAME.DONE)).toBe(STATUS_NAME.DONE);
+      });
+
+      it('invalid STATUS_NAME', () => {
+        expect(() => {
+          strategy.getCreatedStatus(STATUS_NAME.ASSIGNING_RESPONSIBLE);
+        }).toThrow();
+      });
+    });
+
+    describe('ADVANCED', () => {
+      strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.ADVANCED, [ROLE.ARCHITECT]);
+
+      Object.values(strategy.roles).forEach(({ id: roleName, createdStatus }: IRole) => {
+        describe(roleName, () => {
+          beforeEach(() => {
+            strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.ADVANCED, [roleName]);
+          });
+
+          it('default STATUS_NAME', () => {
+            expect(strategy.getCreatedStatus()).toBe(createdStatus);
+          });
+
+          Object.values(STATUS_NAME).forEach((status) => {
+            it(`current STATUS_NAME="${status}" must be converted to STATUS_NAME.CREATING`, () => {
+              expect(strategy.getCreatedStatus(status)).toBe(createdStatus);
+            });
+          });
         });
       });
     });

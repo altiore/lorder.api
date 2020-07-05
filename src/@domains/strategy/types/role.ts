@@ -1,3 +1,5 @@
+import { STATUS_NAME } from './status';
+
 export enum ROLE {
   ARCHITECT = 'architect',
   DEVELOPER = 'dev-full',
@@ -12,4 +14,5 @@ export interface IRole {
   id: ROLE;
   title: string;
   order: number;
+  createdStatus: STATUS_NAME;
 }
