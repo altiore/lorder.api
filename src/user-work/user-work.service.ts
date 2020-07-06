@@ -83,7 +83,7 @@ export class UserWorkService {
     }
     res = await curManager.save(UserWork, userWork);
     if (recalculate) {
-      await this.projectService.calculateUserStatistic(user, 0, curManager);
+      await this.projectService.calculateUserStatistic(user, curManager);
     } else {
       await this.projectMemberService.addTime(userWork, curManager);
     }
@@ -94,7 +94,7 @@ export class UserWorkService {
     let result: DeleteResult;
     await this.userWorkRepo.manager.transaction(async (entityManager) => {
       result = await entityManager.delete(UserWork, { id: userWork.id });
-      await this.projectService.calculateUserStatistic(user, 0, entityManager);
+      await this.projectService.calculateUserStatistic(user, entityManager);
     });
     return result;
   }

@@ -21,6 +21,7 @@ import {
 import { IColumn, ROLE, STATUS_NAME, TASK_FLOW_STRATEGY } from '../@domains/strategy';
 import { TaskFlowStrategy } from '../@domains/strategy';
 import { ProjectRole } from '../@orm/project-role/project-role.entity';
+import { UserTask } from '../@orm/user-task';
 import { ProjectPaginationDto } from './@dto';
 
 @Injectable()
@@ -160,96 +161,47 @@ export class ProjectService {
    *   "task"
    * WHERE "task"."projectId" = 53;
    */
-  public async calculateUserStatistic(
-    user: User,
-    projectId: number = 0,
-    entityManager?: EntityManager
-  ): Promise<{ [key: number]: { timeSum: number; valueSum: number } }> {
+  public async calculateUserStatistic(user: User, entityManager?: EntityManager): Promise<void> {
     const manager = entityManager || this.projectRepo.manager;
 
-    const step = 4;
-    let i = 0;
-    let userTasksPortion;
-    const projectTimeSums: { [key: number]: { timeSum: number; valueSum: number } } = {};
+    // 1. Удалить статистику для задачи, в которой нет работы
+    await manager.query(`
+      DELETE FROM "user_tasks"
+      WHERE "user_tasks"."userId"=${user.id}
+        AND (
+          SELECT COUNT("id")
+          FROM "user_work"
+          WHERE "userId"="user_tasks"."userId"
+          AND "taskId"="user_tasks"."taskId"
+        ) = 0
+    `);
 
-    // Удалить статистику для задачи, в которой нет работы
-    await manager.query(
-      `DELETE FROM "user_tasks"
-              WHERE
-                "user_tasks"."userId"=${user.id}
-                AND (
-                  SELECT COUNT("id")
-                  FROM "user_work"
-                  WHERE
-                    "userId"="user_tasks"."userId"
-                    AND "taskId"="user_tasks"."taskId") = 0`
-    );
+    // 2. Посчитать статистику по времени для текущего пользователя
+    await manager.query(`
+      UPDATE "user_tasks"
+      SET "time"=(
+        (
+          SELECT SUM(EXTRACT('epoch' from "user_work"."finishAt") - EXTRACT('epoch' from "user_work"."startAt"))
+          FROM "user_work"
+          WHERE "userId"="user_tasks"."userId"
+            AND "taskId"="user_tasks"."taskId"
+        ) * 1000
+      )
+      WHERE "user_tasks"."userId"=${user.id}
+    `);
 
-    await manager.query(
-      `UPDATE "user_tasks"
-              SET "time"=((
-                SELECT SUM(EXTRACT('epoch' from "user_work"."finishAt") - EXTRACT('epoch' from "user_work"."startAt"))
-                  FROM "user_work"
-                WHERE "userId"="user_tasks"."userId"
-                  AND "taskId"="user_tasks"."taskId")*1000) WHERE "user_tasks"."userId"=${user.id}`
-    );
-
-    do {
-      // TODO: userProject должен хранить последний зафиксированный элемент,
-      //  чтоб можно было пересчитывать только последнюю измененную часть
-      userTasksPortion = await manager
-        .createQueryBuilder()
-        .select('user_tasks.userId')
-        .addSelect('user_tasks.taskId')
-        .addSelect('user_tasks.benefitPart')
-        .from('user_tasks', 'user_tasks')
-        .leftJoinAndMapOne('user_tasks.task', 'task', 'task', 'user_tasks.taskId=task.id')
-        .leftJoinAndMapMany(
-          'task.userWorks',
-          'user_work',
-          'userWorks',
-          '"user_tasks"."taskId"="userWorks"."taskId" AND "user_tasks"."userId"="userWorks"."userId"'
-        )
-        .where('"user_tasks"."userId" = :userId', { userId: user.id })
-        .andWhere('"task"."projectId" = :projectId', { projectId })
-        .take(step)
-        .skip(i * step)
-        .getMany();
-
-      if (!userTasksPortion || !userTasksPortion.length) {
-        break;
-      }
-
-      userTasksPortion.map((userT) => {
-        projectTimeSums[userT.task.projectId] = {
-          timeSum: get(projectTimeSums, [userT.task.projectId, 'timeSum'], 0) || 0,
-          valueSum:
-            (get(projectTimeSums, [userT.task.projectId, 'valueSum'], 0) || 0) + userT.benefitPart * userT.task.value,
-        };
-        userT.task.userWorks.map((uw) => {
-          projectTimeSums[userT.task.projectId] = {
-            timeSum:
-              (get(projectTimeSums, [userT.task.projectId, 'timeSum'], 0) || 0) +
-              moment(uw.finishAt).diff(moment(uw.startAt)),
-            valueSum: get(projectTimeSums, [userT.task.projectId, 'valueSum'], 0),
-          };
-        });
-      });
-      i++;
-    } while (userTasksPortion.length === step);
-
-    for (const prId of Object.keys(projectTimeSums)) {
-      await manager.update(
-        UserProject,
-        { projectId: prId, memberId: user.id },
-        {
-          timeSum: projectTimeSums[prId].timeSum,
-          valueSum: projectTimeSums[prId].valueSum,
-        }
-      );
-    }
-
-    return projectTimeSums;
+    // 3. Обновить статистику по benefitPart для всех пользователя
+    await manager.query(`
+      UPDATE "user_tasks" as "updated"
+      SET "benefitPart"=(
+          ROUND(
+                  CAST((1 / CAST((SELECT COUNT(*)
+                             FROM "user_tasks" as "selected"
+                             WHERE "updated"."taskId"="selected"."taskId") AS FLOAT)) AS NUMERIC),
+                      6
+              )
+          )
+    `);
   }
 
   /**
@@ -265,7 +217,7 @@ export class ProjectService {
         });
 
         for (const member of projectWithMembers.members) {
-          await this.calculateUserStatistic(member.member, project.id, manager);
+          await this.calculateUserStatistic(member.member, manager);
         }
 
         // 1. Посчитать скорость выполнения проекта в задачах, поинтах, расходуемых часах

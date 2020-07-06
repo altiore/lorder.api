@@ -109,6 +109,30 @@ describe('task-flow-strategy', () => {
     });
   });
 
+  describe('canBeStarted', () => {
+    describe('SIMPLE', () => {
+      beforeEach(() => {
+        strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.SIMPLE, []);
+      });
+
+      it('STATUS_NAME.CREATING', () => {
+        expect(strategy.canBeStarted(STATUS_NAME.CREATING)).toBeTruthy();
+      });
+
+      it('STATUS_NAME.READY_TO_DO', () => {
+        expect(strategy.canBeStarted(STATUS_NAME.READY_TO_DO)).toBeTruthy();
+      });
+
+      it('STATUS_NAME.TESTING', () => {
+        expect(strategy.canBeStarted(STATUS_NAME.TESTING)).toBeTruthy();
+      });
+
+      it('STATUS_NAME.DONE', () => {
+        expect(strategy.canBeStarted(STATUS_NAME.DONE)).toBeFalsy();
+      });
+    });
+  });
+
   describe('SIMPLE strategy', () => {
     beforeEach(() => {
       strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.SIMPLE, []);
@@ -134,7 +158,7 @@ describe('task-flow-strategy', () => {
       });
 
       it('from DONE', () => {
-        expect(strategy.canBeMoved(STATUS_NAME.DONE, STATUS_NAME.CREATING)).toBeTruthy();
+        expect(strategy.canBeMoved(STATUS_NAME.DONE, STATUS_NAME.CREATING)).toBeFalsy();
         expect(strategy.canBeMoved(STATUS_NAME.DONE, STATUS_NAME.READY_TO_DO)).toBeTruthy();
         expect(strategy.canBeMoved(STATUS_NAME.DONE, STATUS_NAME.TESTING)).toBeTruthy();
       });

@@ -12,8 +12,8 @@ import { TASK_FLOW_STRATEGY } from './types/task-flow-strategy';
 import { TASK_TYPE } from './types/task-type';
 
 export class TaskFlowStrategy {
-  private readonly strategy: string;
   private readonly userRoles: ROLE | ROLE[];
+  readonly strategy: string;
   private _createdStatus?: STATUS_NAME;
   private _inProgressStatus?: STATUS_NAME;
   private _roles?: IRole[];
@@ -260,9 +260,7 @@ export class TaskFlowStrategy {
         }
       }
     });
-    if (this.strategy === TASK_FLOW_STRATEGY.SIMPLE) {
-      return allowedMove ? (toStatus as STATUS_NAME) : false;
-    }
+
     return allowedMove ? allowedMove.to : false;
   }
 
