@@ -14,7 +14,14 @@ import { Roles, UserJWT } from '../@common/decorators';
 import { RolesGuard } from '../@common/guards';
 import { AccessLevel, ProjectParam } from '../project/@common/decorators';
 import { AccessLevelGuard } from '../project/@common/guards';
-import { StartResponse, StopResponse, UserWorkCreateDto, UserWorkEditResultDto, UserWorkPatchDto } from './dto';
+import {
+  StartResponse,
+  StopResponse,
+  UserWorkCreateDto,
+  UserWorkEditResultDto,
+  UserWorkPatchDto,
+  UserWorkStartDto,
+} from './dto';
 import { UserWorkService } from './user-work.service';
 
 @ApiBearerAuth()
@@ -36,7 +43,7 @@ export class UserWorkController {
   @AccessLevel(ACCESS_LEVEL.RED)
   @ApiResponse({ status: 201, type: StartResponse, description: 'ACCESS_LEVEL.RED' })
   public start(
-    @Body() userWorkCreateDto: UserWorkCreateDto,
+    @Body() userWorkCreateDto: UserWorkStartDto,
     @ProjectParam() project: Project,
     @UserJWT() user: User
   ): Promise<StartResponse> {

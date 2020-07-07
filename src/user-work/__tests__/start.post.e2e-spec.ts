@@ -68,7 +68,7 @@ describe(`POST ${h.url}`, () => {
       });
   });
 
-  it('by owner with validation error (title not set)', async () => {
+  it('by owner with validation error (sequenceNumber not set)', async () => {
     await h
       .requestBy(await h.getUser('super-admin@mail.com'))
       .post(h.path())
@@ -82,12 +82,10 @@ describe(`POST ${h.url}`, () => {
           {
             children: [],
             constraints: {
-              isNotEmpty: 'title should not be empty',
-              isString: 'title must be a string',
-              maxLength: 'title must be shorter than or equal to 140 characters',
-              minLength: 'title must be longer than or equal to 3 characters',
+              isNotEmpty: 'sequenceNumber should not be empty',
+              isNumber: 'sequenceNumber must be a number conforming to the specified constraints',
             },
-            property: 'title',
+            property: 'sequenceNumber',
           },
         ],
         message: 'Validation Error',
@@ -103,7 +101,7 @@ describe(`POST ${h.url}`, () => {
         description: 'создана автоматически',
         extraData: 'extra data',
         projectId,
-        title: 'Новая задача',
+        sequenceNumber: 1,
       })
       .expect(422);
     expect(body).toEqual({
@@ -149,53 +147,6 @@ describe(`POST ${h.url}`, () => {
       .expect(403);
   });
 
-  it('by owner with correct data, when exists not finished user work', async () => {
-    const { body } = await h
-      .requestBy(await h.getUser('exist-not-finished@mail.com'))
-      .post(h.path())
-      .send({
-        description: 'Описание новой задачи',
-        projectId,
-        title: 'Задача Lorder',
-      })
-      .expect(201);
-    expect(body).toEqual({
-      finished: expect.arrayContaining([
-        expect.objectContaining({
-          finishAt: expect.any(String),
-          id: expect.any(Number),
-          startAt: expect.any(String),
-        }),
-      ]),
-      started: expect.objectContaining({
-        description: 'Описание новой задачи',
-        taskId: expect.any(Number),
-      }),
-    });
-    const task = await h.findOne(Task, { id: body.started.taskId });
-    expect(task).toEqual(
-      expect.objectContaining({
-        createdAt: expect.any(moment),
-        createdById: null,
-        description: 'Описание новой задачи',
-        id: expect.any(Number),
-        isArchived: false,
-        performerId: (await h.findOne(User, { email: 'exist-not-finished@mail.com' })).id,
-        projectId: expect.any(Number),
-        sequenceNumber: expect.any(Number),
-        source: null,
-        statusTypeName: STATUS_NAME.READY_TO_DO,
-        title: 'Задача Lorder',
-        typeId: expect.any(Number),
-        updatedAt: expect.any(moment),
-        value: null,
-      })
-    );
-    expect(body.finished[0].finishAt).toBe(body.started.startAt);
-    await h.removeCreated(UserWork, { id: body.started.id });
-    await h.removeCreated(Task, { id: body.started.taskId });
-  });
-
   it('by owner with correct data existing task with IN_TESTING status', async () => {
     const taskInTesting = await h.findOne(Task, { title: 'IN_TESTING' });
     expect(taskInTesting.statusTypeName).toBe(STATUS_NAME.READY_TO_DO);
@@ -205,54 +156,13 @@ describe(`POST ${h.url}`, () => {
       .send({
         description: 'Описание новой задачи',
         projectId,
-        title: 'Задача Lorder',
-        taskId: taskInTesting.id,
+        sequenceNumber: taskInTesting.sequenceNumber,
       })
       .expect(201);
     expect(body.started.task).toEqual(
       expect.objectContaining({
         inProgress: true,
         statusTypeName: STATUS_NAME.READY_TO_DO,
-      })
-    );
-    await h.removeCreated(UserWork, { id: body.started.id });
-    await h.removeCreated(Task, { id: body.started.taskId });
-  });
-
-  it('by owner with correct data', async () => {
-    const { body } = await h
-      .requestBy(await h.getUser('super-admin@mail.com'))
-      .post(h.path())
-      .send({
-        description: 'Описание новой задачи',
-        projectId,
-        title: 'Задача Lorder',
-      })
-      .expect(201);
-    expect(body).toEqual({
-      finished: [],
-      started: expect.objectContaining({
-        description: 'Описание новой задачи',
-        taskId: expect.any(Number),
-      }),
-    });
-    const task = await h.findOne(Task, { id: body.started.taskId });
-    expect(task).toEqual(
-      expect.objectContaining({
-        createdAt: expect.any(moment),
-        createdById: null,
-        description: 'Описание новой задачи',
-        id: expect.any(Number),
-        isArchived: false,
-        performerId: (await h.findOne(User, { email: 'super-admin@mail.com' })).id,
-        projectId: expect.any(Number),
-        sequenceNumber: expect.any(Number),
-        source: null,
-        statusTypeName: STATUS_NAME.READY_TO_DO,
-        title: 'Задача Lorder',
-        typeId: expect.any(Number),
-        updatedAt: expect.any(moment),
-        value: null,
       })
     );
     await h.removeCreated(UserWork, { id: body.started.id });

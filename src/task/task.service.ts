@@ -61,6 +61,36 @@ export class TaskService {
     return await this.taskRepo.delete({ sequenceNumber, project: { id: projectId } });
   }
 
+  public async findOneBySNAndProject(
+    sequenceNumber: number,
+    projectId: number,
+    user: User,
+    accessLevel: ACCESS_LEVEL = ACCESS_LEVEL.RED,
+    where = {},
+    withoutRelations = false,
+    manager?: EntityManager
+  ): Promise<Task> {
+    const curManager = manager || this.taskRepo.manager;
+    const task = await curManager.findOne(Task, {
+      relations: withoutRelations ? [] : ['performer', 'userWorks', 'userTasks'],
+      where: {
+        sequenceNumber,
+        projectId,
+        ...where,
+      },
+    });
+    if (!task) {
+      throw new NotFoundException('Задача не была найдена');
+    }
+    task.project = await this.projectService.findOneByMember(task.projectId, user, curManager);
+    // Эта проверка ДОЛЖНА быть здесь. Если ее убрать, то можно будет в url написать проект, к которому есть доступ
+    // и отредактировать произвольную задачу из произвольного проекта
+    if (!task.project || !task.project.isAccess(accessLevel)) {
+      throw new ForbiddenException('Доступ к этой задаче запрещен');
+    }
+    return task;
+  }
+
   public async findOneById(
     taskId: number,
     user: User,

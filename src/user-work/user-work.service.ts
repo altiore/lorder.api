@@ -22,7 +22,14 @@ import { ProjectService } from '../project/project.service';
 import { ProjectTaskService } from '../project/task/project.task.service';
 import { TaskService } from '../task/task.service';
 import { UserService } from '../user/user.service';
-import { StartResponse, StopResponse, UserWorkCreateDto, UserWorkEditResultDto, UserWorkPatchDto } from './dto';
+import {
+  StartResponse,
+  StopResponse,
+  UserWorkCreateDto,
+  UserWorkEditResultDto,
+  UserWorkPatchDto,
+  UserWorkStartDto,
+} from './dto';
 
 @Injectable()
 export class UserWorkService {
@@ -179,7 +186,7 @@ export class UserWorkService {
     );
   }
 
-  public async start(project: Project, user: User, userWorkData: UserWorkCreateDto): Promise<StartResponse> {
+  public async start(project: Project, user: User, userWorkData: UserWorkStartDto): Promise<StartResponse> {
     const result: StartResponse = {
       finished: [],
       started: null,
@@ -188,8 +195,8 @@ export class UserWorkService {
       // 0. Находим стратегию перемещения задач
       const strategy = await this.projectService.getCurrentUserStrategy(project, user, entityManager);
 
-      // 1. Найти или создать новую задачу
-      const task = await this.findTaskOrCreateDefault(project, user, userWorkData, strategy, entityManager);
+      // 1. Найти задачу для старта
+      const task = await this.findTaskByStartDto(project, user, userWorkData, entityManager);
 
       // 2. Проверить, что эту задачу может начать текущий пользователь
       await this.checkUserCanStart(strategy, task, user);
@@ -202,7 +209,13 @@ export class UserWorkService {
       if (result.finished && result.finished.length) {
         startAt = result.finished[0].finishAt;
       }
-      result.started = await this.startTask(task, user, userWorkData, startAt, strategy, entityManager);
+      const preparedUserWorkData: UserWorkCreateDto = {
+        description: userWorkData.description,
+        projectId: task.projectId,
+        taskId: task.id,
+        title: userWorkData.description,
+      };
+      result.started = await this.startTask(task, user, preparedUserWorkData, startAt, strategy, entityManager);
     });
 
     return result;
@@ -405,6 +418,31 @@ export class UserWorkService {
     if (!strategy.canBeStarted(task.statusTypeName)) {
       throw new NotAcceptableException('Вы не можете начать выполнять задачу в этом статусе');
     }
+  }
+
+  private async findTaskByStartDto(
+    project: Project,
+    user: User,
+    userWorkData: UserWorkStartDto,
+    manager: EntityManager
+  ): Promise<Task> {
+    let startedTask;
+    startedTask = await this.taskService.findOneBySNAndProject(
+      userWorkData.sequenceNumber,
+      userWorkData.projectId,
+      user,
+      undefined,
+      undefined,
+      undefined,
+      manager
+    );
+    if (!startedTask) {
+      throw new NotFoundException(
+        `Указанная задача ${userWorkData.sequenceNumber} не найдена в проекте ${project.title}`
+      );
+    }
+
+    return startedTask;
   }
 
   private async findTaskOrCreateDefault(
