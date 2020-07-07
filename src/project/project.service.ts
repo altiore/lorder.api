@@ -160,6 +160,17 @@ export class ProjectService {
         ) = 0
     `);
 
+    // 1.1. Если user_task нет, то создать
+    let userTask = await manager.findOne(UserTask, { taskId: userWork.taskId, userId: user.id });
+    if (!userTask) {
+      userTask = new UserTask();
+      userTask.benefitPart = 1;
+      userTask.time = 0;
+      userTask.userId = user.id;
+      userTask.taskId = userWork.taskId;
+      await manager.save(userTask);
+    }
+
     // 2. Посчитать статистику по времени для текущего пользователя
     await manager.query(`
       UPDATE "user_tasks"

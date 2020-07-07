@@ -96,6 +96,8 @@ export class UserWorkService {
 
     // 4. Обновить user_tasks и user_project
     await this.projectService.updateStatisticForUserWork(user, curManager, userWork);
+    // TODO: update existing instead of getting one more time
+    resultUserWork.task.userTasks = await curManager.find(UserTask, { taskId: userWork.taskId });
 
     return resultUserWork;
   }
