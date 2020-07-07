@@ -67,7 +67,7 @@ export class Task {
   description: string;
 
   @ApiPropertyOptional()
-  @Column({ nullable: true })
+  @Column({ nullable: false, default: 0 })
   value: number;
 
   @ApiPropertyOptional()

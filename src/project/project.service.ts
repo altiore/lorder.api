@@ -22,6 +22,7 @@ import { IColumn, ROLE, STATUS_NAME, TASK_FLOW_STRATEGY } from '../@domains/stra
 import { TaskFlowStrategy } from '../@domains/strategy';
 import { ProjectRole } from '../@orm/project-role/project-role.entity';
 import { UserTask } from '../@orm/user-task';
+import { UserWork } from '../@orm/user-work';
 import { ProjectPaginationDto } from './@dto';
 
 @Injectable()
@@ -139,29 +140,85 @@ export class ProjectService {
     return project;
   }
 
-  /**
-   * считаем как для всех проектов (если projectId = 0), так и для одного проекта.
-   * Для всех проектов нужно пересчитать, если работа пользователя изменилась. В этом случае могут быть затронуты
-   * другие проекты и пересчитать нужно все.
-   * Один проект считаем, когда нужно обновить информацию для проекта
-   *
-   * SELECT
-   *   SUM("task"."value"*"user_tasks"."benefitPart") as "benefitPart"
-   * FROM
-   *   "user_tasks"
-   * LEFT JOIN
-   *   "task" ON "task"."id"="user_tasks"."taskId"
-   * WHERE
-   *  "userId"=1
-   *   AND "task"."projectId" = 53;
-   *
-   * SELECT
-   *   SUM("task"."value") as "projectBenefit"
-   * FROM
-   *   "task"
-   * WHERE "task"."projectId" = 53;
-   */
-  public async calculateUserStatistic(user: User, entityManager?: EntityManager): Promise<void> {
+  public async updateStatisticForUserWork(user: User, entityManager: EntityManager, userWork: UserWork): Promise<void> {
+    const manager = entityManager || this.projectRepo.manager;
+
+    if (!userWork.projectId) {
+      userWork.task = await manager.findOne(Task, { id: userWork.taskId });
+    }
+
+    // 1. Удалить статистику для задачи, в которой нет работы
+    await manager.query(`
+      DELETE FROM "user_tasks"
+      WHERE "user_tasks"."userId"=${user.id}
+        AND "user_tasks"."taskId"=${userWork.taskId}
+        AND (
+          SELECT COUNT("id")
+          FROM "user_work"
+          WHERE "userId"="user_tasks"."userId"
+          AND "taskId"="user_tasks"."taskId"
+        ) = 0
+    `);
+
+    // 2. Посчитать статистику по времени для текущего пользователя
+    await manager.query(`
+      UPDATE "user_tasks"
+      SET "time"=COALESCE((
+        (
+          SELECT SUM(EXTRACT('epoch' from "user_work"."finishAt") - EXTRACT('epoch' from "user_work"."startAt"))
+          FROM "user_work"
+          WHERE "userId"="user_tasks"."userId"
+            AND "taskId"="user_tasks"."taskId"
+        ) * 1000
+      ), 0)
+      WHERE "user_tasks"."userId"=${user.id}
+        AND "user_tasks"."taskId"=${userWork.taskId}
+    `);
+
+    // 3. Обновить статистику по benefitPart для всех пользователей
+    await manager.query(`
+      UPDATE "user_tasks" as "updated"
+      SET "benefitPart"=COALESCE((
+          ROUND(
+                  CAST((1 / CAST((SELECT COUNT(*)
+                             FROM "user_tasks" as "selected"
+                             WHERE "updated"."taskId"="selected"."taskId") AS FLOAT)) AS NUMERIC),
+                      6
+              )
+          ), 0)
+      WHERE "updated"."taskId"=${userWork.taskId}
+    `);
+
+    // 4. Обновить статистику user_project
+    await manager.query(`
+      UPDATE "user_project"
+      SET "timeSum"=COALESCE((
+          SELECT SUM("time_sum_user_tasks"."time")
+          FROM "user_tasks" as "time_sum_user_tasks"
+          WHERE "user_project"."memberId" = "time_sum_user_tasks"."userId"
+            AND "time_sum_user_tasks"."taskId" IN (
+              SELECT "id"
+              FROM "task" as "first_task"
+              WHERE "first_task"."projectId" = "user_project"."projectId"
+          )
+      ), 0),
+          "valueSum"=COALESCE((
+              SELECT SUM("value_user_tasks"."benefitPart" * "value_task"."value")
+              FROM "user_tasks" as "value_user_tasks"
+                       LEFT JOIN "task" as "value_task" ON "value_task"."id" = "value_user_tasks"."taskId"
+              WHERE "user_project"."memberId" = "value_user_tasks"."userId"
+                AND "value_task"."value" IS NOT NULL
+                AND "value_user_tasks"."taskId" IN (
+                  SELECT "id"
+                  FROM "task" as "second_task"
+                  WHERE "second_task"."projectId" = "user_project"."projectId"
+              )
+          ), 0)
+      WHERE "user_project"."projectId"=${userWork.projectId}
+    `);
+  }
+
+  public async calculateUserStatistic(user: User, entityManager: EntityManager, projectId: number): Promise<void> {
     const manager = entityManager || this.projectRepo.manager;
 
     // 1. Удалить статистику для задачи, в которой нет работы
@@ -179,28 +236,56 @@ export class ProjectService {
     // 2. Посчитать статистику по времени для текущего пользователя
     await manager.query(`
       UPDATE "user_tasks"
-      SET "time"=(
+      SET "time"=COALESCE((
         (
           SELECT SUM(EXTRACT('epoch' from "user_work"."finishAt") - EXTRACT('epoch' from "user_work"."startAt"))
           FROM "user_work"
           WHERE "userId"="user_tasks"."userId"
             AND "taskId"="user_tasks"."taskId"
         ) * 1000
-      )
+      ), 0)
       WHERE "user_tasks"."userId"=${user.id}
     `);
 
-    // 3. Обновить статистику по benefitPart для всех пользователя
+    // 3. Обновить статистику по benefitPart для всех пользователей
     await manager.query(`
       UPDATE "user_tasks" as "updated"
-      SET "benefitPart"=(
+      SET "benefitPart"=COALESCE((
           ROUND(
                   CAST((1 / CAST((SELECT COUNT(*)
                              FROM "user_tasks" as "selected"
                              WHERE "updated"."taskId"="selected"."taskId") AS FLOAT)) AS NUMERIC),
                       6
               )
+          ), 0)
+    `);
+
+    // 4. Обновить статистику user_project
+    await manager.query(`
+      UPDATE "user_project"
+      SET "timeSum"=COALESCE((
+          SELECT SUM("time_sum_user_tasks"."time")
+          FROM "user_tasks" as "time_sum_user_tasks"
+          WHERE "user_project"."memberId" = "time_sum_user_tasks"."userId"
+            AND "time_sum_user_tasks"."taskId" IN (
+              SELECT "id"
+              FROM "task" as "first_task"
+              WHERE "first_task"."projectId" = "user_project"."projectId"
           )
+      ), 0),
+          "valueSum"=COALESCE((
+              SELECT SUM("value_user_tasks"."benefitPart" * "value_task"."value")
+              FROM "user_tasks" as "value_user_tasks"
+                       LEFT JOIN "task" as "value_task" ON "value_task"."id" = "value_user_tasks"."taskId"
+              WHERE "user_project"."memberId" = "value_user_tasks"."userId"
+                AND "value_task"."value" IS NOT NULL
+                AND "value_user_tasks"."taskId" IN (
+                  SELECT "id"
+                  FROM "task" as "second_task"
+                  WHERE "second_task"."projectId" = "user_project"."projectId"
+              )
+          ), 0)
+      WHERE "user_project"."projectId"=${projectId}
     `);
   }
 
@@ -217,7 +302,7 @@ export class ProjectService {
         });
 
         for (const member of projectWithMembers.members) {
-          await this.calculateUserStatistic(member.member, manager);
+          await this.calculateUserStatistic(member.member, manager, projectWithMembers.id);
         }
 
         // 1. Посчитать скорость выполнения проекта в задачах, поинтах, расходуемых часах

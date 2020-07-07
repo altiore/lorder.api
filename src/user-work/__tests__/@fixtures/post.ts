@@ -1,3 +1,5 @@
+import * as moment from 'moment';
+
 import { STATUS_NAME } from '../../../@domains/strategy';
 import { ROLES } from '../../../@orm/role';
 import { ACCESS_LEVEL } from '../../../@orm/user-project';
@@ -6,6 +8,7 @@ import {
   createTasks,
   createUserProjects,
   createUsers,
+  createUserTasks,
   createUserWorks,
 } from '../../../@test-helper/@fixtureCreators';
 
@@ -55,6 +58,7 @@ export const tasksFixture = createTasks([
     title: 'NotFinished',
     statusTypeName: STATUS_NAME.READY_TO_DO,
     inProgress: true,
+    value: 7,
   },
   {
     performer: { email: 'exist-not-finished@mail.com' },
@@ -72,6 +76,22 @@ export const tasksFixture = createTasks([
 export const userWorksFixture = createUserWorks([
   {
     finishAt: null,
+    startAt: moment().subtract(1, 'hour'),
+    task: { title: 'NotFinished' },
+    user: { email: 'exist-not-finished@mail.com' },
+  },
+  {
+    finishAt: moment().subtract(1, 'hour'),
+    startAt: moment().subtract(2, 'hour'),
+    task: { title: 'NotFinished' },
+    user: { email: 'exist-not-finished@mail.com' },
+  },
+]);
+
+export const userTaskFixture = createUserTasks([
+  {
+    time: 3600000,
+    benefitPart: 1,
     task: { title: 'NotFinished' },
     user: { email: 'exist-not-finished@mail.com' },
   },

@@ -110,7 +110,7 @@ describe(`PATCH ${h.url}`, () => {
       });
   });
 
-  it('by owner with validation error' + ' (description is number, startAt string but is not date string)', async () => {
+  it('by owner with validation error (description is number, startAt string but is not date string)', async () => {
     const { body } = await h
       .requestBy(await h.getUser('super-admin@mail.com'))
       .patch(h.path(userWorkId))
@@ -166,7 +166,7 @@ describe(`PATCH ${h.url}`, () => {
     });
   });
 
-  it('by owner with validation error' + ' (description longer then 255, startAt is number)', async () => {
+  it('by owner with validation error (description longer then 255, startAt is number)', async () => {
     const { body } = await h
       .requestBy(await h.getUser('super-admin@mail.com'))
       .patch(h.path(userWorkId))
@@ -296,7 +296,7 @@ describe(`PATCH ${h.url}`, () => {
       projectId,
       source: lorem.words(2),
       startAt: moment().subtract(20, 'minutes').toISOString(),
-      taskId: 444,
+      taskId: -1,
       value: 10,
     };
     await h

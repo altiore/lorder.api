@@ -92,7 +92,7 @@ export const tasksFixture = createTasks([
     project: { title: 'Fourth' },
     title: 'Fourth Project, task 1',
     userTasks: [{ user: { email: 'user@mail.com' } }],
-    value: null,
+    value: 0,
   },
 ]);
 

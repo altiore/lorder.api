@@ -77,43 +77,45 @@ export class UserWorkService {
     recalculate: boolean = false,
     manager?: EntityManager
   ): Promise<UserWork> {
+    // 1. Проверить, что обнровляемое время валидно
+    if (userWork.finishAt && moment(userWork.startAt).diff(moment(userWork.finishAt)) > 0) {
+      throw new NotAcceptableException('startAt не может быть позже, чем finishAt');
+    }
+
+    // 2. Убедиться, что все необходимые для проверок данные загружены
     const curManager = manager || this.userWorkRepo.manager;
-    let res = userWork;
     if (!userWork.projectId || !userWork.task.userTasks) {
       userWork.task = await curManager.findOne(Task, {
         relations: ['performer', 'userTasks', 'project'],
         where: { id: userWork.taskId },
       });
     }
-    if (userWork.finishAt && moment(userWork.startAt).diff(moment(userWork.finishAt)) > 0) {
-      throw new NotAcceptableException('startAt не может быть позже, чем finishAt');
-    }
-    res = await curManager.save(UserWork, userWork);
-    if (recalculate) {
-      await this.projectService.calculateUserStatistic(user, curManager);
-    } else {
-      await this.projectMemberService.addTime(userWork, curManager);
-    }
-    return res;
+
+    // 3. Сохранить новое время в задаче
+    const resultUserWork = await curManager.save(UserWork, userWork);
+
+    // 4. Обновить user_tasks и user_project
+    await this.projectService.updateStatisticForUserWork(user, curManager, userWork);
+
+    return resultUserWork;
   }
 
   public async remove(userWork: UserWork, user): Promise<DeleteResult | undefined> {
     let result: DeleteResult;
     await this.userWorkRepo.manager.transaction(async (entityManager) => {
       result = await entityManager.delete(UserWork, { id: userWork.id });
-      await this.projectService.calculateUserStatistic(user, entityManager);
+      await this.projectService.updateStatisticForUserWork(user, entityManager, userWork);
     });
     return result;
   }
 
-  private async finishTask(
+  private async finishUserWork(
     curManager: EntityManager,
     userWork: UserWork,
     user: User,
     pushForward?: boolean
   ): Promise<UserWork> {
-    const strategy = await this.projectService.getCurrentUserStrategy(userWork.task.project, user, curManager);
-    userWork.finishAt = moment();
+    // 1. Если нет projectId, найти его!
     if (!userWork.projectId || !userWork.task.userTasks) {
       userWork.task = await curManager.findOne(Task, {
         relations: ['performer', 'userTasks', 'project'],
@@ -121,45 +123,34 @@ export class UserWorkService {
       });
     }
 
+    // 2. Обновить finishAt - это и есть завершение задачи. Завершение работы
+    userWork.finishAt = moment();
+    const resUserWork = await this.updateTime(userWork, user, false, curManager);
+
+    // 3. Завершить задачу
+    userWork.task = await this.finishTask(userWork.task, user, pushForward, curManager);
+
+    return resUserWork;
+  }
+
+  private async finishTask(task: Task, user: User, pushForward: boolean, manager): Promise<Task> {
+    // 1.1. Подготовить данные, общие для всех стратегий
     const newTaskData: Partial<Task> = { inProgress: false };
+
+    // 1.2. Если задачу нунжно перемещать вперед, то добавить данные для обновления
     if (pushForward) {
-      const moveTo = strategy.pushForward(userWork.task.statusTypeName);
+      const strategy = await this.projectService.getCurrentUserStrategy(task.project, user, manager);
+      const moveTo = strategy.pushForward(task.statusTypeName);
       if (!moveTo) {
         throw new NotAcceptableException(
-          `Невозможно изменить статус задачи "${userWork.task.statusTypeName}". Видимо, у вас нет на это прав`
+          `Невозможно изменить статус задачи "${task.statusTypeName}". Видимо, у вас нет на это прав`
         );
       }
-      userWork.task.statusTypeName = moveTo.to;
+      task.statusTypeName = moveTo.to;
       newTaskData.statusTypeName = moveTo.to;
     }
-    await this.taskService.updateByUser(userWork.task, newTaskData, user, curManager);
 
-    const curUserTask = userWork.task.userTasks.find((el) => el.userId === user.id);
-
-    // TODO: проверить стратегию проекта
-
-    if (!curUserTask) {
-      // 1. create new userTask
-      let userTask = new UserTask();
-      userTask.task = { id: userWork.taskId } as Task;
-      userTask.user = { id: user.id } as User;
-      userTask.time = userWork.finishAt.diff(userWork.startAt);
-      userTask = await curManager.save(userTask);
-      userWork.task.userTasks.push(userTask);
-
-      // 2. update all benefitParts
-      await this.updateBenefitParts(userWork.task.userTasks, curManager);
-    } else {
-      curUserTask.time += userWork.finishAt.diff(userWork.startAt);
-      await curManager.save(curUserTask);
-    }
-
-    if (curUserTask && !curUserTask.benefitPart) {
-      // 2. update all benefitParts
-      await this.updateBenefitParts(userWork.task.userTasks, curManager);
-    }
-
-    return await this.updateTime(userWork, user, false, curManager);
+    return await this.taskService.updateByUser(task, newTaskData, user, manager);
   }
 
   public async updateBenefitParts(userTasks: UserTask[], manager?: EntityManager): Promise<void> {
@@ -181,7 +172,7 @@ export class UserWorkService {
 
     return await Promise.all(
       userWorks.map(async (userWork) => {
-        return await this.finishTask(curManager, userWork, user, true);
+        return await this.finishUserWork(curManager, userWork, user, true);
       })
     );
   }
@@ -231,7 +222,7 @@ export class UserWorkService {
     };
     await this.userWorkRepo.manager.transaction(async (entityManager) => {
       // 1. Решаем вопрос с предыдущей задачей
-      result.previous = await this.finishTask(entityManager, userWork, user, true);
+      result.previous = await this.finishUserWork(entityManager, userWork, user, true);
 
       // 2. Решаем вопрос с новой задачей
       const defProject = await this.userService.getDefaultProject(user, entityManager);
@@ -257,7 +248,7 @@ export class UserWorkService {
     };
     await this.userWorkRepo.manager.transaction(async (manager) => {
       // 1. Останавливаем предыдущую задачу
-      stopResponse.previous = await this.finishTask(manager, userWork, user);
+      stopResponse.previous = await this.finishUserWork(manager, userWork, user);
 
       // 2. Создаем новую С ПРАВИЛЬНЫМ prevTaskId!
       const defProject = await this.userService.getDefaultProject(user, manager);

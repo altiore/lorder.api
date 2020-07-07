@@ -61,7 +61,7 @@ export class UserWorkController {
     @UserJWT() user: User
   ): Promise<UserWorkEditResultDto> {
     const userWork = await this.userWorkService.findOneByUser(userWorkId, user);
-    return this.userWorkService.update(userWork, userWorkDto, user);
+    return await this.userWorkService.update(userWork, userWorkDto, user);
   }
 
   @Patch(':userWorkId/stop')

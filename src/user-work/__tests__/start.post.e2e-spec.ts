@@ -1,18 +1,25 @@
-import moment = require('moment');
-
 import { STATUS_NAME } from '../../@domains/strategy';
 import { Task } from '../../@orm/task';
-import { User } from '../../@orm/user';
+import { UserProject } from '../../@orm/user-project';
+import { UserTask } from '../../@orm/user-task';
 import { UserWork } from '../../@orm/user-work';
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
-import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/post';
+import {
+  projectsFixture,
+  tasksFixture,
+  userProjectsFixture,
+  usersFixture,
+  userTaskFixture,
+  userWorksFixture,
+} from './@fixtures/post';
 
 const h = new TestHelper('/user-works')
   .addFixture(usersFixture)
   .addFixture(projectsFixture)
   .addFixture(userProjectsFixture)
   .addFixture(tasksFixture)
-  .addFixture(userWorksFixture);
+  .addFixture(userWorksFixture)
+  .addFixture(userTaskFixture);
 
 describe(`POST ${h.url}`, () => {
   let projectId: number;
@@ -149,14 +156,18 @@ describe(`POST ${h.url}`, () => {
 
   it('by owner with correct data existing task with IN_TESTING status', async () => {
     const taskInTesting = await h.findOne(Task, { title: 'IN_TESTING' });
+    const userId = await h.getUser('exist-not-finished@mail.com');
+    const taskInfo: Partial<Task> = {
+      projectId,
+      sequenceNumber: taskInTesting.sequenceNumber,
+    };
     expect(taskInTesting.statusTypeName).toBe(STATUS_NAME.READY_TO_DO);
     const { body } = await h
-      .requestBy(await h.getUser('exist-not-finished@mail.com'))
+      .requestBy(userId)
       .post(h.path())
       .send({
         description: 'Описание новой задачи',
-        projectId,
-        sequenceNumber: taskInTesting.sequenceNumber,
+        ...taskInfo,
       })
       .expect(201);
     expect(body.started.task).toEqual(
@@ -165,6 +176,21 @@ describe(`POST ${h.url}`, () => {
         statusTypeName: STATUS_NAME.READY_TO_DO,
       })
     );
+    const userTask = await h.findOne(UserTask, { taskId: body.finished[0].taskId, userId });
+    const time = userTask?.time;
+    expect(time).toBeGreaterThanOrEqual(7200000);
+    expect(time).toBeLessThanOrEqual(7220000);
+
+    const userProject = await h.findOne(UserProject, { memberId: userId, projectId });
+    expect(userProject).toEqual(
+      expect.objectContaining({
+        valueSum: 7,
+      })
+    );
+    const timeSum = userProject?.timeSum;
+    expect(timeSum).toBeGreaterThanOrEqual(7200000);
+    expect(timeSum).toBeLessThanOrEqual(7220000);
+
     await h.removeCreated(UserWork, { id: body.started.id });
     await h.removeCreated(Task, { id: body.started.taskId });
   });

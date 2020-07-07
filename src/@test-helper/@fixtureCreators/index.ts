@@ -8,5 +8,6 @@ export * from './task-comment';
 export * from './task-logs';
 export * from './user';
 export * from './user-project';
+export * from './user-task';
 export * from './user-work';
 export * from './task-types';
