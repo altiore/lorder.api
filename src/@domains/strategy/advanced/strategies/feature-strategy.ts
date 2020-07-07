@@ -235,7 +235,16 @@ export const feature_strategy: Array<IStep> = [
   {
     status: STATUS_NAME.DEPLOYED_COMMUNITY_ESTIMATION,
     roles: [ROLE.ARCHITECT],
-    moves: [],
+    moves: [
+      // TODO: это перемещение должно быть коллективным. Только сообщество может осуществить окончательное перемещение
+      // после оценки
+      {
+        type: MOVE_TYPE.PUSH_FORWARD,
+        role: ROLE.ARCHITECT,
+        to: STATUS_NAME.DONE,
+        requirements: {},
+      },
+    ],
   },
   {
     status: STATUS_NAME.DONE,

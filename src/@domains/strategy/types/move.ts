@@ -11,5 +11,5 @@ export interface IMove {
   type: MOVE_TYPE;
   to: STATUS_NAME;
   role?: ROLE;
-  requirements?: { fields?: string[] };
+  requirements?: { fields?: any };
 }
