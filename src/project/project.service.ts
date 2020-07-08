@@ -152,7 +152,7 @@ export class ProjectService {
       DELETE FROM "user_tasks"
           USING "user_tasks" AS "ut"
               LEFT JOIN "task" "t" ON "t"."id"="ut"."taskId"
-      WHERE "user_tasks"."userId"==${user.id}
+      WHERE "user_tasks"."userId"=${user.id}
         AND "t"."statusTypeName"!='done'
         AND (
                 SELECT COUNT("id")
@@ -242,7 +242,7 @@ export class ProjectService {
       DELETE FROM "user_tasks"
           USING "user_tasks" AS "ut"
               LEFT JOIN "task" "t" ON "t"."id"="ut"."taskId"
-      WHERE "user_tasks"."userId"==${user.id}
+      WHERE "user_tasks"."userId"=${user.id}
         AND "t"."statusTypeName"!='done'
         AND (
                 SELECT COUNT("id")
