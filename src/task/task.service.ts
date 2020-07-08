@@ -1,17 +1,18 @@
 import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { DeleteResult, EntityManager, FindConditions, In } from 'typeorm';
+import { DeleteResult, EntityManager, In, IsNull } from 'typeorm';
 
 import { Project } from '@orm/project';
 import { ProjectPart } from '@orm/project-part/project-part.entity';
-import { Task, TaskRepository, TASK_SIMPLE_STATUS } from '@orm/task';
+import { Task, TaskRepository } from '@orm/task';
 import { TaskLogRepository, TASK_CHANGE_TYPE } from '@orm/task-log';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL } from '@orm/user-project';
 
 import { ListResponseDto, PaginationDto } from '../@common/dto';
 import { STATUS_NAME } from '../@domains/strategy';
+import { UserWork } from '../@orm/user-work';
 import { ProjectPartService } from '../project-part/project-part.service';
 import { ProjectService } from '../project/project.service';
 import { TaskPagination } from './dto';
@@ -123,6 +124,10 @@ export class TaskService {
     let task = await this.findOneById(taskId, user, ACCESS_LEVEL.YELLOW, { isArchived: false });
 
     if (task) {
+      const userWork = await this.taskRepo.manager.findOne(UserWork, { finishAt: IsNull(), taskId: task.id });
+      if (userWork) {
+        throw new NotAcceptableException('Вы не можете заархивировать задачу, которая сейчас в работе!');
+      }
       await this.taskRepo.manager.transaction(async (entityManager) => {
         task = await this.updateByUser(task, { isArchived: true }, user, entityManager);
       });
