@@ -211,6 +211,7 @@ export class ProjectService {
               SELECT "id"
               FROM "task" as "first_task"
               WHERE "first_task"."projectId" = "user_project"."projectId"
+                AND "first_task"."isArchived"=false
           )
       ), 0),
           "valueSum"=COALESCE((
@@ -223,6 +224,8 @@ export class ProjectService {
                   SELECT "id"
                   FROM "task" as "second_task"
                   WHERE "second_task"."projectId" = "user_project"."projectId"
+                    AND "second_task"."isArchived" = false
+                    AND "second_task"."statusTypeName" = '${STATUS_NAME.DONE}'
               )
           ), 0)
       WHERE "user_project"."projectId"=${userWork.projectId}
@@ -282,6 +285,7 @@ export class ProjectService {
               SELECT "id"
               FROM "task" as "first_task"
               WHERE "first_task"."projectId" = "user_project"."projectId"
+                AND "first_task"."isArchived"=false
           )
       ), 0),
           "valueSum"=COALESCE((
@@ -294,6 +298,8 @@ export class ProjectService {
                   SELECT "id"
                   FROM "task" as "second_task"
                   WHERE "second_task"."projectId" = "user_project"."projectId"
+                    AND "second_task"."isArchived" = false
+                    AND "second_task"."statusTypeName" = '${STATUS_NAME.DONE}'
               )
           ), 0)
       WHERE "user_project"."projectId"=${projectId}
