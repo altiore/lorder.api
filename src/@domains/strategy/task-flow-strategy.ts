@@ -140,6 +140,20 @@ export class TaskFlowStrategy {
     }, []));
   }
 
+  get canStartStatuses(): STATUS_NAME[] {
+    if (this._availableStatuses) {
+      return this._availableStatuses;
+    }
+
+    return (this._availableStatuses = this.columns.reduce((res, cur) => {
+      if (cur.moves.find((el) => el.type === MOVE_TYPE.PUSH_FORWARD)) {
+        return res.concat(cur.statuses);
+      }
+
+      return res;
+    }, []));
+  }
+
   get roles(): Array<IRole> {
     if (this._roles) {
       return this._roles;

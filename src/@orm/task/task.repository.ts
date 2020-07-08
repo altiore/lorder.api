@@ -1,7 +1,8 @@
-import { Between, EntityManager, EntityRepository, FindConditions, In, Repository } from 'typeorm';
+import { EntityManager, EntityRepository, FindConditions, In, Repository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Project } from '../project/project.entity';
+import { UserProject } from '../user-project';
 import { User } from '../user/user.entity';
 import { Task } from './task.entity';
 
@@ -32,29 +33,32 @@ export class TaskRepository extends Repository<Task> {
     });
   }
 
-  public async findAllWithPagination(
+  public async findTasksWithPagination(
     { skip = 0, count = 50, orderBy = TaskOrderByField.updatedAt, order = 'desc' }: PaginationDto<TaskOrderByField>,
     user: User,
-    allowedProjectIds: number[] = []
+    userProjects: UserProject[] = []
   ): Promise<Task[]> {
-    return this.find({
-      order: {
-        [orderBy]: order.toUpperCase(),
-      },
-      relations: requiredRelations,
-      skip,
-      take: count,
-      where: {
-        isArchived: false,
-        performerId: user.id,
-        projectId: In(allowedProjectIds),
-        // TODO: заменить на статусы работы для этого пользователя
-        status: Between(1, 3),
-        userWorks: {
-          userId: user.id,
+    const projects = userProjects.map((el) => el.project).filter((project) => project.id !== user.defaultProjectId);
+    let resTasks = [];
+    for (const pr of projects) {
+      const tasks = await this.find({
+        order: {
+          [orderBy]: order.toUpperCase(),
         },
-      },
-    });
+        relations: requiredRelations,
+        skip,
+        take: count,
+        where: {
+          isArchived: false,
+          performerId: user.id,
+          projectId: pr.id,
+          statusTypeName: In(pr.strategyInfo.canStartStatuses),
+        },
+      });
+      resTasks = resTasks.concat(tasks);
+    }
+
+    return resTasks;
   }
 
   public async createByProject(data: Partial<Task>, project: Project, manager: EntityManager): Promise<Task> {
