@@ -53,6 +53,28 @@ describe('task-flow-strategy', () => {
     });
   });
 
+  describe('availableStatuses', () => {
+    describe('SIMPLE', () => {
+      beforeEach(() => {
+        strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.SIMPLE, []);
+      });
+
+      it('empty roles', () => {
+        expect(strategy.availableStatuses.length).toBe(4);
+      });
+    });
+
+    describe('ADVANCED', () => {
+      beforeEach(() => {
+        strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.ADVANCED, []);
+      });
+
+      it('undefined roles', () => {
+        expect(strategy.availableStatuses.length).toBe(12);
+      });
+    });
+  });
+
   describe('getCreatedStatus', () => {
     describe('SIMPLE', () => {
       beforeEach(() => {

@@ -91,11 +91,12 @@ export class TaskFlowStrategy {
         );
         const defRole = this.defaultRole;
         this._userStrategyRoles =
-          existingRoles.length === rolesArr.length
+          rolesArr.length && existingRoles.length === rolesArr.length
             ? existingRoles
             : existingRoles.includes(defRole)
             ? existingRoles
             : [...existingRoles, defRole];
+
         break;
       }
       case TASK_FLOW_STRATEGY.SIMPLE: {

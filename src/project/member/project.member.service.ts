@@ -128,8 +128,7 @@ export class ProjectMemberService {
           accessLevel: -1,
           member: user,
           projectId,
-          // TODO: сохранять роль!
-          // roles,
+          roles,
         });
         return await this.userProjectRepo.save(newMember);
       }
