@@ -150,14 +150,16 @@ export class ProjectService {
     // 1. Удалить статистику для задачи, в которой нет работы
     await manager.query(`
       DELETE FROM "user_tasks"
-      WHERE "user_tasks"."userId"=${user.id}
-        AND "user_tasks"."taskId"=${userWork.taskId}
+          USING "user_tasks" AS "ut"
+              LEFT JOIN "task" "t" ON "t"."id"="ut"."taskId"
+      WHERE "user_tasks"."userId"==${user.id}
+        AND "t"."statusTypeName"!='done'
         AND (
-          SELECT COUNT("id")
-          FROM "user_work"
-          WHERE "userId"="user_tasks"."userId"
-          AND "taskId"="user_tasks"."taskId"
-        ) = 0
+                SELECT COUNT("id")
+                FROM "user_work"
+                WHERE "userId"="user_tasks"."userId"
+                  AND "taskId"="user_tasks"."taskId"
+            ) = 0
     `);
 
     // 1.1. Если user_task нет, то создать
@@ -238,13 +240,16 @@ export class ProjectService {
     // 1. Удалить статистику для задачи, в которой нет работы
     await manager.query(`
       DELETE FROM "user_tasks"
-      WHERE "user_tasks"."userId"=${user.id}
+          USING "user_tasks" AS "ut"
+              LEFT JOIN "task" "t" ON "t"."id"="ut"."taskId"
+      WHERE "user_tasks"."userId"==${user.id}
+        AND "t"."statusTypeName"!='done'
         AND (
-          SELECT COUNT("id")
-          FROM "user_work"
-          WHERE "userId"="user_tasks"."userId"
-          AND "taskId"="user_tasks"."taskId"
-        ) = 0
+                SELECT COUNT("id")
+                FROM "user_work"
+                WHERE "userId"="user_tasks"."userId"
+                  AND "taskId"="user_tasks"."taskId"
+            ) = 0
     `);
 
     // 2. Посчитать статистику по времени для текущего пользователя

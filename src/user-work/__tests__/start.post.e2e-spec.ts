@@ -184,7 +184,7 @@ describe(`POST ${h.url}`, () => {
     const userProject = await h.findOne(UserProject, { memberId: userId, projectId });
     expect(userProject).toEqual(
       expect.objectContaining({
-        valueSum: 7,
+        valueSum: 0,
       })
     );
     const timeSum = userProject?.timeSum;
