@@ -191,12 +191,6 @@ describe('task-flow-strategy', () => {
         expect(strategy.userStrategyRoles).toEqual([undefined]);
       });
     });
-
-    describe('pushForward', () => {
-      it('', () => {
-        expect(strategy.pushForward());
-      });
-    });
   });
 
   describe('ADVANCED strategy', () => {

@@ -1,5 +1,4 @@
-import { STATUS_NAME } from '..';
-import { IRole, ROLE } from '../types/role';
+import { IRole, ROLE, STATUS_NAME } from '../types';
 
 export const roles: Array<IRole> = [
   { id: ROLE.ARCHITECT, title: 'Архитектор', order: 1, createdStatus: STATUS_NAME.CREATING },

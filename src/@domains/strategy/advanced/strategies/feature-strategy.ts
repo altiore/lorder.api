@@ -1,6 +1,6 @@
-import { MOVE_TYPE, ROLE, STATUS_NAME } from '../../';
-import { COLUMN_TYPE } from '../../types/column-type';
-import { IStep } from '../../types/step';
+import { COLUMN_TYPE, IStep, MOVE_TYPE, ROLE, STATUS_NAME } from '../../types';
+import { isNumber, moreThan, required } from '../../validators';
+import { longerThen } from '../../validators/longerThan';
 
 export const feature_strategy: Array<IStep> = [
   {
@@ -15,7 +15,10 @@ export const feature_strategy: Array<IStep> = [
         to: STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING,
         role: ROLE.ARCHITECT,
         requirements: {
-          fields: ['performerId'],
+          fields: {
+            description: [required, longerThen(120)],
+          },
+          transit: true,
         },
       },
     ],
@@ -31,9 +34,12 @@ export const feature_strategy: Array<IStep> = [
       {
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.ARCHITECT,
-        to: STATUS_NAME.ESTIMATION_BEFORE_PERFORMER,
+        to: STATUS_NAME.ASSIGNING_RESPONSIBLE,
         requirements: {
-          fields: ['value'],
+          fields: {
+            value: [required, isNumber, moreThan(0)],
+          },
+          transit: true,
         },
       },
     ],
@@ -50,7 +56,6 @@ export const feature_strategy: Array<IStep> = [
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.ARCHITECT,
         to: STATUS_NAME.ESTIMATION_BEFORE_PERFORMER,
-        requirements: {},
       },
     ],
   },
@@ -66,7 +71,6 @@ export const feature_strategy: Array<IStep> = [
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.DEVELOPER,
         to: STATUS_NAME.ASSIGNING_PERFORMER,
-        requirements: {},
       },
     ],
   },
@@ -82,9 +86,6 @@ export const feature_strategy: Array<IStep> = [
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.DEVELOPER,
         to: STATUS_NAME.ESTIMATION_BEFORE_TO_DO,
-        requirements: {
-          fields: ['value'],
-        },
       },
     ],
   },
@@ -101,7 +102,6 @@ export const feature_strategy: Array<IStep> = [
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.DEVELOPER,
         to: STATUS_NAME.READY_TO_DO,
-        requirements: {},
       },
     ],
   },
@@ -118,7 +118,6 @@ export const feature_strategy: Array<IStep> = [
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.DEVELOPER,
         to: STATUS_NAME.PROF_REVIEW,
-        requirements: {},
       },
     ],
   },
@@ -135,7 +134,11 @@ export const feature_strategy: Array<IStep> = [
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.DEVELOPER,
         to: STATUS_NAME.TESTING,
-        requirements: {},
+      },
+      {
+        type: MOVE_TYPE.BRING_BACK,
+        role: ROLE.DEVELOPER,
+        to: STATUS_NAME.READY_TO_DO,
       },
     ],
   },
@@ -152,13 +155,11 @@ export const feature_strategy: Array<IStep> = [
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.TESTER,
         to: STATUS_NAME.ARCHITECT_REVIEW,
-        requirements: {},
       },
       {
         type: MOVE_TYPE.BRING_BACK,
         role: ROLE.TESTER,
         to: STATUS_NAME.ESTIMATION_BEFORE_TO_DO,
-        requirements: {},
       },
     ],
   },
@@ -175,13 +176,11 @@ export const feature_strategy: Array<IStep> = [
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.ARCHITECT,
         to: STATUS_NAME.READY_TO_DEPLOY,
-        requirements: {},
       },
       {
         type: MOVE_TYPE.BRING_BACK,
         role: ROLE.ARCHITECT,
         to: STATUS_NAME.TESTING,
-        requirements: {},
       },
     ],
   },
@@ -196,7 +195,6 @@ export const feature_strategy: Array<IStep> = [
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.ARCHITECT,
         to: STATUS_NAME.DEPLOYED_PROF_ESTIMATION,
-        requirements: {},
       },
     ],
   },
@@ -212,7 +210,6 @@ export const feature_strategy: Array<IStep> = [
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.DEVELOPER,
         to: STATUS_NAME.DEPLOYED_ARCHITECT_ESTIMATION,
-        requirements: {},
       },
     ],
   },
@@ -228,7 +225,6 @@ export const feature_strategy: Array<IStep> = [
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.ARCHITECT,
         to: STATUS_NAME.DEPLOYED_COMMUNITY_ESTIMATION,
-        requirements: {},
       },
     ],
   },
@@ -242,7 +238,6 @@ export const feature_strategy: Array<IStep> = [
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.ARCHITECT,
         to: STATUS_NAME.DONE,
-        requirements: {},
       },
     ],
   },

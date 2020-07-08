@@ -7,9 +7,17 @@ export enum MOVE_TYPE {
   JUMP = 'JUMP',
 }
 
+export type IValidator = (field: string, value: any) => undefined | { [key in string]: string };
+
 export interface IMove {
   type: MOVE_TYPE;
   to: STATUS_NAME;
   role?: ROLE;
-  requirements?: { fields?: any };
+  requirements?: { fields?: { [key in string]: IValidator[] }; transit?: true };
+}
+
+export interface IMoveError {
+  constraints: { [key in string]: string };
+  property: string;
+  value: any;
 }

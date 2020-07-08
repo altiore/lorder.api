@@ -3,13 +3,20 @@ import { intersection } from 'lodash';
 import { TASK_SIMPLE_STATUS } from '../../@orm/task/task-simple-status';
 import { getColumns, getSteps as getAdvancedSteps, roles as advancedRoles } from './advanced';
 import { columns as simpleColumns, steps as simpleSteps } from './simple';
-import { COLUMN_TYPE, IColumn } from './types/column-type';
-import { IMove, MOVE_TYPE } from './types/move';
-import { IRole, ROLE } from './types/role';
-import { STATUS_NAME } from './types/status';
-import { IStep } from './types/step';
-import { TASK_FLOW_STRATEGY } from './types/task-flow-strategy';
-import { TASK_TYPE } from './types/task-type';
+import {
+  COLUMN_TYPE,
+  IColumn,
+  IMove,
+  IMoveError,
+  IRole,
+  IStep,
+  IValidator,
+  MOVE_TYPE,
+  ROLE,
+  STATUS_NAME,
+  TASK_FLOW_STRATEGY,
+  TASK_TYPE,
+} from './types';
 
 export class TaskFlowStrategy {
   private readonly userRoles: ROLE | ROLE[];
@@ -235,13 +242,46 @@ export class TaskFlowStrategy {
     return (this._createdStatus = createdStatus);
   }
 
-  pushForward(statusTypeName: STATUS_NAME): IMove | undefined {
+  pushForward(statusTypeName: STATUS_NAME, dataObject?: object): [IMove | undefined, Array<IMoveError>] {
     const step = this.columns.find((col) => col.statuses.includes(statusTypeName));
+    let resultMove: IMove;
+    const errors: Array<IMoveError> = [];
     if (step) {
-      return Array.isArray(step.moves) ? step.moves.find((move) => move.type === MOVE_TYPE.PUSH_FORWARD) : undefined;
+      resultMove = Array.isArray(step.moves) ? step.moves.find((m) => m.type === MOVE_TYPE.PUSH_FORWARD) : undefined;
     }
 
-    return undefined;
+    if (resultMove) {
+      if (resultMove.requirements) {
+        if (resultMove.requirements.fields) {
+          Object.keys(resultMove.requirements.fields).forEach((property) => {
+            resultMove.requirements.fields[property].forEach((validate: IValidator) => {
+              const value = dataObject[property];
+              const constraints = validate(property, value);
+              if (constraints) {
+                const index = errors.findIndex((el) => Boolean(el.property === property));
+                if (index !== -1) {
+                  errors[index].constraints = { ...errors[index].constraints, ...constraints };
+                } else {
+                  errors.push({ property, constraints, value });
+                }
+              }
+            });
+          });
+        }
+        if (resultMove.requirements.transit && !errors.length) {
+          const [nextMove, nextErrors] = this.pushForward(resultMove.to, dataObject);
+          if (nextErrors.length) {
+            return [resultMove, errors];
+          } else {
+            return [nextMove, []];
+          }
+        }
+      }
+
+      return [resultMove, errors];
+    }
+
+    return [undefined, []];
   }
 
   public canBeStarted(statusTypeName: STATUS_NAME) {

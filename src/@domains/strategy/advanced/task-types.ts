@@ -1,4 +1,4 @@
-import { ITaskType, TASK_TYPE } from '../types/task-type';
+import { ITaskType, TASK_TYPE } from '../types';
 
 export const taskTypes: Array<ITaskType> = [
   { name: TASK_TYPE.FEAT },

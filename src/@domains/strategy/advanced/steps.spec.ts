@@ -1,5 +1,4 @@
-import { ROLE, TASK_TYPE } from '..';
-import { COLUMN_TYPE } from '../types/column-type';
+import { COLUMN_TYPE, ROLE, TASK_TYPE } from '../types';
 import { getColumns, getSteps } from './steps';
 
 describe('strategy advanced', () => {

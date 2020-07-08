@@ -1,6 +1,6 @@
 import { intersection } from 'lodash';
 
-import { IColumn, IStep, ROLE, TASK_TYPE } from '..';
+import { IColumn, IStep, ROLE, TASK_TYPE } from '../types';
 import { feature_strategy } from './strategies/feature-strategy';
 
 export const stepsObj: { [key in TASK_TYPE]: IStep[] } = {

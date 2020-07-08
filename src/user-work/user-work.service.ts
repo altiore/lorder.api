@@ -136,18 +136,24 @@ export class UserWorkService {
   }
 
   private async finishTask(task: Task, user: User, pushForward: boolean, manager): Promise<Task> {
-    // 1.1. Подготовить данные, общие для всех стратегий
+    // 1. Подготовить данные, общие для всех стратегий
     const newTaskData: Partial<Task> = { inProgress: false };
 
-    // 1.2. Если задачу нунжно перемещать вперед, то добавить данные для обновления
+    // 2. Если задачу нунжно перемещать вперед, то добавить данные для обновления
     if (pushForward) {
+      // 2.1.
       const strategy = await this.projectService.getCurrentUserStrategy(task.project, user, manager);
-      const moveTo = strategy.pushForward(task.statusTypeName);
+      const [moveTo, errors] = strategy.pushForward(task.statusTypeName, task);
       if (!moveTo) {
         throw new NotAcceptableException(
           `Невозможно изменить статус задачи "${task.statusTypeName}". Видимо, у вас нет на это прав`
         );
       }
+
+      if (errors.length) {
+        throw new ValidationException(errors.map((res) => Object.assign(new ValidationError(), res)));
+      }
+
       task.statusTypeName = moveTo.to;
       newTaskData.statusTypeName = moveTo.to;
     }
