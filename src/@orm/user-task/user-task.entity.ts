@@ -3,6 +3,23 @@ import { Column, Entity, Index, ManyToOne } from 'typeorm';
 import { Task } from '../task/task.entity';
 import { User } from '../user/user.entity';
 
+enum URGENCY {
+  LOW = 0.618,
+  REGULAR = 1,
+  HIGH = 1.618,
+  CRITICAL = 2.618,
+  ULTRA = 4.236,
+}
+
+enum COMPLEXITY {
+  EASY = 0.368,
+  REGULAR = 1,
+  HIGH = 2.718,
+  STRONG = 7.389,
+  ULTRA_STRONG = 20.085,
+  UNKNOWN = 54.598,
+}
+
 @Entity('user_tasks')
 export class UserTask {
   @Index()
@@ -27,4 +44,13 @@ export class UserTask {
 
   @Column('float', { default: 0 })
   time: number;
+
+  @Column('enum', { nullable: true, enum: COMPLEXITY })
+  complexity: COMPLEXITY;
+
+  @Column('enum', { nullable: true, enum: URGENCY })
+  urgency: URGENCY;
+
+  @Column('float', { nullable: true })
+  value: number;
 }

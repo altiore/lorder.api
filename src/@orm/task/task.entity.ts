@@ -67,7 +67,7 @@ export class Task {
   description: string;
 
   @ApiPropertyOptional()
-  @Column({ nullable: false, default: 0 })
+  @Column('float', { nullable: false, default: 0 })
   value: number;
 
   @ApiPropertyOptional()
@@ -115,6 +115,14 @@ export class Task {
   @ApiProperty({ type: User })
   @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL', onUpdate: 'CASCADE' })
   createdBy: User;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  responsibleId: number;
+
+  @ApiProperty({ type: User })
+  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL', onUpdate: 'CASCADE' })
+  responsible: User;
 
   @OneToMany((type) => UserWork, (userWork) => userWork.task, { eager: false })
   userWorks: UserWork[];
