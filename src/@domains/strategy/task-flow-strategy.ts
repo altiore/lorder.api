@@ -242,46 +242,60 @@ export class TaskFlowStrategy {
     return (this._createdStatus = createdStatus);
   }
 
-  pushForward(statusTypeName: STATUS_NAME, dataObject?: object): [IMove | undefined, Array<IMoveError>] {
-    const step = this.columns.find((col) => col.statuses.includes(statusTypeName));
-    let resultMove: IMove;
-    const errors: Array<IMoveError> = [];
-    if (step) {
-      resultMove = Array.isArray(step.moves) ? step.moves.find((m) => m.type === MOVE_TYPE.PUSH_FORWARD) : undefined;
+  pushForward(
+    statusTypeName: STATUS_NAME,
+    dataObject: object,
+    prevMove?: IMove
+  ): [IMove | undefined, Array<IMoveError>] {
+    const step = this.steps.find((s) => s.status === statusTypeName);
+
+    if (!step) {
+      return [undefined, []];
     }
 
-    if (resultMove) {
-      if (resultMove.requirements) {
-        if (resultMove.requirements.fields) {
-          Object.keys(resultMove.requirements.fields).forEach((property) => {
-            resultMove.requirements.fields[property].forEach((validate: IValidator) => {
-              const value = dataObject[property];
-              const constraints = validate(property, value);
-              if (constraints) {
-                const index = errors.findIndex((el) => Boolean(el.property === property));
-                if (index !== -1) {
-                  errors[index].constraints = { ...errors[index].constraints, ...constraints };
-                } else {
-                  errors.push({ property, constraints, value });
-                }
-              }
-            });
-          });
-        }
-        if (resultMove.requirements.transit && !errors.length) {
-          const [nextMove, nextErrors] = this.pushForward(resultMove.to, dataObject);
-          if (nextErrors.length) {
-            return [resultMove, errors];
+    const resultMove = Array.isArray(step.moves)
+      ? step.moves.find((m) => m.type === MOVE_TYPE.PUSH_FORWARD)
+      : undefined;
+
+    if (!resultMove) {
+      return [undefined, []];
+    }
+
+    let errors: Array<IMoveError> = [];
+    if (resultMove.requirements) {
+      if (resultMove.requirements.fields) {
+        errors = this.validateFields(resultMove.requirements.fields, dataObject);
+      }
+      if (resultMove.requirements.transit && !errors.length) {
+        return this.pushForward(resultMove.to, dataObject, resultMove);
+      }
+    }
+
+    if (errors.length && prevMove) {
+      return [prevMove, []];
+    }
+
+    return [resultMove, errors];
+  }
+
+  private validateFields(fields: { [key in string]: IValidator[] }, dataObject: object): Array<IMoveError> {
+    const errors: Array<IMoveError> = [];
+    Object.keys(fields).forEach((property) => {
+      fields[property].forEach((validate: IValidator) => {
+        const value = dataObject[property];
+        const constraints = validate(property, value);
+        if (constraints) {
+          const index = errors.findIndex((el) => Boolean(el.property === property));
+          if (index !== -1) {
+            errors[index].constraints = { ...errors[index].constraints, ...constraints };
           } else {
-            return [nextMove, []];
+            errors.push({ property, constraints, value });
           }
         }
-      }
+      });
+    });
 
-      return [resultMove, errors];
-    }
-
-    return [undefined, []];
+    return errors;
   }
 
   public canBeStarted(statusTypeName: STATUS_NAME) {
@@ -297,14 +311,14 @@ export class TaskFlowStrategy {
     );
   }
 
-  public canBeMoved(fromStatus: STATUS_NAME | COLUMN_TYPE, toStatus: STATUS_NAME | COLUMN_TYPE): STATUS_NAME | false {
+  public canBeMoved(fromStatus: STATUS_NAME, toStatus: STATUS_NAME | COLUMN_TYPE): STATUS_NAME | false {
     let allowedMove: IMove | null = null;
     const toColumn = this.columns.find(
       (col) => col.column === toStatus || col.statuses.includes(toStatus as STATUS_NAME)
     );
-    this.columns.forEach((col) => {
-      if (col.column === fromStatus || col.statuses.includes(fromStatus as STATUS_NAME)) {
-        const curMove = col.moves.find(
+    this.steps.forEach((step) => {
+      if (step.status === fromStatus) {
+        const curMove = step.moves.find(
           (move) =>
             (move.to === undefined || toColumn.statuses.includes(move.to)) &&
             (move.role === undefined || this.userStrategyRoles.includes(move.role))

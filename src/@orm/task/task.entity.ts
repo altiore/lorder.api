@@ -30,6 +30,24 @@ import { User } from '../user/user.entity';
 @Index(['projectId', 'sequenceNumber'])
 @Unique(['projectId', 'sequenceNumber'])
 export class Task {
+  static plainFields = [
+    'id',
+    'sequenceNumber',
+    'projectId',
+    'title',
+    'description',
+    'value',
+    'source',
+    'status',
+    'statusTypeName',
+    'typeId',
+    'isArchived',
+    'inProgress',
+    'performerId',
+    'createdById',
+    'responsibleId',
+  ];
+
   @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;

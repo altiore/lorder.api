@@ -9,6 +9,7 @@ export enum COLUMN_TYPE {
   REVIEWING = 'reviewing',
   CHECKING = 'checking',
   FINISHING = 'finishing',
+  PUBLISHING = 'publishing',
 
   POST_ESTIMATION = 'post-estimation',
 }

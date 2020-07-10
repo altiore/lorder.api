@@ -25,7 +25,7 @@ export const feature_strategy: Array<IStep> = [
   },
   {
     column: {
-      [ROLE.ARCHITECT]: COLUMN_TYPE.TO_DO,
+      [ROLE.ARCHITECT]: COLUMN_TYPE.PREPARING,
       [ROLE.DEVELOPER]: COLUMN_TYPE.BACK_LOG,
     },
     status: STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING,
@@ -46,7 +46,7 @@ export const feature_strategy: Array<IStep> = [
   },
   {
     column: {
-      [ROLE.ARCHITECT]: COLUMN_TYPE.TO_DO,
+      [ROLE.ARCHITECT]: COLUMN_TYPE.PREPARING,
       [ROLE.DEVELOPER]: COLUMN_TYPE.BACK_LOG,
     },
     status: STATUS_NAME.ASSIGNING_RESPONSIBLE,
@@ -72,6 +72,11 @@ export const feature_strategy: Array<IStep> = [
         role: ROLE.DEVELOPER,
         to: STATUS_NAME.ASSIGNING_PERFORMER,
       },
+      {
+        type: MOVE_TYPE.BRING_BACK,
+        role: ROLE.DEVELOPER,
+        to: STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING,
+      },
     ],
   },
   {
@@ -86,6 +91,11 @@ export const feature_strategy: Array<IStep> = [
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.DEVELOPER,
         to: STATUS_NAME.ESTIMATION_BEFORE_TO_DO,
+      },
+      {
+        type: MOVE_TYPE.BRING_BACK,
+        role: ROLE.DEVELOPER,
+        to: STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING,
       },
     ],
   },
@@ -102,6 +112,11 @@ export const feature_strategy: Array<IStep> = [
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.DEVELOPER,
         to: STATUS_NAME.READY_TO_DO,
+      },
+      {
+        type: MOVE_TYPE.BRING_BACK,
+        role: ROLE.DEVELOPER,
+        to: STATUS_NAME.ASSIGNING_PERFORMER,
       },
     ],
   },
@@ -165,7 +180,7 @@ export const feature_strategy: Array<IStep> = [
   },
   {
     column: {
-      [ROLE.ARCHITECT]: COLUMN_TYPE.REVIEWING,
+      [ROLE.ARCHITECT]: COLUMN_TYPE.PUBLISHING,
       [ROLE.DEVELOPER]: COLUMN_TYPE.CHECKING,
       [ROLE.TESTER]: COLUMN_TYPE.REVIEWING,
     },
@@ -186,6 +201,7 @@ export const feature_strategy: Array<IStep> = [
   },
   {
     column: {
+      [ROLE.ARCHITECT]: COLUMN_TYPE.PUBLISHING,
       [ROLE.TESTER]: COLUMN_TYPE.FINISHING,
     },
     status: STATUS_NAME.READY_TO_DEPLOY,
@@ -200,6 +216,7 @@ export const feature_strategy: Array<IStep> = [
   },
   {
     column: {
+      [ROLE.ARCHITECT]: COLUMN_TYPE.POST_ESTIMATION,
       [ROLE.DEVELOPER]: COLUMN_TYPE.POST_ESTIMATION,
       [ROLE.TESTER]: COLUMN_TYPE.FINISHING,
     },
@@ -215,6 +232,7 @@ export const feature_strategy: Array<IStep> = [
   },
   {
     column: {
+      [ROLE.ARCHITECT]: COLUMN_TYPE.POST_ESTIMATION,
       [ROLE.DEVELOPER]: COLUMN_TYPE.FINISHING,
       [ROLE.TESTER]: COLUMN_TYPE.FINISHING,
     },
@@ -229,6 +247,9 @@ export const feature_strategy: Array<IStep> = [
     ],
   },
   {
+    column: {
+      [ROLE.ARCHITECT]: COLUMN_TYPE.POST_ESTIMATION,
+    },
     status: STATUS_NAME.DEPLOYED_COMMUNITY_ESTIMATION,
     roles: [ROLE.ARCHITECT],
     moves: [

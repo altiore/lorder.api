@@ -38,7 +38,7 @@ export function getColumns(roles: ROLE | ROLE[]): IColumn[] {
         });
       } else {
         res[columnIndex].statuses.push(cur.status);
-        res[columnIndex].moves.concat(cur.moves.filter(filterMoves));
+        res[columnIndex].moves = res[columnIndex].moves.concat(cur.moves.filter(filterMoves));
       }
       return res;
     }, []);

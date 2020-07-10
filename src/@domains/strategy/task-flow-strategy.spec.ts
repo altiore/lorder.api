@@ -47,7 +47,7 @@ describe('task-flow-strategy', () => {
           strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.ADVANCED, [ROLE.ARCHITECT]);
         });
         it('columns count', () => {
-          expect(strategy.columns.length).toBe(10);
+          expect(strategy.columns.length).toBe(6);
         });
       });
     });
@@ -195,16 +195,35 @@ describe('task-flow-strategy', () => {
 
   describe('ADVANCED strategy', () => {
     describe('canBeMoved', () => {
-      it('ARCHITECT', () => {
-        strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.ADVANCED, ROLE.ARCHITECT);
-        expect(strategy.canBeMoved(STATUS_NAME.CREATING, STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING)).toBeTruthy();
-        expect(
-          strategy.canBeMoved(STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING, STATUS_NAME.ESTIMATION_BEFORE_PERFORMER)
-        ).toBeTruthy();
+      describe('ARCHITECT', () => {
+        beforeAll(() => {
+          strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.ADVANCED, ROLE.ARCHITECT);
+        });
+
+        it('CREATING -> ESTIMATION_BEFORE_ASSIGNING', () => {
+          expect(strategy.canBeMoved(STATUS_NAME.CREATING, STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING)).toEqual(
+            STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING
+          );
+        });
+
+        it('ESTIMATION_BEFORE_ASSIGNING -> ASSIGNING_RESPONSIBLE', () => {
+          expect(
+            strategy.canBeMoved(STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING, STATUS_NAME.ASSIGNING_RESPONSIBLE)
+          ).toEqual(STATUS_NAME.ASSIGNING_RESPONSIBLE);
+        });
+
+        it('ASSIGNING_RESPONSIBLE -> ESTIMATION_BEFORE_PERFORMER', () => {
+          expect(
+            strategy.canBeMoved(STATUS_NAME.ASSIGNING_RESPONSIBLE, STATUS_NAME.ESTIMATION_BEFORE_PERFORMER)
+          ).toEqual(STATUS_NAME.ESTIMATION_BEFORE_PERFORMER);
+        });
+
         expect(
           strategy.canBeMoved(STATUS_NAME.ASSIGNING_RESPONSIBLE, STATUS_NAME.ESTIMATION_BEFORE_PERFORMER)
         ).toBeTruthy();
+
         expect(strategy.canBeMoved(STATUS_NAME.CREATING, STATUS_NAME.ESTIMATION_BEFORE_PERFORMER)).toBeFalsy();
+
         expect(strategy.canBeMoved(STATUS_NAME.ESTIMATION_BEFORE_PERFORMER, STATUS_NAME.CREATING)).toBeFalsy();
       });
 

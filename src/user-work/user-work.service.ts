@@ -2,6 +2,7 @@ import { ForbiddenException, Injectable, NotAcceptableException, NotFoundExcepti
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { ValidationError } from 'class-validator';
+import { pick } from 'lodash';
 import * as moment from 'moment';
 import { DeleteResult, EntityManager, IsNull } from 'typeorm';
 
@@ -12,12 +13,11 @@ import { ACCESS_LEVEL } from '@orm/user-project';
 import { PaginationDto } from '@common/dto';
 
 import { ValidationException } from '../@common/exceptions/validation.exception';
-import { STATUS_NAME, TaskFlowStrategy } from '../@domains/strategy';
+import { TaskFlowStrategy } from '../@domains/strategy';
 import { Task } from '../@orm/task';
 import { TaskType } from '../@orm/task-type/task-type.entity';
 import { UserTask } from '../@orm/user-task';
 import { UserWork, UserWorkRepository } from '../@orm/user-work';
-import { ProjectMemberService } from '../project/member/project.member.service';
 import { ProjectService } from '../project/project.service';
 import { ProjectTaskService } from '../project/task/project.task.service';
 import { TaskService } from '../task/task.service';
@@ -38,8 +38,7 @@ export class UserWorkService {
     private readonly projectService: ProjectService,
     private readonly projectTaskService: ProjectTaskService,
     private readonly userService: UserService,
-    private readonly taskService: TaskService,
-    private readonly projectMemberService: ProjectMemberService
+    private readonly taskService: TaskService
   ) {}
 
   public findAll(pagesDto: PaginationDto, user: User): Promise<UserWork[]> {
@@ -143,7 +142,7 @@ export class UserWorkService {
     if (pushForward) {
       // 2.1.
       const strategy = await this.projectService.getCurrentUserStrategy(task.project, user, manager);
-      const [moveTo, errors] = strategy.pushForward(task.statusTypeName, task);
+      const [moveTo, errors] = strategy.pushForward(task.statusTypeName, pick(task, Task.plainFields));
       if (!moveTo) {
         throw new NotAcceptableException(
           `Невозможно изменить статус задачи "${task.statusTypeName}". Видимо, у вас нет на это прав`
@@ -410,12 +409,12 @@ export class UserWorkService {
     // 2. Проверить, что задачу никто не выполняет
     if (task.inProgress) {
       // TODO: проверить так же, что нет незаконченных работ в этой задаче
-      throw new NotAcceptableException('Над этой задачей уже кто-то работает!');
+      throw new NotAcceptableException('Эта задача уже в процессе выполнения!');
     }
 
     // 3. Проверить, что задача в этом статусе доступна пользователю для выполнения
     if (!strategy.canBeStarted(task.statusTypeName)) {
-      throw new NotAcceptableException('Вы не можете начать выполнять задачу в этом статусе');
+      throw new NotAcceptableException('Ваша роль в проекте не позволяет вам начать задачу в этом статусе');
     }
   }
 
