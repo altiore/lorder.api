@@ -139,7 +139,7 @@ export const feature_strategy: Array<IStep> = [
   {
     column: {
       [ROLE.ARCHITECT]: COLUMN_TYPE.DEVELOPING,
-      [ROLE.DEVELOPER]: COLUMN_TYPE.REVIEWING,
+      [ROLE.DEVELOPER]: COLUMN_TYPE.CODE_REVIEW,
       [ROLE.TESTER]: COLUMN_TYPE.DEVELOPING,
     },
     status: STATUS_NAME.PROF_REVIEW,
@@ -202,6 +202,7 @@ export const feature_strategy: Array<IStep> = [
   {
     column: {
       [ROLE.ARCHITECT]: COLUMN_TYPE.PUBLISHING,
+      [ROLE.DEVELOPER]: COLUMN_TYPE.CHECKING,
       [ROLE.TESTER]: COLUMN_TYPE.FINISHING,
     },
     status: STATUS_NAME.READY_TO_DEPLOY,
@@ -233,7 +234,7 @@ export const feature_strategy: Array<IStep> = [
   {
     column: {
       [ROLE.ARCHITECT]: COLUMN_TYPE.POST_ESTIMATION,
-      [ROLE.DEVELOPER]: COLUMN_TYPE.FINISHING,
+      [ROLE.DEVELOPER]: COLUMN_TYPE.POST_ESTIMATION,
       [ROLE.TESTER]: COLUMN_TYPE.FINISHING,
     },
     status: STATUS_NAME.DEPLOYED_ARCHITECT_ESTIMATION,
@@ -249,6 +250,7 @@ export const feature_strategy: Array<IStep> = [
   {
     column: {
       [ROLE.ARCHITECT]: COLUMN_TYPE.POST_ESTIMATION,
+      [ROLE.DEVELOPER]: COLUMN_TYPE.POST_ESTIMATION,
     },
     status: STATUS_NAME.DEPLOYED_COMMUNITY_ESTIMATION,
     roles: [ROLE.ARCHITECT],

@@ -11,11 +11,11 @@ describe('strategy advanced', () => {
   });
 
   it('getRoleSteps ARCHITECT', () => {
-    expect(getColumns(ROLE.ARCHITECT).length).toEqual(10);
+    expect(getColumns(ROLE.ARCHITECT).length).toEqual(6);
   });
 
   it('getRoleSteps DEVELOPER', () => {
-    expect(getColumns(ROLE.DEVELOPER).length).toEqual(8);
+    expect(getColumns(ROLE.DEVELOPER).length).toEqual(6);
   });
 
   it('getRoleSteps TESTER', () => {
