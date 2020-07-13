@@ -1,14 +1,14 @@
+import { COMPLEXITY_NAME } from '../../../../@orm/user-task';
 import { COLUMN_TYPE, IStep, MOVE_TYPE, ROLE, STATUS_NAME } from '../../types';
-import { isNumber, moreThan, required } from '../../validators';
+import { isNumber, moreThan, oneOf, required } from '../../validators';
 import { longerThen } from '../../validators/longerThan';
 
 export const feature_strategy: Array<IStep> = [
   {
-    status: STATUS_NAME.CREATING,
-    roles: [ROLE.ARCHITECT],
     column: {
       [ROLE.ARCHITECT]: COLUMN_TYPE.PREPARING,
     },
+    status: STATUS_NAME.CREATING,
     moves: [
       {
         type: MOVE_TYPE.PUSH_FORWARD,
@@ -29,7 +29,6 @@ export const feature_strategy: Array<IStep> = [
       [ROLE.DEVELOPER]: COLUMN_TYPE.BACK_LOG,
     },
     status: STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING,
-    roles: [ROLE.ARCHITECT, ROLE.DEVELOPER],
     moves: [
       {
         type: MOVE_TYPE.PUSH_FORWARD,
@@ -50,7 +49,6 @@ export const feature_strategy: Array<IStep> = [
       [ROLE.DEVELOPER]: COLUMN_TYPE.BACK_LOG,
     },
     status: STATUS_NAME.ASSIGNING_RESPONSIBLE,
-    roles: [ROLE.ARCHITECT, ROLE.DEVELOPER],
     moves: [
       {
         type: MOVE_TYPE.PUSH_FORWARD,
@@ -65,12 +63,17 @@ export const feature_strategy: Array<IStep> = [
       [ROLE.DEVELOPER]: COLUMN_TYPE.PREPARING,
     },
     status: STATUS_NAME.ESTIMATION_BEFORE_PERFORMER,
-    roles: [ROLE.ARCHITECT, ROLE.DEVELOPER],
     moves: [
       {
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.DEVELOPER,
         to: STATUS_NAME.ASSIGNING_PERFORMER,
+        requirements: {
+          // fields: {
+          //   complexity: [required, oneOf(COMPLEXITY_NAME)],
+          // },
+          transit: true,
+        },
       },
       {
         type: MOVE_TYPE.BRING_BACK,
@@ -85,12 +88,14 @@ export const feature_strategy: Array<IStep> = [
       [ROLE.DEVELOPER]: COLUMN_TYPE.PREPARING,
     },
     status: STATUS_NAME.ASSIGNING_PERFORMER,
-    roles: [ROLE.ARCHITECT, ROLE.DEVELOPER],
     moves: [
       {
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.DEVELOPER,
         to: STATUS_NAME.ESTIMATION_BEFORE_TO_DO,
+        requirements: {
+          transit: true,
+        },
       },
       {
         type: MOVE_TYPE.BRING_BACK,
@@ -106,7 +111,6 @@ export const feature_strategy: Array<IStep> = [
       [ROLE.TESTER]: COLUMN_TYPE.DEVELOPING,
     },
     status: STATUS_NAME.ESTIMATION_BEFORE_TO_DO,
-    roles: [ROLE.ARCHITECT, ROLE.DEVELOPER, ROLE.TESTER],
     moves: [
       {
         type: MOVE_TYPE.PUSH_FORWARD,
@@ -116,7 +120,7 @@ export const feature_strategy: Array<IStep> = [
       {
         type: MOVE_TYPE.BRING_BACK,
         role: ROLE.DEVELOPER,
-        to: STATUS_NAME.ASSIGNING_PERFORMER,
+        to: STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING,
       },
     ],
   },
@@ -127,7 +131,6 @@ export const feature_strategy: Array<IStep> = [
       [ROLE.TESTER]: COLUMN_TYPE.DEVELOPING,
     },
     status: STATUS_NAME.READY_TO_DO,
-    roles: [ROLE.ARCHITECT, ROLE.DEVELOPER, ROLE.TESTER],
     moves: [
       {
         type: MOVE_TYPE.PUSH_FORWARD,
@@ -143,7 +146,6 @@ export const feature_strategy: Array<IStep> = [
       [ROLE.TESTER]: COLUMN_TYPE.DEVELOPING,
     },
     status: STATUS_NAME.PROF_REVIEW,
-    roles: [ROLE.ARCHITECT, ROLE.DEVELOPER, ROLE.TESTER],
     moves: [
       {
         type: MOVE_TYPE.PUSH_FORWARD,
@@ -164,7 +166,6 @@ export const feature_strategy: Array<IStep> = [
       [ROLE.TESTER]: COLUMN_TYPE.TO_DO,
     },
     status: STATUS_NAME.TESTING,
-    roles: [ROLE.ARCHITECT, ROLE.DEVELOPER, ROLE.TESTER],
     moves: [
       {
         type: MOVE_TYPE.PUSH_FORWARD,
@@ -185,7 +186,6 @@ export const feature_strategy: Array<IStep> = [
       [ROLE.TESTER]: COLUMN_TYPE.REVIEWING,
     },
     status: STATUS_NAME.ARCHITECT_REVIEW,
-    roles: [ROLE.ARCHITECT, ROLE.DEVELOPER, ROLE.TESTER],
     moves: [
       {
         type: MOVE_TYPE.PUSH_FORWARD,
@@ -206,7 +206,6 @@ export const feature_strategy: Array<IStep> = [
       [ROLE.TESTER]: COLUMN_TYPE.FINISHING,
     },
     status: STATUS_NAME.READY_TO_DEPLOY,
-    roles: [ROLE.ARCHITECT, ROLE.DEVELOPER, ROLE.TESTER],
     moves: [
       {
         type: MOVE_TYPE.PUSH_FORWARD,
@@ -222,7 +221,6 @@ export const feature_strategy: Array<IStep> = [
       [ROLE.TESTER]: COLUMN_TYPE.FINISHING,
     },
     status: STATUS_NAME.DEPLOYED_PROF_ESTIMATION,
-    roles: [ROLE.ARCHITECT, ROLE.DEVELOPER, ROLE.TESTER],
     moves: [
       {
         type: MOVE_TYPE.PUSH_FORWARD,
@@ -238,7 +236,6 @@ export const feature_strategy: Array<IStep> = [
       [ROLE.TESTER]: COLUMN_TYPE.FINISHING,
     },
     status: STATUS_NAME.DEPLOYED_ARCHITECT_ESTIMATION,
-    roles: [ROLE.ARCHITECT, ROLE.DEVELOPER, ROLE.TESTER],
     moves: [
       {
         type: MOVE_TYPE.PUSH_FORWARD,
@@ -253,10 +250,7 @@ export const feature_strategy: Array<IStep> = [
       [ROLE.DEVELOPER]: COLUMN_TYPE.POST_ESTIMATION,
     },
     status: STATUS_NAME.DEPLOYED_COMMUNITY_ESTIMATION,
-    roles: [ROLE.ARCHITECT],
     moves: [
-      // TODO: это перемещение должно быть коллективным. Только сообщество может осуществить окончательное перемещение
-      // после оценки
       {
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.ARCHITECT,
@@ -265,8 +259,10 @@ export const feature_strategy: Array<IStep> = [
     ],
   },
   {
+    column: {
+      [ROLE.ARCHITECT]: COLUMN_TYPE.FINISHING,
+    },
     status: STATUS_NAME.DONE,
-    roles: [ROLE.ARCHITECT],
     moves: [],
   },
 ];

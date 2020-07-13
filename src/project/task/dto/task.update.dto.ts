@@ -3,6 +3,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsIn, IsNumber, IsOptional, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
 
 import { COLUMN_TYPE, STATUS_NAME } from '../../../@domains/strategy';
+import { COMPLEXITY_NAME, URGENCY_NAME } from '../../../@orm/user-task';
 
 export class TaskUpdateDto {
   @ApiPropertyOptional()
@@ -53,4 +54,14 @@ export class TaskUpdateDto {
   @IsNumber(undefined, { each: true })
   @IsOptional()
   projectParts?: number[];
+
+  @ApiPropertyOptional({ enum: COMPLEXITY_NAME })
+  @IsString()
+  @IsIn(Object.values(COMPLEXITY_NAME))
+  complexity?: COMPLEXITY_NAME;
+
+  @ApiPropertyOptional({ enum: URGENCY_NAME })
+  @IsString()
+  @IsIn(Object.values(URGENCY_NAME))
+  urgency?: URGENCY_NAME;
 }

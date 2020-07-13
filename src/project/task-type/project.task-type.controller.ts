@@ -58,23 +58,6 @@ export class ProjectTaskTypeController {
     return this.projectTaskTypeService.addTaskType(project, dto.taskTypeId);
   }
 
-  // @ApiResponse({
-  //   description: 'Project task types has been successfully created.',
-  //   status: 200,
-  //   type: ProjectTaskType,
-  // })
-  // @Post('create')
-  // @Roles('user')
-  // @AccessLevel(ACCESS_LEVEL.INDIGO)
-  // public async createTaskTypeAndAddToProject(
-  //   @Body() dto: CreateTaskTypeDto,
-  //   @UserJWT() user: User,
-  //   @Param('projectId', ParseIntPipe) projectId: number,
-  //   @ProjectParam() project: DeepPartial<Project>
-  // ): Promise<TaskType> {
-  //   return this.projectTaskTypeService.createTaskType(project, dto);
-  // }
-
   @ApiResponse({
     description: 'Project task types has been successfully added.',
     status: 200,

@@ -3,6 +3,14 @@ import { Column, Entity, Index, ManyToOne } from 'typeorm';
 import { Task } from '../task/task.entity';
 import { User } from '../user/user.entity';
 
+export enum URGENCY_NAME {
+  LOW = 'LOW',
+  REGULAR = 'REGULAR',
+  HIGH = 'HIGH',
+  CRITICAL = 'CRITICAL',
+  ULTRA = 'ULTRA',
+}
+
 enum URGENCY {
   LOW = 0.618,
   REGULAR = 1,
@@ -11,17 +19,28 @@ enum URGENCY {
   ULTRA = 4.236,
 }
 
+export enum COMPLEXITY_NAME {
+  JUNIOR = 'JUNIOR',
+  MIDDLE = 'MIDDLE',
+  SENIOR = 'SENIOR',
+  ARCHITECT = 'ARCHITECT',
+  DISCUSSION = 'DISCUSSION',
+  COMMUNITY = 'COMMUNITY',
+}
+
 enum COMPLEXITY {
-  EASY = 0.368,
-  REGULAR = 1,
-  HIGH = 2.718,
-  STRONG = 7.389,
-  ULTRA_STRONG = 20.085,
-  UNKNOWN = 54.598,
+  JUNIOR = 0.368,
+  MIDDLE = 1,
+  SENIOR = 2.718,
+  ARCHITECT = 7.389,
+  DISCUSSION = 20.085,
+  COMMUNITY = 54.598,
 }
 
 @Entity('user_tasks')
 export class UserTask {
+  static plainFields = ['complexity', 'urgency', 'userValue'];
+
   @Index()
   @Column({ primary: true })
   userId: number;
@@ -52,5 +71,5 @@ export class UserTask {
   urgency: URGENCY;
 
   @Column('float', { nullable: true })
-  value: number;
+  userValue: number;
 }

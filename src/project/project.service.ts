@@ -2,7 +2,6 @@ import { ForbiddenException, Injectable, NotAcceptableException, NotFoundExcepti
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { get, pick } from 'lodash';
-import * as moment from 'moment';
 import { EntityManager, In } from 'typeorm';
 
 import { Project, ProjectDto, ProjectRepository } from '@orm/project';
@@ -18,7 +17,7 @@ import {
   timeProductivity,
 } from '@common/helpers/metricConverter';
 
-import { IColumn, ROLE, STATUS_NAME, TASK_FLOW_STRATEGY } from '../@domains/strategy';
+import { ROLE, STATUS_NAME, TASK_FLOW_STRATEGY } from '../@domains/strategy';
 import { TaskFlowStrategy } from '../@domains/strategy';
 import { ProjectRole } from '../@orm/project-role/project-role.entity';
 import { UserTask } from '../@orm/user-task';

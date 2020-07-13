@@ -48,17 +48,4 @@ export class ProjectTaskTypeService {
       return 'error';
     }
   }
-
-  // public async createTaskType(project: DeepPartial<Project>, taskInfo: CreateTaskTypeDto): Promise<TaskType> {
-  //   let taskType = await this.taskTypeRepo.findOne({
-  //     where: {
-  //       name: taskInfo.name,
-  //     },
-  //   });
-  //   if (!taskType) {
-  //     taskType = await this.taskTypeRepo.createOne(taskInfo);
-  //   }
-  //   await this.addTaskType(project, taskType.id);
-  //   return taskType;
-  // }
 }

@@ -9,6 +9,15 @@ export enum MOVE_TYPE {
 
 export type IValidator = (field: string, value: any) => undefined | { [key in string]: string };
 
+export interface IShortMove {
+  type: MOVE_TYPE;
+  to: STATUS_NAME;
+  requirements?: {
+    fields?: string[];
+    transit?: true;
+  };
+}
+
 export interface IMove {
   type: MOVE_TYPE;
   to: STATUS_NAME;

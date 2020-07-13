@@ -1,6 +1,6 @@
 import { intersection } from 'lodash';
 
-import { IColumn, IStep, ROLE, TASK_TYPE } from '../types';
+import { IColumn, IMove, IShortMove, IStep, ROLE, TASK_TYPE } from '../types';
 import { feature_strategy } from './strategies/feature-strategy';
 
 export const stepsObj: { [key in TASK_TYPE]: IStep[] } = {
@@ -10,47 +10,63 @@ export const stepsObj: { [key in TASK_TYPE]: IStep[] } = {
   [TASK_TYPE.DOC]: [],
 };
 
-export function getSteps(taskType: TASK_TYPE) {
+export function getSteps(taskType: TASK_TYPE): IStep[] {
   return stepsObj[taskType];
 }
 
 export function getColumns(roles: ROLE | ROLE[]): IColumn[] {
   const rolesArr = Array.isArray(roles) ? roles : [roles];
 
-  const filterMoves = (m) => rolesArr.includes(m.role);
+  const reduceMoves = (moves): IShortMove[] => {
+    return moves.map((m: IMove) => ({
+      type: m.type,
+      to: m.to,
+      ...(m.requirements && m.requirements.fields
+        ? {
+            requirements: {
+              fields: Array.isArray(m.requirements.fields) ? m.requirements.fields : Object.keys(m.requirements.fields),
+            },
+          }
+        : {}),
+    }));
+  };
+
+  const prepareMoves = (moves) => {
+    return reduceMoves(moves.filter((m) => rolesArr.includes(m.role)));
+  };
 
   if (rolesArr.length === 1) {
     const role = rolesArr[0];
     // TODO: учитывать разные типы задач
     return getSteps(TASK_TYPE.FEAT).reduce((res, cur) => {
       // Если роли нет в списке ролей, которым доступен статус, то пропустить этот шаг
-      if (cur.roles.indexOf(role) === -1) {
+      if (!cur.column[role]) {
         return res;
       }
 
-      const columnName = cur.column?.[rolesArr[0]] || cur.status;
+      const columnName = cur.column[rolesArr[0]];
       const columnIndex = res.findIndex((el) => el.column === columnName);
       if (columnIndex === -1) {
         res.push({
           column: columnName,
           statuses: [cur.status],
-          moves: cur.moves.filter(filterMoves),
+          moves: prepareMoves(cur.moves),
         });
       } else {
         res[columnIndex].statuses.push(cur.status);
-        res[columnIndex].moves = res[columnIndex].moves.concat(cur.moves.filter(filterMoves));
+        res[columnIndex].moves = reduceMoves(res[columnIndex].moves.concat(prepareMoves(cur.moves)));
       }
       return res;
     }, []);
   } else {
     return getSteps(TASK_TYPE.FEAT)
       .filter((step: IStep) => {
-        return Boolean(intersection(step.roles, rolesArr).length);
+        return Boolean(intersection(Object.keys(step.column), rolesArr).length);
       })
       .map((el) => ({
         column: el.status,
         statuses: [el.status],
-        moves: el.moves.filter(filterMoves),
+        moves: prepareMoves(el.moves),
       }));
   }
 }

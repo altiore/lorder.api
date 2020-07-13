@@ -1,4 +1,4 @@
-import { intersection } from 'lodash';
+import { chain, intersection } from 'lodash';
 
 import { TASK_SIMPLE_STATUS } from '../../@orm/task/task-simple-status';
 import { getColumns, getSteps as getAdvancedSteps, roles as advancedRoles } from './advanced';
@@ -33,6 +33,14 @@ export class TaskFlowStrategy {
   constructor(strategyName: string, userRoles?: ROLE | ROLE[]) {
     this.strategy = strategyName;
     this.userRoles = userRoles;
+  }
+
+  get data() {
+    const userRoles = this.userStrategyRoles;
+    return {
+      columns: chain(userRoles).keyBy().mapValues(this.getRoleColumns.bind(this)).value(),
+      userRoles,
+    };
   }
 
   get steps(): IStep[] {
@@ -136,6 +144,20 @@ export class TaskFlowStrategy {
     }
 
     return this._columns;
+  }
+
+  getRoleColumns(role: ROLE): Array<IColumn> {
+    switch (this.strategy) {
+      case TASK_FLOW_STRATEGY.ADVANCED: {
+        return getColumns(role);
+      }
+      case TASK_FLOW_STRATEGY.SIMPLE: {
+        return simpleColumns;
+      }
+      default: {
+        return [];
+      }
+    }
   }
 
   get availableStatuses(): STATUS_NAME[] {
@@ -300,9 +322,9 @@ export class TaskFlowStrategy {
 
   public canBeStarted(statusTypeName: STATUS_NAME) {
     return (
-      this.columns.findIndex((col) => {
+      this.steps.findIndex((col) => {
         return (
-          col.statuses.includes(statusTypeName) &&
+          col.status === statusTypeName &&
           col.moves.findIndex(
             (move) => move.type === MOVE_TYPE.PUSH_FORWARD && this.userStrategyRoles.includes(move.role)
           ) !== -1

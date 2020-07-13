@@ -142,7 +142,12 @@ export class UserWorkService {
     if (pushForward) {
       // 2.1.
       const strategy = await this.projectService.getCurrentUserStrategy(task.project, user, manager);
-      const [moveTo, errors] = strategy.pushForward(task.statusTypeName, pick(task, Task.plainFields));
+      const userTask = task.userTasks.find((el) => el.userId === user.id);
+      const objectForValidation = {
+        ...pick(task, Task.plainFields),
+        ...pick(userTask || {}, UserTask.plainFields),
+      };
+      const [moveTo, errors] = strategy.pushForward(task.statusTypeName, objectForValidation);
       if (!moveTo) {
         throw new NotAcceptableException(
           `Невозможно изменить статус задачи "${task.statusTypeName}". Видимо, у вас нет на это прав`

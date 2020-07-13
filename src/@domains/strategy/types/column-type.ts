@@ -1,4 +1,4 @@
-import { IMove } from './move';
+import { IShortMove } from './move';
 import { STATUS_NAME } from './status';
 
 export enum COLUMN_TYPE {
@@ -15,12 +15,8 @@ export enum COLUMN_TYPE {
   POST_ESTIMATION = 'post-estimation',
 }
 
-/**
- * moves = true означает, что любые перемещения доступны
- * TODO: Добавить все перемещения во все стратегии
- */
 export interface IColumn {
   column: STATUS_NAME | COLUMN_TYPE;
   statuses: STATUS_NAME[];
-  moves: IMove[];
+  moves: IShortMove[];
 }

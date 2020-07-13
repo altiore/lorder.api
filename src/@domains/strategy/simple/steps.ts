@@ -1,6 +1,8 @@
-import { IColumn, IStep, MOVE_TYPE, ROLE, STATUS_NAME } from '../';
+import { keyBy, mapValues } from 'lodash';
 
-const roleTypes = Object.values(ROLE);
+import { IColumn, IStep, MOVE_TYPE, ROLE, STATUS_NAME } from '../types';
+
+// const roleTypes = Object.values(ROLE);
 
 // const roles: Array<IRole> = roleTypes.map((role, index) => ({
 //   id: role,
@@ -8,10 +10,12 @@ const roleTypes = Object.values(ROLE);
 //   order: index + 1,
 // }));
 
+export const stepColumn = (columnName: STATUS_NAME) => mapValues(keyBy(Object.values(ROLE)), () => columnName);
+
 export const steps: Array<IStep> = [
   {
+    column: stepColumn(STATUS_NAME.CREATING),
     status: STATUS_NAME.CREATING,
-    roles: roleTypes,
     moves: [
       {
         type: MOVE_TYPE.PUSH_FORWARD,
@@ -28,8 +32,8 @@ export const steps: Array<IStep> = [
     ],
   },
   {
+    column: stepColumn(STATUS_NAME.READY_TO_DO),
     status: STATUS_NAME.READY_TO_DO,
-    roles: roleTypes,
     moves: [
       {
         type: MOVE_TYPE.JUMP,
@@ -46,8 +50,8 @@ export const steps: Array<IStep> = [
     ],
   },
   {
+    column: stepColumn(STATUS_NAME.TESTING),
     status: STATUS_NAME.TESTING,
-    roles: roleTypes,
     moves: [
       {
         type: MOVE_TYPE.PUSH_FORWARD,
@@ -64,8 +68,8 @@ export const steps: Array<IStep> = [
     ],
   },
   {
+    column: stepColumn(STATUS_NAME.DONE),
     status: STATUS_NAME.DONE,
-    roles: roleTypes,
     moves: [
       {
         type: MOVE_TYPE.JUMP,
@@ -82,5 +86,5 @@ export const steps: Array<IStep> = [
 export const columns: Array<IColumn> = steps.map(({ status, moves }) => ({
   column: status,
   statuses: [status],
-  moves,
+  moves: moves as any,
 }));

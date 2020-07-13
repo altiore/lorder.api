@@ -4,8 +4,7 @@ import { ROLE } from './role';
 import { STATUS_NAME } from './status';
 
 export interface IStep {
-  column?: { [key in ROLE]?: COLUMN_TYPE };
+  column: { [key in ROLE]?: COLUMN_TYPE };
   status: STATUS_NAME;
-  roles: ROLE[];
   moves: IMove[];
 }

@@ -1,4 +1,5 @@
 import { TaskFlowStrategy } from './task-flow-strategy';
+import { MOVE_TYPE } from './types';
 import { COLUMN_TYPE } from './types/column-type';
 import { IRole, ROLE } from './types/role';
 import { STATUS_NAME } from './types/status';
@@ -49,6 +50,52 @@ describe('task-flow-strategy', () => {
         it('columns count', () => {
           expect(strategy.columns.length).toBe(6);
         });
+
+        it('first column moves', () => {
+          expect(strategy.columns[0].moves).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                type: MOVE_TYPE.PUSH_FORWARD,
+              }),
+            ])
+          );
+        });
+      });
+
+      describe('DEVELOPER', () => {
+        beforeEach(() => {
+          strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.ADVANCED, [ROLE.DEVELOPER]);
+        });
+        it('columns count', () => {
+          expect(strategy.columns.length).toBe(6);
+        });
+
+        it('first column', () => {
+          expect(strategy.columns[0]).toEqual(
+            expect.objectContaining({
+              column: COLUMN_TYPE.BACK_LOG,
+              moves: [],
+            })
+          );
+        });
+
+        it('second column', () => {
+          expect(strategy.columns[1]).toEqual(
+            expect.objectContaining({
+              column: COLUMN_TYPE.PREPARING,
+              moves: expect.arrayContaining([
+                expect.objectContaining({
+                  type: MOVE_TYPE.PUSH_FORWARD,
+                  to: STATUS_NAME.READY_TO_DO,
+                }),
+                expect.objectContaining({
+                  type: MOVE_TYPE.BRING_BACK,
+                  to: STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING,
+                }),
+              ]),
+            })
+          );
+        });
       });
     });
   });
@@ -70,7 +117,7 @@ describe('task-flow-strategy', () => {
       });
 
       it('undefined roles', () => {
-        expect(strategy.availableStatuses.length).toBe(12);
+        expect(strategy.availableStatuses.length).toBe(13);
       });
     });
   });
@@ -287,6 +334,20 @@ describe('task-flow-strategy', () => {
         strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.ADVANCED, [ROLE.FE_DEVELOPER]);
         expect(strategy.userStrategyRoles.length).toBe(1);
         expect(strategy.userStrategyRoles).toEqual(expect.arrayContaining([ROLE.DEVELOPER]));
+      });
+    });
+  });
+
+  describe('data', () => {
+    describe('ADVANCED', () => {
+      describe('DEVELOPER', () => {
+        it('test 2 roles', () => {
+          strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.ADVANCED, [ROLE.ARCHITECT, ROLE.DEVELOPER]);
+          const data = strategy.data;
+          expect(data.userRoles).toEqual([ROLE.ARCHITECT, ROLE.DEVELOPER]);
+          expect(data.columns[ROLE.ARCHITECT].length).toBe(6);
+          expect(data.columns[ROLE.DEVELOPER].length).toBe(6);
+        });
       });
     });
   });
