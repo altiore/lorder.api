@@ -58,10 +58,12 @@ export class TaskUpdateDto {
   @ApiPropertyOptional({ enum: COMPLEXITY_NAME })
   @IsString()
   @IsIn(Object.values(COMPLEXITY_NAME))
+  @IsOptional()
   complexity?: COMPLEXITY_NAME;
 
   @ApiPropertyOptional({ enum: URGENCY_NAME })
   @IsString()
   @IsIn(Object.values(URGENCY_NAME))
+  @IsOptional()
   urgency?: URGENCY_NAME;
 }
