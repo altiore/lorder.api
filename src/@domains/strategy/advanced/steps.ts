@@ -17,22 +17,30 @@ export function getSteps(taskType: TASK_TYPE): IStep[] {
 export function getColumns(roles: ROLE | ROLE[]): IColumn[] {
   const rolesArr = Array.isArray(roles) ? roles : [roles];
 
-  const reduceMoves = (moves): IShortMove[] => {
-    return moves.map((m: IMove) => ({
-      type: m.type,
-      to: m.to,
-      ...(m.requirements && m.requirements.fields
-        ? {
-            requirements: {
-              fields: Array.isArray(m.requirements.fields) ? m.requirements.fields : Object.keys(m.requirements.fields),
-            },
-          }
-        : {}),
-    }));
+  const reduceMoves = (moves: IMove[], step: IStep): IShortMove[] => {
+    return moves.map((m: IMove) => {
+      return {
+        from: step.status,
+        type: m.type,
+        to: m.to,
+        ...(m.requirements && m.requirements.fields
+          ? {
+              requirements: {
+                fields: Array.isArray(m.requirements.fields)
+                  ? m.requirements.fields
+                  : Object.keys(m.requirements.fields),
+              },
+            }
+          : {}),
+      };
+    });
   };
 
-  const prepareMoves = (moves) => {
-    return reduceMoves(moves.filter((m) => rolesArr.includes(m.role)));
+  const prepareMoves = (step: IStep) => {
+    return reduceMoves(
+      step.moves.filter((m) => rolesArr.includes(m.role)),
+      step
+    );
   };
 
   if (rolesArr.length === 1) {
@@ -50,11 +58,11 @@ export function getColumns(roles: ROLE | ROLE[]): IColumn[] {
         res.push({
           column: columnName,
           statuses: [cur.status],
-          moves: prepareMoves(cur.moves),
+          moves: prepareMoves(cur),
         });
       } else {
         res[columnIndex].statuses.push(cur.status);
-        res[columnIndex].moves = reduceMoves(res[columnIndex].moves.concat(prepareMoves(cur.moves)));
+        res[columnIndex].moves = res[columnIndex].moves.concat(prepareMoves(cur));
       }
       return res;
     }, []);
@@ -66,7 +74,7 @@ export function getColumns(roles: ROLE | ROLE[]): IColumn[] {
       .map((el) => ({
         column: el.status,
         statuses: [el.status],
-        moves: prepareMoves(el.moves),
+        moves: prepareMoves(el),
       }));
   }
 }

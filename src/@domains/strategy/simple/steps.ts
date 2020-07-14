@@ -1,6 +1,6 @@
 import { keyBy, mapValues } from 'lodash';
 
-import { IColumn, IStep, MOVE_TYPE, ROLE, STATUS_NAME } from '../types';
+import { IColumn, IMove, IShortMove, IStep, MOVE_TYPE, ROLE, STATUS_NAME } from '../types';
 
 // const roleTypes = Object.values(ROLE);
 
@@ -86,5 +86,11 @@ export const steps: Array<IStep> = [
 export const columns: Array<IColumn> = steps.map(({ status, moves }) => ({
   column: status,
   statuses: [status],
-  moves: moves as any,
+  moves: moves.map(
+    (m: IMove): IShortMove => ({
+      from: status,
+      type: m.type,
+      to: m.to,
+    })
+  ),
 }));

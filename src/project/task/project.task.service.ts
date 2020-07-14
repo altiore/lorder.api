@@ -17,6 +17,7 @@ import { ValidationException } from '@common/exceptions/validation.exception';
 import { TaskService } from 'task/task.service';
 
 import { STATUS_NAME, TaskFlowStrategy } from '../../@domains/strategy';
+import { UserTask } from '../../@orm/user-task';
 import { ProjectService } from '../project.service';
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
 
@@ -56,10 +57,31 @@ export class ProjectTaskService {
     // 2. Проверить, что задача может быть изменена (Законченная или заархивированная задача не может быть изменена)
     this.checkCanBeEdit(checkedTask);
 
-    // 3. Подготовить данные для обновления задачи
-    const preparedData = await this.parseTaskDtoToTaskObj(taskUpdateDto, project.id, strategy);
+    // 3. Подготовить данные userTask и обновить userTask
+    const userTask = this.parseTaskDtoToUserTask(taskUpdateDto);
+    if (Object.keys(userTask).length) {
+      await this.projectTaskTypeRepo.manager.update(
+        UserTask,
+        {
+          taskId: checkedTask.id,
+          userId: user.id,
+        },
+        userTask
+      );
+      const index =
+        checkedTask.userTasks &&
+        checkedTask.userTasks.findIndex((ut) => ut.userId === user.id && ut.taskId === checkedTask.id);
+      if (index !== -1) {
+        checkedTask.userTasks[index] = this.projectTaskTypeRepo.manager.merge(
+          UserTask,
+          checkedTask.userTasks[index],
+          userTask
+        );
+      }
+    }
 
-    // 4. Обновить задачу
+    // 4. Подготовить данные для обновления задачи и обновить задачу
+    const preparedData = await this.parseTaskDtoToTaskObj(taskUpdateDto, project.id, strategy);
     return await this.taskService.updateByUser(checkedTask, preparedData, user);
   }
 
@@ -171,6 +193,15 @@ export class ProjectTaskService {
     }
 
     return preparedData;
+  }
+
+  private parseTaskDtoToUserTask(data: TaskUpdateDto): Partial<UserTask> {
+    const preparedUserTask: Partial<UserTask> = {};
+    if (data.complexity) {
+      preparedUserTask.complexity = data.complexity;
+    }
+
+    return preparedUserTask;
   }
 
   public async checkAccess(

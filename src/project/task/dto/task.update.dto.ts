@@ -3,7 +3,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsIn, IsNumber, IsOptional, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
 
 import { COLUMN_TYPE, STATUS_NAME } from '../../../@domains/strategy';
-import { COMPLEXITY_NAME, URGENCY_NAME } from '../../../@orm/user-task';
+import { COMPLEXITY, URGENCY } from '../../../@orm/user-task';
 
 export class TaskUpdateDto {
   @ApiPropertyOptional()
@@ -55,15 +55,15 @@ export class TaskUpdateDto {
   @IsOptional()
   projectParts?: number[];
 
-  @ApiPropertyOptional({ enum: COMPLEXITY_NAME })
+  @ApiPropertyOptional({ enum: COMPLEXITY })
   @IsString()
-  @IsIn(Object.values(COMPLEXITY_NAME))
+  @IsIn(Object.values(COMPLEXITY))
   @IsOptional()
-  complexity?: COMPLEXITY_NAME;
+  complexity?: COMPLEXITY;
 
-  @ApiPropertyOptional({ enum: URGENCY_NAME })
+  @ApiPropertyOptional({ enum: URGENCY })
   @IsString()
-  @IsIn(Object.values(URGENCY_NAME))
+  @IsIn(Object.values(URGENCY))
   @IsOptional()
-  urgency?: URGENCY_NAME;
+  urgency?: URGENCY;
 }
