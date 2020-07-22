@@ -2,6 +2,7 @@ import { ForbiddenException, Injectable, NotAcceptableException } from '@nestjs/
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { ValidationError } from 'class-validator';
+import { pick } from 'lodash';
 import { EntityManager } from 'typeorm';
 
 import { Project } from '@orm/project';
@@ -58,7 +59,8 @@ export class ProjectTaskService {
     this.checkCanBeEdit(checkedTask);
 
     // 3. Подготовить данные userTask и обновить userTask
-    const userTask = this.parseTaskDtoToUserTask(taskUpdateDto);
+    const userTask = pick(taskUpdateDto, UserTask.plainFields);
+    console.log('');
     if (Object.keys(userTask).length) {
       await this.projectTaskTypeRepo.manager.update(
         UserTask,
@@ -193,15 +195,6 @@ export class ProjectTaskService {
     }
 
     return preparedData;
-  }
-
-  private parseTaskDtoToUserTask(data: TaskUpdateDto): Partial<UserTask> {
-    const preparedUserTask: Partial<UserTask> = {};
-    if (data.complexity) {
-      preparedUserTask.complexity = data.complexity;
-    }
-
-    return preparedUserTask;
   }
 
   public async checkAccess(

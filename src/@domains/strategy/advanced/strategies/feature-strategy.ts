@@ -1,6 +1,6 @@
-import { COMPLEXITY } from '../../../../@orm/user-task';
+import { COMPLEXITY, URGENCY } from '../../../../@orm/user-task';
 import { COLUMN_TYPE, IStep, MOVE_TYPE, ROLE, STATUS_NAME } from '../../types';
-import { isNumber, moreThan, oneOf, required } from '../../validators';
+import { isString, oneOf, required } from '../../validators';
 import { longerThen } from '../../validators/longerThan';
 
 export const feature_strategy: Array<IStep> = [
@@ -36,7 +36,7 @@ export const feature_strategy: Array<IStep> = [
         to: STATUS_NAME.ASSIGNING_RESPONSIBLE,
         requirements: {
           fields: {
-            value: [required, isNumber, moreThan(0)],
+            urgency: [required, isString, oneOf(Object.values(URGENCY))],
           },
           transit: true,
         },

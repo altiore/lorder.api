@@ -66,4 +66,9 @@ export class TaskUpdateDto {
   @IsIn(Object.values(URGENCY))
   @IsOptional()
   urgency?: URGENCY;
+
+  @ApiPropertyOptional({ enum: URGENCY })
+  @IsNumber()
+  @IsOptional()
+  userValue?: number;
 }
