@@ -36,7 +36,7 @@ export const feature_strategy: Array<IStep> = [
         to: STATUS_NAME.ASSIGNING_RESPONSIBLE,
         requirements: {
           fields: {
-            urgency: [required, isString, oneOf(Object.values(URGENCY))],
+            urgency: [required, isString, oneOf(URGENCY)],
           },
           transit: true,
         },

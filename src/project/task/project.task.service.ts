@@ -17,8 +17,8 @@ import { ValidationException } from '@common/exceptions/validation.exception';
 
 import { TaskService } from 'task/task.service';
 
-import { STATUS_NAME, TaskFlowStrategy } from '../../@domains/strategy';
-import { UserTask } from '../../@orm/user-task';
+import { STATUS_NAME, TaskFlowStrategy, TASK_FLOW_STRATEGY } from '../../@domains/strategy';
+import { URGENCY, UserTask } from '../../@orm/user-task';
 import { ProjectService } from '../project.service';
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
 
@@ -58,32 +58,15 @@ export class ProjectTaskService {
     // 2. Проверить, что задача может быть изменена (Законченная или заархивированная задача не может быть изменена)
     this.checkCanBeEdit(checkedTask);
 
-    // 3. Подготовить данные userTask и обновить userTask
-    const userTask = pick(taskUpdateDto, UserTask.plainFields);
-    console.log('');
-    if (Object.keys(userTask).length) {
-      await this.projectTaskTypeRepo.manager.update(
-        UserTask,
-        {
-          taskId: checkedTask.id,
-          userId: user.id,
-        },
-        userTask
-      );
-      const index =
-        checkedTask.userTasks &&
-        checkedTask.userTasks.findIndex((ut) => ut.userId === user.id && ut.taskId === checkedTask.id);
-      if (index !== -1) {
-        checkedTask.userTasks[index] = this.projectTaskTypeRepo.manager.merge(
-          UserTask,
-          checkedTask.userTasks[index],
-          userTask
-        );
-      }
+    // 3. Подготовить данные для обновления задачи и обновить задачу
+    const preparedData = await this.parseTaskDtoToTaskObj(taskUpdateDto, project.id, strategy);
+
+    // 4. Подготовить value данные userTask и обновить userTask
+    const value = await this.updateUserTask(taskUpdateDto, checkedTask, user, strategy);
+    if (typeof value !== 'undefined') {
+      preparedData.value = value;
     }
 
-    // 4. Подготовить данные для обновления задачи и обновить задачу
-    const preparedData = await this.parseTaskDtoToTaskObj(taskUpdateDto, project.id, strategy);
     return await this.taskService.updateByUser(checkedTask, preparedData, user);
   }
 
@@ -107,6 +90,67 @@ export class ProjectTaskService {
     }
     await this.taskService.deleteBySequenceNumber(sequenceNumber, projectId);
     return task;
+  }
+
+  private async updateUserTask(
+    taskUpdateDto: TaskUpdateDto,
+    checkedTask: Task,
+    user: User,
+    strategy: TaskFlowStrategy
+  ): Promise<number | undefined> {
+    if (strategy.strategy === TASK_FLOW_STRATEGY.SIMPLE) {
+      return undefined;
+    }
+
+    const userTask = pick(taskUpdateDto, UserTask.plainFields);
+    if (Object.keys(userTask).length) {
+      await this.projectTaskTypeRepo.manager.update(
+        UserTask,
+        {
+          taskId: checkedTask.id,
+          userId: user.id,
+        },
+        userTask
+      );
+      const index =
+        checkedTask.userTasks &&
+        checkedTask.userTasks.findIndex((ut) => ut.userId === user.id && ut.taskId === checkedTask.id);
+      if (index !== -1) {
+        checkedTask.userTasks[index] = this.projectTaskTypeRepo.manager.merge(
+          UserTask,
+          checkedTask.userTasks[index],
+          userTask
+        );
+      }
+
+      let urgCount = 0;
+      let urgSum = 0;
+      let complexCount = 0;
+      let complexSum = 0;
+      let valueSum = 0;
+      let valueCount = 0;
+      checkedTask.userTasks?.forEach((cur) => {
+        if (cur.urgency) {
+          urgCount++;
+          urgSum += UserTask.getUrgency(cur.urgency);
+        }
+        if (cur.complexity) {
+          complexCount++;
+          complexSum += UserTask.getComplexity(cur.complexity);
+        }
+        if (cur.userValue) {
+          valueCount++;
+          valueSum += cur.userValue;
+        }
+      });
+
+      const value =
+        (urgCount ? urgSum / urgCount : 1) *
+        (complexCount ? complexSum / complexCount : 1) *
+        (valueCount ? valueSum / valueCount : 1);
+
+      return Math.round(value * 2) / 2;
+    }
   }
 
   private async parseTaskDtoToTaskObj(
@@ -141,7 +185,7 @@ export class ProjectTaskService {
     if (taskDto.title !== undefined) {
       preparedData.title = taskDto.title;
     }
-    if (taskDto.value !== undefined) {
+    if (strategy.strategy === TASK_FLOW_STRATEGY.SIMPLE && taskDto.value !== undefined) {
       preparedData.value = taskDto.value;
     }
     if (taskDto.source !== undefined) {

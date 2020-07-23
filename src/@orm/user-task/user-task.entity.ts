@@ -11,7 +11,7 @@ export enum URGENCY {
   ULTRA = 'ULTRA',
 }
 
-const MAP_URGENCY = {
+export const MAP_URGENCY = {
   [URGENCY.LOW]: 0.618,
   [URGENCY.REGULAR]: 1,
   [URGENCY.HIGH]: 1.618,
@@ -31,7 +31,7 @@ export enum COMPLEXITY {
 export const MAP_COMPLEXITY = {
   [COMPLEXITY.JUNIOR]: 0.368,
   [COMPLEXITY.MIDDLE]: 1,
-  [COMPLEXITY.MIDDLE]: 2.718,
+  [COMPLEXITY.SENIOR]: 2.718,
   [COMPLEXITY.ARCHITECT]: 7.389,
   [COMPLEXITY.DISCUSSION]: 20.085,
   [COMPLEXITY.COMMUNITY]: 54.598,
@@ -40,6 +40,14 @@ export const MAP_COMPLEXITY = {
 @Entity('user_tasks')
 export class UserTask {
   static plainFields = ['complexity', 'urgency', 'userValue'];
+
+  static getComplexity(complexity: COMPLEXITY) {
+    return MAP_COMPLEXITY[complexity] || 0;
+  }
+
+  static getUrgency(urgency: URGENCY) {
+    return MAP_URGENCY[urgency] || 0;
+  }
 
   @Index()
   @Column({ primary: true })
