@@ -149,7 +149,7 @@ export class ProjectTaskService {
         (complexCount ? complexSum / complexCount : 1) *
         (valueCount ? valueSum / valueCount : 1);
 
-      return Math.round(value * 2) / 2;
+      return Math.round(value * 4) / 4;
     }
   }
 
