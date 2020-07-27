@@ -117,7 +117,7 @@ export class ProjectService {
       userProjects.map(async (uProject) => {
         const strategy = await this.getCurrentUserStrategy(uProject.project, user, this.projectRepo.manager);
         uProject.project.taskColumns = strategy.columns;
-        uProject.project.strategyInfo = strategy;
+        uProject.project.strategyInfo = strategy.public;
       })
     );
 

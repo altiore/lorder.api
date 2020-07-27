@@ -6,6 +6,7 @@ import { columns as simpleColumns, steps as simpleSteps } from './simple';
 import {
   COLUMN_TYPE,
   IColumn,
+  IDetailedRole,
   IMove,
   IMoveError,
   IRole,
@@ -18,9 +19,17 @@ import {
   TASK_TYPE,
 } from './types';
 
+export interface IStrategyPublic {
+  canStartStatuses: STATUS_NAME[];
+  strategy: TASK_FLOW_STRATEGY;
+  defaultRole: ROLE;
+  roles: IRole[];
+  userRoles: IDetailedRole[];
+}
+
 export class TaskFlowStrategy {
   private readonly userRoles: ROLE | ROLE[];
-  readonly strategy: string;
+  readonly strategy: TASK_FLOW_STRATEGY;
   private _createdStatus?: STATUS_NAME;
   private _inProgressStatus?: STATUS_NAME;
   private _roles?: IRole[];
@@ -30,9 +39,19 @@ export class TaskFlowStrategy {
   private _availableStatuses?: STATUS_NAME[];
   private _steps: IStep[];
 
-  constructor(strategyName: string, userRoles?: ROLE | ROLE[]) {
+  constructor(strategyName: TASK_FLOW_STRATEGY, userRoles?: ROLE | ROLE[]) {
     this.strategy = strategyName;
     this.userRoles = userRoles;
+  }
+
+  get public(): IStrategyPublic {
+    return {
+      canStartStatuses: this.canStartStatuses,
+      defaultRole: this.defaultRole,
+      roles: this.roles,
+      strategy: this.strategy,
+      userRoles: this.detailedRoles,
+    };
   }
 
   get data() {
@@ -125,6 +144,13 @@ export class TaskFlowStrategy {
     }
 
     return this._userStrategyRoles;
+  }
+
+  get detailedRoles(): IDetailedRole[] {
+    return this.userStrategyRoles.map((role) => ({
+      ...this.roles.find((r) => r.id === role),
+      columns: this.getRoleColumns(role),
+    }));
   }
 
   get columns(): Array<IColumn> {

@@ -14,7 +14,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { IColumn, TaskFlowStrategy } from '../../@domains/strategy';
+import { IColumn, IStrategyPublic } from '../../@domains/strategy';
 import { TASK_FLOW_STRATEGY } from '../../@domains/strategy';
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
 import { ProjectPart } from '../project-part/project-part.entity';
@@ -130,7 +130,7 @@ export class Project {
 
   taskColumns?: IColumn[];
 
-  strategyInfo?: TaskFlowStrategy;
+  strategyInfo?: IStrategyPublic;
 
   isAccess(accessLevel: ACCESS_LEVEL) {
     if (!this.accessLevel) {

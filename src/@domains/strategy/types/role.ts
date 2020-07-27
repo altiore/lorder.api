@@ -1,3 +1,4 @@
+import { IColumn } from './column-type';
 import { STATUS_NAME } from './status';
 
 export enum ROLE {
@@ -15,4 +16,8 @@ export interface IRole {
   title: string;
   order: number;
   createdStatus: STATUS_NAME;
+}
+
+export interface IDetailedRole extends IRole {
+  columns: IColumn[];
 }
