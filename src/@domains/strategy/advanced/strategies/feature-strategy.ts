@@ -1,6 +1,6 @@
 import { COMPLEXITY, URGENCY } from '../../../../@orm/user-task';
 import { COLUMN_TYPE, IStep, MOVE_TYPE, ROLE, STATUS_NAME } from '../../types';
-import { isString, oneOf, required } from '../../validators';
+import { isNumber, isString, oneOf, required } from '../../validators';
 import { longerThen } from '../../validators/longerThan';
 
 export const feature_strategy: Array<IStep> = [
@@ -116,6 +116,12 @@ export const feature_strategy: Array<IStep> = [
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.DEVELOPER,
         to: STATUS_NAME.READY_TO_DO,
+        requirements: {
+          fields: {
+            userValue: [required, isNumber],
+          },
+          transit: true,
+        },
       },
       {
         type: MOVE_TYPE.BRING_BACK,
