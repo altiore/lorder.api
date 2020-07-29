@@ -120,7 +120,6 @@ export const feature_strategy: Array<IStep> = [
           fields: {
             userValue: [required, isNumber],
           },
-          transit: true,
         },
       },
       {
