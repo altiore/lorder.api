@@ -18,7 +18,7 @@ import { ValidationException } from '@common/exceptions/validation.exception';
 import { TaskService } from 'task/task.service';
 
 import { STATUS_NAME, TaskFlowStrategy, TASK_FLOW_STRATEGY } from '../../@domains/strategy';
-import { URGENCY, UserTask } from '../../@orm/user-task';
+import { UserTask } from '../../@orm/user-task';
 import { ProjectService } from '../project.service';
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
 
@@ -104,23 +104,39 @@ export class ProjectTaskService {
 
     const userTask = pick(taskUpdateDto, UserTask.plainFields);
     if (Object.keys(userTask).length) {
-      await this.projectTaskTypeRepo.manager.update(
-        UserTask,
-        {
-          taskId: checkedTask.id,
-          userId: user.id,
-        },
-        userTask
-      );
-      const index =
-        checkedTask.userTasks &&
-        checkedTask.userTasks.findIndex((ut) => ut.userId === user.id && ut.taskId === checkedTask.id);
-      if (index !== -1) {
-        checkedTask.userTasks[index] = this.projectTaskTypeRepo.manager.merge(
+      const curUserTask = await this.projectTaskTypeRepo.manager.findOne(UserTask, {
+        taskId: checkedTask.id,
+        userId: user.id,
+      });
+      if (curUserTask) {
+        await this.projectTaskTypeRepo.manager.update(
           UserTask,
-          checkedTask.userTasks[index],
+          {
+            taskId: checkedTask.id,
+            userId: user.id,
+          },
           userTask
         );
+
+        const index =
+          checkedTask.userTasks &&
+          checkedTask.userTasks.findIndex((ut) => ut.userId === user.id && ut.taskId === checkedTask.id);
+        if (index !== -1) {
+          checkedTask.userTasks[index] = this.projectTaskTypeRepo.manager.merge(
+            UserTask,
+            checkedTask.userTasks[index],
+            userTask
+          );
+        }
+      } else {
+        const newUserTask = this.projectTaskTypeRepo.manager.create(UserTask, {
+          ...userTask,
+          taskId: checkedTask.id,
+          userId: user.id,
+        });
+        await this.projectTaskTypeRepo.manager.save(newUserTask);
+
+        checkedTask.userTasks.push(newUserTask);
       }
 
       let urgCount = 0;

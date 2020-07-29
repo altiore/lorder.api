@@ -154,6 +154,9 @@ export class ProjectService {
         WHERE "t"."id"="ut"."taskId"
           AND "ut"."userId"=${user.id}
           AND "t"."statusTypeName"!='done'
+          AND "ut"."complexity" IS NULL
+          AND "ut"."urgency" IS NULL
+          AND "ut"."userValue" IS NULL
           AND (
                   SELECT COUNT("id")
                   FROM "user_work"
