@@ -77,7 +77,7 @@ export class ProjectTaskService {
     const checkedTask = await this.checkAccess(sequenceNumber, project, user);
 
     // 2. TODO: проверить разрешенное перемещение задачи для данного пользователя
-    const toStatus = await this.checkUserCanMove(project, user, checkedTask, taskMoveDto.statusTypeName, manager);
+    const toStatus = await this.checkUserCanMove(project, user, checkedTask, taskMoveDto, manager);
 
     // 3. Обновить и вернуть обновленную задачу
     return this.taskService.updateByUser(checkedTask, { statusTypeName: toStatus }, user);
@@ -279,13 +279,23 @@ export class ProjectTaskService {
     project: Project,
     user: User,
     task: Task,
-    toStatus: STATUS_NAME,
+    taskMoveDto: TaskMoveDto,
     manager: EntityManager
   ): Promise<STATUS_NAME> {
     const strategy = await this.projectService.getCurrentUserStrategy(project, user, manager);
-    const correctToStatus = strategy.canBeMoved(task.statusTypeName, toStatus);
+    const correctToStatus = strategy.canBeMoved(
+      task.statusTypeName,
+      taskMoveDto.statusTypeName,
+      taskMoveDto.selectedRole
+    );
     if (!correctToStatus) {
-      throw new NotAcceptableException('Задача не может быть перемещена в этот статус!');
+      if (strategy.userStrategyRoles.length > 1) {
+        throw new NotAcceptableException('Данное перемещение невозможно. Смени роль или заполни недостающие поля');
+      }
+
+      throw new NotAcceptableException(
+        'Задача не может быть перемещена в этот статус' + ' без дополнительных корректировок'
+      );
     }
 
     return correctToStatus;

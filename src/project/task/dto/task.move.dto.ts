@@ -1,8 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-import { IsIn, IsNotEmpty, IsString } from 'class-validator';
+import { IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-import { COLUMN_TYPE, STATUS_NAME } from '../../../@domains/strategy';
+import { COLUMN_TYPE, ROLE, STATUS_NAME } from '../../../@domains/strategy';
 
 export class TaskMoveDto {
   @ApiProperty()
@@ -10,4 +10,10 @@ export class TaskMoveDto {
   @IsIn([...Object.values(STATUS_NAME), ...Object.values(COLUMN_TYPE)])
   @IsNotEmpty()
   statusTypeName?: STATUS_NAME;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsIn(Object.values(ROLE))
+  @IsOptional()
+  selectedRole?: ROLE;
 }

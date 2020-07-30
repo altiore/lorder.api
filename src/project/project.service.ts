@@ -471,6 +471,7 @@ export class ProjectService {
   }
 
   async findProjectDetails(project: Project, user: User): Promise<Project> {
+    // 1. находим детальную информацию о проекте для отображения внутренних страниц проекта
     const p = await this.projectRepo.findOne({
       relations: [
         'defaultTaskType',
@@ -483,8 +484,15 @@ export class ProjectService {
       ],
       where: { id: project.id },
     });
+
+    // 2. accessLevel необходимо скопировать, т.к. мы не получаем уровень доступа к проекту в последнем запросе
     p.accessLevel = project.accessLevel;
-    p.taskColumns = (await this.getCurrentUserStrategy(project, user, this.projectRepo.manager)).columns;
+
+    // 3. добавить информацию о стратегии проекта
+    const strategy = await this.getCurrentUserStrategy(p, user, this.projectRepo.manager);
+    p.taskColumns = strategy.columns;
+    p.strategyInfo = strategy.public;
+
     return p;
   }
 

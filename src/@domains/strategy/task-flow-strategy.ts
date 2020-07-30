@@ -118,7 +118,7 @@ export class TaskFlowStrategy {
 
     const rolesArr = Array.isArray(this.userRoles) ? this.userRoles : [this.userRoles];
     switch (this.strategy) {
-      case TASK_FLOW_STRATEGY.ADVANCED: {
+      case TASK_FLOW_STRATEGY.ADVANCED:
         const existingRoles: ROLE[] = intersection<ROLE>(
           this.roles.map((el) => el.id),
           rolesArr
@@ -132,15 +132,12 @@ export class TaskFlowStrategy {
             : [...existingRoles, defRole];
 
         break;
-      }
-      case TASK_FLOW_STRATEGY.SIMPLE: {
+      case TASK_FLOW_STRATEGY.SIMPLE:
         this._userStrategyRoles = [undefined];
         break;
-      }
-      default: {
+      default:
         this._userStrategyRoles = [];
         break;
-      }
     }
 
     return this._userStrategyRoles;
@@ -159,14 +156,12 @@ export class TaskFlowStrategy {
     }
 
     switch (this.strategy) {
-      case TASK_FLOW_STRATEGY.ADVANCED: {
+      case TASK_FLOW_STRATEGY.ADVANCED:
         this._columns = getColumns(this.userStrategyRoles);
         break;
-      }
-      case TASK_FLOW_STRATEGY.SIMPLE: {
+      case TASK_FLOW_STRATEGY.SIMPLE:
         this._columns = simpleColumns;
         break;
-      }
     }
 
     return this._columns;
@@ -174,15 +169,12 @@ export class TaskFlowStrategy {
 
   getRoleColumns(role: ROLE): Array<IColumn> {
     switch (this.strategy) {
-      case TASK_FLOW_STRATEGY.ADVANCED: {
+      case TASK_FLOW_STRATEGY.ADVANCED:
         return getColumns(role);
-      }
-      case TASK_FLOW_STRATEGY.SIMPLE: {
+      case TASK_FLOW_STRATEGY.SIMPLE:
         return simpleColumns;
-      }
-      default: {
+      default:
         return [];
-      }
     }
   }
 
@@ -216,14 +208,15 @@ export class TaskFlowStrategy {
     }
 
     switch (this.strategy) {
-      case TASK_FLOW_STRATEGY.ADVANCED: {
+      case TASK_FLOW_STRATEGY.ADVANCED:
         this._roles = advancedRoles;
         break;
-      }
-      default: {
+      case TASK_FLOW_STRATEGY.SIMPLE:
         this._roles = [];
         break;
-      }
+      default:
+        this._roles = [];
+        break;
     }
 
     return this._roles;
@@ -235,15 +228,15 @@ export class TaskFlowStrategy {
     }
 
     switch (this.strategy) {
-      case TASK_FLOW_STRATEGY.ADVANCED: {
+      case TASK_FLOW_STRATEGY.ADVANCED:
         this._inProgressStatus = statusTypeName;
-
         break;
-      }
-      default: {
+      case TASK_FLOW_STRATEGY.SIMPLE:
         this._inProgressStatus = STATUS_NAME.READY_TO_DO;
         break;
-      }
+      default:
+        this._inProgressStatus = STATUS_NAME.READY_TO_DO;
+        break;
     }
 
     return this._inProgressStatus;
@@ -256,11 +249,10 @@ export class TaskFlowStrategy {
 
     let createdStatus: STATUS_NAME;
     switch (this.strategy) {
-      case TASK_FLOW_STRATEGY.SIMPLE: {
+      case TASK_FLOW_STRATEGY.SIMPLE:
         createdStatus = (taskStatusName as STATUS_NAME) || STATUS_NAME.READY_TO_DO;
         break;
-      }
-      case TASK_FLOW_STRATEGY.ADVANCED: {
+      case TASK_FLOW_STRATEGY.ADVANCED:
         const userRoles = this.userStrategyRoles;
         if (userRoles.includes(ROLE.ARCHITECT)) {
           createdStatus = this.roles.find((r) => r.id === ROLE.ARCHITECT)?.createdStatus;
@@ -276,11 +268,9 @@ export class TaskFlowStrategy {
         createdStatus = this.roles.find((r) => r.id === ROLE.TESTER)?.createdStatus;
 
         break;
-      }
-      default: {
+      default:
         createdStatus = STATUS_NAME.READY_TO_DO;
         break;
-      }
     }
 
     if (this.steps.findIndex((s) => s.status === createdStatus) === -1) {
@@ -359,23 +349,29 @@ export class TaskFlowStrategy {
     );
   }
 
-  public canBeMoved(fromStatus: STATUS_NAME, toStatus: STATUS_NAME | COLUMN_TYPE): STATUS_NAME | false {
-    let allowedMove: IMove | null = null;
-    const toColumn = this.columns.find(
-      (col) => col.column === toStatus || col.statuses.includes(toStatus as STATUS_NAME)
-    );
-    this.steps.forEach((step) => {
-      if (step.status === fromStatus) {
-        const curMove = step.moves.find(
-          (move) =>
-            (move.to === undefined || toColumn.statuses.includes(move.to)) &&
-            (move.role === undefined || this.userStrategyRoles.includes(move.role))
-        );
+  public canBeMoved(
+    fromStatus: STATUS_NAME,
+    toStatus: STATUS_NAME | COLUMN_TYPE,
+    selectedRole?: ROLE
+  ): STATUS_NAME | false {
+    const columns = selectedRole ? this.getRoleColumns(selectedRole) : this.columns;
+    const toColumn = columns.find((col) => {
+      return col.column === toStatus || col.statuses.includes(toStatus as STATUS_NAME);
+    });
+    if (!toColumn) {
+      return false;
+    }
 
-        if (curMove) {
-          allowedMove = curMove;
-        }
-      }
+    const fromStep = this.steps.find((step) => step.status === fromStatus);
+    if (!fromStep) {
+      return false;
+    }
+
+    const allowedMove: IMove | null = fromStep.moves.find((move) => {
+      return (
+        (move.to === undefined || toColumn.statuses.includes(move.to)) &&
+        (move.role === undefined || this.userStrategyRoles.includes(move.role))
+      );
     });
 
     return allowedMove ? allowedMove.to : false;
