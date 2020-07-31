@@ -5,8 +5,9 @@ import { DeepPartial, DeleteResult } from 'typeorm';
 
 import { Project } from '@orm/project';
 import { ProjectTaskType, ProjectTaskTypeRepository } from '@orm/project-task-type';
+import { TaskTypeRepository } from '@orm/task-type/task-type.repository';
 
-import { TaskTypeRepository } from '../../@orm/task-type/task-type.repository';
+import { TASK_TYPE } from '@domains/strategy/types';
 
 @Injectable()
 export class ProjectTaskTypeService {
@@ -29,6 +30,11 @@ export class ProjectTaskTypeService {
 
   public async removeFromProject(project: DeepPartial<Project>, taskTypeId: number): Promise<DeleteResult> {
     const taskType = await this.taskTypeRepo.findOne(taskTypeId);
+    if (taskType.name === TASK_TYPE.FEAT) {
+      throw new NotAcceptableException(
+        `Запрещено удалять тип задачи ${TASK_TYPE.FEAT} из проекта. Этот тип задач используется для задач по-умолчанию`
+      );
+    }
     if (!taskType) {
       throw new NotFoundException('Тип задачи не был найден');
     }

@@ -1,4 +1,4 @@
-import { DeepPartial, EntityRepository, Repository } from 'typeorm';
+import { DeepPartial, EntityManager, EntityRepository, Repository } from 'typeorm';
 
 import { TaskType } from '../../@orm/task-type/task-type.entity';
 import { Project } from '../project/project.entity';
@@ -26,14 +26,19 @@ export class ProjectTaskTypeRepository extends Repository<ProjectTaskType> {
     return entities;
   }
 
-  public async addToProject(project: DeepPartial<Project>, taskType: TaskType): Promise<ProjectTaskType> {
-    const order = await this.count({ where: { project } });
-    const entity = this.create({
+  public async addToProject(
+    project: DeepPartial<Project>,
+    taskType: TaskType,
+    manager?: EntityManager
+  ): Promise<ProjectTaskType> {
+    const m = manager || this.manager;
+    const order = await m.count(ProjectTaskType, { where: { project } });
+    const entity = m.create(ProjectTaskType, {
       order,
       project,
       taskType,
     });
-    return await this.save(entity);
+    return await m.save(entity);
   }
 
   public async removeFromProject(project: DeepPartial<Project>, taskType: TaskType): Promise<any> {

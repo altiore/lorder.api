@@ -17,9 +17,11 @@ import {
   timeProductivity,
 } from '@common/helpers/metricConverter';
 
-import { ROLE, STATUS_NAME, TASK_FLOW_STRATEGY } from '../@domains/strategy';
+import { ROLE, STATUS_NAME, TASK_FLOW_STRATEGY, TASK_TYPE } from '../@domains/strategy';
 import { TaskFlowStrategy } from '../@domains/strategy';
 import { ProjectRole } from '../@orm/project-role/project-role.entity';
+import { ProjectTaskTypeRepository } from '../@orm/project-task-type';
+import { TaskType } from '../@orm/task-type/task-type.entity';
 import { UserTask } from '../@orm/user-task';
 import { UserWork } from '../@orm/user-work';
 import { ProjectPaginationDto } from './@dto';
@@ -29,7 +31,8 @@ export class ProjectService {
   constructor(
     @InjectRepository(ProjectRepository) private readonly projectRepo: ProjectRepository,
     @InjectRepository(ProjectPubRepository) private readonly projectPubRepo: ProjectPubRepository,
-    @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository
+    @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository,
+    @InjectRepository(ProjectTaskTypeRepository) private readonly projectTaskTypeRepo: ProjectTaskTypeRepository
   ) {}
 
   public async findOneBySuperAdmin(id: number): Promise<Project> {
@@ -72,6 +75,12 @@ export class ProjectService {
   public async create(data: ProjectDto, user: User, manager?: EntityManager): Promise<Project> {
     const curManager = manager || this.projectRepo.manager;
     const project = await this.projectRepo.createByUser(data, user, curManager);
+
+    // 2. добавить в проект тип задачи по-умолчанию
+    const taskType = await curManager.findOne(TaskType, { name: TASK_TYPE.FEAT });
+    await this.projectTaskTypeRepo.addToProject(project, taskType, curManager);
+
+    // 3. добавить пользователю роль во вновь созданном проекте
     await this.userProjectRepo.addToProject(project, user, user, ACCESS_LEVEL.VIOLET, curManager);
     return project;
   }
