@@ -11,7 +11,7 @@ import { ROLE } from '../../@domains/strategy';
 import { ProjectRoleAllowedMove } from '../../@orm/project-role-allowed-move/project-role-allowed-move.entity';
 import { ProjectRole } from '../../@orm/project-role/project-role.entity';
 import { RoleService } from '../../role/role.service';
-import { ProjectRoleCreateDto } from './dto';
+import { ProjectRoleCreateDto, ProjectRoleUpdateDto } from './dto';
 import { ProjectRoleRepository } from './project-role.repository';
 
 @Injectable()
@@ -40,8 +40,18 @@ export class ProjectRoleService {
       project,
       role,
       allowedMoves: projectRoleDto.allowedMoveIds.map((id) => ({ id })) as ProjectRoleAllowedMove[],
+      isPublic: projectRoleDto.isPublic,
     };
     const entity = this.repo.create(projectRoleData);
+    return classToClass(await this.repo.save(entity));
+  }
+
+  public async updateOne(roleId: number, projectRoleDto: ProjectRoleUpdateDto): Promise<ProjectRole> {
+    let entity = await this.repo.findOne(roleId);
+    if (!entity) {
+      throw new NotFoundException('Роль в проекте не была найдена');
+    }
+    entity = this.repo.merge(entity, projectRoleDto);
     return classToClass(await this.repo.save(entity));
   }
 

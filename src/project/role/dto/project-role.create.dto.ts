@@ -1,6 +1,17 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-import { ArrayMinSize, IsInt, IsLowercase, IsNotEmpty, IsNumber, IsString, Length, Matches } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsBoolean,
+  IsInt,
+  IsLowercase,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Length,
+  Matches,
+} from 'class-validator';
 
 export class ProjectRoleCreateDto {
   @ApiProperty()
@@ -18,4 +29,9 @@ export class ProjectRoleCreateDto {
   @IsNumber(undefined, { each: true })
   @IsInt({ each: true })
   allowedMoveIds?: number[];
+
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  isPublic?: boolean;
 }

@@ -24,6 +24,10 @@ export class ProjectRole {
   @Column()
   roleId: ROLE;
 
+  @ApiProperty()
+  @Column('bool', { nullable: false, default: false })
+  isPublic!: boolean;
+
   @ApiProperty({ type: RoleFlow })
   @ManyToOne((type) => RoleFlow, { nullable: false, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
   role!: RoleFlow;
@@ -40,6 +44,7 @@ export class ProjectRole {
   })
   project!: Project;
 
+  // TODO: либо перенести в эту таблицу данные стратегий. Либо удалить эту связанную таблицу
   @ApiProperty({ isArray: true, type: ProjectRoleAllowedMove })
   @OneToMany(() => ProjectRoleAllowedMove, (m) => m.projectRole)
   allowedMoves: ProjectRoleAllowedMove[];
