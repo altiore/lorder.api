@@ -50,21 +50,25 @@ export class ProjectTaskService {
     project: Project,
     user: User
   ): Promise<Task> {
+    // 1. Получить информацию о стратегии, доступной пользователю в данном проекте
     const strategy = await this.projectService.getCurrentUserStrategy(project, user, this.projectTaskTypeRepo.manager);
 
-    // 1. Проверить соответсвие проекта задаче и уровень доступа пользователя к проекту
+    // 2. Проверить соответсвие проекта задаче и уровень доступа пользователя к проекту
     const checkedTask = await this.checkAccess(sequenceNumber, project, user, ACCESS_LEVEL.YELLOW);
 
-    // 2. Проверить, что задача может быть изменена (Законченная или заархивированная задача не может быть изменена)
+    // 3. Проверить, что задача может быть изменена (Законченная или заархивированная задача не может быть изменена)
     this.checkCanBeEdit(checkedTask);
 
-    // 3. Подготовить данные для обновления задачи и обновить задачу
+    // 4. Подготовить данные для обновления задачи и обновить задачу
     const preparedData = await this.parseTaskDtoToTaskObj(taskUpdateDto, project.id, strategy);
 
-    // 4. Подготовить value данные userTask и обновить userTask
-    const value = await this.updateUserTask(taskUpdateDto, checkedTask, user, strategy);
+    // 5. Подготовить value данные userTask и обновить userTask
+    const [value, transitToStatus] = await this.updateUserTask(taskUpdateDto, checkedTask, user, strategy);
     if (typeof value !== 'undefined') {
       preparedData.value = value;
+    }
+    if (transitToStatus !== checkedTask.statusTypeName) {
+      preparedData.statusTypeName = transitToStatus;
     }
 
     return await this.taskService.updateByUser(checkedTask, preparedData, user);
@@ -97,13 +101,14 @@ export class ProjectTaskService {
     checkedTask: Task,
     user: User,
     strategy: TaskFlowStrategy
-  ): Promise<number | undefined> {
+  ): Promise<[number | undefined, STATUS_NAME]> {
     if (strategy.strategy === TASK_FLOW_STRATEGY.SIMPLE) {
-      return undefined;
+      return [undefined, checkedTask.statusTypeName];
     }
 
     const userTask = pick(taskUpdateDto, UserTask.plainFields);
-    if (Object.keys(userTask).length) {
+    let value: number | undefined;
+    if (userTask && Object.keys(userTask).length) {
       const curUserTask = await this.projectTaskTypeRepo.manager.findOne(UserTask, {
         taskId: checkedTask.id,
         userId: user.id,
@@ -159,14 +164,21 @@ export class ProjectTaskService {
           valueSum += cur.userValue;
         }
       });
-
-      const value =
+      value =
         (urgCount ? urgSum / urgCount : 1) *
         (complexCount ? complexSum / complexCount : 1) *
         (valueCount ? valueSum / valueCount : 1);
-
-      return Math.round(value * 4) / 4;
+      value = Math.round(value * 4) / 4;
     }
+
+    let transitStatus = checkedTask.statusTypeName;
+    if (strategy.getIsTransit(checkedTask.statusTypeName)) {
+      const objectForValidation = this.projectService.getTaskDataForStrategyValidation(checkedTask, user);
+      const [resMove] = strategy.pushForward(checkedTask.statusTypeName, objectForValidation);
+      transitStatus = resMove.to;
+    }
+
+    return [value, transitStatus];
   }
 
   private async parseTaskDtoToTaskObj(

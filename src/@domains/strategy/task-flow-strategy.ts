@@ -377,6 +377,20 @@ export class TaskFlowStrategy {
     return allowedMove ? allowedMove.to : false;
   }
 
+  getIsTransit(currentStatus: STATUS_NAME) {
+    const currentStep = this.steps.find((s) => s.status === currentStatus);
+    if (currentStep) {
+      const pushForwardMove = currentStep.moves.find((move) => {
+        return move.type === MOVE_TYPE.PUSH_FORWARD && this.userStrategyRoles.includes(move.role);
+      });
+      if (pushForwardMove) {
+        return Boolean(pushForwardMove?.requirements?.transit);
+      }
+    }
+
+    return false;
+  }
+
   static statusTypeNameToSimpleStatus(statusTypeName: STATUS_NAME): TASK_SIMPLE_STATUS {
     const res = {
       [STATUS_NAME.CREATING]: 0,

@@ -505,6 +505,14 @@ export class ProjectService {
     return p;
   }
 
+  public getTaskDataForStrategyValidation(task: Task, user: User) {
+    const userTask = task.userTasks.find((el) => el.userId === user.id);
+    return {
+      ...pick(task, Task.plainFields),
+      ...pick(userTask || {}, UserTask.plainFields),
+    };
+  }
+
   /**
    * Возвращает информацию о доступных текущему пользователю перемещениях в рамках текущего проекта.
    * По-сути, этот метод возвращает только ту часть стратегии перемещения задач по проекту,
