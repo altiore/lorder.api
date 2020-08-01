@@ -174,8 +174,10 @@ export class ProjectTaskService {
     let transitStatus = checkedTask.statusTypeName;
     if (strategy.getIsTransit(checkedTask.statusTypeName)) {
       const objectForValidation = this.projectService.getTaskDataForStrategyValidation(checkedTask, user);
-      const [resMove] = strategy.pushForward(checkedTask.statusTypeName, objectForValidation);
-      transitStatus = resMove.to;
+      const [resMove, errors] = strategy.pushForward(checkedTask.statusTypeName, objectForValidation);
+      if (resMove && !errors?.length) {
+        transitStatus = resMove.to;
+      }
     }
 
     return [value, transitStatus];
