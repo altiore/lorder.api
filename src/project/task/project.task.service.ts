@@ -300,6 +300,7 @@ export class ProjectTaskService {
     const correctToStatus = strategy.canBeMoved(
       task.statusTypeName,
       taskMoveDto.statusTypeName,
+      this.projectService.getTaskDataForStrategyValidation(task, user),
       taskMoveDto.selectedRole
     );
     if (!correctToStatus) {

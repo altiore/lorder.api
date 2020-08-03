@@ -248,30 +248,30 @@ describe('task-flow-strategy', () => {
         });
 
         it('CREATING -> ESTIMATION_BEFORE_ASSIGNING', () => {
-          expect(strategy.canBeMoved(STATUS_NAME.CREATING, STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING)).toEqual(
+          expect(strategy.canBeMoved(STATUS_NAME.CREATING, STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING, {})).toEqual(
             STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING
           );
         });
 
         it('ESTIMATION_BEFORE_ASSIGNING -> ASSIGNING_RESPONSIBLE', () => {
           expect(
-            strategy.canBeMoved(STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING, STATUS_NAME.ASSIGNING_RESPONSIBLE)
+            strategy.canBeMoved(STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING, STATUS_NAME.ASSIGNING_RESPONSIBLE, {})
           ).toEqual(STATUS_NAME.ASSIGNING_RESPONSIBLE);
         });
 
         it('ASSIGNING_RESPONSIBLE -> ESTIMATION_BEFORE_PERFORMER', () => {
           expect(
-            strategy.canBeMoved(STATUS_NAME.ASSIGNING_RESPONSIBLE, STATUS_NAME.ESTIMATION_BEFORE_PERFORMER)
+            strategy.canBeMoved(STATUS_NAME.ASSIGNING_RESPONSIBLE, STATUS_NAME.ESTIMATION_BEFORE_PERFORMER, {})
           ).toEqual(STATUS_NAME.ESTIMATION_BEFORE_PERFORMER);
         });
 
         expect(
-          strategy.canBeMoved(STATUS_NAME.ASSIGNING_RESPONSIBLE, STATUS_NAME.ESTIMATION_BEFORE_PERFORMER)
+          strategy.canBeMoved(STATUS_NAME.ASSIGNING_RESPONSIBLE, STATUS_NAME.ESTIMATION_BEFORE_PERFORMER, {})
         ).toBeTruthy();
 
-        expect(strategy.canBeMoved(STATUS_NAME.CREATING, STATUS_NAME.ESTIMATION_BEFORE_PERFORMER)).toBeFalsy();
+        expect(strategy.canBeMoved(STATUS_NAME.CREATING, STATUS_NAME.ESTIMATION_BEFORE_PERFORMER, {})).toBeFalsy();
 
-        expect(strategy.canBeMoved(STATUS_NAME.ESTIMATION_BEFORE_PERFORMER, STATUS_NAME.CREATING)).toBeFalsy();
+        expect(strategy.canBeMoved(STATUS_NAME.ESTIMATION_BEFORE_PERFORMER, STATUS_NAME.CREATING, {})).toBeFalsy();
       });
 
       describe('TESTER', () => {
@@ -280,33 +280,35 @@ describe('task-flow-strategy', () => {
         });
 
         it('TESTING -> ARCHITECT_REVIEW', () => {
-          expect(strategy.canBeMoved(STATUS_NAME.TESTING, STATUS_NAME.ARCHITECT_REVIEW)).toBe(
+          expect(strategy.canBeMoved(STATUS_NAME.TESTING, STATUS_NAME.ARCHITECT_REVIEW, {})).toBe(
             STATUS_NAME.ARCHITECT_REVIEW
           );
         });
 
         it('TESTING -> COLUMN_TYPE.REVIEWING', () => {
-          expect(strategy.canBeMoved(STATUS_NAME.TESTING, COLUMN_TYPE.REVIEWING)).toBe(STATUS_NAME.ARCHITECT_REVIEW);
+          expect(strategy.canBeMoved(STATUS_NAME.TESTING, COLUMN_TYPE.REVIEWING, {})).toBe(
+            STATUS_NAME.ARCHITECT_REVIEW
+          );
         });
 
         it('TESTING -> ESTIMATION_BEFORE_TO_DO', () => {
-          expect(strategy.canBeMoved(STATUS_NAME.TESTING, STATUS_NAME.ESTIMATION_BEFORE_TO_DO)).toBe(
+          expect(strategy.canBeMoved(STATUS_NAME.TESTING, STATUS_NAME.ESTIMATION_BEFORE_TO_DO, {})).toBe(
             STATUS_NAME.ESTIMATION_BEFORE_TO_DO
           );
         });
 
         it('TESTING -> COLUMN_TYPE.DEVELOPING', () => {
-          expect(strategy.canBeMoved(STATUS_NAME.TESTING, COLUMN_TYPE.DEVELOPING)).toBe(
+          expect(strategy.canBeMoved(STATUS_NAME.TESTING, COLUMN_TYPE.DEVELOPING, {})).toBe(
             STATUS_NAME.ESTIMATION_BEFORE_TO_DO
           );
         });
 
         it('ESTIMATION_BEFORE_TO_DO -> COLUMN_TYPE.DEVELOPING', () => {
-          expect(strategy.canBeMoved(STATUS_NAME.ESTIMATION_BEFORE_TO_DO, COLUMN_TYPE.DEVELOPING)).toBeFalsy();
+          expect(strategy.canBeMoved(STATUS_NAME.ESTIMATION_BEFORE_TO_DO, COLUMN_TYPE.DEVELOPING, {})).toBeFalsy();
         });
 
         it('ARCHITECT_REVIEW -> COLUMN_TYPE.DEVELOPING', () => {
-          expect(strategy.canBeMoved(STATUS_NAME.ARCHITECT_REVIEW, COLUMN_TYPE.FINISHING)).toBeFalsy();
+          expect(strategy.canBeMoved(STATUS_NAME.ARCHITECT_REVIEW, COLUMN_TYPE.FINISHING, {})).toBeFalsy();
         });
       });
     });

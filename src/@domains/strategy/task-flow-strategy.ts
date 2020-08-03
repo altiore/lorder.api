@@ -283,6 +283,7 @@ export class TaskFlowStrategy {
   pushForward(
     statusTypeName: STATUS_NAME,
     dataObject: object,
+    finalStatus?: STATUS_NAME,
     prevMove?: IMove
   ): [IMove | undefined, Array<IMoveError>] {
     const step = this.steps.find((s) => s.status === statusTypeName);
@@ -292,7 +293,9 @@ export class TaskFlowStrategy {
     }
 
     const resultMove = Array.isArray(step.moves)
-      ? step.moves.find((m) => m.type === MOVE_TYPE.PUSH_FORWARD)
+      ? step.moves.find((m) => {
+          return m.type === MOVE_TYPE.PUSH_FORWARD && (m.role === undefined || this.userStrategyRoles.includes(m.role));
+        })
       : undefined;
 
     if (!resultMove) {
@@ -304,8 +307,11 @@ export class TaskFlowStrategy {
       if (resultMove.requirements.fields) {
         errors = this.validateFields(resultMove.requirements.fields, dataObject);
       }
+      if (finalStatus && finalStatus === resultMove.to) {
+        return [resultMove, errors];
+      }
       if (resultMove.requirements.transit && !errors.length) {
-        return this.pushForward(resultMove.to, dataObject, resultMove);
+        return this.pushForward(resultMove.to, dataObject, finalStatus, resultMove);
       }
     }
 
@@ -352,6 +358,7 @@ export class TaskFlowStrategy {
   public canBeMoved(
     fromStatus: STATUS_NAME,
     toStatus: STATUS_NAME | COLUMN_TYPE,
+    dataObject: object = {},
     selectedRole?: ROLE
   ): STATUS_NAME | false {
     const columns = selectedRole ? this.getRoleColumns(selectedRole) : this.columns;
@@ -374,7 +381,18 @@ export class TaskFlowStrategy {
       );
     });
 
-    return allowedMove ? allowedMove.to : false;
+    if (allowedMove) {
+      if (allowedMove.type === MOVE_TYPE.PUSH_FORWARD) {
+        const [resMove] = this.pushForward(fromStatus, dataObject, allowedMove.to);
+        if (resMove && resMove.to === allowedMove.to) {
+          return resMove.to;
+        }
+        return false;
+      }
+      return allowedMove.to;
+    }
+
+    return false;
   }
 
   getIsTransit(currentStatus: STATUS_NAME) {
