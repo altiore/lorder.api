@@ -39,7 +39,7 @@ export const MAP_COMPLEXITY = {
 
 @Entity('user_tasks')
 export class UserTask {
-  static plainFields = ['complexity', 'urgency', 'userValue'];
+  static plainFields = ['complexity', 'urgency', 'userValue', 'userValueFinal'];
 
   static getComplexity(complexity: COMPLEXITY) {
     return MAP_COMPLEXITY[complexity] || 0;
@@ -80,4 +80,7 @@ export class UserTask {
 
   @Column('float', { nullable: true })
   userValue: number;
+
+  @Column('float', { nullable: true })
+  userValueFinal: number;
 }

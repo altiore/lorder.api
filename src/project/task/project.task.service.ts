@@ -150,6 +150,8 @@ export class ProjectTaskService {
       let complexSum = 0;
       let valueSum = 0;
       let valueCount = 0;
+      let valueFinalSum = 0;
+      let valueFinalCount = 0;
       checkedTask.userTasks?.forEach((cur) => {
         if (cur.urgency) {
           urgCount++;
@@ -163,11 +165,15 @@ export class ProjectTaskService {
           valueCount++;
           valueSum += cur.userValue;
         }
+        if (cur.userValueFinal) {
+          valueFinalCount++;
+          valueFinalSum += Math.max(cur.userValue || 0, cur.userValueFinal);
+        }
       });
       value =
         (urgCount ? urgSum / urgCount : 1) *
         (complexCount ? complexSum / complexCount : 1) *
-        (valueCount ? valueSum / valueCount : 1);
+        (valueFinalCount ? valueFinalSum / valueFinalCount : valueCount ? valueSum / valueCount : 1);
       value = Math.round(value * 4) / 4;
     }
 

@@ -67,8 +67,13 @@ export class TaskUpdateDto {
   @IsOptional()
   urgency?: URGENCY;
 
-  @ApiPropertyOptional({ enum: URGENCY })
+  @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
   userValue?: number;
+
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  userValueFinal?: number;
 }

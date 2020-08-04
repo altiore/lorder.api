@@ -25,7 +25,7 @@ describe('task-flow-strategy', () => {
           strategy = new TaskFlowStrategy(TASK_FLOW_STRATEGY.ADVANCED, [ROLE.ARCHITECT]);
         });
         it('columns count', () => {
-          expect(strategy.steps.length).toBe(15);
+          expect(strategy.steps.length).toBe(14);
         });
       });
     });
@@ -117,7 +117,7 @@ describe('task-flow-strategy', () => {
       });
 
       it('undefined roles', () => {
-        expect(strategy.availableStatuses.length).toBe(13);
+        expect(strategy.availableStatuses.length).toBe(12);
       });
     });
   });

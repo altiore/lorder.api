@@ -231,6 +231,11 @@ export const feature_strategy: Array<IStep> = [
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.DEVELOPER,
         to: STATUS_NAME.DEPLOYED_ARCHITECT_ESTIMATION,
+        requirements: {
+          fields: {
+            complexity: [required, oneOf(COMPLEXITY)],
+          },
+        },
       },
     ],
   },
@@ -245,21 +250,12 @@ export const feature_strategy: Array<IStep> = [
       {
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.ARCHITECT,
-        to: STATUS_NAME.DEPLOYED_COMMUNITY_ESTIMATION,
-      },
-    ],
-  },
-  {
-    column: {
-      [ROLE.ARCHITECT]: COLUMN_TYPE.POST_ESTIMATION,
-      [ROLE.DEVELOPER]: COLUMN_TYPE.POST_ESTIMATION,
-    },
-    status: STATUS_NAME.DEPLOYED_COMMUNITY_ESTIMATION,
-    moves: [
-      {
-        type: MOVE_TYPE.PUSH_FORWARD,
-        role: ROLE.ARCHITECT,
         to: STATUS_NAME.DONE,
+        requirements: {
+          fields: {
+            userValueFinal: [required, isNumber],
+          },
+        },
       },
     ],
   },
