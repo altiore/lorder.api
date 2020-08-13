@@ -11,6 +11,7 @@
   },
   "scripts": {
     "start:dev": "sh bin/start.sh && cross-env NODE_ENV=development nodemon",
+    "start:debug": "NODE_ENV=development nodemon --config nodemon-debug.json",
     "start": "node dist/main.js",
     "stop": "sh bin/stop.sh",
     "start:hmr": "node dist/server",
