@@ -38,10 +38,16 @@ export class ProjectTaskService {
     return this.taskService.findOneBySequenceNumber(sequenceNumber, projectId);
   }
 
-  public async create(taskCreateDto: TaskCreateDto, project: Project, user: User): Promise<Task> {
-    const strategy = await this.projectService.getCurrentUserStrategy(project, user, this.projectTaskTypeRepo.manager);
-    const preparedData = await this.parseTaskDtoToTaskObj(taskCreateDto, project.id, strategy, true);
-    return await this.taskService.createByProject(preparedData, project, user);
+  public async create(
+    taskCreateDto: TaskCreateDto,
+    project: Project,
+    user: User,
+    manager?: EntityManager
+  ): Promise<Task> {
+    const curManager = manager || this.projectTaskTypeRepo.manager;
+    const strategy = await this.projectService.getCurrentUserStrategy(project, user, curManager);
+    const preparedData = await this.parseTaskDtoToTaskObj(taskCreateDto, project.id, strategy, true, curManager);
+    return await this.taskService.createByProject(preparedData, project, user, curManager);
   }
 
   public async update(

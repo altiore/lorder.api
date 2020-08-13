@@ -12,6 +12,7 @@ import { ACCESS_LEVEL } from '@orm/user-project';
 
 import { PaginationDto } from '@common/dto';
 
+import { DATE_FORMAT } from '../@common/consts';
 import { ValidationException } from '../@common/exceptions/validation.exception';
 import { TaskFlowStrategy } from '../@domains/strategy';
 import { Task } from '../@orm/task';
@@ -23,6 +24,7 @@ import { ProjectTaskService } from '../project/task/project.task.service';
 import { TaskService } from '../task/task.service';
 import { UserService } from '../user/user.service';
 import {
+  CreateAndStartDto,
   StartResponse,
   StopResponse,
   UserWorkCreateDto,
@@ -185,36 +187,79 @@ export class UserWorkService {
     );
   }
 
-  public async start(project: Project, user: User, userWorkData: UserWorkStartDto): Promise<StartResponse> {
+  private async startTransactionContent(
+    project: Project,
+    user: User,
+    userWorkData: UserWorkStartDto,
+    entityManager: EntityManager
+  ) {
     const result: StartResponse = {
       finished: [],
       started: null,
     };
+
+    // 0. Находим стратегию перемещения задач
+    const strategy = await this.projectService.getCurrentUserStrategy(project, user, entityManager);
+
+    // 1. Найти задачу для старта
+    const task = await this.findTaskByStartDto(project, user, userWorkData, entityManager);
+
+    // 2. Проверить, что эту задачу может начать текущий пользователь
+    await this.checkUserCanStart(strategy, task, user);
+
+    // 3. Завершить предыдущие задачи, если есть незавершенные
+    result.finished = await this.finishNotFinished(user, entityManager);
+
+    // 4. Создать новую запись в таблице "работа пользователя" и обновить информацию о задаче
+    let startAt;
+    if (result.finished && result.finished.length) {
+      startAt = result.finished[0].finishAt;
+    }
+    const preparedUserWorkData: UserWorkCreateDto = {
+      description: userWorkData.description,
+      projectId: task.projectId,
+      taskId: task.id,
+      title: userWorkData.description,
+    };
+    result.started = await this.startTask(task, user, preparedUserWorkData, startAt, strategy, entityManager);
+
+    return result;
+  }
+
+  public async start(project: Project, user: User, userWorkData: UserWorkStartDto): Promise<StartResponse> {
+    let result: StartResponse = {
+      finished: [],
+      started: null,
+    };
     await this.userWorkRepo.manager.transaction(async (entityManager) => {
-      // 0. Находим стратегию перемещения задач
-      const strategy = await this.projectService.getCurrentUserStrategy(project, user, entityManager);
+      result = await this.startTransactionContent(project, user, userWorkData, entityManager);
+    });
 
-      // 1. Найти задачу для старта
-      const task = await this.findTaskByStartDto(project, user, userWorkData, entityManager);
+    return result;
+  }
 
-      // 2. Проверить, что эту задачу может начать текущий пользователь
-      await this.checkUserCanStart(strategy, task, user);
+  public async createAndStart(project: Project, user: User): Promise<StartResponse> {
+    let result: StartResponse = {
+      finished: [],
+      started: null,
+    };
 
-      // 3. Завершить предыдущие задачи, если есть незавершенные
-      result.finished = await this.finishNotFinished(user, entityManager);
+    const date = moment().format(DATE_FORMAT);
+    const title = `Задача ${date}`;
 
-      // 4. Создать новую запись в таблице "работа пользователя" и обновить информацию о задаче
-      let startAt;
-      if (result.finished && result.finished.length) {
-        startAt = result.finished[0].finishAt;
-      }
-      const preparedUserWorkData: UserWorkCreateDto = {
-        description: userWorkData.description,
-        projectId: task.projectId,
-        taskId: task.id,
-        title: userWorkData.description,
-      };
-      result.started = await this.startTask(task, user, preparedUserWorkData, startAt, strategy, entityManager);
+    await this.userWorkRepo.manager.transaction(async (entityManager) => {
+      const task = await this.projectTaskService.create({ title }, project, user, entityManager);
+
+      result = await this.startTransactionContent(
+        project,
+        user,
+        {
+          description: `Задача создана с доски пользователя ${date}`,
+          projectId: project.id,
+          sequenceNumber: task.sequenceNumber,
+        },
+        entityManager
+      );
     });
 
     return result;

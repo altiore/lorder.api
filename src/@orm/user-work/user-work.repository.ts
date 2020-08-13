@@ -2,6 +2,7 @@ import moment = require('moment');
 import { Moment } from 'moment';
 import { EntityManager, EntityRepository, IsNull, Repository, SelectQueryBuilder } from 'typeorm';
 
+import { DATE_FORMAT } from '../../@common/consts';
 import { PaginationDto } from '../../@common/dto/pagination.dto';
 import { Task } from '../task/task.entity';
 import { User } from '../user/user.entity';
@@ -81,18 +82,18 @@ export class UserWorkRepository extends Repository<UserWork> {
       query = this.createQueryBuilder().orWhere(
         `UserWork.id != :id AND UserWork.userId = :userId AND UserWork.startAt BETWEEN :start AND :finish`,
         {
-          finish: finishAt.format('YYYY-MM-DD HH:mm:ss'),
+          finish: finishAt.format(DATE_FORMAT),
           id: changedUserWork.id,
-          start: startAt.format('YYYY-MM-DD HH:mm:ss'),
+          start: startAt.format(DATE_FORMAT),
           userId: user.id,
         }
       );
       query.orWhere(
         `UserWork.id != :id AND UserWork.userId = :userId AND UserWork.finishAt BETWEEN :start AND :finish`,
         {
-          finish: finishAt.format('YYYY-MM-DD HH:mm:ss'),
+          finish: finishAt.format(DATE_FORMAT),
           id: changedUserWork.id,
-          start: startAt.format('YYYY-MM-DD HH:mm:ss'),
+          start: startAt.format(DATE_FORMAT),
           userId: user.id,
         }
       );
@@ -100,18 +101,18 @@ export class UserWorkRepository extends Repository<UserWork> {
       query = this.createQueryBuilder().orWhere(
         `UserWork.id != :id AND UserWork.userId = :userId AND UserWork.startAt BETWEEN :start AND :finish`,
         {
-          finish: moment().format('YYYY-MM-DD HH:mm:ss'),
+          finish: moment().format(DATE_FORMAT),
           id: changedUserWork.id,
-          start: startAt.format('YYYY-MM-DD HH:mm:ss'),
+          start: startAt.format(DATE_FORMAT),
           userId: user.id,
         }
       );
       query.orWhere(
         `UserWork.id != :id AND UserWork.userId = :userId AND UserWork.finishAt BETWEEN :start AND :finish`,
         {
-          finish: moment().format('YYYY-MM-DD HH:mm:ss'),
+          finish: moment().format(DATE_FORMAT),
           id: changedUserWork.id,
-          start: startAt.format('YYYY-MM-DD HH:mm:ss'),
+          start: startAt.format(DATE_FORMAT),
           userId: user.id,
         }
       );

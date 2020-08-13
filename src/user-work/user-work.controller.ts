@@ -15,6 +15,7 @@ import { RolesGuard } from '../@common/guards';
 import { AccessLevel, ProjectParam } from '../project/@common/decorators';
 import { AccessLevelGuard } from '../project/@common/guards';
 import {
+  CreateAndStartDto,
   StartResponse,
   StopResponse,
   UserWorkCreateDto,
@@ -48,6 +49,18 @@ export class UserWorkController {
     @UserJWT() user: User
   ): Promise<StartResponse> {
     return this.userWorkService.start(project, user, userWorkCreateDto);
+  }
+
+  @Post('create-and-start')
+  @Roles('user')
+  @AccessLevel(ACCESS_LEVEL.RED)
+  @ApiResponse({ status: 201, type: StartResponse, description: 'ACCESS_LEVEL.RED' })
+  public createAndStart(
+    @Body() createAndStartDto: CreateAndStartDto,
+    @ProjectParam() project: Project,
+    @UserJWT() user: User
+  ): Promise<StartResponse> {
+    return this.userWorkService.createAndStart(project, user);
   }
 
   @Patch(':userWorkId')
