@@ -14,6 +14,7 @@ import { MeModule } from './me/me.module';
 import { ProjectPartModule } from './project-part/project-part.module';
 import { ProjectStatusMoveModule } from './project-status-move/project.status-move.module';
 import { ProjectModule } from './project/project.module';
+import { PublicProjectModule } from './public-project/public-project.module';
 import { PublicModule } from './public/public.module';
 import { RedisModule } from './redis/redis.module';
 import { RoleModule } from './role/role.module';
@@ -36,6 +37,7 @@ import { WebHooksModule } from './webhooks/webhooks.module';
     ProjectModule,
     ProjectPartModule,
     ProjectStatusMoveModule,
+    PublicProjectModule,
     PublicModule,
     RedisModule,
     RoleModule,

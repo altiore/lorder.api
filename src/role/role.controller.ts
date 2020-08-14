@@ -36,6 +36,9 @@ import { RoleService } from './role.service';
       primary: true,
     },
   },
+  query: {
+    alwaysPaginate: true,
+  },
 })
 @Controller('roles')
 export class RoleController {

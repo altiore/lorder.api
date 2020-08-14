@@ -68,3 +68,7 @@ export function Auth(apiResponseOpts: ApiResponseOptions, roles: ROLES[] | ROLES
     ApiUnauthorizedResponse({ description: 'Unauthorized"' })
   );
 }
+
+export function UnAuth(apiResponseOpts: ApiResponseOptions) {
+  return applyDecorators(ApiResponse(apiResponseOpts));
+}

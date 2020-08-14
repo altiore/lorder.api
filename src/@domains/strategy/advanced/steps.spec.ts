@@ -3,11 +3,11 @@ import { getColumns, getSteps } from './steps';
 
 describe('strategy advanced', () => {
   it('getSteps', () => {
-    expect(getSteps(TASK_TYPE.FEAT).length).toBe(15);
+    expect(getSteps(TASK_TYPE.FEAT).length).toBe(14);
   });
 
   it('getRoleSteps ARCHITECT + DEVELOPER', () => {
-    expect(getColumns([ROLE.ARCHITECT, ROLE.DEVELOPER]).length).toEqual(15);
+    expect(getColumns([ROLE.ARCHITECT, ROLE.DEVELOPER]).length).toEqual(14);
   });
 
   it('getRoleSteps ARCHITECT', () => {
