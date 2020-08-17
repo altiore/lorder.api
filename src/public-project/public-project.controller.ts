@@ -31,6 +31,15 @@ import { PublicProjectService } from './public-project.service';
   },
   query: {
     alwaysPaginate: true,
+    join: {
+      project: {
+        allow: ['id', 'monthlyBudget'],
+        eager: true,
+      },
+      'project.logo': {
+        eager: true,
+      },
+    },
   },
 })
 @Controller('public-projects')
