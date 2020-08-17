@@ -19,11 +19,13 @@ import {
 
 import { ROLE, STATUS_NAME, TASK_FLOW_STRATEGY, TASK_TYPE } from '../@domains/strategy';
 import { TaskFlowStrategy } from '../@domains/strategy';
+import { Media, MEDIA_TYPE } from '../@orm/media';
 import { ProjectRole } from '../@orm/project-role/project-role.entity';
 import { ProjectTaskTypeRepository } from '../@orm/project-task-type';
 import { TaskType } from '../@orm/task-type/task-type.entity';
 import { UserTask } from '../@orm/user-task';
 import { UserWork } from '../@orm/user-work';
+import { FileService } from '../file/file.service';
 import { ProjectPaginationDto } from './@dto';
 
 @Injectable()
@@ -32,7 +34,8 @@ export class ProjectService {
     @InjectRepository(ProjectRepository) private readonly projectRepo: ProjectRepository,
     @InjectRepository(ProjectPubRepository) private readonly projectPubRepo: ProjectPubRepository,
     @InjectRepository(UserProjectRepository) private readonly userProjectRepo: UserProjectRepository,
-    @InjectRepository(ProjectTaskTypeRepository) private readonly projectTaskTypeRepo: ProjectTaskTypeRepository
+    @InjectRepository(ProjectTaskTypeRepository) private readonly projectTaskTypeRepo: ProjectTaskTypeRepository,
+    private readonly fileService: FileService
   ) {}
 
   public async findOneBySuperAdmin(id: number): Promise<Project> {
@@ -532,6 +535,25 @@ export class ProjectService {
     }
 
     return new TaskFlowStrategy(project.strategy, userRoles);
+  }
+
+  public async updateLogo(file: any, user: User, project: Project): Promise<Media> {
+    if (!project.logo) {
+      await this.addLogo(project);
+    }
+    return this.fileService.updateOrCreateObjInGoogleCloudStorage(file, project.logo);
+  }
+
+  private async addLogo(project: Project): Promise<Project> {
+    project.logo = await this.fileService.createOne({
+      title: `${project.title} логотип`,
+      type: MEDIA_TYPE.PROJECT_LOGO,
+      url: '#',
+    });
+
+    await this.projectRepo.update({ id: project.id }, { logo: project.logo });
+
+    return project;
   }
 
   private async changeStrategy(project: Project, user: User, newStrategy: TASK_FLOW_STRATEGY): Promise<true> {

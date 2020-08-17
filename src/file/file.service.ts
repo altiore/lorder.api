@@ -50,7 +50,7 @@ export class FileService {
     }
 
     if (media && media.url) {
-      return this.mediaRepo.updateUrl(media, this.getMediaUrl(res));
+      return this.mediaRepo.updateUrl(media, this.getMediaUrl(res), CLOUD_TYPE.GOOGLE);
     }
 
     return await this.mediaRepo.createOne({
@@ -65,15 +65,18 @@ export class FileService {
     if (get(media, 'cloud') === CLOUD_TYPE.GOOGLE) {
       const storage = new Storage();
 
+      // 2. Если файл был ранее сохранен в GOOGLE CLOUD - удалить файл и сохранить новый
+      const fileName = this.getObjectName(media);
+      await storage.bucket(process.env.GOOGLE_APPLICATION_BUCKET).file(fileName).delete();
+
       const res = await storage.bucket(process.env.GOOGLE_APPLICATION_BUCKET).upload(file.path, {
-        destination: this.getObjectName(media),
         gzip: true,
         metadata: {
           cacheControl: 'public, max-age=31536000',
         },
       });
 
-      return this.mediaRepo.updateUrl(media, this.getMediaUrl(res));
+      return this.mediaRepo.updateUrl(media, this.getMediaUrl(res), CLOUD_TYPE.GOOGLE);
     }
 
     return this.saveToGoogleCloudStorage(file, media);

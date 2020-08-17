@@ -1,6 +1,6 @@
 import { EntityRepository, Repository } from 'typeorm';
 
-import { Media } from './media.entity';
+import { CLOUD_TYPE, Media } from './media.entity';
 
 @EntityRepository(Media)
 export class MediaRepository extends Repository<Media> {
@@ -13,8 +13,11 @@ export class MediaRepository extends Repository<Media> {
     return await this.save(media);
   }
 
-  public async updateUrl(media: Media, url: string): Promise<Media> {
+  public async updateUrl(media: Media, url: string, type?: CLOUD_TYPE): Promise<Media> {
     media.url = url;
+    if (type) {
+      media.cloud = type;
+    }
     return this.save(media);
   }
 }

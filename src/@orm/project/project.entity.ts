@@ -17,6 +17,7 @@ import {
 import { IColumn, IStrategyPublic } from '../../@domains/strategy';
 import { TASK_FLOW_STRATEGY } from '../../@domains/strategy';
 import { momentDateTransformer } from '../@columns/moment.date.transformer';
+import { Media } from '../media/media.entity';
 import { ProjectPart } from '../project-part/project-part.entity';
 import { ProjectPub } from '../project-pub/project-pub.entity';
 import { ProjectRole } from '../project-role/project-role.entity';
@@ -88,6 +89,11 @@ export class Project {
     onUpdate: 'NO ACTION',
   })
   owner: User;
+
+  @ApiProperty({ type: Media })
+  @OneToOne(() => Media, { eager: true, nullable: true })
+  @JoinColumn()
+  logo?: Media;
 
   @ApiProperty({ type: Task, isArray: true })
   @OneToMany(() => Task, (m) => m.project)

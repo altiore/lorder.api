@@ -11,6 +11,7 @@ import { UserWorkRepository } from '@orm/user-work';
 
 import { AuthModule } from 'auth/auth.module';
 
+import { FileModule } from '../file/file.module';
 import { RedisModule } from '../redis/redis.module';
 import { TaskModule } from '../task/task.module';
 import { AccessLevelGuard } from './@common/guards';
@@ -29,6 +30,7 @@ import { TaskLogModule } from './task/task-log/task-log.module';
   controllers: [ProjectController, ProjectMemberController, ProjectTaskController, ProjectTaskTypeController],
   exports: [AccessLevelGuard, ProjectService, ProjectTaskService, ProjectMemberService],
   imports: [
+    FileModule,
     forwardRef(() => AuthModule),
     forwardRef(() => TaskLogModule),
     forwardRef(() => TaskModule),

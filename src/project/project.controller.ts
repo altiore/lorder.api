@@ -1,12 +1,27 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+import { Media } from '@orm/media';
 import { Project, ProjectDto } from '@orm/project';
 import { ROLES } from '@orm/role';
 import { User } from '@orm/user';
 import { ACCESS_LEVEL, UserProject } from '@orm/user-project';
 
-import { Auth, res, UserJWT } from '@common/decorators';
+import { Auth, res, Roles, UserJWT } from '@common/decorators';
+import { FileUploadDto } from '@common/dto';
+import { MyFileInterceptor } from '@common/interceptors';
 
 import { ProjectParam } from './@common/decorators';
 import { ProjectPaginationDto } from './@dto';
@@ -81,5 +96,19 @@ export class ProjectController {
   @Auth(res(Project, 'Обновить статистику проекта').c, ROLES.USER, ACCESS_LEVEL.VIOLET)
   public async statistic(@ProjectParam() project: Project): Promise<UserProject[]> {
     return this.projectService.updateStatistic(project);
+  }
+
+  @Auth(res(Project, 'Обновить лого проекта').c, ROLES.USER, ACCESS_LEVEL.VIOLET)
+  @Roles('user')
+  @ApiResponse({ status: 200, type: Media })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Project Logo',
+    type: FileUploadDto,
+  })
+  @Post(':projectId/logo')
+  @UseInterceptors(MyFileInterceptor)
+  public updateAvatar(@UploadedFile() file, @ProjectParam() project: Project, @UserJWT() user: User) {
+    return this.projectService.updateLogo(file, user, project);
   }
 }

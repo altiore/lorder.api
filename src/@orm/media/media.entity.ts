@@ -6,6 +6,7 @@ export enum MEDIA_TYPE {
   IMAGE = 'image',
   VIDEO = 'video',
   DOCUMENT = 'document',
+  PROJECT_LOGO = 'project-logo',
 }
 
 export enum CLOUD_TYPE {
