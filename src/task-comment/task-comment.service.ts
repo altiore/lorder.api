@@ -30,4 +30,14 @@ export class TaskCommentService extends TypeOrmCrudService<TaskComment> {
   public async findOnById(id: number): Promise<TaskComment> {
     return await this.repo.findOne({ where: { id } });
   }
+
+  public async updateCommentsCount(taskId: number): Promise<void> {
+    await this.repo.manager.query(`
+      UPDATE
+        "task"
+      SET
+        "commentsCount"=(SELECT COUNT(*) FROM "task_comment" WHERE "taskId" = ${taskId})
+      WHERE "id" = ${taskId}
+    `);
+  }
 }

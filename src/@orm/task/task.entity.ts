@@ -30,7 +30,7 @@ import { User } from '../user/user.entity';
 @Index(['projectId', 'sequenceNumber'])
 @Unique(['projectId', 'sequenceNumber'])
 export class Task {
-  static plainFields = [
+  static plainFields: (keyof Task)[] = [
     'id',
     'sequenceNumber',
     'projectId',
@@ -167,4 +167,7 @@ export class Task {
   })
   @JoinTable()
   projectParts: ProjectPart[];
+
+  @Column('int', { nullable: false, default: 0 })
+  commentsCount: number;
 }

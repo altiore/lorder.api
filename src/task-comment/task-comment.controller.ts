@@ -70,7 +70,9 @@ export class TaskCommentController implements CrudController<TaskComment> {
     @UserJWT() user: User
   ): Promise<TaskComment> {
     const task = await this.service.findTaskByIdAndCheckAccess(taskId, projectId, user, ACCESS_LEVEL.ORANGE);
-    return this.base.createOneBase(req, { ...dto, taskId: task.id, userId: user.id } as TaskComment);
+    const result = await this.base.createOneBase(req, { ...dto, taskId: task.id, userId: user.id } as TaskComment);
+    await this.service.updateCommentsCount(task.id);
+    return result;
   }
 
   @Auth(res(TaskComment).deleteOne, ROLES.USER, ACCESS_LEVEL.RED)
@@ -108,6 +110,8 @@ export class TaskCommentController implements CrudController<TaskComment> {
     if (taskComment.userId !== user.id) {
       throw new ForbiddenException('Нельзя удалить чужой комментарий');
     }
-    return this.base.deleteOneBase(req);
+    const result = await this.base.deleteOneBase(req);
+    await this.service.updateCommentsCount(taskComment.taskId);
+    return result;
   }
 }

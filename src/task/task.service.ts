@@ -34,9 +34,7 @@ export class TaskService {
     const strategy = await this.projectService.getCurrentUserStrategy(project, user, this.taskRepo.manager);
 
     // Найти только задачи, доступные пользователю в текущем статусе
-    const [data, total] = await this.taskRepo.findAllByProjectId(pagesDto, project.id, {
-      statusTypeName: In(strategy.availableStatuses),
-    });
+    const [data, total] = await this.taskRepo.findAllByProjectId(pagesDto, project.id, strategy.availableStatuses);
     const pageCount = Math.ceil(total / count);
     return { count, data, page, pageCount, total };
   }

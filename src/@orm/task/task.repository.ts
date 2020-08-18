@@ -1,6 +1,7 @@
-import { EntityManager, EntityRepository, FindConditions, In, Repository } from 'typeorm';
+import { EntityManager, EntityRepository, In, Repository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
+import { STATUS_NAME } from '../../@domains/strategy/types';
 import { Project } from '../project/project.entity';
 import { UserProject } from '../user-project';
 import { User } from '../user/user.entity';
@@ -22,15 +23,26 @@ export class TaskRepository extends Repository<Task> {
   public findAllByProjectId(
     { skip = 0, count = 20, orderBy = 'id', order = 'desc' }: PaginationDto,
     projectId: number,
-    where: FindConditions<Task> = {}
+    availableStatuses: STATUS_NAME[]
   ): Promise<[Task[], number]> {
-    return this.findAndCount({
-      order: { [orderBy]: order.toUpperCase() },
-      relations: requiredRelations,
-      skip,
-      take: count,
-      where: { project: { id: projectId }, isArchived: false, ...where },
-    });
+    return this.createQueryBuilder('task')
+      .addSelect('COUNT("task"."id")', 'sum')
+      .orderBy({ [orderBy]: order.toUpperCase() as 'ASC' | 'DESC' })
+      .groupBy('"task"."id"')
+      .skip(skip)
+      .take(count)
+      .where('"task"."projectId" = :projectId', { projectId })
+      .andWhere('"task"."isArchived" = :isArchived', { isArchived: false })
+      .andWhere('"task"."statusTypeName" IN (:...availableStatuses)', { availableStatuses })
+      .getManyAndCount();
+
+    // return this.findAndCount({
+    //   order: { [orderBy]: order.toUpperCase() },
+    //   relations: requiredRelations,
+    //   skip,
+    //   take: count,
+    //   where: { project: { id: projectId }, isArchived: false, statusTypeName: In(availableStatuses) },
+    // });
   }
 
   public async findTasksWithPagination(
