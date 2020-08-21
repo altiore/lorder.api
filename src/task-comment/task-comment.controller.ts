@@ -49,6 +49,14 @@ import { TaskCommentService } from './task-comment.service';
   },
   query: {
     alwaysPaginate: true,
+    join: {
+      user: {
+        eager: true,
+      },
+      'user.avatar': {
+        eager: true,
+      },
+    },
   },
 })
 @Controller('projects/:projectId/tasks/:taskId/comments')

@@ -42,7 +42,9 @@ export class TaskCommentService extends TypeOrmCrudService<TaskComment> {
   }
 
   public async createNewComment(text: string, task: Task, user: User, manager: EntityManager): Promise<TaskComment> {
-    const comment = this.repo.create({ text, taskId: task.id, userId: user.id });
-    return await manager.save(comment);
+    let comment = this.repo.create({ text, taskId: task.id, userId: user.id });
+    comment = await manager.save(comment);
+    comment.user = user;
+    return comment;
   }
 }

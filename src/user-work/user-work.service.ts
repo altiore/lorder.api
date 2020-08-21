@@ -158,11 +158,15 @@ export class UserWorkService {
       }
 
       if (strategy.strategy === TASK_FLOW_STRATEGY.ADVANCED) {
-        const step = strategy.findStepByStatusName(moveTo.to);
         // если на следующем шаге нет возможности начать задачу для моего пользователя,
         // то сменить пользователя
-        if (step && !strategy.canBeStarted(step.status)) {
-          task.performerId = await this.projectService.findStatusPerformerByStep(task.project, strategy, step, manager);
+        if (moveTo && !strategy.canBeStarted(moveTo.to)) {
+          task.performerId = await this.projectService.findStatusPerformerByStep(
+            task.project,
+            strategy,
+            moveTo,
+            manager
+          );
           newTaskData.performerId = task.performerId;
         }
       }
@@ -466,8 +470,8 @@ export class UserWorkService {
       }
 
       const strategy = await this.projectService.getCurrentUserStrategy(project, user, manager);
-      const stepForBringBack = strategy.bringBack(task.statusTypeName);
-      if (!stepForBringBack) {
+      const bringBackMove = strategy.bringBack(task.statusTypeName);
+      if (!bringBackMove) {
         throw new NotAcceptableException('Задача не может быть возвращена назад');
       }
 
@@ -481,12 +485,12 @@ export class UserWorkService {
       const performerId = await this.projectService.findStatusPerformerByStep(
         project,
         strategy,
-        stepForBringBack,
+        bringBackMove,
         manager
       );
 
       const newTaskData: Partial<Task> = {
-        statusTypeName: stepForBringBack.status,
+        statusTypeName: bringBackMove.to,
         performerId,
       };
       task = await this.taskService.updateByUser(task, newTaskData, user, manager);

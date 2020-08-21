@@ -342,13 +342,15 @@ export class TaskFlowStrategy {
     return errors;
   }
 
-  public bringBack(statusTypeName: STATUS_NAME): IStep | undefined {
-    return this.steps.find((col) => {
-      return (
-        col.status === statusTypeName &&
-        col.moves.find((move) => move.type === MOVE_TYPE.BRING_BACK && this.userStrategyRoles.includes(move.role))
-      );
-    });
+  public bringBack(statusTypeName: STATUS_NAME): IMove | undefined {
+    const step = this.findStepByStatusName(statusTypeName);
+    if (step) {
+      return step.moves.find((m) => {
+        return m.type === MOVE_TYPE.BRING_BACK && this.userStrategyRoles.includes(m.role);
+      });
+    }
+
+    return undefined;
   }
 
   public findMoveForStart(step: IStep): IMove | undefined {

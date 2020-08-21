@@ -18,6 +18,7 @@ import {
 } from '@common/helpers/metricConverter';
 
 import {
+  IMove,
   IStep,
   MOVE_TYPE,
   ROLE,
@@ -554,15 +555,16 @@ export class ProjectService {
   public async findStatusPerformerByStep(
     project: Project,
     strategy: TaskFlowStrategy,
-    step: IStep,
+    move: IMove,
     manager: EntityManager
   ): Promise<number> {
-    const move = strategy.findMoveForStart(step);
-    if (!move) {
+    const step = strategy.findStepByStatusName(move.to);
+    const forwardMove = strategy.findMoveForStart(step);
+    if (!forwardMove) {
       throw new NotAcceptableException('Не удалось найти, кому возвращать задачу');
     }
 
-    const projectRole = await manager.findOne(ProjectRole, { projectId: project.id, roleId: move.role });
+    const projectRole = await manager.findOne(ProjectRole, { projectId: project.id, roleId: forwardMove.role });
     if (!projectRole) {
       throw new NotAcceptableException('Не удалось найти, роль в проекте');
     }
