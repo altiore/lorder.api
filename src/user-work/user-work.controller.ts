@@ -16,9 +16,9 @@ import { AccessLevel, ProjectParam } from '../project/@common/decorators';
 import { AccessLevelGuard } from '../project/@common/guards';
 import {
   CreateAndStartDto,
+  RevertBackDto,
   StartResponse,
   StopResponse,
-  UserWorkCreateDto,
   UserWorkEditResultDto,
   UserWorkPatchDto,
   UserWorkStartDto,
@@ -97,6 +97,18 @@ export class UserWorkController {
   ): Promise<StopResponse> {
     const userWork = await this.userWorkService.findOneByUserAndCheckAccess(userWorkId, user);
     return this.userWorkService.pause(userWork, user);
+  }
+
+  @Patch(':userWorkId/revert-back')
+  @Roles('user')
+  @ApiResponse({ status: 200, type: UserWork, description: 'ACCESS_LEVEL.RED' })
+  public async revertBack(
+    @Body() revertBackDto: RevertBackDto,
+    @Param('userWorkId', ParseIntPipe) userWorkId: number,
+    @UserJWT() user: User
+  ): Promise<StopResponse> {
+    const userWork = await this.userWorkService.findOneByUserAndCheckAccess(userWorkId, user);
+    return this.userWorkService.revertBack(revertBackDto, userWork, user);
   }
 
   @Delete(':userWorkId')

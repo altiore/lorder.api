@@ -342,6 +342,23 @@ export class TaskFlowStrategy {
     return errors;
   }
 
+  public bringBack(statusTypeName: STATUS_NAME): IStep | undefined {
+    return this.steps.find((col) => {
+      return (
+        col.status === statusTypeName &&
+        col.moves.find((move) => move.type === MOVE_TYPE.BRING_BACK && this.userStrategyRoles.includes(move.role))
+      );
+    });
+  }
+
+  public findMoveForStart(step: IStep): IMove | undefined {
+    return step.moves.find((move) => move.type === MOVE_TYPE.PUSH_FORWARD);
+  }
+
+  public findStepByStatusName(statusTypeName: STATUS_NAME): IStep {
+    return this.steps.find((s) => s.status === statusTypeName);
+  }
+
   public canBeStarted(statusTypeName: STATUS_NAME) {
     return (
       this.steps.findIndex((col) => {

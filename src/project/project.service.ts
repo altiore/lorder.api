@@ -17,8 +17,15 @@ import {
   timeProductivity,
 } from '@common/helpers/metricConverter';
 
-import { ROLE, STATUS_NAME, TASK_FLOW_STRATEGY, TASK_TYPE } from '../@domains/strategy';
-import { TaskFlowStrategy } from '../@domains/strategy';
+import {
+  IStep,
+  MOVE_TYPE,
+  ROLE,
+  STATUS_NAME,
+  TaskFlowStrategy,
+  TASK_FLOW_STRATEGY,
+  TASK_TYPE,
+} from '../@domains/strategy';
 import { Media, MEDIA_TYPE } from '../@orm/media';
 import { ProjectRole } from '../@orm/project-role/project-role.entity';
 import { ProjectTaskTypeRepository } from '../@orm/project-task-type';
@@ -542,6 +549,41 @@ export class ProjectService {
       await this.addLogo(project);
     }
     return this.fileService.updateOrCreateObjInGoogleCloudStorage(file, project.logo);
+  }
+
+  public async findStatusPerformerByStep(
+    project: Project,
+    strategy: TaskFlowStrategy,
+    step: IStep,
+    manager: EntityManager
+  ): Promise<number> {
+    const move = strategy.findMoveForStart(step);
+    if (!move) {
+      throw new NotAcceptableException('Не удалось найти, кому возвращать задачу');
+    }
+
+    const projectRole = await manager.findOne(ProjectRole, { projectId: project.id, roleId: move.role });
+    if (!projectRole) {
+      throw new NotAcceptableException('Не удалось найти, роль в проекте');
+    }
+
+    const res = await manager.query(`
+      SELECT "userProjectMemberId"
+      FROM "user_project_roles_project_role"
+      WHERE
+        "projectRoleId" = ${projectRole.id}
+        AND "userProjectProjectId" = ${project.id}
+  `);
+
+    if (!res?.length) {
+      throw new NotAcceptableException('Не удалось найти пользователей с необходимой ролью');
+    }
+    const resultMemberId = res[Math.floor(Math.random() * res.length)]?.userProjectMemberId;
+    if (!resultMemberId) {
+      throw new NotAcceptableException('Не удалось найти пользователей с необходимой ролью');
+    }
+
+    return resultMemberId;
   }
 
   private async addLogo(project: Project): Promise<Project> {

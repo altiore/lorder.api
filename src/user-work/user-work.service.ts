@@ -2,7 +2,6 @@ import { ForbiddenException, Injectable, NotAcceptableException, NotFoundExcepti
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { ValidationError } from 'class-validator';
-import { pick } from 'lodash';
 import * as moment from 'moment';
 import { DeleteResult, EntityManager, IsNull } from 'typeorm';
 
@@ -14,17 +13,18 @@ import { PaginationDto } from '@common/dto';
 
 import { DATE_FORMAT } from '../@common/consts';
 import { ValidationException } from '../@common/exceptions/validation.exception';
-import { TaskFlowStrategy } from '../@domains/strategy';
+import { TaskFlowStrategy, TASK_FLOW_STRATEGY } from '../@domains/strategy';
 import { Task } from '../@orm/task';
 import { TaskType } from '../@orm/task-type/task-type.entity';
 import { UserTask } from '../@orm/user-task';
 import { UserWork, UserWorkRepository } from '../@orm/user-work';
 import { ProjectService } from '../project/project.service';
 import { ProjectTaskService } from '../project/task/project.task.service';
+import { TaskCommentService } from '../task-comment/task-comment.service';
 import { TaskService } from '../task/task.service';
 import { UserService } from '../user/user.service';
 import {
-  CreateAndStartDto,
+  RevertBackDto,
   StartResponse,
   StopResponse,
   UserWorkCreateDto,
@@ -40,7 +40,8 @@ export class UserWorkService {
     private readonly projectService: ProjectService,
     private readonly projectTaskService: ProjectTaskService,
     private readonly userService: UserService,
-    private readonly taskService: TaskService
+    private readonly taskService: TaskService,
+    private readonly taskCommentService: TaskCommentService
   ) {}
 
   public findAll(pagesDto: PaginationDto, user: User): Promise<UserWork[]> {
@@ -156,21 +157,21 @@ export class UserWorkService {
         throw new ValidationException(errors.map((res) => Object.assign(new ValidationError(), res)));
       }
 
+      if (strategy.strategy === TASK_FLOW_STRATEGY.ADVANCED) {
+        const step = strategy.findStepByStatusName(moveTo.to);
+        // если на следующем шаге нет возможности начать задачу для моего пользователя,
+        // то сменить пользователя
+        if (step && !strategy.canBeStarted(step.status)) {
+          task.performerId = await this.projectService.findStatusPerformerByStep(task.project, strategy, step, manager);
+          newTaskData.performerId = task.performerId;
+        }
+      }
+
       task.statusTypeName = moveTo.to;
       newTaskData.statusTypeName = moveTo.to;
     }
 
     return await this.taskService.updateByUser(task, newTaskData, user, manager);
-  }
-
-  public async updateBenefitParts(userTasks: UserTask[], manager?: EntityManager): Promise<void> {
-    const curManager = manager || this.userWorkRepo.manager;
-    const usersCount = userTasks.length;
-    userTasks.map((ut) => {
-      const accuracy = 1000000;
-      ut.benefitPart = Math.round(accuracy / usersCount) / accuracy;
-    });
-    await curManager.save(userTasks);
   }
 
   public async finishNotFinished(user: User, manager?: EntityManager): Promise<UserWork[]> {
@@ -290,39 +291,56 @@ export class UserWorkService {
     return result;
   }
 
+  private async pauseTransactionContent(
+    userWork: UserWork,
+    user: User,
+    manager: EntityManager,
+    withPrevTaskId: boolean = true
+  ): Promise<StopResponse> {
+    const stopResponse: StopResponse = {
+      next: null,
+      previous: null,
+    };
+
+    // 1. Останавливаем предыдущую задачу
+    stopResponse.previous = await this.finishUserWork(manager, userWork, user);
+
+    // 2. Создаем новую С ПРАВИЛЬНЫМ prevTaskId!
+    const defProject = await this.userService.getDefaultProject(user, manager);
+    const userWorkData: UserWorkCreateDto = {
+      description: `После "${stopResponse.previous.task.title}"`,
+      projectId: defProject.id,
+      title: 'Перерыв/Отдых',
+    };
+    if (withPrevTaskId) {
+      userWorkData.prevTaskId = userWork.taskId;
+    }
+    const { task, strategy } = await this.createTaskByProject(defProject, user, userWorkData, manager);
+    stopResponse.next = await this.startTask(
+      task,
+      user,
+      userWorkData,
+      stopResponse.previous.finishAt,
+      strategy,
+      manager
+    );
+
+    // 3. Добавляем в ответ предыдущую задачу к той, что только что создали, чтоб знать, какую задачв возобновлять
+    stopResponse.next.prevTask = userWork.task;
+    return stopResponse;
+  }
+
   public async pause(userWork: UserWork, user: User): Promise<StopResponse> {
     if (userWork.finishAt) {
       throw new NotAcceptableException('Эта задача уже завершена. Вы не можете завершить одну и ту же задачу дважды');
     }
 
-    const stopResponse: StopResponse = {
+    let stopResponse: StopResponse = {
       next: null,
       previous: null,
     };
     await this.userWorkRepo.manager.transaction(async (manager) => {
-      // 1. Останавливаем предыдущую задачу
-      stopResponse.previous = await this.finishUserWork(manager, userWork, user);
-
-      // 2. Создаем новую С ПРАВИЛЬНЫМ prevTaskId!
-      const defProject = await this.userService.getDefaultProject(user, manager);
-      const userWorkData = {
-        description: `После "${stopResponse.previous.task.title}"`,
-        projectId: defProject.id,
-        title: 'Перерыв/Отдых',
-        prevTaskId: userWork.taskId,
-      };
-      const { task, strategy } = await this.createTaskByProject(defProject, user, userWorkData, manager);
-      stopResponse.next = await this.startTask(
-        task,
-        user,
-        userWorkData,
-        stopResponse.previous.finishAt,
-        strategy,
-        manager
-      );
-
-      // 3. Добавляем в ответ предыдущую задачу к той, что только что создали, чтоб знать, какую задачв возобновлять
-      stopResponse.next.prevTask = userWork.task;
+      stopResponse = await this.pauseTransactionContent(userWork, user, manager);
     });
 
     return stopResponse;
@@ -421,6 +439,58 @@ export class UserWorkService {
       removed,
       touched,
     };
+  }
+
+  public async revertBack(revertBackDto: RevertBackDto, userWork: UserWork, user: User): Promise<StopResponse> {
+    let stopResponse: StopResponse = {
+      next: null,
+      previous: userWork,
+    };
+
+    await this.userWorkRepo.manager.transaction(async (manager) => {
+      // 1. Определить, можем ли мы вернуть задачу назад
+      if (userWork.task.performerId !== user.id) {
+        throw new NotAcceptableException('Вы пытаетесь вернуть назад задачу, которая не назначена на вас');
+      }
+
+      const strategy = await this.projectService.getCurrentUserStrategy(userWork.task.project, user, manager);
+      const stepForBringBack = strategy.bringBack(userWork.task.statusTypeName);
+      if (!stepForBringBack) {
+        throw new NotAcceptableException('Задача не может быть возвращена назад');
+      }
+
+      // 2. Если задача в прогрессе - поставить ее на паузу
+      if (!userWork.finishAt) {
+        stopResponse = await this.pauseTransactionContent(userWork, user, manager, false);
+      }
+
+      // 3. Поменять статус задачи и ответственного
+      const performerId = await this.projectService.findStatusPerformerByStep(
+        userWork.task.project,
+        strategy,
+        stepForBringBack,
+        manager
+      );
+
+      const newTaskData: Partial<Task> = {
+        statusTypeName: stepForBringBack.status,
+        performerId,
+      };
+      stopResponse.previous.task = await this.taskService.updateByUser(userWork.task, newTaskData, user, manager);
+
+      // 4. Добавить комментарий в задачу
+      const comment = await this.taskCommentService.createNewComment(
+        revertBackDto.reason,
+        userWork.taskId,
+        userWork.task.projectId,
+        user,
+        manager
+      );
+      stopResponse.previous.task.commentsCount += 1;
+      stopResponse.previous.task.comments = [comment];
+    });
+
+    return stopResponse;
   }
 
   public recent(user: User, pagesDto: PaginationDto): Promise<UserWork[]> {

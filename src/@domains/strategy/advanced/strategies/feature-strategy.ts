@@ -15,9 +15,6 @@ export const feature_strategy: Array<IStep> = [
         to: STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING,
         role: ROLE.ARCHITECT,
         requirements: {
-          fields: {
-            description: [required, longerThen(120)],
-          },
           transit: true,
         },
       },
@@ -36,6 +33,7 @@ export const feature_strategy: Array<IStep> = [
         to: STATUS_NAME.ASSIGNING_RESPONSIBLE,
         requirements: {
           fields: {
+            description: [required, longerThen(120)],
             urgency: [required, isString, oneOf(URGENCY)],
           },
           transit: true,
@@ -141,6 +139,11 @@ export const feature_strategy: Array<IStep> = [
         type: MOVE_TYPE.PUSH_FORWARD,
         role: ROLE.DEVELOPER,
         to: STATUS_NAME.PROF_REVIEW,
+      },
+      {
+        type: MOVE_TYPE.BRING_BACK,
+        role: ROLE.DEVELOPER,
+        to: STATUS_NAME.ESTIMATION_BEFORE_ASSIGNING,
       },
     ],
   },
