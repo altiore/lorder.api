@@ -441,32 +441,45 @@ export class UserWorkService {
     };
   }
 
-  public async revertBack(revertBackDto: RevertBackDto, userWork: UserWork, user: User): Promise<StopResponse> {
+  public async revertBack(
+    sequenceNumber: number,
+    project: Project,
+    user: User,
+    revertBackDto: RevertBackDto
+  ): Promise<{ task: Task; stopResponse: StopResponse }> {
     let stopResponse: StopResponse = {
       next: null,
-      previous: userWork,
+      previous: null,
     };
+    let task = await this.userWorkRepo.manager.findOne(Task, {
+      where: { sequenceNumber, project: { id: project.id } },
+      relations: ['comments', 'userWorks'],
+    });
+    if (!task) {
+      throw new NotFoundException('Задача не была найдена!');
+    }
 
     await this.userWorkRepo.manager.transaction(async (manager) => {
       // 1. Определить, можем ли мы вернуть задачу назад
-      if (userWork.task.performerId !== user.id) {
+      if (task.performerId !== user.id) {
         throw new NotAcceptableException('Вы пытаетесь вернуть назад задачу, которая не назначена на вас');
       }
 
-      const strategy = await this.projectService.getCurrentUserStrategy(userWork.task.project, user, manager);
-      const stepForBringBack = strategy.bringBack(userWork.task.statusTypeName);
+      const strategy = await this.projectService.getCurrentUserStrategy(task.project, user, manager);
+      const stepForBringBack = strategy.bringBack(task.statusTypeName);
       if (!stepForBringBack) {
         throw new NotAcceptableException('Задача не может быть возвращена назад');
       }
 
       // 2. Если задача в прогрессе - поставить ее на паузу
-      if (!userWork.finishAt) {
+      const userWork = task.userWorks.find((el) => !el.finishAt);
+      if (userWork && !userWork.finishAt) {
         stopResponse = await this.pauseTransactionContent(userWork, user, manager, false);
       }
 
       // 3. Поменять статус задачи и ответственного
       const performerId = await this.projectService.findStatusPerformerByStep(
-        userWork.task.project,
+        task.project,
         strategy,
         stepForBringBack,
         manager
@@ -476,21 +489,21 @@ export class UserWorkService {
         statusTypeName: stepForBringBack.status,
         performerId,
       };
-      stopResponse.previous.task = await this.taskService.updateByUser(userWork.task, newTaskData, user, manager);
+      task = await this.taskService.updateByUser(task, newTaskData, user, manager);
 
       // 4. Добавить комментарий в задачу
       const comment = await this.taskCommentService.createNewComment(
         revertBackDto.reason,
-        userWork.taskId,
-        userWork.task.projectId,
+        task.id,
+        task.projectId,
         user,
         manager
       );
-      stopResponse.previous.task.commentsCount += 1;
-      stopResponse.previous.task.comments = [comment];
+      task.commentsCount += 1;
+      task.comments.push(comment);
     });
 
-    return stopResponse;
+    return { task, stopResponse };
   }
 
   public recent(user: User, pagesDto: PaginationDto): Promise<UserWork[]> {

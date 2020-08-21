@@ -10,8 +10,10 @@ import { PaginationDto } from '@common/dto';
 
 import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 
-import { Roles, UserJWT } from '../@common/decorators';
+import { Auth, res, Roles, UserJWT } from '../@common/decorators';
 import { RolesGuard } from '../@common/guards';
+import { ROLES } from '../@orm/role';
+import { Task } from '../@orm/task';
 import { AccessLevel, ProjectParam } from '../project/@common/decorators';
 import { AccessLevelGuard } from '../project/@common/guards';
 import {
@@ -99,16 +101,15 @@ export class UserWorkController {
     return this.userWorkService.pause(userWork, user);
   }
 
-  @Patch(':userWorkId/revert-back')
-  @Roles('user')
-  @ApiResponse({ status: 200, type: UserWork, description: 'ACCESS_LEVEL.RED' })
+  @Patch(':sequenceNumber/:projectId/bring-back')
+  @Auth(res(Project).updateOne, ROLES.USER, ACCESS_LEVEL.VIOLET)
   public async revertBack(
+    @Param('sequenceNumber', ParseIntPipe) sequenceNumber: number,
     @Body() revertBackDto: RevertBackDto,
-    @Param('userWorkId', ParseIntPipe) userWorkId: number,
+    @ProjectParam() project: Project,
     @UserJWT() user: User
-  ): Promise<StopResponse> {
-    const userWork = await this.userWorkService.findOneByUserAndCheckAccess(userWorkId, user);
-    return this.userWorkService.revertBack(revertBackDto, userWork, user);
+  ): Promise<{ task: Task; stopResponse: StopResponse }> {
+    return this.userWorkService.revertBack(sequenceNumber, project, user, revertBackDto);
   }
 
   @Delete(':userWorkId')
