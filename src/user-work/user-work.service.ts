@@ -465,7 +465,7 @@ export class UserWorkService {
         throw new NotAcceptableException('Вы пытаетесь вернуть назад задачу, которая не назначена на вас');
       }
 
-      const strategy = await this.projectService.getCurrentUserStrategy(task.project, user, manager);
+      const strategy = await this.projectService.getCurrentUserStrategy(project, user, manager);
       const stepForBringBack = strategy.bringBack(task.statusTypeName);
       if (!stepForBringBack) {
         throw new NotAcceptableException('Задача не может быть возвращена назад');
@@ -479,7 +479,7 @@ export class UserWorkService {
 
       // 3. Поменять статус задачи и ответственного
       const performerId = await this.projectService.findStatusPerformerByStep(
-        task.project,
+        project,
         strategy,
         stepForBringBack,
         manager
@@ -492,13 +492,7 @@ export class UserWorkService {
       task = await this.taskService.updateByUser(task, newTaskData, user, manager);
 
       // 4. Добавить комментарий в задачу
-      const comment = await this.taskCommentService.createNewComment(
-        revertBackDto.reason,
-        task.id,
-        task.projectId,
-        user,
-        manager
-      );
+      const comment = await this.taskCommentService.createNewComment(revertBackDto.reason, task, user, manager);
       task.commentsCount += 1;
       task.comments.push(comment);
     });
