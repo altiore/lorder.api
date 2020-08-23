@@ -4,9 +4,9 @@ import { EntityManager, EntityRepository, IsNull, Repository, SelectQueryBuilder
 
 import { DATE_FORMAT } from '../../@common/consts';
 import { PaginationDto } from '../../@common/dto/pagination.dto';
-import { Task } from '../task/task.entity';
-import { User } from '../user/user.entity';
-import { UserWork } from './user-work.entity';
+import { Task } from '../entities/task.entity';
+import { UserWork } from '../entities/user-work.entity';
+import { User } from '../entities/user.entity';
 
 @EntityRepository(UserWork)
 export class UserWorkRepository extends Repository<UserWork> {

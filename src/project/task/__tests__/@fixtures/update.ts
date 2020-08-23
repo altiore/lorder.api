@@ -1,6 +1,7 @@
+import { ROLES } from '@orm/entities/role.entity';
+import { ACCESS_LEVEL } from '@orm/entities/user-project.entity';
+
 import { STATUS_NAME } from '../../../../@domains/strategy';
-import { ROLES } from '../../../../@orm/role';
-import { ACCESS_LEVEL } from '../../../../@orm/user-project';
 import {
   createProjects,
   createTasks,

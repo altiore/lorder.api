@@ -1,18 +1,20 @@
 import { ForbiddenException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { DeleteResult, EntityManager, In, IsNull } from 'typeorm';
+import { DeleteResult, EntityManager, IsNull } from 'typeorm';
 
-import { Project } from '@orm/project';
-import { ProjectPart } from '@orm/project-part/project-part.entity';
-import { Task, TaskRepository } from '@orm/task';
-import { TaskLogRepository, TASK_CHANGE_TYPE } from '@orm/task-log';
-import { User } from '@orm/user';
-import { ACCESS_LEVEL } from '@orm/user-project';
+import { ProjectPart } from '@orm/entities/project-part.entity';
+import { Project } from '@orm/entities/project.entity';
+import { TASK_CHANGE_TYPE } from '@orm/entities/task-log.entity';
+import { Task } from '@orm/entities/task.entity';
+import { ACCESS_LEVEL } from '@orm/entities/user-project.entity';
+import { UserWork } from '@orm/entities/user-work.entity';
+import { User } from '@orm/entities/user.entity';
+import { TaskLogRepository } from '@orm/task-log/task-log.repository';
+import { TaskRepository } from '@orm/task/task.repository';
 
 import { ListResponseDto, PaginationDto } from '../@common/dto';
 import { STATUS_NAME } from '../@domains/strategy';
-import { UserWork } from '../@orm/user-work';
 import { ProjectPartService } from '../project-part/project-part.service';
 import { ProjectService } from '../project/project.service';
 import { TaskPagination } from './dto';

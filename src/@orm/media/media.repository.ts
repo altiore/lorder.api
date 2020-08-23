@@ -1,6 +1,6 @@
 import { EntityRepository, Repository } from 'typeorm';
 
-import { CLOUD_TYPE, Media } from './media.entity';
+import { CLOUD_TYPE, Media } from '../entities/media.entity';
 
 @EntityRepository(Media)
 export class MediaRepository extends Repository<Media> {

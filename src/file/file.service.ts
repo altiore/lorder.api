@@ -4,7 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Storage, UploadResponse } from '@google-cloud/storage';
 import { get } from 'lodash';
 
-import { CLOUD_TYPE, Media, MediaRepository, MEDIA_TYPE } from '@orm/media';
+import { CLOUD_TYPE, Media, MEDIA_TYPE } from '@orm/entities/media.entity';
+import { MediaRepository } from '@orm/media/media.repository';
 
 import * as fs from 'fs';
 

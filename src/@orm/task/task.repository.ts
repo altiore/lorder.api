@@ -1,11 +1,11 @@
 import { EntityManager, EntityRepository, In, Repository } from 'typeorm';
 
-import { PaginationDto } from '../../@common/dto/pagination.dto';
+import { PaginationDto } from '../../@common/dto';
 import { STATUS_NAME } from '../../@domains/strategy/types';
-import { Project } from '../project/project.entity';
-import { UserProject } from '../user-project';
-import { User } from '../user/user.entity';
-import { Task } from './task.entity';
+import { Project } from '../entities/project.entity';
+import { Task } from '../entities/task.entity';
+import { UserProject } from '../entities/user-project.entity';
+import { User } from '../entities/user.entity';
 
 export enum TaskOrderByField {
   'createdAt' = 'createdAt',

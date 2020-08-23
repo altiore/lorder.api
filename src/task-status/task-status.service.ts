@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 
-import { TaskStatus } from '../@orm/task-status/task-status.entity';
+import { TaskStatus } from '@orm/entities/task-status.entity';
 
 @Injectable()
 export class TaskStatusService extends TypeOrmCrudService<TaskStatus> {

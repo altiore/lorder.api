@@ -13,11 +13,12 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { Media } from '@orm/media';
-import { Project, ProjectDto } from '@orm/project';
-import { ROLES } from '@orm/role';
-import { User } from '@orm/user';
-import { ACCESS_LEVEL, UserProject } from '@orm/user-project';
+import { Media } from '@orm/entities/media.entity';
+import { Project } from '@orm/entities/project.entity';
+import { ROLES } from '@orm/entities/role.entity';
+import { ACCESS_LEVEL, UserProject } from '@orm/entities/user-project.entity';
+import { User } from '@orm/entities/user.entity';
+import { ProjectDto } from '@orm/project/dto';
 
 import { Auth, res, Roles, UserJWT } from '@common/decorators';
 import { FileUploadDto } from '@common/dto';

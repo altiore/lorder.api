@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { RoleRepository } from '@orm/role';
-import { UserRepository } from '@orm/user';
+import { RoleRepository } from '@orm/role/role.repository';
+import { UserRepository } from '@orm/user/user.repository';
 
 import { FileModule } from '../file/file.module';
 import { ProjectModule } from '../project/project.module';

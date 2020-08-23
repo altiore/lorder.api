@@ -7,21 +7,20 @@ npm-debug.log
 yarn-error.log
 
 dist
-!/dist/app.json
-!/dist/.env
-!/dist/.gitignore
-!/dist/Procfile
 
 # Local development
 .env
+.env.prev
 .env.test.env
 *.dev
 .DS_Store
 yarn.lock
-google-api-key.json
+google-api-key*.json
 uploads
-./temp
-altiore-1298-e837eac2c685.json
+./docker/temp
+altiore-*.json
+!altiore-8888-888888888888.json
+lorder-*.json
 
 # Docker
 /nbproject/

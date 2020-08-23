@@ -4,11 +4,21 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { get, pick } from 'lodash';
 import { EntityManager, In } from 'typeorm';
 
-import { Project, ProjectDto, ProjectRepository } from '@orm/project';
-import { ProjectPub, ProjectPubRepository } from '@orm/project-pub';
-import { Task } from '@orm/task';
-import { User } from '@orm/user';
-import { ACCESS_LEVEL, UserProject, UserProjectRepository } from '@orm/user-project';
+import { Media, MEDIA_TYPE } from '@orm/entities/media.entity';
+import { ProjectPub } from '@orm/entities/project-pub.entity';
+import { ProjectRole } from '@orm/entities/project-role.entity';
+import { Project } from '@orm/entities/project.entity';
+import { TaskType } from '@orm/entities/task-type.entity';
+import { Task } from '@orm/entities/task.entity';
+import { ACCESS_LEVEL, UserProject } from '@orm/entities/user-project.entity';
+import { UserTask } from '@orm/entities/user-task.entity';
+import { UserWork } from '@orm/entities/user-work.entity';
+import { User } from '@orm/entities/user.entity';
+import { ProjectPubRepository } from '@orm/project-pub/project-pub.repository';
+import { ProjectTaskTypeRepository } from '@orm/project-task-type/project-task-type.repository';
+import { ProjectDto } from '@orm/project/dto';
+import { ProjectRepository } from '@orm/project/project.repository';
+import { UserProjectRepository } from '@orm/user-project/user-project.repository';
 
 import {
   daysToMonths,
@@ -27,12 +37,6 @@ import {
   TASK_FLOW_STRATEGY,
   TASK_TYPE,
 } from '../@domains/strategy';
-import { Media, MEDIA_TYPE } from '../@orm/media';
-import { ProjectRole } from '../@orm/project-role/project-role.entity';
-import { ProjectTaskTypeRepository } from '../@orm/project-task-type';
-import { TaskType } from '../@orm/task-type/task-type.entity';
-import { UserTask } from '../@orm/user-task';
-import { UserWork } from '../@orm/user-work';
 import { FileService } from '../file/file.service';
 import { ProjectPaginationDto } from './@dto';
 

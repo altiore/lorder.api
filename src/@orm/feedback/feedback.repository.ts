@@ -1,7 +1,7 @@
 import { EntityRepository, Repository } from 'typeorm';
 
-import { PaginationDto } from '../../@common/dto/pagination.dto';
-import { Feedback } from './feedback.entity';
+import { PaginationDto } from '../../@common/dto';
+import { Feedback } from '../entities/feedback.entity';
 
 @EntityRepository(Feedback)
 export class FeedbackRepository extends Repository<Feedback> {

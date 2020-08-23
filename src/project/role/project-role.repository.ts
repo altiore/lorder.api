@@ -1,6 +1,6 @@
 import { EntityRepository, Repository } from 'typeorm';
 
-import { ProjectRole } from '../../@orm/project-role/project-role.entity';
+import { ProjectRole } from '@orm/entities/project-role.entity';
 
 @EntityRepository(ProjectRole)
 export class ProjectRoleRepository extends Repository<ProjectRole> {

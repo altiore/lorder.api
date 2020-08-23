@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { ProjectRepository } from '@orm/project';
-import { ProjectPubRepository } from '@orm/project-pub';
-import { UserRepository } from '@orm/user';
+import { ProjectPubRepository } from '@orm/project-pub/project-pub.repository';
+import { ProjectRepository } from '@orm/project/project.repository';
+import { UserRepository } from '@orm/user/user.repository';
 
 import { RedisModule } from '../redis/redis.module';
 import { StatisticsController } from './statistics.controller';

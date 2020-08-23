@@ -1,7 +1,7 @@
 import { Controller, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { Media } from '@orm/media';
+import { Media } from '@orm/entities/media.entity';
 
 import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 

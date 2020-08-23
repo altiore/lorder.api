@@ -4,10 +4,10 @@ import { Crud, CrudController, CrudRequest, Override, ParsedBody, ParsedRequest 
 
 import { get } from 'lodash';
 
-import { Project } from '@orm/project';
-import { ProjectPart } from '@orm/project-part/project-part.entity';
-import { ROLES } from '@orm/role';
-import { ACCESS_LEVEL } from '@orm/user-project';
+import { ProjectPart } from '@orm/entities/project-part.entity';
+import { Project } from '@orm/entities/project.entity';
+import { ROLES } from '@orm/entities/role.entity';
+import { ACCESS_LEVEL } from '@orm/entities/user-project.entity';
 
 import { Auth, res } from '@common/decorators';
 

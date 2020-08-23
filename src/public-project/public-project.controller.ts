@@ -2,7 +2,7 @@ import { Controller } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Crud } from '@nestjsx/crud';
 
-import { ProjectPub } from '@orm/project-pub';
+import { ProjectPub } from '@orm/entities/project-pub.entity';
 
 import { res, UnAuth } from '@common/decorators';
 

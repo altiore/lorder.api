@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { TaskComment } from '@orm/task-comment/task-comment.entity';
+import { TaskComment } from '@orm/entities/task-comment.entity';
 
 import { ProjectModule } from '../project/project.module';
 import { TaskModule } from '../task/task.module';

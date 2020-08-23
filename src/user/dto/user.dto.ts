@@ -3,7 +3,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsIn, IsOptional } from 'class-validator';
 import { toArray } from 'lodash';
 
-import { ROLES } from '@orm/role';
+import { ROLES } from '@orm/entities/role.entity';
 
 export class UserDto {
   @ApiPropertyOptional()

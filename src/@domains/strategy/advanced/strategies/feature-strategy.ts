@@ -1,4 +1,4 @@
-import { COMPLEXITY, URGENCY } from '../../../../@orm/user-task';
+import { COMPLEXITY, URGENCY } from '../../../../@orm/entities/user-task.entity';
 import { COLUMN_TYPE, IStep, MOVE_TYPE, ROLE, STATUS_NAME } from '../../types';
 import { isNumber, isString, oneOf, required } from '../../validators';
 import { longerThen } from '../../validators/longerThan';

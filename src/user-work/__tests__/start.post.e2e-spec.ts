@@ -1,8 +1,9 @@
+import { Task } from '@orm/entities/task.entity';
+import { UserProject } from '@orm/entities/user-project.entity';
+import { UserTask } from '@orm/entities/user-task.entity';
+import { UserWork } from '@orm/entities/user-work.entity';
+
 import { STATUS_NAME } from '../../@domains/strategy';
-import { Task } from '../../@orm/task';
-import { UserProject } from '../../@orm/user-project';
-import { UserTask } from '../../@orm/user-task';
-import { UserWork } from '../../@orm/user-work';
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
 import {
   projectsFixture,

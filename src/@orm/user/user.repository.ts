@@ -2,10 +2,10 @@ import { createHash } from 'crypto';
 import { DeepPartial, EntityRepository, In, Repository } from 'typeorm';
 
 import { PaginationDto } from '../../@common/dto/pagination.dto';
-import { Role } from '../role/role.entity';
-import { UserRole } from '../user-role/user-role.entity';
+import { Role } from '../entities/role.entity';
+import { UserRole } from '../entities/user-role.entity';
+import { User } from '../entities/user.entity';
 import { requiredUserRelations } from './dto/required.relations';
-import { User } from './user.entity';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {

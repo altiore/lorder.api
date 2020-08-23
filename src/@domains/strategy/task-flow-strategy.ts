@@ -1,6 +1,7 @@
 import { chain, intersection } from 'lodash';
 
-import { TASK_SIMPLE_STATUS } from '../../@orm/task/task-simple-status';
+import { TASK_SIMPLE_STATUS } from '@orm/task/task-simple-status';
+
 import { getColumns, getSteps as getAdvancedSteps, roles as advancedRoles } from './advanced';
 import { columns as simpleColumns, steps as simpleSteps } from './simple';
 import {

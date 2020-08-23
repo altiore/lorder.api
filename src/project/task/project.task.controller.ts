@@ -15,10 +15,10 @@ import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { DeepPartial } from 'typeorm';
 
-import { Project } from '@orm/project';
-import { Task } from '@orm/task';
-import { User } from '@orm/user';
-import { ACCESS_LEVEL } from '@orm/user-project';
+import { Project } from '@orm/entities/project.entity';
+import { Task } from '@orm/entities/task.entity';
+import { ACCESS_LEVEL } from '@orm/entities/user-project.entity';
+import { User } from '@orm/entities/user.entity';
 
 import { Roles, UserJWT } from '@common/decorators';
 import { ListResponseDto, PaginationDto } from '@common/dto';

@@ -5,7 +5,7 @@ import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { ValidationError } from 'class-validator';
 import { EntityManager, In } from 'typeorm';
 
-import { ProjectPart } from '@orm/project-part/project-part.entity';
+import { ProjectPart } from '@orm/entities/project-part.entity';
 
 import { ValidationException } from '../@common/exceptions/validation.exception';
 

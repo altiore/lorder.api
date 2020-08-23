@@ -3,7 +3,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 import { TASK_FLOW_STRATEGY } from '../../../@domains/strategy';
-import { PROJECT_TYPE } from '../project.entity';
+import { PROJECT_TYPE } from '../../entities/project.entity';
 
 export class ProjectDto {
   @ApiProperty()

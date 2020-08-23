@@ -1,14 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 import { ClientResponse } from '@sendgrid/client/src/response';
 import { MailData } from '@sendgrid/helpers/classes/mail';
-import * as sgMail from '@sendgrid/mail';
+import { MailService as SendGridMailService } from '@sendgrid/mail';
 import * as Mustache from 'mustache';
 
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
 import { MailAcceptedDto } from './dto';
+import { MAIL_PROVIDER_SERVICE } from './mail.constants';
 
 /**
  * каждое письмо соответсвует одноименному файлу в папке mjml
@@ -26,9 +27,7 @@ export class MailService {
   private static readonly INVITE_TEMPLATE = 'invite';
   private static readonly MAGIC_LINK = 'magic';
 
-  constructor() {
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-  }
+  constructor(@Inject(MAIL_PROVIDER_SERVICE) private readonly mailService: typeof SendGridMailService) {}
 
   public sendInvite({
     email,
@@ -59,13 +58,14 @@ export class MailService {
   }
 
   public sendMagicLink(email: string, link: string): Promise<MailAcceptedDto> {
-    const output = this.putParamsToTemplate(MailService.MAGIC_LINK, {
+    const dynamicTemplateData = {
       EMAIL: email,
       LINK: link,
-    });
+    };
+    const output = this.putParamsToTemplate(MailService.MAGIC_LINK, dynamicTemplateData);
 
-    // const [res] = await this.send({
     return this.send({
+      dynamicTemplateData,
       from: MailService.ADMIN_EMAIL,
       html: output,
       subject: 'Магическая ссылка Lorder',
@@ -99,7 +99,7 @@ export class MailService {
    * @see https://sendgrid.com/docs/API_Reference/Web_API_v3/index.html
    */
   private async sendWithSendGrid(msg: MailData): Promise<MailAcceptedDto> {
-    const [res] = (await sgMail.send(msg)) as [ClientResponse, {}];
+    const [res] = (await this.mailService.send(msg)) as [ClientResponse, {}];
     return {
       statusCode: res.statusCode,
       statusMessage: res.statusMessage,

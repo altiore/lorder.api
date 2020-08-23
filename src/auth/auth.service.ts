@@ -12,14 +12,16 @@ import * as jwt from 'jsonwebtoken';
 import * as moment from 'moment';
 import { DeepPartial } from 'typeorm';
 
-import { EmailDto, LoginUserDto, RefreshUserDto, User, UserRepository } from '@orm/user';
-import { UserProjectRepository } from '@orm/user-project';
+import { Session } from '@orm/entities/session.entity';
+import { User } from '@orm/entities/user.entity';
+import { UserProjectRepository } from '@orm/user-project/user-project.repository';
+import { EmailDto, LoginUserDto, RefreshUserDto } from '@orm/user/dto';
+import { RegisterUserDto } from '@orm/user/dto/register.user.dto';
+import { UserRepository } from '@orm/user/user.repository';
 
 import { Request } from 'express';
 
 import { ValidationException } from '../@common/exceptions/validation.exception';
-import { Session } from '../@orm/session/session.entity';
-import { RegisterUserDto } from '../@orm/user/dto/register.user.dto';
 import { MailAcceptedDto } from '../mail/dto';
 import { MailService } from '../mail/mail.service';
 import { RedisService } from '../redis/redis.service';
@@ -73,12 +75,12 @@ export class AuthService {
       userData = await this.redisService.findUserDataByOneTimeToken(activateDto.oneTimeToken);
     } catch (e) {
       throw new NotFoundException(
-        'Истек срок действия одноразовой ссылки.' + ' Пожалуйста, запросите новую ссылку для восстановления'
+        'Истек срок действия одноразовой ссылки. Пожалуйста, запросите новую ссылку для восстановления 1'
       );
     }
     if (!userData || !userData.email) {
       throw new NotFoundException(
-        'Истек срок действия одноразовой ссылки.' + ' Пожалуйста, запросите новую ссылку для восстановления'
+        'Истек срок действия одноразовой ссылки. Пожалуйста, запросите новую ссылку для восстановления 2'
       );
     }
     const user = await this.userService.findUserByEmail(userData.email);

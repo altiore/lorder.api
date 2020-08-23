@@ -1,9 +1,9 @@
 import { fixtureCreator, one } from 'typeorm-fixtures';
 
-import { company } from 'faker';
+import { ProjectPart } from '@orm/entities/project-part.entity';
+import { Project } from '@orm/entities/project.entity';
 
-import { Project } from '../../@orm/project';
-import { ProjectPart } from '../../@orm/project-part/project-part.entity';
+import { company } from 'faker';
 
 export const createProjectParts = fixtureCreator<ProjectPart>(ProjectPart, function (entity, index) {
   return {

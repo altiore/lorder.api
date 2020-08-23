@@ -1,11 +1,11 @@
 import { fixtureCreator, many, one } from 'typeorm-fixtures';
 
-import { company } from 'faker';
+import { ProjectRoleAllowedMove } from '@orm/entities/project-role-allowed-move.entity';
+import { ProjectRole } from '@orm/entities/project-role.entity';
+import { Project } from '@orm/entities/project.entity';
+import { RoleFlow } from '@orm/entities/role-flow.entity';
 
-import { Project } from '../../@orm/project';
-import { ProjectRoleAllowedMove } from '../../@orm/project-role-allowed-move/project-role-allowed-move.entity';
-import { ProjectRole } from '../../@orm/project-role/project-role.entity';
-import { RoleFlow } from '../../@orm/role-flow';
+import { company } from 'faker';
 
 export const createProjectRoles = fixtureCreator<ProjectRole>(ProjectRole, function (entity, index) {
   return {

@@ -4,7 +4,7 @@ import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 
 import { DeleteResult } from 'typeorm';
 
-import { RoleFlow } from '@orm/role-flow';
+import { RoleFlow } from '@orm/entities/role-flow.entity';
 
 @Injectable()
 export class RoleService extends TypeOrmCrudService<RoleFlow> {

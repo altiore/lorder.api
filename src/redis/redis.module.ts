@@ -1,7 +1,5 @@
 import { CacheModule, CacheModuleOptions, DynamicModule, Module } from '@nestjs/common';
 
-import * as redisStore from 'cache-manager-redis-store';
-
 import { REDIS_CACHE_MANAGER } from './redis.constants';
 import { RedisController } from './redis.controller';
 import { createCacheManager } from './redis.providers';
@@ -19,20 +17,11 @@ export class RedisModule {
    * @param options
    */
   static registerCache(options?: CacheModuleOptions): DynamicModule {
-    return CacheModule.registerAsync({
+    return CacheModule.register({
       imports: [RedisModule],
       inject: [RedisService],
-      useFactory: async (redisService: RedisService) => {
-        const allOptions = {
-          ttl: 30,
-          ...(options || {}),
-        };
-        return {
-          store: redisStore,
-          host: 'redis',
-          url: process.env.REDISCLOUD_URL,
-          ...allOptions,
-        };
+      useFactory: (redisService: RedisService) => {
+        return redisService;
       },
     });
   }

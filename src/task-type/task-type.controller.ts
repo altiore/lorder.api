@@ -2,12 +2,12 @@ import { Controller } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Crud } from '@nestjsx/crud';
 
-import { ROLES } from '@orm/role';
+import { ROLES } from '@orm/entities/role.entity';
+import { TaskType } from '@orm/entities/task-type.entity';
+import { TaskTypeCreateDto } from '@orm/task-type/dto';
 
 import { Auth, res } from '@common/decorators';
 
-import { TaskTypeCreateDto } from '../@orm/task-type/dto';
-import { TaskType } from '../@orm/task-type/task-type.entity';
 import { TaskTypeService } from './task-type.service';
 
 @ApiTags('task-types (roles: user(get), super-admin(create/edit/delete))')

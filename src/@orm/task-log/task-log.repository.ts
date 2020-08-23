@@ -1,9 +1,9 @@
 import { omit } from 'lodash';
 import { EntityRepository, Repository } from 'typeorm';
 
-import { Task } from '../task/task.entity';
-import { User } from '../user/user.entity';
-import { TaskLog, TASK_CHANGE_TYPE } from './task-log.entity';
+import { TaskLog, TASK_CHANGE_TYPE } from '../entities/task-log.entity';
+import { Task } from '../entities/task.entity';
+import { User } from '../entities/user.entity';
 
 @EntityRepository(TaskLog)
 export class TaskLogRepository extends Repository<TaskLog> {

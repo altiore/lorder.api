@@ -2,8 +2,8 @@ import { NotFoundException } from '@nestjs/common';
 
 import { EntityRepository, Repository } from 'typeorm';
 
-import { Project } from '../project/project.entity';
-import { ProjectPub } from './project-pub.entity';
+import { ProjectPub } from '../entities/project-pub.entity';
+import { Project } from '../entities/project.entity';
 
 @EntityRepository(ProjectPub)
 export class ProjectPubRepository extends Repository<ProjectPub> {

@@ -1,8 +1,9 @@
 import * as moment from 'moment';
 
+import { Task } from '@orm/entities/task.entity';
+import { UserWork } from '@orm/entities/user-work.entity';
+
 import { STATUS_NAME } from '../../@domains/strategy';
-import { Task } from '../../@orm/task';
-import { UserWork } from '../../@orm/user-work';
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
 import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/stop';
 

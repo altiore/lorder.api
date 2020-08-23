@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { Feedback } from '@orm/feedback';
+import { Feedback } from '@orm/entities/feedback.entity';
 
 import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 

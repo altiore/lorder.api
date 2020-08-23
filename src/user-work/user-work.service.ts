@@ -5,19 +5,20 @@ import { ValidationError } from 'class-validator';
 import * as moment from 'moment';
 import { DeleteResult, EntityManager, IsNull } from 'typeorm';
 
-import { Project } from '@orm/project';
-import { User } from '@orm/user';
-import { ACCESS_LEVEL } from '@orm/user-project';
+import { Project } from '@orm/entities/project.entity';
+import { TaskType } from '@orm/entities/task-type.entity';
+import { Task } from '@orm/entities/task.entity';
+import { ACCESS_LEVEL } from '@orm/entities/user-project.entity';
+import { UserTask } from '@orm/entities/user-task.entity';
+import { UserWork } from '@orm/entities/user-work.entity';
+import { User } from '@orm/entities/user.entity';
+import { UserWorkRepository } from '@orm/user-work/user-work.repository';
 
 import { PaginationDto } from '@common/dto';
 
 import { DATE_FORMAT } from '../@common/consts';
 import { ValidationException } from '../@common/exceptions/validation.exception';
 import { TaskFlowStrategy, TASK_FLOW_STRATEGY } from '../@domains/strategy';
-import { Task } from '../@orm/task';
-import { TaskType } from '../@orm/task-type/task-type.entity';
-import { UserTask } from '../@orm/user-task';
-import { UserWork, UserWorkRepository } from '../@orm/user-work';
 import { ProjectService } from '../project/project.service';
 import { ProjectTaskService } from '../project/task/project.task.service';
 import { TaskCommentService } from '../task-comment/task-comment.service';

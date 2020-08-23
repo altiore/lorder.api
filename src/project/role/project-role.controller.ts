@@ -3,15 +3,15 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { DeepPartial, DeleteResult } from 'typeorm';
 
-import { Project } from '@orm/project';
-import { ROLES } from '@orm/role';
-import { User } from '@orm/user';
-import { ACCESS_LEVEL } from '@orm/user-project';
+import { ProjectRole } from '@orm/entities/project-role.entity';
+import { Project } from '@orm/entities/project.entity';
+import { ROLES } from '@orm/entities/role.entity';
+import { ACCESS_LEVEL } from '@orm/entities/user-project.entity';
+import { User } from '@orm/entities/user.entity';
 
 import { Auth, res, UserJWT } from '@common/decorators';
 
 import { ROLE } from '../../@domains/strategy';
-import { ProjectRole } from '../../@orm/project-role/project-role.entity';
 import { ProjectParam } from '../@common/decorators';
 import { ProjectRoleCreateDto, ProjectRoleUpdateDto } from './dto';
 import { ProjectRoleService } from './project-role.service';

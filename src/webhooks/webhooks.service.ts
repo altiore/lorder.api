@@ -4,7 +4,7 @@ import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 
 import { Repository } from 'typeorm';
 
-import { WebHook } from '@orm/webhook/webhook.entity';
+import { WebHook } from '@orm/entities/webhook.entity';
 
 import { checkGitHubSig } from './webhooks.sig-checker';
 

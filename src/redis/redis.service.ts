@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import * as guid from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 
 import { UserDataDto } from './dto/user.data.dto';
 import { REDIS_CACHE_MANAGER } from './redis.constants';
@@ -10,7 +10,7 @@ export class RedisService {
   constructor(@Inject(REDIS_CACHE_MANAGER) private readonly redis: any) {}
 
   createOneTimeToken(userData: UserDataDto, expiresInSeconds: number = 300): Promise<string> {
-    const token = guid();
+    const token = uuidv4();
     return new Promise((resolve, reject) => {
       this.redis.hmset(token, userData as any, (err) => {
         if (err) {

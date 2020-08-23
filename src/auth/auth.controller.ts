@@ -13,14 +13,13 @@ import {
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { RefreshUserDto } from '@orm/user';
-import { EmailDto, LoginUserDto } from '@orm/user/dto';
+import { EmailDto, LoginUserDto, RefreshUserDto } from '@orm/user/dto';
+import { RegisterUserDto } from '@orm/user/dto/register.user.dto';
 
 import { ValidationException } from '@common/exceptions/validation.exception';
 
 import { Request as Req, Response as Res } from 'express';
 
-import { RegisterUserDto } from '../@orm/user/dto/register.user.dto';
 import { MailAcceptedDto } from '../mail/dto';
 import { AuthService } from './auth.service';
 import { ActivateDto, IdentityDto } from './dto';

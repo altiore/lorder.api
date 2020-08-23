@@ -4,8 +4,8 @@ import { Crud } from '@nestjsx/crud';
 
 import { DeleteResult } from 'typeorm';
 
-import { ROLES } from '@orm/role';
-import { RoleFlow } from '@orm/role-flow';
+import { RoleFlow } from '@orm/entities/role-flow.entity';
+import { ROLES } from '@orm/entities/role.entity';
 
 import { Auth, res } from '@common/decorators';
 

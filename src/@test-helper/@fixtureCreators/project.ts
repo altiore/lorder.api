@@ -1,10 +1,11 @@
 import { fixtureCreator, one } from 'typeorm-fixtures';
 
+import { Project, PROJECT_TYPE } from '@orm/entities/project.entity';
+import { User } from '@orm/entities/user.entity';
+
 import { company, random } from 'faker';
 
 import { TASK_FLOW_STRATEGY } from '../../@domains/strategy';
-import { Project, PROJECT_TYPE } from '../../@orm/project';
-import { User } from '../../@orm/user';
 
 export const createProjects = fixtureCreator<Project>(Project, function (entity, index) {
   return {

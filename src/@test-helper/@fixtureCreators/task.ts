@@ -1,12 +1,13 @@
 import { fixtureCreator, many, one } from 'typeorm-fixtures';
 
+import { Project } from '@orm/entities/project.entity';
+import { Task } from '@orm/entities/task.entity';
+import { UserTask } from '@orm/entities/user-task.entity';
+import { User } from '@orm/entities/user.entity';
+
 import { company, random } from 'faker';
 
 import { STATUS_NAME } from '../../@domains/strategy';
-import { Project } from '../../@orm/project';
-import { Task } from '../../@orm/task';
-import { User } from '../../@orm/user';
-import { UserTask } from '../../@orm/user-task';
 
 export const createTasks = fixtureCreator<Task>(Task, function (entity, index) {
   return {

@@ -1,8 +1,8 @@
 import { Controller, Get, NotFoundException, Param, ParseIntPipe, Patch, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { Task } from '@orm/task';
-import { User } from '@orm/user';
+import { Task } from '@orm/entities/task.entity';
+import { User } from '@orm/entities/user.entity';
 
 import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 

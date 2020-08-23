@@ -1,8 +1,9 @@
 import { create } from 'cache-manager-redis-store';
 import moment = require('moment');
 
-import { User } from '../../@orm/user';
-import { ACCESS_LEVEL, UserProject } from '../../@orm/user-project';
+import { ACCESS_LEVEL, UserProject } from '@orm/entities/user-project.entity';
+import { User } from '@orm/entities/user.entity';
+
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
 import { RedisService } from '../../redis/redis.service';
 import { projectsFixture } from './@fixtures/projects';
@@ -58,7 +59,12 @@ describe(`GET ${h.url}`, () => {
   it('no-password - correct data with correct token', async () => {
     const user = h.entities.User[0];
     const email = user.email;
-    const redisService = new RedisService(create({ url: undefined }).getClient());
+    const redisService = new RedisService(
+      create({
+        ttl: 30,
+        url: process.env.REDISCLOUD_URL,
+      }).getClient()
+    );
     const oneTimeToken = await redisService.createOneTimeToken({
       email,
     });
@@ -99,7 +105,12 @@ describe(`GET ${h.url}`, () => {
   it('with password - correct data with correct token', async () => {
     const user = h.entities.User[1];
     const email = user.email;
-    const redisService = new RedisService(create({ url: undefined }).getClient());
+    const redisService = new RedisService(
+      create({
+        ttl: 30,
+        url: process.env.REDISCLOUD_URL,
+      }).getClient()
+    );
     const oneTimeToken = await redisService.createOneTimeToken({
       email,
       password: 'correct password',
@@ -141,7 +152,12 @@ describe(`GET ${h.url}`, () => {
     const user = h.entities.User[2];
     const project = h.entities.Project[0];
     const email = user.email;
-    const redisService = new RedisService(create({ url: undefined }).getClient());
+    const redisService = new RedisService(
+      create({
+        ttl: 30,
+        url: process.env.REDISCLOUD_URL,
+      }).getClient()
+    );
     const oneTimeToken = await redisService.createOneTimeToken({
       email,
     });

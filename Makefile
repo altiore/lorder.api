@@ -5,31 +5,30 @@ docker_compose_bin = docker-compose
 .PHONY : help init start stop
 .DEFAULT_GOAL := help
 
-help: ## Show help text
+help: ## Показать помощь
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
----------------: ## Development tasks ---------------
+---------------: ## Скрипты для разработки ---------------
 
-init: configs start ## Initialize project
-	${docker_compose_bin} exec postgres bash -c "wait-postgres" \
-	&& npm install
-	@echo "********************************************************************\n\
-	* This project was successfully initialized. Let's go to coding :) *\n\
-	********************************************************************\n"
-
-configs: ## Create enviroment file if it doesn't exist and fill it default values
-	test -s .env || cp .env.example .env \
-	&& ./bin/generate-credentials.sh \
-	@echo "Environment files have been created. Want to continue with default values? [Y/n]"
-	@read line; if [ $$line == "n" ]; then echo Aborting; exit 1 ; fi
-
-start: ## Run project in background
+init: ## Заново инициализировать приложение. Первый старт или если нужно пересобрать приложение
 	chmod +x bin/start.sh \
 	&& ./bin/start.sh \
-	@echo "Start..."
+	@echo "Initial..."
 
-install: ## Run project in background
-	docker exec -t altiore_server bash -c "npm install"
+start: ## Запустить версию для разработки
+	${docker_compose_bin} up
 
-stop: ## Stop project
+stop: ## Остановить
 	${docker_compose_bin} stop
+
+it: ## Войти внутрь главного контейнера (например, для запуска тестов и миграций)
+	docker exec -it lorder_server /bin/bash
+
+gen: ## Заново сгенерировать файл конфигурации
+	test -s .env || cp .env.example .env \
+	&& ./bin/generate-credentials.sh \
+	@echo "Environment files have been created. Start application? [Y/n]"
+	@read line;\
+	if [ $$line = "Y" ]; then\
+		make initial;\
+	fi

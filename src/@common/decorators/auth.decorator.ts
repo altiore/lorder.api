@@ -3,8 +3,8 @@ import { ApiBearerAuth, ApiResponse, ApiResponseOptions, ApiUnauthorizedResponse
 
 import { get } from 'lodash';
 
-import { ROLES } from '@orm/role';
-import { ACCESS_LEVEL } from '@orm/user-project';
+import { ROLES } from '@orm/entities/role.entity';
+import { ACCESS_LEVEL } from '@orm/entities/user-project.entity';
 
 import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 

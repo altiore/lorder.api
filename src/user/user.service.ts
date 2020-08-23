@@ -3,12 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { DeepPartial, EntityManager } from 'typeorm';
 
-import { Media, MEDIA_TYPE } from '@orm/media';
-import { Project, PROJECT_TYPE } from '@orm/project';
-import { RoleRepository } from '@orm/role';
-import { UpdateUserDto, User, UserRepository } from '@orm/user';
+import { Media, MEDIA_TYPE } from '@orm/entities/media.entity';
+import { Project, PROJECT_TYPE } from '@orm/entities/project.entity';
+import { UserRole } from '@orm/entities/user-role.entity';
+import { User } from '@orm/entities/user.entity';
+import { RoleRepository } from '@orm/role/role.repository';
+import { UpdateUserDto } from '@orm/user/dto';
+import { UserRepository } from '@orm/user/user.repository';
 
-import { UserRole } from '../@orm/user-role/user-role.entity';
 import { JwtPayload } from '../auth/interfaces';
 import { FileService } from '../file/file.service';
 import { ProjectService } from '../project/project.service';

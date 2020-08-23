@@ -5,12 +5,14 @@ import { ValidationError } from 'class-validator';
 import { pick } from 'lodash';
 import { EntityManager } from 'typeorm';
 
-import { Project } from '@orm/project';
-import { ProjectTaskType, ProjectTaskTypeRepository } from '@orm/project-task-type';
-import { Task } from '@orm/task';
-import { TaskType } from '@orm/task-type/task-type.entity';
-import { User } from '@orm/user';
-import { ACCESS_LEVEL, UserProject } from '@orm/user-project';
+import { ProjectTaskType } from '@orm/entities/project-task-type.entity';
+import { Project } from '@orm/entities/project.entity';
+import { TaskType } from '@orm/entities/task-type.entity';
+import { Task } from '@orm/entities/task.entity';
+import { ACCESS_LEVEL, UserProject } from '@orm/entities/user-project.entity';
+import { UserTask } from '@orm/entities/user-task.entity';
+import { User } from '@orm/entities/user.entity';
+import { ProjectTaskTypeRepository } from '@orm/project-task-type/project-task-type.repository';
 
 import { ListResponseDto, PaginationDto } from '@common/dto';
 import { ValidationException } from '@common/exceptions/validation.exception';
@@ -18,7 +20,6 @@ import { ValidationException } from '@common/exceptions/validation.exception';
 import { TaskService } from 'task/task.service';
 
 import { STATUS_NAME, TaskFlowStrategy, TASK_FLOW_STRATEGY } from '../../@domains/strategy';
-import { UserTask } from '../../@orm/user-task';
 import { ProjectService } from '../project.service';
 import { TaskCreateDto, TaskMoveDto, TaskUpdateDto } from './dto';
 

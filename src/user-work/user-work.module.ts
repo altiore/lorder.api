@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { UserWorkRepository } from '@orm/user-work';
+import { UserWorkRepository } from '@orm/user-work/user-work.repository';
 
 import { ProjectModule } from '../project/project.module';
 import { TaskCommentModule } from '../task-comment/task-comment.module';
