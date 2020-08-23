@@ -15,7 +15,7 @@
     "start": "node dist/main.js",
     "stop": "sh bin/stop.sh",
     "preinstall": "[ -f ./bin/gcpSetup.js ] && node bin/gcpSetup.js || echo \"$FILE does not exist.\"\n  ",
-    "postinstall": "if [ \"NODE_ENV\" = \"production\" ]; then npm run build && npm run migration:up:prod; else echo \"Development mode No postinstall\"; fi",
+    "postinstall": "if [ \"$NODE_ENV\" = \"production\" ]; then npm run build && npm run migration:up:prod; else echo \"Development mode No postinstall\"; fi",
     "build": "rm -rf dist && nest build",
     "pretest": "cross-env TYPEORM_DATABASE=lorder_contrib_test node bin/refresh.js && npm run migration:test:up",
     "test": "node --max-old-space-size=4096 --expose-gc node_modules/.bin/cross-env TYPEORM_DATABASE=lorder_contrib_test node_modules/.bin/jest --logHeapUsage --coverage -i -b --detectOpenHandles",
