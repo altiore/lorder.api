@@ -1,9 +1,10 @@
 import { fixtureCreator, one } from 'typeorm-fixtures';
 
+import { User } from '@orm/entities/user.entity';
+
 import { random } from 'faker';
 
-import { Session } from '../../@orm/session/session.entity';
-import { User } from '../../@orm/user';
+import { Session } from '../../@orm/entities/session.entity';
 
 export const createSessionFixture = fixtureCreator<Session>(Session, function (entity, index) {
   return {

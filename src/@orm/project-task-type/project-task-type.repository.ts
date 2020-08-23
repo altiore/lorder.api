@@ -1,8 +1,8 @@
 import { DeepPartial, EntityManager, EntityRepository, Repository } from 'typeorm';
 
-import { TaskType } from '../../@orm/task-type/task-type.entity';
-import { Project } from '../project/project.entity';
-import { ProjectTaskType } from './project-task-type.entity';
+import { ProjectTaskType } from '../entities/project-task-type.entity';
+import { Project } from '../entities/project.entity';
+import { TaskType } from '../entities/task-type.entity';
 
 @EntityRepository(ProjectTaskType)
 export class ProjectTaskTypeRepository extends Repository<ProjectTaskType> {

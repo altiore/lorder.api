@@ -1,10 +1,10 @@
 import { fixtureCreator, many } from 'typeorm-fixtures';
 
-import { name } from 'faker';
+import { Role } from '@orm/entities/role.entity';
+import { UserRole } from '@orm/entities/user-role.entity';
+import { User } from '@orm/entities/user.entity';
 
-import { Role } from '../../@orm/role';
-import { User } from '../../@orm/user';
-import { UserRole } from '../../@orm/user-role/user-role.entity';
+import { name } from 'faker';
 
 export const createUsers = fixtureCreator<User>(User, function (entity, index) {
   return {

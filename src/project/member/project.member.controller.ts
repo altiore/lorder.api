@@ -3,9 +3,10 @@ import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { DeepPartial } from 'typeorm';
 
-import { Project } from '@orm/project';
-import { EmailDto, User } from '@orm/user';
-import { ACCESS_LEVEL, UserProject } from '@orm/user-project';
+import { Project } from '@orm/entities/project.entity';
+import { ACCESS_LEVEL, UserProject } from '@orm/entities/user-project.entity';
+import { User } from '@orm/entities/user.entity';
+import { EmailDto } from '@orm/user/dto';
 
 import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 

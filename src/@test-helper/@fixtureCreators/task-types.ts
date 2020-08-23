@@ -1,6 +1,6 @@
 import { fixtureCreator } from 'typeorm-fixtures';
 
-import { TaskType } from '@orm/task-type/task-type.entity';
+import { TaskType } from '@orm/entities/task-type.entity';
 
 import { random } from 'faker';
 

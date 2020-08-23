@@ -1,5 +1,5 @@
 import { ROLE } from '../../../@domains/strategy';
-import { UserProject } from '../../../@orm/user-project';
+import { UserProject } from '../../../@orm/entities/user-project.entity';
 import { TestHelper } from '../../../@test-helper/@utils/TestHelper';
 import { projectRoles, projectsFixture, roleFlows, userProjectsFixture, usersFixture } from './@fixtures/request';
 

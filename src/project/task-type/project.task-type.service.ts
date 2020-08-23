@@ -3,8 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { DeepPartial, DeleteResult } from 'typeorm';
 
-import { Project } from '@orm/project';
-import { ProjectTaskType, ProjectTaskTypeRepository } from '@orm/project-task-type';
+import { ProjectTaskType } from '@orm/entities/project-task-type.entity';
+import { Project } from '@orm/entities/project.entity';
+import { ProjectTaskTypeRepository } from '@orm/project-task-type/project-task-type.repository';
 import { TaskTypeRepository } from '@orm/task-type/task-type.repository';
 
 import { TASK_TYPE } from '@domains/strategy/types';

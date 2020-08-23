@@ -1,10 +1,10 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { Project } from '@orm/project';
-import { User } from '@orm/user';
-import { ACCESS_LEVEL } from '@orm/user-project';
-import { UserWork } from '@orm/user-work';
+import { Project } from '@orm/entities/project.entity';
+import { ACCESS_LEVEL } from '@orm/entities/user-project.entity';
+import { UserWork } from '@orm/entities/user-work.entity';
+import { User } from '@orm/entities/user.entity';
 
 import { PaginationDto } from '@common/dto';
 
@@ -12,8 +12,8 @@ import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 
 import { Auth, res, Roles, UserJWT } from '../@common/decorators';
 import { RolesGuard } from '../@common/guards';
-import { ROLES } from '../@orm/role';
-import { Task } from '../@orm/task';
+import { ROLES } from '../@orm/entities/role.entity';
+import { Task } from '../@orm/entities/task.entity';
 import { AccessLevel, ProjectParam } from '../project/@common/decorators';
 import { AccessLevelGuard } from '../project/@common/guards';
 import {

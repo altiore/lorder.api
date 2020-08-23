@@ -3,9 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { LessThan, MoreThan } from 'typeorm';
 
-import { Project } from '@orm/project';
-import { TaskLog, TaskLogRepository } from '@orm/task-log';
-import { User } from '@orm/user';
+import { Project } from '@orm/entities/project.entity';
+import { TaskLog } from '@orm/entities/task-log.entity';
+import { User } from '@orm/entities/user.entity';
+import { TaskLogRepository } from '@orm/task-log/task-log.repository';
 
 import { ListDto } from '../../../@common/dto';
 import { ProjectTaskService } from '../project.task.service';

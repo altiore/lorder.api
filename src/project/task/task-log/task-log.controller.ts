@@ -1,10 +1,10 @@
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { Project } from '@orm/project';
-import { TaskLog } from '@orm/task-log';
-import { User } from '@orm/user';
-import { ACCESS_LEVEL } from '@orm/user-project';
+import { Project } from '@orm/entities/project.entity';
+import { TaskLog } from '@orm/entities/task-log.entity';
+import { ACCESS_LEVEL } from '@orm/entities/user-project.entity';
+import { User } from '@orm/entities/user.entity';
 
 import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 

@@ -68,11 +68,10 @@ pipelines:
 definitions:
   services:
     postgres:
-      image: postgres:11.5
+      image: postgres:11.6
       restart: always
       volumes:
-        - ./docker/postgres-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-        - ./docker/wait-postgres.sh:/usr/bin/wait-postgres
+        - ./docker/postgres:/docker-entrypoint-initdb.d
       environment:
         POSTGRES_DB: 'pipelines'
         POSTGRES_USER: 'test_user'

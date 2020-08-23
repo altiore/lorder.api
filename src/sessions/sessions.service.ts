@@ -9,8 +9,9 @@ import { Repository } from 'typeorm';
 import { Request } from 'express';
 
 import getReferer from '../@common/helpers/getReferer';
-import { Session } from '../@orm/session/session.entity';
-import { RefreshUserDto, User } from '../@orm/user';
+import { Session } from '../@orm/entities/session.entity';
+import { User } from '../@orm/entities/user.entity';
+import { RefreshUserDto } from '../@orm/user/dto';
 import { requiredUserRelations } from '../@orm/user/dto/required.relations';
 import { JwtPayload } from '../auth/interfaces';
 

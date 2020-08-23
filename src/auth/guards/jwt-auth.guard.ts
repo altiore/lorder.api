@@ -3,9 +3,10 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import * as jwt from 'jsonwebtoken';
 import { ExtractJwt } from 'passport-jwt';
 
+import { User } from '@orm/entities/user.entity';
+
 import { Request, Response } from 'express';
 
-import { User } from '../../@orm/user';
 import { AuthService } from '../auth.service';
 import { JwtPayload } from '../interfaces';
 

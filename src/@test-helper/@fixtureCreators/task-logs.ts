@@ -1,11 +1,11 @@
 import moment = require('moment');
 import { fixtureCreator, one } from 'typeorm-fixtures';
 
-import { random } from 'faker';
+import { TaskLog, TASK_CHANGE_TYPE } from '@orm/entities/task-log.entity';
+import { Task } from '@orm/entities/task.entity';
+import { User } from '@orm/entities/user.entity';
 
-import { Task } from '../../@orm/task';
-import { TaskLog, TASK_CHANGE_TYPE } from '../../@orm/task-log';
-import { User } from '../../@orm/user';
+import { random } from 'faker';
 
 export const createTaskLogs = fixtureCreator<TaskLog>(TaskLog, function (entity, index) {
   return {

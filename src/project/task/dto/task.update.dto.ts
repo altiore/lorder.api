@@ -3,7 +3,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsIn, IsNumber, IsOptional, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
 
 import { COLUMN_TYPE, STATUS_NAME } from '../../../@domains/strategy';
-import { COMPLEXITY, URGENCY } from '../../../@orm/user-task';
+import { COMPLEXITY, URGENCY } from '../../../@orm/entities/user-task.entity';
 
 export class TaskUpdateDto {
   @ApiPropertyOptional()

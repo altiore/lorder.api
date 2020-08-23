@@ -1,10 +1,11 @@
 import { fixtureCreator, one } from 'typeorm-fixtures';
 
+import { User } from '@orm/entities/user.entity';
+
 import { lorem } from 'faker';
 
-import { Task } from '../../@orm/task';
-import { TaskComment } from '../../@orm/task-comment/task-comment.entity';
-import { User } from '../../@orm/user';
+import { TaskComment } from '../../@orm/entities/task-comment.entity';
+import { Task } from '../../@orm/entities/task.entity';
 
 export const createTaskComments = fixtureCreator<TaskComment>(TaskComment, function (entity, index) {
   return {

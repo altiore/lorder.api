@@ -1,5 +1,5 @@
-import { ROLES } from '../../../../../@orm/role';
-import { ACCESS_LEVEL } from '../../../../../@orm/user-project';
+import { ROLES } from '../../../../../@orm/entities/role.entity';
+import { ACCESS_LEVEL } from '../../../../../@orm/entities/user-project.entity';
 import {
   createProjects,
   createTaskLogs,

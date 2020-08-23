@@ -9,10 +9,10 @@ import * as jwt from 'jsonwebtoken';
 import * as v8 from 'v8';
 
 import { RedisService } from '../../redis/redis.service';
-import { Role } from '../../@orm/role';
+import { Role } from '@orm/entities/role.entity';
 import { MailService } from '../../mail/mail.service';
 import { MailAcceptedDto } from '../../mail/dto';
-import { User } from '../../@orm/user';
+import { User } from '@orm/entities/user.entity';
 
 export class TestHelper {
   private testingModule: TestingModule;

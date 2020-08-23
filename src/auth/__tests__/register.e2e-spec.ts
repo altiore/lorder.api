@@ -1,8 +1,9 @@
 import moment = require('moment');
 
-import { Media } from '../../@orm/media';
-import { Project } from '../../@orm/project';
-import { User } from '../../@orm/user';
+import { Project } from '@orm/entities/project.entity';
+import { User } from '@orm/entities/user.entity';
+
+import { Media } from '../../@orm/entities/media.entity';
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
 import { usersFixture } from './@fixtures/users';
 

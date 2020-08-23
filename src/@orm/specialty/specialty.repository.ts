@@ -1,6 +1,6 @@
 import { EntityRepository, In, Repository } from 'typeorm';
 
-import { Specialty } from './specialty.entity';
+import { Specialty } from '../entities/specialty.entity';
 
 @EntityRepository(Specialty)
 export class SpecialtyRepository extends Repository<Specialty> {

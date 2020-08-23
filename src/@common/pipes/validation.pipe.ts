@@ -3,8 +3,8 @@ import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 
-import { Project } from '@orm/project';
-import { User } from '@orm/user';
+import { Project } from '@orm/entities/project.entity';
+import { User } from '@orm/entities/user.entity';
 
 import { ValidationException } from '../exceptions/validation.exception';
 

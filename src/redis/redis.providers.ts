@@ -8,7 +8,10 @@ export function createCacheManager(): Provider {
   return {
     provide: REDIS_CACHE_MANAGER,
     useFactory: async (configService) => {
-      return create({ url: process.env.REDISCLOUD_URL, host: 'redis'}).getClient();
+      return create({
+        ttl: 30,
+        url: process.env.REDISCLOUD_URL,
+      }).getClient();
     },
   };
 }

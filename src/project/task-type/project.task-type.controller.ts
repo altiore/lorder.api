@@ -3,10 +3,10 @@ import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { DeepPartial, DeleteResult } from 'typeorm';
 
-import { Project } from '@orm/project';
-import { ProjectTaskType } from '@orm/project-task-type';
-import { User } from '@orm/user';
-import { ACCESS_LEVEL } from '@orm/user-project';
+import { ProjectTaskType } from '@orm/entities/project-task-type.entity';
+import { Project } from '@orm/entities/project.entity';
+import { ACCESS_LEVEL } from '@orm/entities/user-project.entity';
+import { User } from '@orm/entities/user.entity';
 
 import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 

@@ -5,15 +5,18 @@ import { ValidationError } from 'class-validator';
 import * as moment from 'moment';
 import { DeepPartial, EntityManager } from 'typeorm';
 
-import { Project } from '@orm/project';
-import { EmailDto, User, UserRepository } from '@orm/user';
-import { UserProject, UserProjectRepository } from '@orm/user-project';
+import { Project } from '@orm/entities/project.entity';
+import { UserProject } from '@orm/entities/user-project.entity';
+import { User } from '@orm/entities/user.entity';
+import { UserProjectRepository } from '@orm/user-project/user-project.repository';
+import { EmailDto } from '@orm/user/dto';
+import { UserRepository } from '@orm/user/user.repository';
 
 import { AuthService } from 'auth/auth.service';
 
 import { IdDto } from '../../@common/dto';
 import { ValidationException } from '../../@common/exceptions/validation.exception';
-import { UserWork } from '../../@orm/user-work';
+import { UserWork } from '../../@orm/entities/user-work.entity';
 import { ProjectRoleService } from '../role/project-role.service';
 import { RequestMembership } from './dto/request.membership';
 import { UserProjectUpdateDto } from './dto/user-project.update.dto';

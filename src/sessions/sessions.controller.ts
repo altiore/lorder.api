@@ -3,8 +3,8 @@ import { ApiTags } from '@nestjs/swagger';
 import { Crud } from '@nestjsx/crud';
 
 import { Auth, res } from '../@common/decorators';
-import { ROLES } from '../@orm/role';
-import { Session } from '../@orm/session/session.entity';
+import { ROLES } from '../@orm/entities/role.entity';
+import { Session } from '../@orm/entities/session.entity';
 
 @ApiTags('sessions')
 @Crud({

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { WebHook } from '@orm/webhook/webhook.entity';
+import { WebHook } from '@orm/entities/webhook.entity';
 
 import { WebHooksController } from './webhooks.controller';
 import { WebHooksService } from './webhooks.service';

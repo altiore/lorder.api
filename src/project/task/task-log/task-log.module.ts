@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { TaskLogRepository } from '@orm/task-log';
+import { TaskLogRepository } from '@orm/task-log/task-log.repository';
 
 import { ProjectModule } from '../../project.module';
 import { TaskLogController } from './task-log.controller';

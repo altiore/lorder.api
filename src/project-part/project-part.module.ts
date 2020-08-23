@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { ProjectPart } from '@orm/project-part/project-part.entity';
+import { ProjectPart } from '@orm/entities/project-part.entity';
 
 import { ProjectModule } from '../project/project.module';
 import { ProjectPartController } from './project-part.controller';

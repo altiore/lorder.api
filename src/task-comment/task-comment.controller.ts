@@ -9,10 +9,10 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { Crud, CrudController, CrudRequest, Override, ParsedBody, ParsedRequest } from '@nestjsx/crud';
 
-import { ROLES } from '@orm/role';
-import { TaskComment } from '@orm/task-comment/task-comment.entity';
-import { User } from '@orm/user';
-import { ACCESS_LEVEL } from '@orm/user-project';
+import { ROLES } from '@orm/entities/role.entity';
+import { TaskComment } from '@orm/entities/task-comment.entity';
+import { ACCESS_LEVEL } from '@orm/entities/user-project.entity';
+import { User } from '@orm/entities/user.entity';
 
 import { Auth, res, UserJWT } from '@common/decorators';
 

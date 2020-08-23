@@ -1,8 +1,8 @@
 import { fixtureCreator, one } from 'typeorm-fixtures';
 
-import { Task } from '../../@orm/task';
-import { User } from '../../@orm/user';
-import { UserTask } from '../../@orm/user-task';
+import { Task } from '@orm/entities/task.entity';
+import { UserTask } from '@orm/entities/user-task.entity';
+import { User } from '@orm/entities/user.entity';
 
 export const createUserTasks = fixtureCreator<UserTask>(UserTask, function (entity, index) {
   return {

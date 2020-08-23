@@ -1,10 +1,10 @@
 import { DeepPartial, EntityManager, EntityRepository, MoreThanOrEqual, Repository } from 'typeorm';
 
-import { PaginationDto } from '../../@common/dto/pagination.dto';
-import { Project } from '../project/project.entity';
-import { User } from '../user/user.entity';
-import { ACCESS_LEVEL } from './user-project.consts';
-import { UserProject } from './user-project.entity';
+import { PaginationDto } from '../../@common/dto';
+import { Project } from '../entities/project.entity';
+import { ACCESS_LEVEL } from '../entities/user-project.entity';
+import { UserProject } from '../entities/user-project.entity';
+import { User } from '../entities/user.entity';
 
 @EntityRepository(UserProject)
 export class UserProjectRepository extends Repository<UserProject> {

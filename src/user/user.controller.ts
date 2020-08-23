@@ -15,8 +15,8 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { Media } from '@orm/media';
-import { User } from '@orm/user';
+import { Media } from '@orm/entities/media.entity';
+import { User } from '@orm/entities/user.entity';
 
 import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
 

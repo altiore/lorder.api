@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 
 import { get } from 'lodash';
 
-import { ACCESS_LEVEL } from '@orm/user-project';
+import { ACCESS_LEVEL } from '@orm/entities/user-project.entity';
 
 import { ProjectService } from '../../project.service';
 

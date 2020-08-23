@@ -1,4 +1,4 @@
-import { TaskComment } from '../../@orm/task-comment/task-comment.entity';
+import { TaskComment } from '../../@orm/entities/task-comment.entity';
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
 import {
   projectsFixture,

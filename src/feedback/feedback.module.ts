@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { FeedbackRepository } from '@orm/feedback';
+import { FeedbackRepository } from '@orm/feedback/feedback.repository';
 
 import { UserModule } from '../user/user.module';
 import { FeedbackController } from './feedback.controller';

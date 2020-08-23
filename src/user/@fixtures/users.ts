@@ -1,4 +1,4 @@
-import { ROLES } from '../../@orm/role';
+import { ROLES } from '../../@orm/entities/role.entity';
 import { createUsers } from '../../@test-helper/@fixtureCreators';
 
 export const usersFixture = createUsers([

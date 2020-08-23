@@ -13,8 +13,7 @@ import {
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { RefreshUserDto } from '@orm/user';
-import { EmailDto, LoginUserDto } from '@orm/user/dto';
+import { EmailDto, LoginUserDto, RefreshUserDto } from '@orm/user/dto';
 
 import { ValidationException } from '@common/exceptions/validation.exception';
 

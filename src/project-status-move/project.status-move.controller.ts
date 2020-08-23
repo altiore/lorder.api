@@ -2,9 +2,9 @@ import { Controller } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Crud } from '@nestjsx/crud';
 
-import { ProjectRoleAllowedMove } from '@orm/project-role-allowed-move/project-role-allowed-move.entity';
-import { ROLES } from '@orm/role';
-import { ACCESS_LEVEL } from '@orm/user-project';
+import { ProjectRoleAllowedMove } from '@orm/entities/project-role-allowed-move.entity';
+import { ROLES } from '@orm/entities/role.entity';
+import { ACCESS_LEVEL } from '@orm/entities/user-project.entity';
 
 import { Auth, res } from '@common/decorators';
 

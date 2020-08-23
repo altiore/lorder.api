@@ -1,9 +1,9 @@
 // import { company, random } from 'faker';
 import { fixtureCreator, one } from 'typeorm-fixtures';
 
-import { Project } from '../../@orm/project';
-import { User } from '../../@orm/user';
-import { ACCESS_LEVEL, UserProject } from '../../@orm/user-project';
+import { Project } from '@orm/entities/project.entity';
+import { ACCESS_LEVEL, UserProject } from '@orm/entities/user-project.entity';
+import { User } from '@orm/entities/user.entity';
 
 export const createUserProjects = fixtureCreator<UserProject>(UserProject, function (entity, index) {
   return {

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { UserWork } from '@orm/user-work';
+import { UserWork } from '@orm/entities/user-work.entity';
 
 export class StopResponse {
   @ApiProperty({ type: UserWork })

@@ -1,11 +1,11 @@
 import moment = require('moment');
 import { fixtureCreator, one } from 'typeorm-fixtures';
 
-import { internet, random } from 'faker';
+import { Task } from '@orm/entities/task.entity';
+import { UserWork } from '@orm/entities/user-work.entity';
+import { User } from '@orm/entities/user.entity';
 
-import { Task } from '../../@orm/task';
-import { User } from '../../@orm/user';
-import { UserWork } from '../../@orm/user-work';
+import { internet, random } from 'faker';
 
 export const createUserWorks = fixtureCreator<UserWork>(UserWork, function (entity, index) {
   return {

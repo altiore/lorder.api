@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { ProjectRoleAllowedMove } from '@orm/project-role-allowed-move/project-role-allowed-move.entity';
+import { ProjectRoleAllowedMove } from '@orm/entities/project-role-allowed-move.entity';
 
 import { ProjectModule } from '../project/project.module';
 import { ProjectStatusMoveController } from './project.status-move.controller';

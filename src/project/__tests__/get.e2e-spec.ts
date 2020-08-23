@@ -1,4 +1,4 @@
-import { ACCESS_LEVEL } from '../../@orm/user-project';
+import { ACCESS_LEVEL } from '../../@orm/entities/user-project.entity';
 import { TestHelper } from '../../@test-helper/@utils/TestHelper';
 import { projectsFixture, tasksFixture, userProjectsFixture, usersFixture, userWorksFixture } from './@fixtures/get';
 

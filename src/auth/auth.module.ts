@@ -1,8 +1,8 @@
 import { forwardRef, Global, HttpModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { UserRepository } from '@orm/user';
-import { UserProjectRepository } from '@orm/user-project';
+import { UserProjectRepository } from '@orm/user-project/user-project.repository';
+import { UserRepository } from '@orm/user/user.repository';
 
 import { MailModule } from '../mail/mail.module';
 import { RedisModule } from '../redis/redis.module';

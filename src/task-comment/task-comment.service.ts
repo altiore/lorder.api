@@ -4,11 +4,11 @@ import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 
 import { EntityManager } from 'typeorm';
 
-import { TaskComment } from '@orm/task-comment/task-comment.entity';
+import { TaskComment } from '@orm/entities/task-comment.entity';
 
-import { Task } from '../@orm/task';
-import { User } from '../@orm/user';
-import { ACCESS_LEVEL } from '../@orm/user-project';
+import { Task } from '../@orm/entities/task.entity';
+import { ACCESS_LEVEL } from '../@orm/entities/user-project.entity';
+import { User } from '../@orm/entities/user.entity';
 import { TaskService } from '../task/task.service';
 
 @Injectable()

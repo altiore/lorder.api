@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Feedback, FeedbackRepository } from '@orm/feedback';
+import { Feedback } from '@orm/entities/feedback.entity';
+import { FeedbackRepository } from '@orm/feedback/feedback.repository';
 
 import { PaginationDto } from '../@common/dto/pagination.dto';
 import { UserService } from '../user/user.service';

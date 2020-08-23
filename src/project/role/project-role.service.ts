@@ -4,12 +4,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { classToClass } from 'class-transformer';
 import { In } from 'typeorm';
 
-import { Project } from '@orm/project';
-import { User } from '@orm/user';
+import { Project } from '@orm/entities/project.entity';
+import { User } from '@orm/entities/user.entity';
 
 import { ROLE } from '../../@domains/strategy';
-import { ProjectRoleAllowedMove } from '../../@orm/project-role-allowed-move/project-role-allowed-move.entity';
-import { ProjectRole } from '../../@orm/project-role/project-role.entity';
+import { ProjectRoleAllowedMove } from '../../@orm/entities/project-role-allowed-move.entity';
+import { ProjectRole } from '../../@orm/entities/project-role.entity';
 import { RoleService } from '../../role/role.service';
 import { ProjectRoleCreateDto, ProjectRoleUpdateDto } from './dto';
 import { ProjectRoleRepository } from './project-role.repository';

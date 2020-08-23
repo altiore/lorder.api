@@ -9,7 +9,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 
-import { Task } from '@orm/task';
+import { Task } from '@orm/entities/task.entity';
 
 import { Server, Socket } from 'socket.io';
 
