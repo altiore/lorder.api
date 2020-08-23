@@ -29,6 +29,7 @@ export class RedisModule {
         };
         return {
           store: redisStore,
+          host: 'redis',
           url: process.env.REDISCLOUD_URL,
           ...allOptions,
         };

@@ -15,14 +15,8 @@ fi
 
 if [ -z `docker ps -q --no-trunc | grep $(docker-compose ps -q postgres)` ]; then
   echo "\n \033[0;32m   starting docker...\033[0;30m"
-  docker-compose down && docker-compose up -d
-  sleep 10
+  docker-compose build --no-cache && docker-compose up
 
-  echo "\n \033[0;32m   run migrations...\033[0;30m"
-  npm run migration:up
-  npm run migration:test:up
-
-  echo "\n \033[0;32m   Приложение полностью готово к работе! Запусти команду \033[0;31mnpm start\033[0;32m, чтобы начать работу\033[0;30m"
 else
   echo "\n \033[0;32m   docker already running...\033[0;30m"
 fi

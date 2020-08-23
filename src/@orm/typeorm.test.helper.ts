@@ -13,6 +13,8 @@ export class TypeormTestHelper {
     // 1. create connection
     this.connection = await createConnection(config);
 
+
+
     // 2. create repositories
     this.repos = args ? args.map((repo) => this.connection.getCustomRepository(repo)) : [];
     return this.repos;

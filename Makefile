@@ -24,7 +24,12 @@ configs: ## Create enviroment file if it doesn't exist and fill it default value
 	@read line; if [ $$line == "n" ]; then echo Aborting; exit 1 ; fi
 
 start: ## Run project in background
-	${docker_compose_bin} up --build -d
+	chmod +x bin/start.sh \
+	&& ./bin/start.sh \
+	@echo "Start..."
+
+install: ## Run project in background
+	docker exec -t altiore_server bash -c "npm install"
 
 stop: ## Stop project
 	${docker_compose_bin} stop

@@ -1,6 +1,23 @@
-version: '3'
+version: '3.4'
 
 services:
+  server:
+    build:
+      context: .
+      dockerfile: ./docker/node/Dockerfile
+    container_name: altiore_server
+    volumes:
+      - ./mails:/usr/src/app/mails
+      - ./public:/usr/src/app/public
+      - ./src:/usr/src/app/src
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - postgres
+    env_file: .env
+
   redis:
     image: redis
     container_name: altiore_cache
@@ -27,6 +44,4 @@ services:
       - ${TYPEORM_PORT}:5432
 
 volumes:
-  postgres:
-    driver: local
   redis-altiore:

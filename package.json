@@ -10,13 +10,10 @@
     "npm": "6.x"
   },
   "scripts": {
-    "start:dev": "sh bin/start.sh && cross-env NODE_ENV=development nodemon",
-    "start:debug": "NODE_ENV=development nodemon --config nodemon-debug.json",
+    "start:dev": "NODE_ENV=development nodemon",
     "start": "node dist/main.js",
     "stop": "sh bin/stop.sh",
     "start:hmr": "node dist/server",
-    "preinstall": "node bin/gcpSetup.js",
-    "postinstall": "npm run build && npm run migration:up:prod",
     "build": "rm -rf dist && nest build",
     "pretest": "cross-env TYPEORM_DATABASE=altiore_contrib_test node bin/refresh.js && npm run migration:test:up",
     "test": "node --max-old-space-size=4096 --expose-gc node_modules/.bin/cross-env TYPEORM_DATABASE=altiore_contrib_test node_modules/.bin/jest --logHeapUsage --coverage -i -b --detectOpenHandles",
@@ -121,10 +118,6 @@
     "webpack": "4.43.0",
     "webpack-cli": "^3.3.11",
     "webpack-node-externals": "1.7.2"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://git.heroku.com/altiore.git"
   },
   "husky": {
     "hooks": {
