@@ -1,5 +1,7 @@
 #!/bin/sh
 
+[ ! -d "node_modules" ] || npm install --ignore-scripts
+
 case "$NODE_ENV" in
     development)
         echo "Running Development Server"
