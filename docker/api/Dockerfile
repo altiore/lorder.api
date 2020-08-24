@@ -11,5 +11,3 @@ COPY ./package*.json ./
 COPY ./tsconfig*.json ./
 COPY ./tslint.json ./
 COPY ./docker/api/entrypoint.sh ./docker/api/entrypoint.sh
-
-RUN npm install --ignore-scripts

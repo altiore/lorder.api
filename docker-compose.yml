@@ -10,6 +10,7 @@ services:
       - ./mails:/usr/src/app/mails
       - ./public:/usr/src/app/public
       - ./src:/usr/src/app/src
+      - ./node_modules:/usr/src/app/node_modules
     stdin_open: true
     tty: true
     restart: unless-stopped
