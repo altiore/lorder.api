@@ -140,7 +140,7 @@ export class ProjectMemberService {
       throw new ValidationException([
         Object.assign(new ValidationError(), {
           constraints: {
-            isNotExists: 'Запрошеная роль в проекте не существует',
+            isNotExists: 'В проекте нет публичных ролей',
           },
           property: 'role',
           value: data.role,

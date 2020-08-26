@@ -12,7 +12,7 @@ module.exports = {
   entities: [`${baseDir}/@orm/entities/*.entity{.ts,.js}`],
   migrations: [`${baseDir}/@orm/@migrations/*{.ts,.js}`],
 
-  synchronize: process.env.TYPEORM_SYNCHRONIZE === 'true',
+  synchronize: false,
   logging: process.env.TYPEORM_LOGGING === 'true',
 
   cli: {
